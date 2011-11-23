@@ -786,6 +786,22 @@ namespace SamsungIpc
             }
         }
 
+        [CCode (cname = "gint8", cprefix = "IPC_MISC_ME_SN_SERIAL_NUM_", has_type_id = false)]
+        public enum SerialNumberType
+        {
+            SERIAL,
+            MANUFACTURE_DATE,
+            BARCODE,
+        }
+
+        [CCode (cname = "struct ipc_misc_me_sn")]
+        public struct SerialNumberResponseMessage
+        {
+            public SerialNumberType type;
+            public uint8 length;
+            public uint8[] data;
+        }
+
         [CCode (cname = "struct ipc_message_info")]
         public struct MeResponseMessage
         {
