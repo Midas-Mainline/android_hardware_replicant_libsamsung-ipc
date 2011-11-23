@@ -55,6 +55,8 @@
 void ipc_sms_send_msg(unsigned char *data, unsigned char length, int request_id);
 void ipc_sms_deliver_report(int request_id);
 
+unsigned char* ipc_sms_send_msg_pack(struct ipc_sms_send_msg *msg, char *smsc, unsigned char *pdu, int length);
+
 #endif
 
 // vim:ts=4:sw=4:expandtab

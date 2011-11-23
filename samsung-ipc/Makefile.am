@@ -24,6 +24,7 @@ libsamsung_ipc_la_SOURCES = \
 	gprs.c \
 	call.c \
 	net.c \
+	sms.c \
 	$(NULL)
 
 if WANT_PROTOCOL_VERISON_CRESPO

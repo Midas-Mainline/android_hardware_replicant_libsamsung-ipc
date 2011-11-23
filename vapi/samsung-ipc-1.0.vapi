@@ -989,6 +989,102 @@ namespace SamsungIpc
 
     /* ******************************************************************************** */
 
+    namespace Sms
+    {
+        [CCode (ctype = "gint8", cname = "IPC_SMS_MSG_", has_type_id = false)]
+        public enum MessageAmountType
+        {
+            MULTIPLE,
+            SINGLE,
+        }
+
+        [CCode (ctype = "gint8", cname = "IPC_SMS_TYPE_", has_type_id = false)]
+        public enum MessageType
+        {
+            POINT_TO_POINT,
+            STATUS_REPORT,
+            OUTGOING,
+        }
+
+        [CCode (cname = "gint8", cname = "IPC_SMS_ACK_", has_type_id = false)]
+        public enum AcknowledgeErrorType
+        {
+            NO_ERROR,
+            PDA_FULL_ERROR,
+            MAILFORMED_REQ_ERROR,
+            UNSPEC_ERROR,
+        }
+
+        [CCode (cname = "struct ipc_sms_incoming_msg")]
+        public struct IncomingMessage
+        {
+            public uint8 msg_type;
+            public uint8 type;
+            public uint16 sim_index;
+            public uint8 msg_tpid;
+            public uint8 length;
+
+            public unowned uint8[] data
+            {
+                get
+                {
+                    unowned uint8[] res = (uint8[])(&this);
+                    res.length = (int) sizeof( IncomingMessage );
+                    return res;
+                }
+            }
+
+            public uint8[] unpack_pdu( Response response )
+            {
+                uint8[] pdu = new uint8[this.length];
+                uint8 *pdu_start = response.data + sizeof( IncomingMessage );
+                Memory.copy(pdu, pdu_start, this.length);
+                return pdu;
+            }
+        }
+
+        [CCode (cname = "struct ipc_sms_send_msg")]
+        public struct SendMessage
+        {
+            public uint8 type;
+            public uint8 msg_type;
+            public uint8 length;
+            public uint8 smsc_len;
+
+            public uint8[] pack(string smsc, uint8[] pdu);
+
+            public unowned uint8[] data
+            {
+                get
+                {
+                    unowned uint8[] res = (uint8[])(&this);
+                    res.length = (int) sizeof( SendMessage );
+                    return res;
+                }
+            }
+        }
+
+        [CCode (cname = "struct ipc_sms_deliv_report_msg")]
+        public struct DeliverReportMessage
+        {
+            public uint8 type;
+            public uint16 error;
+            public uint8 msg_tpid;
+
+            public unowned uint8[] data
+            {
+                get
+                {
+                    unowned uint8[] res = (uint8[])(&this);
+                    res.length = (int) sizeof( DeliverReportMessage );
+                    return res;
+                }
+            }
+        }
+    }
+
+    /* ******************************************************************************** */
+
     [CCode (cname = "struct ipc_message_info", destroy_function = "", free_function = "")]
     public struct Request
     {
