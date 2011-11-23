@@ -10,6 +10,7 @@ Makefile
 *.lineno
 .deps
 .libs
+.dirstamp
 
 config.*
 aclocal.m4
