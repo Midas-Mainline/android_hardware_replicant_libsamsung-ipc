@@ -564,7 +564,6 @@ namespace SamsungIpc
             public PlmnStatus status;
             public uint8[] plmn;
             public uint8 type;
-            public uint8[] unk;
 
             public unowned uint8[] data
             {
@@ -581,8 +580,19 @@ namespace SamsungIpc
         public struct PlmnEntriesMessage
         {
             public uint8 num;
-            [CCode (cname = "data", array_length_cname = "num")]
-            public PlmnEntriesMessage[] entries;
+
+            public unowned PlmnEntryMessage? get_entry( Response response, uint pos )
+            {
+                unowned PlmnEntryMessage? entry = null;
+
+                if ( pos >= num )
+                    return null;
+
+                uint8 *p = ((uint8*) response.data) + sizeof(PlmnEntriesMessage);
+                entry = (PlmnEntryMessage?) (p + pos * sizeof(PlmnEntryMessage));
+
+                return entry;
+            }
 
             public unowned uint8[] data
             {
@@ -1037,8 +1047,8 @@ namespace SamsungIpc
             public uint8[] unpack_pdu( Response response )
             {
                 uint8[] pdu = new uint8[this.length];
-                uint8 *pdu_start = response.data + sizeof( IncomingMessage );
-                Memory.copy(pdu, pdu_start, this.length);
+                uint8 *pdu_start = ((uint8*) response.data) + sizeof( IncomingMessage );
+                GLib.Memory.copy(pdu, pdu_start, this.length);
                 return pdu;
             }
         }
