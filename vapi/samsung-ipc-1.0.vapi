@@ -542,7 +542,7 @@ namespace SamsungIpc
             public uint8 unk0;
             public uint8 slevel;
             public uint8 unk1;
-            [CCode (array_length_cname = "")]
+            [CCode (array_length = false)]
             public uint8[] plmn;
             public uint8 type;
             public uint16 lac;
@@ -562,6 +562,7 @@ namespace SamsungIpc
         public struct PlmnEntryMessage
         {
             public PlmnStatus status;
+            [CCode (array_length = false)]
             public uint8[] plmn;
             public uint8 type;
 
@@ -780,9 +781,13 @@ namespace SamsungIpc
         [CCode (cname = "struct ipc_misc_me_version", destroy_function = "", free_function = "")]
         public struct VersionMessage
         {
+            [CCode (array_length = false)]
             public uint8[] sw_version;
+            [CCode (array_length = false)]
             public uint8[] hw_version;
+            [CCode (array_length = false)]
             public uint8[] cal_date;
+            [CCode (array_length = false)]
             public uint8[] misc;
 
             public unowned uint8[] data
@@ -890,11 +895,17 @@ namespace SamsungIpc
             public uint8 unk0;
             public uint8 field_flag;
             public uint8 unk1;
+            [CCode (array_length = false)]
             public uint8[] ip;
+            [CCode (array_length = false)]
             public uint8[] dns1;
+            [CCode (array_length = false)]
             public uint8[] dns2;
+            [CCode (array_length = false)]
             public uint8[] gateway;
+            [CCode (array_length = false)]
             public uint8[] subnet_mask;
+            [CCode (array_length = false)]
             public uint8[] unk2;
 
             public unowned uint8[] data
