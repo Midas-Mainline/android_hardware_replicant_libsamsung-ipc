@@ -26,6 +26,13 @@ ifeq ($(TARGET_DEVICE),crespo)
 	LOCAL_CFLAGS += -DDEVICE_CRESPO
 endif
 
+ifeq ($(TARGET_DEVICE),galaxysmtd)
+	device_files := samsung-ipc/device/$(TARGET_DEVICE)/$(TARGET_DEVICE)_nv_data.c
+	LOCAL_CFLAGS += -Iexternal/openssl/include
+	LOCAL_LDFLAGS += -lcrypto
+	LOCAL_CFLAGS += -DDEVICE_CRESPO
+endif
+
 ifeq ($(TARGET_DEVICE),h1)
 	LOCAL_CFLAGS += -DDEVICE_H1
 endif
@@ -53,6 +60,9 @@ LOCAL_MODULE_TAGS := optional
 modemctrl_files := tools/modemctrl.c
 
 ifeq ($(TARGET_DEVICE),crespo)
+	LOCAL_CFLAGS += -DDEVICE_CRESPO
+endif
+ifeq ($(TARGET_DEVICE),galaxysmtd)
 	LOCAL_CFLAGS += -DDEVICE_CRESPO
 endif
 ifeq ($(TARGET_DEVICE),h1)
