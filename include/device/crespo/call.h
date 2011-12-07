@@ -22,6 +22,13 @@
 #ifndef __DEVICE_CRESPO_CALL_H__
 #define __DEVICE_CRESPO_CALL_H__
 
+struct ipc_call_incoming {
+    unsigned char unk;
+    unsigned char type; // IPC_CALL_TYPE_...
+    unsigned char id;
+    unsigned char line;
+} __attribute__((__packed__));
+
 struct ipc_call_outgoing {
     unsigned char unk;
     unsigned char type; // IPC_CALL_TYPE_...

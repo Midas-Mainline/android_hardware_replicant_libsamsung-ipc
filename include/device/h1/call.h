@@ -22,6 +22,12 @@
 #ifndef __DEVICE_H1_CALL_H__
 #define __DEVICE_H1_CALL_H__
 
+struct ipc_call_incoming {
+    unsigned char type; // IPC_CALL_TYPE_...
+    unsigned char id;
+    unsigned char line;
+} __attribute__((__packed__));
+
 struct ipc_call_outgoing {
     unsigned char type; // IPC_CALL_TYPE_...
     unsigned char identity; // IPC_CALL_IDENTITY_...

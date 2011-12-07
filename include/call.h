@@ -67,12 +67,14 @@
 #define IPC_CALL_TERM_MO                0x01
 #define IPC_CALL_TERM_MT                0x02
 
+#define IPC_CALL_DTMF_STATE_START       0x01
+#define IPC_CALL_DTMF_STATE_STOP        0x02
+
 struct ipc_message_info;
 
-struct ipc_call_incoming {
-    unsigned char type; // IPC_CALL_TYPE_...
-    unsigned char id;
-    unsigned char line;
+struct ipc_call_cont_dtmf {
+    unsigned char state;
+    unsigned char tone;
 } __attribute__((__packed__));
 
 void ipc_call_outgoing_setup(struct ipc_call_outgoing *message, unsigned char type,
