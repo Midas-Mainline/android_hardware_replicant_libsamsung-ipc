@@ -70,7 +70,7 @@ struct ipc_client* ipc_client_new(int client_type)
     client->ops = ops;
     client->handlers = (struct ipc_handlers *) malloc(sizeof(struct ipc_handlers));
     client->log_handler = log_handler_default;
-memcpy(client->handlers, &ipc_default_handlers, sizeof(struct ipc_handlers));
+    memcpy(client->handlers, &ipc_default_handlers, sizeof(struct ipc_handlers));
     return client;
 }
 
@@ -244,4 +244,3 @@ int ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response
 }
 
 // vim:ts=4:sw=4:expandtab
-
