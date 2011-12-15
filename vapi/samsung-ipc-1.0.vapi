@@ -1106,6 +1106,48 @@ namespace SamsungIpc
 
     /* ******************************************************************************** */
 
+    namespace Sound
+    {
+        [CCode (ctype = "gint8", cname = "IPC_SND_VOLUME_TYPE_", has_type_id = false)]
+        public enum VolumeType
+        {
+            VOICE,
+            SPEAKER,
+            HEADSET,
+            BTVOICE,
+        }
+
+        [CCode (ctype = "gint8", cname = "IPC_SND_AUDIO_PATH_", has_type_id = false)]
+        public enum AudioPath
+        {
+            HANDSET,
+            HEADSET,
+            SPEAKER,
+            BLUETOOTH,
+            BLUETOOTH_NO_NR,
+            HEADPHONE,
+        }
+
+        [CCode (cname = "struct ipc_snd_spkr_volume_ctrl")]
+        public struct SpeakerVolumeControlMessage
+        {
+            public VolumeType type;
+            public uint8 volume;
+
+            public unowned uint8[] data
+            {
+                get
+                {
+                    unowned uint8[] res = (uint8[])(&this);
+                    res.length = (int) sizeof( SpeakerVolumeControlMessage );
+                    return res;
+                }
+            }
+        }
+    }
+
+    /* ******************************************************************************** */
+
     [CCode (cname = "struct ipc_message_info", destroy_function = "", free_function = "")]
     public struct Request
     {
