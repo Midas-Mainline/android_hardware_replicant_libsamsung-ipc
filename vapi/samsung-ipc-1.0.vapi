@@ -1012,14 +1012,14 @@ namespace SamsungIpc
 
     namespace Sms
     {
-        [CCode (ctype = "gint8", cname = "IPC_SMS_MSG_", has_type_id = false)]
+        [CCode (cname = "gint8", cprefix = "IPC_SMS_MSG_", has_type_id = false)]
         public enum MessageAmountType
         {
             MULTIPLE,
             SINGLE,
         }
 
-        [CCode (ctype = "gint8", cname = "IPC_SMS_TYPE_", has_type_id = false)]
+        [CCode (cname = "gint8", cprefix = "IPC_SMS_TYPE_", has_type_id = false)]
         public enum MessageType
         {
             POINT_TO_POINT,
@@ -1027,7 +1027,7 @@ namespace SamsungIpc
             OUTGOING,
         }
 
-        [CCode (cname = "gint8", cname = "IPC_SMS_ACK_", has_type_id = false)]
+        [CCode (cname = "gint8", cprefix = "IPC_SMS_ACK_", has_type_id = false)]
         public enum AcknowledgeErrorType
         {
             NO_ERROR,
@@ -1108,7 +1108,7 @@ namespace SamsungIpc
 
     namespace Sound
     {
-        [CCode (ctype = "gint8", cname = "IPC_SND_VOLUME_TYPE_", has_type_id = false)]
+        [CCode (cname = "gint8", cprefix = "IPC_SND_VOLUME_TYPE_", has_type_id = false)]
         public enum VolumeType
         {
             VOICE,
@@ -1117,7 +1117,7 @@ namespace SamsungIpc
             BTVOICE,
         }
 
-        [CCode (ctype = "gint8", cname = "IPC_SND_AUDIO_PATH_", has_type_id = false)]
+        [CCode (cname = "gint8", cprefix = "IPC_SND_AUDIO_PATH_", has_type_id = false)]
         public enum AudioPath
         {
             HANDSET,
