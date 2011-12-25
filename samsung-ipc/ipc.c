@@ -29,7 +29,8 @@
 
 #include "ipc_private.h"
 
-extern struct ipc_ops ipc_ops;
+extern struct ipc_ops ipc_fmt_ops;
+extern struct ipc_ops ipc_rfs_ops;
 extern struct ipc_handlers ipc_default_handlers;
 
 void log_handler_default(const char *message, void *user_data)
@@ -58,8 +59,10 @@ struct ipc_client* ipc_client_new(int client_type)
     switch (client_type)
     {
         case IPC_CLIENT_TYPE_FMT:
+            ops = &ipc_fmt_ops;
+            break;
         case IPC_CLIENT_TYPE_RFS:
-            ops = &ipc_ops;
+            ops = &ipc_rfs_ops;
             break;
         default:
             return NULL;

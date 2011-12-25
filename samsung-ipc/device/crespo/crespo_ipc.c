@@ -294,7 +294,7 @@ exit:
     return rc;
 }
 
-int crespo_ipc_client_send(struct ipc_client *client, struct ipc_message_info *request)
+int crespo_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_info *request)
 {
     struct modem_io modem_data;
     struct ipc_header reqhdr;
@@ -359,7 +359,7 @@ int wake_unlock(char *lock_name, int len)
     return rc;
 }
 
-int crespo_ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response)
+int crespo_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
     struct modem_io modem_data;
     struct ipc_header *resphdr;
@@ -377,15 +377,15 @@ int crespo_ipc_client_recv(struct ipc_client *client, struct ipc_message_info *r
     bread = client->handlers->read((uint8_t*) &modem_data, sizeof(struct modem_io) + MAX_MODEM_DATA_SIZE, client->handlers->read_data);
     if (bread < 0)
     {
-        ipc_client_log(client, "ERROR: crespo_ipc_client_recv: can't receive enough bytes from modem to process incoming response!");
+        ipc_client_log(client, "ERROR: crespo_ipc_fmt_client_recv: can't receive enough bytes from modem to process incoming response!");
         return 1;
     }
 
-    ipc_client_log(client, "INFO: crespo_ipc_client_recv: Modem RECV FMT (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
+    ipc_client_log(client, "INFO: crespo_ipc_fmt_client_recv: Modem RECV FMT (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
 
     if(modem_data.size <= 0 || modem_data.size >= 0x1000 || modem_data.data == NULL)
     {
-        ipc_client_log(client, "ERROR: crespo_ipc_client_recv: we retrieve less bytes from the modem than we exepected!");
+        ipc_client_log(client, "ERROR: crespo_ipc_fmt_client_recv: we retrieve less bytes from the modem than we exepected!");
         return 1;
     }
 
@@ -401,7 +401,7 @@ int crespo_ipc_client_recv(struct ipc_client *client, struct ipc_message_info *r
     response->length = modem_data.size - sizeof(struct ipc_header);
     response->data = NULL;
 
-    ipc_client_log(client, "INFO: crespo_ipc_client_recv: response: type = %d (%s), group = %d, index = %d (%s)",
+    ipc_client_log(client, "INFO: crespo_ipc_fmt_client_recv: response: type = %d (%s), group = %d, index = %d (%s)",
                    resphdr->type, ipc_response_type_to_str(resphdr->type), resphdr->group, resphdr->index, ipc_command_type_to_str(IPC_COMMAND(resphdr)));
 
     if(response->length > 0)
@@ -419,6 +419,65 @@ int crespo_ipc_client_recv(struct ipc_client *client, struct ipc_message_info *r
     ipc_client_log(client, "");
 
     wake_unlock("secril_fmt-interface", 20);
+
+    return 0;
+}
+
+int crespo_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_info *response)
+{
+    struct modem_io modem_data;
+    int bread = 0;
+
+    memset(&modem_data, 0, sizeof(struct modem_io));
+    modem_data.data = malloc(MAX_MODEM_DATA_SIZE);
+    modem_data.size = MAX_MODEM_DATA_SIZE;
+
+    memset(response, 0, sizeof(struct ipc_message_info));
+
+    wake_lock("secril_rfs-interface", 20);
+
+    assert(client->handlers->read != NULL);
+    bread = client->handlers->read((uint8_t*) &modem_data, sizeof(struct modem_io) + MAX_MODEM_DATA_SIZE, client->handlers->read_data);
+    if (bread < 0)
+    {
+        ipc_client_log(client, "ERROR: crespo_ipc_rfs_client_recv: can't receive enough bytes from modem to process incoming response!");
+        return 1;
+    }
+
+    ipc_client_log(client, "INFO: crespo_ipc_rfs_client_recv: Modem RECV RFS (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
+
+    if(modem_data.size <= 0 || modem_data.size >= 0x1000 || modem_data.data == NULL)
+    {
+        ipc_client_log(client, "ERROR: crespo_ipc_rfs_client_recv: we retrieve less bytes from the modem than we exepected!");
+        return 1;
+    }
+
+    response->mseq = 0;
+    response->aseq = modem_data.id;
+    response->group = IPC_GROUP_RFS;
+    response->index = modem_data.cmd;
+    response->type = 0;
+    response->length = modem_data.size;
+    response->data = NULL;
+
+    ipc_client_log(client, "INFO: crespo_ipc_rfs_client_recv: response: group = %d, index = %d (%s)",
+                   response->group, response->index, ipc_command_type_to_str(IPC_COMMAND(response)));
+
+    if(response->length > 0)
+    {
+#ifdef DEBUG
+        ipc_client_log(client, "INFO: ==== DATA DUMP ====");
+        ipc_hex_dump(client, (void *) (modem_data.data), response->length);
+#endif
+        response->data = malloc(response->length);
+        memcpy(response->data, (uint8_t *) modem_data.data, response->length);
+    }
+
+    free(modem_data.data);
+
+    ipc_client_log(client, "");
+
+    wake_unlock("secril_rfs-interface", 20);
 
     return 0;
 }
@@ -566,10 +625,16 @@ struct ipc_handlers ipc_default_handlers = {
     .power_off = crespo_ipc_power_off,
 };
 
-struct ipc_ops ipc_ops = {
-    .send = crespo_ipc_client_send,
-    .recv = crespo_ipc_client_recv,
+struct ipc_ops ipc_fmt_ops = {
+    .send = crespo_ipc_fmt_client_send,
+    .recv = crespo_ipc_fmt_client_recv,
     .bootstrap = crespo_modem_bootstrap,
+};
+
+struct ipc_ops ipc_rfs_ops = {
+    .send = crespo_ipc_fmt_client_send,
+    .recv = crespo_ipc_rfs_client_recv,
+    .bootstrap = NULL,
 };
 
 // vim:ts=4:sw=4:expandtab

@@ -220,7 +220,7 @@ struct ipc_handlers ipc_default_handlers = {
     .write = h1_ipc_write,
 };
 
-struct ipc_ops ipc_ops = {
+struct ipc_ops ipc_fmt_ops = {
     .send = h1_ipc_send,
     .recv = h1_ipc_recv,
     .bootstrap = NULL,

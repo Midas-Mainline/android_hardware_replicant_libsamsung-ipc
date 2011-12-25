@@ -18,20 +18,24 @@
  *
  */
 
-#ifndef __CRESPO_IPC_H__
-#define __CRESPO_IPC_H__
+#ifndef __RFS_H__
+#define __RFS_H__
 
-#define BOOTCORE_VERSION        0xf0
-#define PSI_MAGIC               0x30
-#define PSI_DATA_LEN            0x5000
-#define RADIO_IMG_SIZE          0xd80000
+struct ipc_message_info;
 
-#define MAX_MODEM_DATA_SIZE     0x1000
+#define IPC_RFS_NV_READ_ITEM                        0x4201
+#define IPC_RFS_NV_WRITE_ITEM                       0x4202
 
-int wake_lock(char *lock_name, int len);
-int wake_unlock(char *lock_name, int len);
+struct ipc_rfs_io {
+    unsigned int offset;
+    unsigned int length;
+} __attribute__((__packed__));
 
-extern struct ipc_handlers crespo_ipc_default_handlers;
+struct ipc_rfs_io_confirm {
+    unsigned char confirm;
+    unsigned int offset;
+    unsigned int length;
+} __attribute__((__packed__));
 
 #endif
 
