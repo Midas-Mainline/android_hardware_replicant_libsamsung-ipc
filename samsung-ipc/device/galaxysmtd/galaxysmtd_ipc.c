@@ -29,6 +29,7 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
 #include <sys/types.h>
 #include <asm/types.h>
 #include <mtd/mtd-abi.h>
@@ -399,7 +400,7 @@ int wake_unlock(char *lock_name, int len)
     return rc;
 }
 
-int crespo_ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response)
+int galaxysmtd_ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
     struct modem_io modem_data;
     struct ipc_header *resphdr;
@@ -414,18 +415,20 @@ int crespo_ipc_client_recv(struct ipc_client *client, struct ipc_message_info *r
     wake_lock("secril_fmt-interface", 20);
 
     assert(client->handlers->read != NULL);
+    ipc_client_log(client, "INFO: galaxysmtd_ipc_client_recv -> read");
     bread = client->handlers->read((uint8_t*) &modem_data, sizeof(struct modem_io) + MAX_MODEM_DATA_SIZE, client->handlers->read_data);
+    ipc_client_log(client, "INFO: galaxysmtd_ipc_client_recv read something");
     if (bread < 0)
     {
-        ipc_client_log(client, "ERROR: crespo_ipc_client_recv: can't receive enough bytes from modem to process incoming response!");
+        ipc_client_log(client, "ERROR: galaxysmtd_ipc_client_recv: can't receive enough bytes from modem to process incoming response!");
         return 1;
     }
 
-    ipc_client_log(client, "INFO: crespo_ipc_client_recv: Modem RECV FMT (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
+    ipc_client_log(client, "INFO: galaxysmtd_ipc_client_recv: Modem RECV FMT (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
 
     if(modem_data.size <= 0 || modem_data.size >= 0x1000 || modem_data.data == NULL)
     {
-        ipc_client_log(client, "ERROR: crespo_ipc_client_recv: we retrieve less bytes from the modem than we exepected!");
+        ipc_client_log(client, "ERROR: galaxysmtd_ipc_client_recv: we retrieve less bytes from the modem than we exepected!");
         return 1;
     }
 
@@ -463,31 +466,63 @@ int crespo_ipc_client_recv(struct ipc_client *client, struct ipc_message_info *r
     return 0;
 }
 
-int crespo_ipc_open(void *data, unsigned int size, void *io_data)
+int galaxysmtd_ipc_open(void *data, unsigned int size, void *io_data)
 {
     int type = *((int *) data);
     int fd = -1;
+    int ret;
+    char sadata[14];
+
+    if(io_data == NULL)
+        goto error;
+
+    memset(sadata, 0, 14);
+
+    const struct sockaddr saddr = {
+        .sa_family = 0x23,
+        .sa_data = sadata,
+    };
 
     switch(type)
     {
         case IPC_CLIENT_TYPE_FMT:
-            fd = open("/dev/modem_fmt", O_RDWR | O_NOCTTY | O_NONBLOCK);
+            sadata[2] = 1;
             break;
         case IPC_CLIENT_TYPE_RFS:
-            fd = open("/dev/modem_rfs", O_RDWR | O_NOCTTY | O_NONBLOCK);
+            sadata[2] = 'A';
             break;
         default:
             break;
     }
 
+    fd = socket(0x23, SOCK_DGRAM, 0);
+
     if(fd < 0)
-        return -1;
+        goto error;
 
-    if(io_data == NULL)
-        return -1;
+    ret = setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, "svnet0", 16);
+    if(ret<0)
+        goto error;
 
-    memcpy(io_data, &fd, sizeof(int));
+    ret = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, "\1\0\0\0", 4);
+    if(ret<0)
+        goto error;
 
+    ret = bind(fd, &saddr, sizeof(struct sockaddr));
+    if(ret<0)
+        goto error;
+
+    if(type == IPC_CLIENT_TYPE_RFS) {
+        ret = setsockopt(fd, SOL_SOCKET, 0x21, "", 4);
+    }
+
+    *((int*)io_data) = fd;
+    goto end;
+
+error:
+    return -1;
+
+end:
     return 0;
 }
 
@@ -508,7 +543,7 @@ int crespo_ipc_close(void *data, unsigned int size, void *io_data)
     return 0;
 }
 
-int crespo_ipc_read(void *data, unsigned int size, void *io_data)
+int galaxysmtd_ipc_read(void *data, unsigned int size, void *io_data)
 {
     int fd = -1;
     int rc;
@@ -524,7 +559,7 @@ int crespo_ipc_read(void *data, unsigned int size, void *io_data)
     if(fd < 0)
         return -1;
 
-    rc = ioctl(fd, IOCTL_MODEM_RECV, data);
+    rc = recvfrom(fd, data, size, 0, NULL, NULL);
 
     if(rc < 0)
         return -1;
@@ -592,9 +627,9 @@ int galaxysmtd_ipc_power_off(void *data)
 }
 
 struct ipc_handlers ipc_default_handlers = {
-    .read = crespo_ipc_read,
+    .read = galaxysmtd_ipc_read,
     .write = crespo_ipc_write,
-    .open = crespo_ipc_open,
+    .open = galaxysmtd_ipc_open,
     .close = crespo_ipc_close,
     .power_on = galaxysmtd_ipc_power_on,
     .power_off = galaxysmtd_ipc_power_off,
@@ -602,7 +637,7 @@ struct ipc_handlers ipc_default_handlers = {
 
 struct ipc_ops ipc_ops = {
     .send = crespo_ipc_client_send,
-    .recv = crespo_ipc_client_recv,
+    .recv = galaxysmtd_ipc_client_recv,
     .bootstrap = galaxysmtd_modem_bootstrap,
 };
 
