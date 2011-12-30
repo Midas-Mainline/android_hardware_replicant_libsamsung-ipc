@@ -1,7 +1,7 @@
 /**
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
+ * Copyright (C) 2011 Paul Kocialkowsk <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,19 +18,22 @@
  *
  */
 
-#ifndef __GEN_H__
-#define __GEN_H__
+#include <radio.h>
 
-#if defined(DEVICE_CRESPO)
-#include "device/crespo/gen.h"
-#elif defined(DEVICE_H1)
-#include "device/h1/gen.h"
-#endif
+int ipc_gen_phone_res_check(struct ipc_gen_phone_res *res)
+{
+    if(res == NULL)
+        return -1;
 
-#define IPC_GEN_PHONE_RES               0x8001
-
-int ipc_gen_phone_res_check(struct ipc_gen_phone_res *res);
-
-#endif
+    switch(res->code)
+    {
+        case 0x8000:
+            return 0;
+        case 0x8001:
+            return 0;
+        default:
+            return -1;
+    }
+}
 
 // vim:ts=4:sw=4:expandtab

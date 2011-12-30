@@ -23,7 +23,8 @@
 #define __DEVICE_H1_GEN_H__
 
 struct ipc_gen_phone_res {
-    unsigned char group, type;
+    unsigned char group;
+    unsigned char index;
     unsigned short code;
     unsigned char unk;
 } __attribute__((__packed__));

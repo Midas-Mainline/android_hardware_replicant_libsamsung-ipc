@@ -23,8 +23,9 @@
 #define __DEVICE_CRESPO_GEN_H__
 
 struct ipc_gen_phone_res {
-    unsigned char group, type;
-    unsigned char unk;
+    unsigned char group;
+    unsigned char index;
+    unsigned char type;
     unsigned short code;
 } __attribute__((__packed__));
 

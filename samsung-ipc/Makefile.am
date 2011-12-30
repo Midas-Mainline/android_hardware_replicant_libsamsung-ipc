@@ -21,6 +21,7 @@ libsamsung_ipc_la_SOURCES = \
 	\
 	misc.c \
 	sec.c \
+	gen.c \
 	gprs.c \
 	call.c \
 	net.c \

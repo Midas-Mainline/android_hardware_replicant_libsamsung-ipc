@@ -11,6 +11,7 @@ samsung-ipc_files := \
 	samsung-ipc/ipc.c \
 	samsung-ipc/ipc_util.c \
 	samsung-ipc/util.c \
+	samsung-ipc/gen.c \
 	samsung-ipc/gprs.c \
 	samsung-ipc/misc.c \
 	samsung-ipc/net.c \
