@@ -69,19 +69,19 @@ int wake_unlock(char *lock_name, int len)
 
 int crespo_modem_bootstrap(struct ipc_client *client)
 {
-    int s3c2410_serial3_fd= -1;
-    int modem_ctl_fd=   -1;
+    int s3c2410_serial3_fd = -1;
+    int modem_ctl_fd = -1;
 
     /* Control variables. */
-    int boot_tries_count=0;
-    int rc=0;
+    int boot_tries_count = 0;
+    int rc = 0;
 
     /* Boot variables */
-    uint8_t *radio_img_p=NULL;
-    uint8_t bootcore_version=0;
-    uint8_t info_size=0;
-    uint8_t crc_byte=0;
-    int block_size=0;
+    uint8_t *radio_img_p = NULL;
+    uint8_t bootcore_version = 0;
+    uint8_t info_size = 0;
+    uint8_t crc_byte = 0;
+    int block_size = 0;
 
     /* s3c2410 serial setup variables. */
     struct termios termios;
@@ -142,13 +142,6 @@ boot_loop_start:
     cfsetospeed(&termios, B115200);
 
     tcsetattr(s3c2410_serial3_fd, TCSANOW, &termios);
-/*
-    ioctl(s3c2410_serial3_fd, TIOCMGET, &serial); //FIXME
-    ioctl(s3c2410_serial3_fd, TIOCMSET, &serial); //FIXME
-
-    tcgetattr(s3c2410_serial3_fd, &termios); //FIXME
-    tcsetattr(s3c2410_serial3_fd, TCSANOW, &termios); //FIXME
-*/
 
     /* Send 'AT' in ASCII. */
     ipc_client_log(client, "crespo_ipc_bootstrap: sending AT in ASCII");
@@ -312,7 +305,7 @@ error_loop:
 
 error:
     ipc_client_log(client, "%s: something went wrong", __func__);
-    rc = 1;
+    rc = -1;
 exit:
     ipc_client_log(client, "crespo_ipc_bootstrap: exit");
     return rc;
@@ -413,13 +406,13 @@ int crespo_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_inf
     if (bread < 0)
     {
         ipc_client_log(client, "crespo_ipc_fmt_client_recv: can't receive enough bytes from modem to process incoming response!");
-        return 1;
+        return -1;
     }
 
     if(modem_data.size <= 0 || modem_data.size >= MAX_MODEM_DATA_SIZE || modem_data.data == NULL)
     {
         ipc_client_log(client, "crespo_ipc_fmt_client_recv: we retrieve less (or fairly too much) bytes from the modem than we exepected!");
-        return 1;
+        return -1;
     }
 
     resphdr = (struct ipc_header *) modem_data.data;
@@ -473,13 +466,13 @@ int crespo_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_inf
     if (bread < 0)
     {
         ipc_client_log(client, "crespo_ipc_rfs_client_recv: can't receive enough bytes from modem to process incoming response!");
-        return 1;
+        return -1;
     }
 
     if(modem_data.size <= 0 || modem_data.size >= MAX_MODEM_DATA_SIZE || modem_data.data == NULL)
     {
         ipc_client_log(client, "crespo_ipc_rfs_client_recv: we retrieve less (or fairly too much) bytes from the modem than we exepected!");
-        return 1;
+        return -1;
     }
 
     response->mseq = 0;

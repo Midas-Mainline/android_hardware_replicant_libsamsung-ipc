@@ -396,7 +396,7 @@ int modem_read_loop(struct ipc_client *client)
         {
             rc = ipc_client_recv(client, &resp);
 
-            if(rc > 0) {
+            if(rc < 0) {
                 printf("[E] Can't RECV from modem: please run this again\n");
                 break;
             }
@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
             } else if(strncmp(argv[optind], "start", 5) == 0) {
                 printf("[0] Starting modem on FMT client\n");
                 rc = modem_start(client_fmt);
-                if(rc > 0) {
+                if(rc < 0) {
                     printf("[E] Something went wrong\n");
                     modem_stop(client_fmt);
                     return 1;

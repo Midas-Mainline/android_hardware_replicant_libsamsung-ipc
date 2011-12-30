@@ -82,6 +82,7 @@ int ipc_client_free(struct ipc_client *client)
     free(client->handlers);
     free(client);
     client = NULL;
+
     return 0;
 }
 
