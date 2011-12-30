@@ -64,7 +64,7 @@ const char *ipc_request_type_to_str(int type) {
     }
 }
 
-const char *ipc_command_type_to_str(int command) {
+const char *ipc_command_to_str(int command) {
 	switch(command) {
 		IPC_STR(IPC_PWR_PHONE_PWR_UP)
 		IPC_STR(IPC_PWR_PHONE_PWR_OFF)

@@ -43,6 +43,30 @@
 int wake_lock_fd =      -1;
 int wake_unlock_fd =    -1;
 
+int wake_lock(char *lock_name, int len)
+{
+    int rc = 0;
+
+    if(wake_lock_fd < 0)
+        wake_lock_fd = open("/sys/power/wake_lock", O_RDWR);
+
+    rc = write(wake_lock_fd, lock_name, len);
+
+    return rc;
+}
+
+int wake_unlock(char *lock_name, int len)
+{
+    int rc = 0;
+
+    if(wake_unlock_fd < 0)
+        wake_unlock_fd = open("/sys/power/wake_unlock", O_RDWR);
+
+    rc = write(wake_unlock_fd, lock_name, len);
+
+    return rc;
+}
+
 int crespo_modem_bootstrap(struct ipc_client *client)
 {
     int s3c2410_serial3_fd= -1;
@@ -317,14 +341,14 @@ int crespo_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_inf
 
     assert(client->handlers->write != NULL);
 
-    ipc_client_log(client, "INFO: crespo_ipc_client_send: Modem SEND FMT (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
-    ipc_client_log(client, "INFO: crespo_ipc_client_send: request: type = %d (%s), group = %d, index = %d (%s)",
-                   request->type, ipc_request_type_to_str(request->type), request->group, request->index, ipc_command_type_to_str(IPC_COMMAND(request)));
+    ipc_client_log(client, "crespo_ipc_fmt_client_send: SEND FMT (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
+    ipc_client_log(client, "crespo_ipc_fmt_client_send: IPC request (mseq=0x%02x command=%s (0x%04x) type=%s)", 
+                    request->mseq, ipc_command_to_str(IPC_COMMAND(request)), IPC_COMMAND(request), ipc_request_type_to_str(request->type));
 
 #ifdef DEBUG
     if(request->length > 0)
     {
-        ipc_client_log(client, "INFO: ==== DATA DUMP ====");
+        ipc_client_log(client, "==== FMT DATA DUMP ====");
         ipc_hex_dump(client, (void *) request->data, request->length);
     }
 #endif
@@ -335,27 +359,38 @@ int crespo_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_inf
     return rc;
 }
 
-int wake_lock(char *lock_name, int len)
+int crespo_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_info *request)
 {
+    struct modem_io modem_data;
     int rc = 0;
 
-    if(wake_lock_fd < 0)
-        wake_lock_fd = open("/sys/power/wake_lock", O_RDWR);
+    memset(&modem_data, 0, sizeof(struct modem_io));
 
-    rc = write(wake_lock_fd, lock_name, len);
+    modem_data.id = request->mseq;
+    modem_data.cmd = request->index;
 
-    return rc;
-}
+    modem_data.size = request->length;
+    modem_data.data = malloc(request->length);
 
-int wake_unlock(char *lock_name, int len)
-{
-    int rc = 0;
+    memcpy(modem_data.data, request->data, request->length);
 
-    if(wake_unlock_fd < 0)
-        wake_unlock_fd = open("/sys/power/wake_unlock", O_RDWR);
+    assert(client->handlers->write != NULL);
 
-    rc = write(wake_unlock_fd, lock_name, len);
+    ipc_client_log(client, "crespo_ipc_rfs_client_send: SEND RFS (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
+    ipc_client_log(client, "crespo_ipc_rfs_client_send: IPC request (mseq=0x%02x command=%s (0x%04x))", 
+                    request->mseq, ipc_command_to_str(IPC_COMMAND(request)), IPC_COMMAND(request));
 
+#ifdef DEBUG
+    if(request->length > 0)
+    {
+        ipc_client_log(client, "==== RFS DATA DUMP ====");
+        ipc_hex_dump(client, (void *) request->data, request->length);
+    }
+#endif
+
+    ipc_client_log(client, "");
+
+    rc = client->handlers->write((uint8_t*) &modem_data, sizeof(struct modem_io), client->handlers->write_data);
     return rc;
 }
 
@@ -377,19 +412,15 @@ int crespo_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_inf
     bread = client->handlers->read((uint8_t*) &modem_data, sizeof(struct modem_io) + MAX_MODEM_DATA_SIZE, client->handlers->read_data);
     if (bread < 0)
     {
-        ipc_client_log(client, "ERROR: crespo_ipc_fmt_client_recv: can't receive enough bytes from modem to process incoming response!");
+        ipc_client_log(client, "crespo_ipc_fmt_client_recv: can't receive enough bytes from modem to process incoming response!");
         return 1;
     }
 
-    ipc_client_log(client, "INFO: crespo_ipc_fmt_client_recv: Modem RECV FMT (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
-
-    if(modem_data.size <= 0 || modem_data.size >= 0x1000 || modem_data.data == NULL)
+    if(modem_data.size <= 0 || modem_data.size >= MAX_MODEM_DATA_SIZE || modem_data.data == NULL)
     {
-        ipc_client_log(client, "ERROR: crespo_ipc_fmt_client_recv: we retrieve less bytes from the modem than we exepected!");
+        ipc_client_log(client, "crespo_ipc_fmt_client_recv: we retrieve less (or fairly too much) bytes from the modem than we exepected!");
         return 1;
     }
-
-    /* You MUST send back  modem_data */
 
     resphdr = (struct ipc_header *) modem_data.data;
 
@@ -401,13 +432,14 @@ int crespo_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_inf
     response->length = modem_data.size - sizeof(struct ipc_header);
     response->data = NULL;
 
-    ipc_client_log(client, "INFO: crespo_ipc_fmt_client_recv: response: type = %d (%s), group = %d, index = %d (%s)",
-                   resphdr->type, ipc_response_type_to_str(resphdr->type), resphdr->group, resphdr->index, ipc_command_type_to_str(IPC_COMMAND(resphdr)));
+    ipc_client_log(client, "crespo_ipc_fmt_client_recv: RECV FMT (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
+    ipc_client_log(client, "crespo_ipc_fmt_client_recv: IPC response (aseq=0x%02x command=%s (0x%04x) type=%s)", 
+                    response->aseq, ipc_command_to_str(IPC_COMMAND(response)), IPC_COMMAND(response), ipc_response_type_to_str(response->type));
 
     if(response->length > 0)
     {
 #ifdef DEBUG
-        ipc_client_log(client, "INFO: ==== DATA DUMP ====");
+        ipc_client_log(client, "==== FMT DATA DUMP ====");
         ipc_hex_dump(client, (void *) (modem_data.data + sizeof(struct ipc_header)), response->length);
 #endif
         response->data = malloc(response->length);
@@ -440,15 +472,13 @@ int crespo_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_inf
     bread = client->handlers->read((uint8_t*) &modem_data, sizeof(struct modem_io) + MAX_MODEM_DATA_SIZE, client->handlers->read_data);
     if (bread < 0)
     {
-        ipc_client_log(client, "ERROR: crespo_ipc_rfs_client_recv: can't receive enough bytes from modem to process incoming response!");
+        ipc_client_log(client, "crespo_ipc_rfs_client_recv: can't receive enough bytes from modem to process incoming response!");
         return 1;
     }
 
-    ipc_client_log(client, "INFO: crespo_ipc_rfs_client_recv: Modem RECV RFS (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
-
-    if(modem_data.size <= 0 || modem_data.size >= 0x1000 || modem_data.data == NULL)
+    if(modem_data.size <= 0 || modem_data.size >= MAX_MODEM_DATA_SIZE || modem_data.data == NULL)
     {
-        ipc_client_log(client, "ERROR: crespo_ipc_rfs_client_recv: we retrieve less bytes from the modem than we exepected!");
+        ipc_client_log(client, "crespo_ipc_rfs_client_recv: we retrieve less (or fairly too much) bytes from the modem than we exepected!");
         return 1;
     }
 
@@ -460,13 +490,14 @@ int crespo_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_inf
     response->length = modem_data.size;
     response->data = NULL;
 
-    ipc_client_log(client, "INFO: crespo_ipc_rfs_client_recv: response: group = %d, index = %d (%s)",
-                   response->group, response->index, ipc_command_type_to_str(IPC_COMMAND(response)));
+    ipc_client_log(client, "crespo_ipc_rfs_client_recv: RECV RFS (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
+    ipc_client_log(client, "crespo_ipc_rfs_client_recv: IPC response (aseq=0x%02x command=%s (0x%04x) type=%s)", 
+                    response->mseq, ipc_command_to_str(IPC_COMMAND(response)), IPC_COMMAND(response), ipc_response_type_to_str(response->type));
 
     if(response->length > 0)
     {
 #ifdef DEBUG
-        ipc_client_log(client, "INFO: ==== DATA DUMP ====");
+        ipc_client_log(client, "==== RFS DATA DUMP ====");
         ipc_hex_dump(client, (void *) (modem_data.data), response->length);
 #endif
         response->data = malloc(response->length);
@@ -632,7 +663,7 @@ struct ipc_ops ipc_fmt_ops = {
 };
 
 struct ipc_ops ipc_rfs_ops = {
-    .send = crespo_ipc_fmt_client_send,
+    .send = crespo_ipc_rfs_client_send,
     .recv = crespo_ipc_rfs_client_recv,
     .bootstrap = NULL,
 };
