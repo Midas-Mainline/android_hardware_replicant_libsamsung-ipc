@@ -18,6 +18,7 @@
  *
  */
 
+#include <stdio.h>
 #include <radio.h>
 
 int ipc_gen_phone_res_check(struct ipc_gen_phone_res *res)
