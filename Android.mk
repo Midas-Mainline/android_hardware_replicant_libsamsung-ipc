@@ -11,6 +11,7 @@ samsung-ipc_files := \
 	samsung-ipc/ipc.c \
 	samsung-ipc/ipc_util.c \
 	samsung-ipc/util.c \
+	samsung-ipc/rfs.c \
 	samsung-ipc/gen.c \
 	samsung-ipc/gprs.c \
 	samsung-ipc/misc.c \
@@ -18,10 +19,10 @@ samsung-ipc_files := \
 	samsung-ipc/sec.c \
 	samsung-ipc/device/$(TARGET_DEVICE)/$(TARGET_DEVICE)_ipc.c
 
+LOCAL_CFLAGS += -Iexternal/openssl/include
+LOCAL_LDFLAGS += -lcrypto
+
 ifeq ($(TARGET_DEVICE),crespo)
-	device_files := samsung-ipc/device/$(TARGET_DEVICE)/$(TARGET_DEVICE)_nv_data.c
-	LOCAL_CFLAGS += -Iexternal/openssl/include
-	LOCAL_LDFLAGS += -lcrypto
 	LOCAL_CFLAGS += -DDEVICE_CRESPO
 endif
 

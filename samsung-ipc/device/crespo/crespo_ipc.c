@@ -36,7 +36,6 @@
 #include <radio.h>
 
 #include "crespo_modem_ctl.h"
-#include "crespo_nv_data.h"
 #include "crespo_ipc.h"
 #include "ipc_private.h"
 
@@ -484,8 +483,8 @@ int crespo_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_inf
     response->data = NULL;
 
     ipc_client_log(client, "crespo_ipc_rfs_client_recv: RECV RFS (id=%d cmd=%d size=%d)!", modem_data.id, modem_data.cmd, modem_data.size);
-    ipc_client_log(client, "crespo_ipc_rfs_client_recv: IPC response (aseq=0x%02x command=%s (0x%04x) type=%s)", 
-                    response->mseq, ipc_command_to_str(IPC_COMMAND(response)), IPC_COMMAND(response), ipc_response_type_to_str(response->type));
+    ipc_client_log(client, "crespo_ipc_rfs_client_recv: IPC response (aseq=0x%02x command=%s (0x%04x))", 
+                    response->mseq, ipc_command_to_str(IPC_COMMAND(response)), IPC_COMMAND(response));
 
     if(response->length > 0)
     {

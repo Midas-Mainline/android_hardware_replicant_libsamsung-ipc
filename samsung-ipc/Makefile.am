@@ -19,6 +19,7 @@ libsamsung_ipc_la_SOURCES = \
 	ipc_util.c \
 	util.c \
 	\
+	rfs.c \
 	misc.c \
 	sec.c \
 	gen.c \
@@ -31,7 +32,6 @@ libsamsung_ipc_la_SOURCES = \
 if WANT_PROTOCOL_VERISON_CRESPO
 libsamsung_ipc_la_SOURCES += \
 	device/crespo/crespo_ipc.c \
-	device/crespo/crespo_nv_data.c \
 	$(NULL)
 AM_CFLAGS += -DDEVICE_CRESPO
 endif
