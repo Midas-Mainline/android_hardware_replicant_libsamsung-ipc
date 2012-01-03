@@ -23,7 +23,7 @@
 
 struct ipc_message_info;
 
-#define IPC_SND_SPKR_VOLUME_CTRL                    0x9001
+#define IPC_SND_SPKR_VOLUME_CTRL                    0x0901
 #define IPC_SND_MIC_MUTE_CTRL                       0x0902
 #define IPC_SND_AUDIO_PATH_CTRL                     0x0903
 #define IPC_SND_RINGBACK_TONE_CTRL                  0x0908
