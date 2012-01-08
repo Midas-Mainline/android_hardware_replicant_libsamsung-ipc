@@ -73,7 +73,9 @@ struct ipc_client* ipc_client_new(int client_type)
     client->ops = ops;
     client->handlers = (struct ipc_handlers *) malloc(sizeof(struct ipc_handlers));
     client->log_handler = log_handler_default;
+
     memcpy(client->handlers, &ipc_default_handlers, sizeof(struct ipc_handlers));
+
     return client;
 }
 
@@ -174,7 +176,7 @@ int ipc_client_close(struct ipc_client *client)
 {
     if (client == NULL ||
         client->handlers == NULL ||
-        client->handlers->open == NULL)
+        client->handlers->close == NULL)
         return -1;
 
     return client->handlers->close(NULL, 0, client->handlers->close_data);
@@ -184,7 +186,7 @@ int ipc_client_power_on(struct ipc_client *client)
 {
     if (client == NULL ||
         client->handlers == NULL ||
-        client->handlers->open == NULL)
+        client->handlers->power_on == NULL)
         return -1;
 
     return client->handlers->power_on(client->handlers->power_on_data);
@@ -194,7 +196,7 @@ int ipc_client_power_off(struct ipc_client *client)
 {
     if (client == NULL ||
         client->handlers == NULL ||
-        client->handlers->open == NULL)
+        client->handlers->power_off == NULL)
         return -1;
 
     return client->handlers->power_off(client->handlers->power_off_data);
