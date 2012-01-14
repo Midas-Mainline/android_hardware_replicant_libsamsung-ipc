@@ -57,7 +57,7 @@ extern struct ipc_handlers ipc_default_handlers;
 typedef void (*ipc_client_log_handler_cb)(const char *message, void *user_data);
 
 typedef int (*ipc_io_handler_cb)(void *data, unsigned int size, void *io_data);
-typedef int (*ipc_handler_cb)(void *data);
+typedef int (*ipc_handler_cb)(void *io_data);
 
 struct ipc_client *ipc_client_new(int client_type);
 int ipc_client_free(struct ipc_client *client);
@@ -68,7 +68,12 @@ int ipc_client_set_handlers(struct ipc_client *client, struct ipc_handlers *hand
 int ipc_client_set_io_handlers(struct ipc_client *client, 
                                ipc_io_handler_cb read, void *read_data,
                                ipc_io_handler_cb write, void *write_data);
-int ipc_client_set_all_handlers_data(struct ipc_client *client, void *data);
+int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data);
+void *ipc_client_get_handlers_common_data(struct ipc_client *client);
+int ipc_client_create_handlers_common_data(struct ipc_client *client);
+int ipc_client_destroy_handlers_common_data(struct ipc_client *client);
+int ipc_client_set_handlers_common_data_fd(struct ipc_client *client, int fd);
+int ipc_client_get_handlers_common_data_fd(struct ipc_client *client);
 
 int ipc_client_bootstrap_modem(struct ipc_client *client);
 int ipc_client_open(struct ipc_client *client);

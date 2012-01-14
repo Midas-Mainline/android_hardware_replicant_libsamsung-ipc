@@ -65,28 +65,28 @@ int h1_ipc_close(void *io_data)
     return 0;
 }
 
-int h1_ipc_power_on(void *data)
+int h1_ipc_power_on(void *io_data)
 {
     int fd = -1;
 
-    if(data == NULL)
+    if(io_data == NULL)
         return -1;
 
-    fd = *((int *) data);
+    fd = *((int *) io_data);
 
     ioctl(fd, IOCTL_PHONE_ON);
 
     return 0;
 }
 
-int h1_ipc_power_off(void *data)
+int h1_ipc_power_off(void *io_data)
 {
     int fd = -1;
 
-    if(data == NULL)
+    if(io_data == NULL)
         return -1;
 
-    fd = *((int *) data);
+    fd = *((int *) io_data);
 
     ioctl(fd, IOCTL_PHONE_OFF);
 
@@ -211,6 +211,58 @@ int h1_ipc_write(void *data, unsigned int size, void *io_data)
     return write(fd, data, size);
 }
 
+void *h1_ipc_common_data_create(void)
+{
+    void *io_data;
+    int io_data_len;
+
+    io_data_len = sizeof(int);
+    io_data = malloc(io_data_len);
+
+    if(io_data == NULL)
+        return NULL;
+
+    memset(io_data, 0, io_data_len);
+
+    return io_data;
+}
+
+int h1_ipc_common_data_destroy(void *io_data)
+{
+    // This was already done, not an error but we need to return
+    if(io_data == NULL)
+        return 0;
+
+    free(io_data);
+
+    return 0;
+}
+
+int h1_ipc_common_data_set_fd(void *io_data, int fd)
+{
+    int *common_data;
+
+    if(io_data == NULL)
+        return -1;
+
+    common_data = (int *) io_data;
+    common_data = &fd;
+
+    return 0;
+}
+
+int h1_ipc_common_data_get_fd(void *io_data)
+{
+    int *common_data;
+
+    if(io_data == NULL)
+        return -1;
+
+    common_data = (int *) io_data;
+
+    return (int) *(common_data);
+}
+
 struct ipc_handlers ipc_default_handlers = {
     .open = h1_ipc_open,
     .close = h1_ipc_close,
@@ -218,6 +270,11 @@ struct ipc_handlers ipc_default_handlers = {
     .power_off = h1_ipc_power_off,
     .read = h1_ipc_read,
     .write = h1_ipc_write,
+    .common_data = NULL,
+    .common_data_create = h1_ipc_common_data_create,
+    .common_data_destroy = h1_ipc_common_data_destroy,
+    .common_data_set_fd = h1_ipc_common_data_set_fd,
+    .common_data_get_fd = h1_ipc_common_data_get_fd,
 };
 
 struct ipc_ops ipc_fmt_ops = {

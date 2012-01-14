@@ -440,7 +440,7 @@ int modem_start(struct ipc_client *client)
     int rc = -1;
 
 //    ipc_client_set_handlers(client, &ipc_default_handlers);
-    ipc_client_set_all_handlers_data(client, &client_fd);
+    ipc_client_create_handlers_common_data(client);
 
     ipc_client_bootstrap_modem(client);
 
@@ -449,6 +449,8 @@ int modem_start(struct ipc_client *client)
     rc = ipc_client_open(client);
     if(rc < 0)
         return -1;
+
+    client_fd = ipc_client_get_handlers_common_data_fd(client);
 
     rc = ipc_client_power_on(client);
     if(rc < 0)

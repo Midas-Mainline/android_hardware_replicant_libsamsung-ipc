@@ -595,7 +595,7 @@ int crespo_ipc_write(void *data, unsigned int size, void *io_data)
     return 0;
 }
 
-int crespo_ipc_power_on(void *data)
+int crespo_ipc_power_on(void *io_data)
 {
     int fd=open("/dev/modem_ctl", O_RDWR);
     int rc;
@@ -617,7 +617,7 @@ int crespo_ipc_power_on(void *data)
     return 0;
 }
 
-int crespo_ipc_power_off(void *data)
+int crespo_ipc_power_off(void *io_data)
 {
     int fd=open("/dev/modem_ctl", O_RDWR);
     int rc;
@@ -639,6 +639,58 @@ int crespo_ipc_power_off(void *data)
     return 0;
 }
 
+void *crespo_ipc_common_data_create(void)
+{
+    void *io_data;
+    int io_data_len;
+
+    io_data_len = sizeof(int);
+    io_data = malloc(io_data_len);
+
+    if(io_data == NULL)
+        return NULL;
+
+    memset(io_data, 0, io_data_len);
+
+    return io_data;
+}
+
+int crespo_ipc_common_data_destroy(void *io_data)
+{
+    // This was already done, not an error but we need to return
+    if(io_data == NULL)
+        return 0;
+
+    free(io_data);
+
+    return 0;
+}
+
+int crespo_ipc_common_data_set_fd(void *io_data, int fd)
+{
+    int *common_data;
+
+    if(io_data == NULL)
+        return -1;
+
+    common_data = (int *) io_data;
+    common_data = &fd;
+
+    return 0;
+}
+
+int crespo_ipc_common_data_get_fd(void *io_data)
+{
+    int *common_data;
+
+    if(io_data == NULL)
+        return -1;
+
+    common_data = (int *) io_data;
+
+    return (int) *(common_data);
+}
+
 struct ipc_handlers ipc_default_handlers = {
     .read = crespo_ipc_read,
     .write = crespo_ipc_write,
@@ -646,6 +698,11 @@ struct ipc_handlers ipc_default_handlers = {
     .close = crespo_ipc_close,
     .power_on = crespo_ipc_power_on,
     .power_off = crespo_ipc_power_off,
+    .common_data = NULL,
+    .common_data_create = crespo_ipc_common_data_create,
+    .common_data_destroy = crespo_ipc_common_data_destroy,
+    .common_data_set_fd = crespo_ipc_common_data_set_fd,
+    .common_data_get_fd = crespo_ipc_common_data_get_fd,
 };
 
 struct ipc_ops ipc_fmt_ops = {

@@ -117,6 +117,8 @@ int ipc_client_set_io_handlers(struct ipc_client *client,
 {
     if(client == NULL)
         return -1;
+    if(client->handlers == NULL)
+        return -1;
 
     if(read != NULL)
         client->handlers->read = read;
@@ -130,22 +132,112 @@ int ipc_client_set_io_handlers(struct ipc_client *client,
     return 0;
 }
 
-int ipc_client_set_all_handlers_data(struct ipc_client *client, void *data)
+int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data)
 {
+    void *common_data;
+
     if(client == NULL)
+        return -1;
+    if(client->handlers == NULL)
         return -1;
     if(data == NULL)
         return -1;
 
-    client->handlers->read_data = data;
-    client->handlers->write_data = data;
-    client->handlers->open_data = data;
-    client->handlers->close_data = data;
-    client->handlers->power_on_data = data;
-    client->handlers->power_off_data = data;
+    common_data = data;
+    client->handlers->common_data = common_data;
+
+    client->handlers->read_data = common_data;
+    client->handlers->write_data = common_data;
+    client->handlers->open_data = common_data;
+    client->handlers->close_data = common_data;
+    client->handlers->power_on_data = common_data;
+    client->handlers->power_off_data = common_data;
 
     return 0;
 }
+
+void *ipc_client_get_handlers_common_data(struct ipc_client *client)
+{
+    if(client == NULL)
+        return NULL;
+    if(client->handlers == NULL)
+        return -1;
+
+    return client->handlers->common_data;
+
+    return 0;
+}
+
+int ipc_client_create_handlers_common_data(struct ipc_client *client)
+{
+    void *common_data;
+
+    if(client == NULL)
+        return -1;
+    if(client->handlers == NULL)
+        return -1;
+
+    common_data = client->handlers->common_data_create();
+    client->handlers->common_data = common_data;
+
+    client->handlers->read_data = common_data;
+    client->handlers->write_data = common_data;
+    client->handlers->open_data = common_data;
+    client->handlers->close_data = common_data;
+    client->handlers->power_on_data = common_data;
+    client->handlers->power_off_data = common_data;
+
+    return 0;
+}
+
+int ipc_client_destroy_handlers_common_data(struct ipc_client *client)
+{
+    void *common_data;
+    int rc;
+
+    if(client == NULL)
+        return -1;
+    if(client->handlers == NULL)
+        return -1;
+
+    rc = client->handlers->common_data_destroy(client->handlers->common_data);
+
+    if(rc < 0)
+        return -1;
+
+    common_data = NULL;
+    client->handlers->common_data = common_data;
+
+    client->handlers->read_data = common_data;
+    client->handlers->write_data = common_data;
+    client->handlers->open_data = common_data;
+    client->handlers->close_data = common_data;
+    client->handlers->power_on_data = common_data;
+    client->handlers->power_off_data = common_data;
+
+    return 0;
+}
+
+int ipc_client_set_handlers_common_data_fd(struct ipc_client *client, int fd)
+{
+    if(client == NULL)
+        return -1;
+    if(client->handlers == NULL)
+        return -1;
+
+    return client->handlers->common_data_set_fd(client->handlers->common_data, fd);
+}
+
+int ipc_client_get_handlers_common_data_fd(struct ipc_client *client)
+{
+    if(client == NULL)
+        return -1;
+    if(client->handlers == NULL)
+        return -1;
+
+    return client->handlers->common_data_get_fd(client->handlers->common_data);
+}
+
 
 int ipc_client_bootstrap_modem(struct ipc_client *client)
 {

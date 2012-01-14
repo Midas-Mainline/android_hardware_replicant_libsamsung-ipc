@@ -49,6 +49,14 @@ struct ipc_handlers {
     void *power_on_data;
     ipc_handler_cb power_off;
     void *power_off_data;
+
+    /* Handlers common data*/
+    void *common_data;
+
+    void *(*common_data_create)(void);
+    int (*common_data_destroy)(void *io_data);
+    int (*common_data_set_fd)(void *io_data, int fd);
+    int (*common_data_get_fd)(void *io_data);
 };
 
 struct ipc_client {
