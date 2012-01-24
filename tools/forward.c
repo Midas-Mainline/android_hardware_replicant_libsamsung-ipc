@@ -37,6 +37,13 @@
 #define IOCTL_MODEM_SEND        _IO('o', 0x23)
 #define IOCTL_MODEM_RECV        _IO('o', 0x24)
 
+struct modem_io {
+    uint32_t size;
+    uint32_t id;
+    uint32_t cmd;
+    void *data;
+};
+
 void forward_data(int modem_fd, int remote_fd)
 {
     fd_set rfds;
@@ -57,9 +64,10 @@ void forward_data(int modem_fd, int remote_fd)
         }
         else if (rc) {
             if (FD_ISSET(modem_fd, &rfds)) {
-                ssize_t size = ioctl(modem_fd, IOCTL_MODEM_RECV, &buf);
+                rc = ioctl(modem_fd, IOCTL_MODEM_RECV, &buf);
                 if (rc < 0)
                     break;
+                ssize_t size = ((struct modem_io*) &buf)->size;
                 printf("Sending from modem %ld\n", size);
                 ssize_t written = write(remote_fd, &buf, size);
             }
