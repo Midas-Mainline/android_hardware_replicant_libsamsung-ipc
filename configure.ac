@@ -1,4 +1,4 @@
-AC_INIT([libsamsung-ipc], [0.1.0], [smartphones-userland@linuxtogo.org], [libsamsung-ipc])
+AC_INIT([libsamsung-ipc], [1], [smartphones-userland@linuxtogo.org], [libsamsung-ipc])
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE([dist-bzip2 subdir-objects])
