@@ -101,9 +101,8 @@ int ipc_client_set_log_handler(struct ipc_client *client, ipc_client_log_handler
 
 int ipc_client_set_handlers(struct ipc_client *client, struct ipc_handlers *handlers)
 {
-    if(client == NULL)
-        return -1;
-    if(handlers == NULL)
+    if(client == NULL ||
+       handlers == NULL)
         return -1;
 
     memcpy(client->handlers, handlers, sizeof(struct ipc_handlers));
@@ -115,9 +114,8 @@ int ipc_client_set_io_handlers(struct ipc_client *client,
                                ipc_io_handler_cb read, void *read_data,
                                ipc_io_handler_cb write, void *write_data)
 {
-    if(client == NULL)
-        return -1;
-    if(client->handlers == NULL)
+    if(client == NULL ||
+       client->handlers == NULL)
         return -1;
 
     if(read != NULL)
@@ -136,11 +134,9 @@ int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data)
 {
     void *common_data;
 
-    if(client == NULL)
-        return -1;
-    if(client->handlers == NULL)
-        return -1;
-    if(data == NULL)
+    if(client == NULL ||
+       client->handlers == NULL ||
+       data == NULL)
         return -1;
 
     common_data = data;
@@ -158,23 +154,19 @@ int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data)
 
 void *ipc_client_get_handlers_common_data(struct ipc_client *client)
 {
-    if(client == NULL)
+    if(client == NULL ||
+       client->handlers == NULL)
         return NULL;
-    if(client->handlers == NULL)
-        return -1;
 
     return client->handlers->common_data;
-
-    return 0;
 }
 
 int ipc_client_create_handlers_common_data(struct ipc_client *client)
 {
     void *common_data;
 
-    if(client == NULL)
-        return -1;
-    if(client->handlers == NULL)
+    if(client == NULL ||
+       client->handlers == NULL)
         return -1;
 
     common_data = client->handlers->common_data_create();
@@ -195,9 +187,9 @@ int ipc_client_destroy_handlers_common_data(struct ipc_client *client)
     void *common_data;
     int rc;
 
-    if(client == NULL)
-        return -1;
-    if(client->handlers == NULL)
+    if(client == NULL ||
+       client->handlers == NULL ||
+       client->handlers->common_data_destroy == NULL)
         return -1;
 
     rc = client->handlers->common_data_destroy(client->handlers->common_data);
@@ -220,9 +212,9 @@ int ipc_client_destroy_handlers_common_data(struct ipc_client *client)
 
 int ipc_client_set_handlers_common_data_fd(struct ipc_client *client, int fd)
 {
-    if(client == NULL)
-        return -1;
-    if(client->handlers == NULL)
+    if(client == NULL ||
+       client->handlers == NULL ||
+       client->handlers->common_data_set_fd == NULL)
         return -1;
 
     return client->handlers->common_data_set_fd(client->handlers->common_data, fd);
@@ -230,9 +222,9 @@ int ipc_client_set_handlers_common_data_fd(struct ipc_client *client, int fd)
 
 int ipc_client_get_handlers_common_data_fd(struct ipc_client *client)
 {
-    if(client == NULL)
-        return -1;
-    if(client->handlers == NULL)
+    if(client == NULL ||
+       client->handlers == NULL ||
+       client->handlers->common_data_get_fd == NULL)
         return -1;
 
     return client->handlers->common_data_get_fd(client->handlers->common_data);
