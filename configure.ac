@@ -14,7 +14,7 @@ AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
-OPENSSL_REQUIRED=0.0.0
+OPENSSL_REQUIRED=1.0.0e
 
 #------------------------------------------------------------------------------
 # pkg-config
