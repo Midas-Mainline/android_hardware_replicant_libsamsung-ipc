@@ -32,15 +32,22 @@ void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context *messa
     strncpy((char*)message->apn, apn, 124);
 }
 
-void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context *message, char *username, char *password)
+void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context *message, int activate, char *username, char *password)
 {
     assert(message != NULL);
-    message->unk0[0] = 0x1;
-    message->unk0[1] = 0x1;
-    message->unk0[2] = 0x13;
-    message->unk2 = 0x1;
-    strncpy((char*)message->username, username, 32);
-    strncpy((char*)message->password, password, 32);
+    if (activate)
+    {
+        message->unk0[0] = 0x1;
+        message->unk0[1] = 0x1;
+        message->unk0[2] = 0x13;
+        message->unk2 = 0x1;
+        strncpy((char*)message->username, username, 32);
+        strncpy((char*)message->password, password, 32);
+    }
+    else
+    {
+        message->unk0[1] = 0x1;
+    }
 }
 
 // vim:ts=4:sw=4:expandtab

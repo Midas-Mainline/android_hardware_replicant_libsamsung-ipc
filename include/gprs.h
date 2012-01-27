@@ -90,7 +90,7 @@ struct ipc_gprs_current_session_data_counter {
     unsigned char unk[9];
 };
 
-void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context *message, char *username, char *password);
+void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context *message, int activate, char *username, char *password);
 
 #endif
 
