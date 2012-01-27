@@ -472,6 +472,7 @@ void print_help()
     printf("usage: modemctrl <command>\n");
     printf("commands:\n");
     printf("\tstart                 bootstrap modem and start read loop\n");
+    printf("\tbootstrap             bootstrap modem only\n");
     printf("\tpower-on              power on the modem\n");
     printf("\tpower-off             power off the modem\n");
     printf("arguments:\n");
@@ -532,6 +533,9 @@ int main(int argc, char *argv[])
             } else if(strncmp(argv[optind], "power-off", 9) == 0) {
                 ipc_client_power_off(client_fmt);
                 goto modem_quit;
+            } else if (strncmp(argv[optind], "bootstrap", 9) == 0) {
+                ipc_client_create_handlers_common_data(client_fmt);
+                ipc_client_bootstrap_modem(client_fmt);
             } else if(strncmp(argv[optind], "start", 5) == 0) {
                 printf("[0] Starting modem on FMT client\n");
                 rc = modem_start(client_fmt);
