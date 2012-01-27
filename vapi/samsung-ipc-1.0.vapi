@@ -962,7 +962,7 @@ namespace SamsungIpc
             public uint8[] unk1;
 
             [CCode (cname = "ipc_gprs_pdp_context_setup")]
-            public void setup(bool activate, string username, string password);
+            public void setup(bool activate, string? username, string? password);
 
             public unowned uint8[] data
             {
