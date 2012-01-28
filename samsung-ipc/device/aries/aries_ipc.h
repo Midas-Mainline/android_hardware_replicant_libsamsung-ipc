@@ -2,6 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
+ *                    Igor Almeida <igor.contato@gmail.com>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,37 +19,36 @@
  *
  */
 
-#ifndef __GALAXYSMTD_IPC_H__
-#define __GALAXYSMTD_IPC_H__
+#ifndef __ARIES_IPC_H__
+#define __ARIES_IPC_H__
 
-//from trace/logcat: nCoreVer = 0xf0
+#include "phonet.h"
+
 #define BOOTCORE_VERSION        0xf0
-//from trace: write(14, "0", 1) before PSI_DATA_LEN
 #define PSI_MAGIC               0x30
-//from trace/logcat: Bootloader IMG Size: 0x00005000, sent after PSI_MAGIC, LSB first
 #define PSI_DATA_LEN            0x5000
-//from /radio/modem.bin size (0xc00000) - /efs/nv_data.bin size (0x2...)
-#define RADIO_IMG_SIZE          0xc00000-0x200000
+#define RADIO_IMG_MAX_SIZE      0xd80000
+#define RADIO_IMG_READ_SIZE     0xa00000
+#define ONENAND_MAP_SIZE        0xFFF000
+#define ONEDRAM_INIT_READ       0x12341234
+#define ONEDRAM_DEINIT_CMD      0x45674567
+#define ONEDRAM_DEINIT_READ     0xabcdabcd
+#define SO_RFSMAGIC             0x21
+#define SOCKET_RFS_MAGIC        0x80000
+#define PHONET_IFACE            "svnet0"
+#define PHONET_SPN_RES_FMT      0x01
+#define PHONET_SPN_RES_RFS      0x41
 
-//should be the same from crespo
 #define MAX_MODEM_DATA_SIZE     0x1000
 
-struct samsung_rfs_msg
+int phonet_iface_ifdown(void);
+int phonet_iface_ifup(void);
+
+struct aries_ipc_handlers_common_data
 {
-    uint32_t offset;
-    uint32_t size;
+    int fd;
+    struct sockaddr_pn *spn;
 };
-
-struct samsung_rfs_cfrm
-{
-    uint8_t confirmation;
-    struct samsung_rfs_msg msg;
-};
-
-int wake_lock(char *lock_name, int len);
-int wake_unlock(char *lock_name, int len);
-
-extern struct ipc_handlers galaxysmtd_ipc_default_handlers;
 
 #endif
 
