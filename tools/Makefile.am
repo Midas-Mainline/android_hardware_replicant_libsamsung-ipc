@@ -4,13 +4,7 @@ AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	$(NULL)
 
-if WANT_PROTOCOL_VERISON_CRESPO
-AM_CFLAGS += -DDEVICE_CRESPO
-endif
-
-if WANT_PROTOCOL_VERISON_H1
-AM_CFLAGS += -DDEVICE_H1
-endif
+AM_CFLAGS += -DDEVICE_IPC_V4
 
 bin_PROGRAMS = \
 	modemctrl \

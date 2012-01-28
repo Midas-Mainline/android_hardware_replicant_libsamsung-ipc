@@ -27,11 +27,11 @@ samsung_ipc_h1include_HEADERS = \
 	device/h1/gen.h
 	$(NULL)
 
-samsung_ipc_crespoincludedir = $(includedir)/samsung-ipc-1.0/device/crespo/
-samsung_ipc_crespoinclude_HEADERS = \
-	device/crespo/call.h \
-	device/crespo/net.h \
-	device/crespo/sms.h \
-	device/crespo/misc.h \
-	device/crespo/gen.h \
+samsung_ipc_v4includedir = $(includedir)/samsung-ipc-1.0/device/ipc-v4/
+samsung_ipc_v4include_HEADERS = \
+	device/ipc-v4/call.h \
+	device/ipc-v4/net.h \
+	device/ipc-v4/sms.h \
+	device/ipc-v4/misc.h \
+	device/ipc-v4/gen.h \
 	$(NULL)

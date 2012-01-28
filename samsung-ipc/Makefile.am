@@ -29,19 +29,10 @@ libsamsung_ipc_la_SOURCES = \
 	sms.c \
 	$(NULL)
 
-if WANT_PROTOCOL_VERISON_CRESPO
 libsamsung_ipc_la_SOURCES += \
 	device/crespo/crespo_ipc.c \
 	$(NULL)
-AM_CFLAGS += -DDEVICE_CRESPO
-endif
-
-if WANT_PROTOCOL_VERISON_H1
-libsamsung_ipc_la_SOURCES += \
-	device/h1/h1_ipc.c \
-	$(NULL)
-AM_CFLAGS += -DDEVICE_H1
-endif
+AM_CFLAGS += -DDEVICE_IPC_V4
 
 libsamsung_ipc_la_LIBADD = \
 	$(OPENSSL_LIBS) \

@@ -25,9 +25,8 @@ PKG_PROG_PKG_CONFIG
 # protocol version we're building for
 
 AC_ARG_WITH(protocol-version, [  --with-protocol-version=NAME     Version of the IPC protocol we're building libsamsung-ipc for],
-            [v=$withval;protocol_version=$v], [protocol_version=crespo])
-AM_CONDITIONAL([WANT_PROTOCOL_VERISON_CRESPO], [test x"$protocol_version" = x"crespo"])
-AM_CONDITIONAL([WANT_PROTOCOL_VERISON_H1], [test x"$protocol_version" = x"h1"])
+            [v=$withval;protocol_version=$v], [protocol_version=4])
+AM_CONDITIONAL([WANT_PROTOCOL_VERISON_4], [test x"$protocol_version" = x"4"])
 
 #------------------------------------------------------------------------------
 # openssl

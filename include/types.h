@@ -32,6 +32,7 @@
 #include "rfs.h"
 #include "snd.h"
 #include "gprs.h"
+#include "ss.h"
 
 /* AP -> Baseband */
 #define IPC_TYPE_EXEC                               0x01
