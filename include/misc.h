@@ -21,8 +21,8 @@
 #ifndef __MISC_H__
 #define __MISC_H__
 
-#if defined(DEVICE_CRESPO)
-#include "device/crespo/misc.h"
+#if defined(DEVICE_IPC_V4)
+#include "device/ipc-v4/misc.h"
 #elif defined(DEVICE_H1)
 #include "device/h1/misc.h"
 #endif

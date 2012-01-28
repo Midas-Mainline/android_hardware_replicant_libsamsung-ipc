@@ -2,6 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
+ * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +19,14 @@
  *
  */
 
-#ifndef __DEVICE_CRESPO_MISC_H__
-#define __DEVICE_CRESPO_MISC_H__
+#ifndef __DEVICE_IPC_V4_GEN_H__
+#define __DEVICE_IPC_V4_GEN_H__
 
-struct ipc_misc_me_version {
-    unsigned char unk;
-    char sw_version[32];
-    char hw_version[32];
-    char cal_date[32];
-    char misc[32];
-} __attribute__((__packed__));
-
-struct ipc_misc_me_sn {
-    unsigned char type; // IPC_MISC_ME_SN_SERIAL_NUM*
-    unsigned char length;
-    char data[32];
+struct ipc_gen_phone_res {
+    unsigned char group;
+    unsigned char index;
+    unsigned char type;
+    unsigned short code;
 } __attribute__((__packed__));
 
 #endif

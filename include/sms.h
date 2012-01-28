@@ -21,8 +21,8 @@
 #ifndef __SMS_H__
 #define __SMS_H__
 
-#if defined(DEVICE_CRESPO)
-#include "device/crespo/sms.h"
+#if defined(DEVICE_IPC_V4)
+#include "device/ipc-v4/sms.h"
 #elif defined(DEVICE_H1)
 #include "device/h1/sms.h"
 #endif

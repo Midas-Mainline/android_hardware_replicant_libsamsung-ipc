@@ -21,8 +21,8 @@
 #ifndef __GEN_H__
 #define __GEN_H__
 
-#if defined(DEVICE_CRESPO)
-#include "device/crespo/gen.h"
+#if defined(DEVICE_IPC_V4)
+#include "device/ipc-v4/gen.h"
 #elif defined(DEVICE_H1)
 #include "device/h1/gen.h"
 #endif

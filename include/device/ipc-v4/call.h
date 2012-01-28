@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef __DEVICE_CRESPO_CALL_H__
-#define __DEVICE_CRESPO_CALL_H__
+#ifndef __DEVICE_IPC_V4_CALL_H__
+#define __DEVICE_IPC_V4_CALL_H__
 
 struct ipc_call_incoming {
     unsigned char unk;

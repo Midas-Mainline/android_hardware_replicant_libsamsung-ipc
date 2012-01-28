@@ -21,8 +21,8 @@
 #ifndef __NET_H__
 #define __NET_H__
 
-#if defined(DEVICE_CRESPO)
-#include "device/crespo/net.h"
+#if defined(DEVICE_IPC_V4)
+#include "device/ipc-v4/net.h"
 #elif defined(DEVICE_H1)
 #include "device/h1/net.h"
 #endif

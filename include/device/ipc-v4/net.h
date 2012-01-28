@@ -19,14 +19,23 @@
  *
  */
 
-#ifndef __DEVICE_CRESPO_GEN_H__
-#define __DEVICE_CRESPO_GEN_H__
+#ifndef __DEVICE_IPC_V4_NET_H__
+#define __DEVICE_IPC_V4_NET_H__
 
-struct ipc_gen_phone_res {
-    unsigned char group;
-    unsigned char index;
-    unsigned char type;
-    unsigned short code;
+#define IPC_NET_ACCESS_TECHNOLOGY_UNKNOWN                           0xff
+#define IPC_NET_ACCESS_TECHNOLOGY_GSM                               0x00
+#define IPC_NET_ACCESS_TECHNOLOGY_GSM2                              0x01
+#define IPC_NET_ACCESS_TECHNOLOGY_GPRS                              0x02
+#define IPC_NET_ACCESS_TECHNOLOGY_EDGE                              0x03
+#define IPC_NET_ACCESS_TECHNOLOGY_UMTS                              0x04
+
+struct ipc_net_current_plmn {
+    char unk0;
+    unsigned char slevel;
+    char unk1;
+    unsigned char plmn[5];
+    unsigned char type; // IPC_NET_SERVICE_TYPE_... ?
+    unsigned short lac;
 } __attribute__((__packed__));
 
 #endif

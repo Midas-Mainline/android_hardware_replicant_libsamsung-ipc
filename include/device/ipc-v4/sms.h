@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef __DEVICE_CRESPO_SMS_H__
-#define __DEVICE_CRESPO_SMS_H__
+#ifndef __DEVICE_IPC_V4_SMS_H__
+#define __DEVICE_IPC_V4_SMS_H__
 
 #define IPC_SMS_ACK_NO_ERROR            0x0000
 #define IPC_SMS_ACK_PDA_FULL_ERROR      0x8080

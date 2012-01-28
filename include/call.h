@@ -21,8 +21,8 @@
 #ifndef __CALL_H__
 #define __CALL_H__
 
-#if defined(DEVICE_CRESPO)
-#include "device/crespo/call.h"
+#if defined(DEVICE_IPC_V4)
+#include "device/ipc-v4/call.h"
 #elif defined(DEVICE_H1)
 #include "device/h1/call.h"
 #endif
