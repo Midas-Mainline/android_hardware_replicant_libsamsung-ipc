@@ -73,18 +73,6 @@
 #define IPC_PB_ENTRY_INFO                           0x0604
 #define IPC_PB_CAPABILITY_INFO                      0x0605
 
-/* SS */
-#define IPC_SS_WAITING                              0x0C01
-#define IPC_SS_CLI                                  0x0C02
-#define IPC_SS_BARRING                              0x0C03
-#define IPC_SS_BARRING_PW                           0x0C04
-#define IPC_SS_FORWARDING                           0x0C05
-#define IPC_SS_INFO                                 0x0C06
-#define IPC_SS_MANAGE_CALL                          0x0C07
-#define IPC_SS_USSD                                 0x0C08
-#define IPC_SS_AOC                                  0x0C09
-#define IPC_SS_RELEASE_COMPLETE                     0x0C0A
-
 /* Sat */
 #define IPC_SAT_PROFILE_DOWNLOAD                    0x0E01
 #define IPC_SAT_ENVELOPE_CMD                        0x0E02
