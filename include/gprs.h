@@ -42,6 +42,7 @@
 #define IPC_GPRS_CALL_STATUS_TYPE_OFF       0x3
 
 #define IPC_GPRS_ERROR_UNAVAILABLE          0x94
+#define IPC_GPRS_ERROR_NOT_SUBSCRIBED       0x0B
 
 struct ipc_gprs_define_pdp_context {
     unsigned char unk0[3];
@@ -91,6 +92,7 @@ struct ipc_gprs_current_session_data_counter {
 };
 
 void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context *message, int activate, char *username, char *password);
+void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context *message, char *apn);
 
 #endif
 
