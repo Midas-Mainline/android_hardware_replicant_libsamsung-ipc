@@ -190,7 +190,7 @@ void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp
                     printf("[3] SIM init complete\n");
                     if(state == MODEM_STATE_NORMAL)
                         state = MODEM_STATE_SIM_OK;
-                        
+
                 break;
                 case IPC_SEC_PIN_SIM_PB_INIT_COMPLETE:
                     printf("[I] SIM Phone Book init complete\n");
@@ -278,7 +278,7 @@ void modem_response_call(struct ipc_client *client, struct ipc_message_info *res
                 modem_snd_no_mic_mute(client);
             }
         break;
-    }    
+    }
 }
 
 void modem_response_pwr(struct ipc_client *client, struct ipc_message_info *resp)
@@ -478,7 +478,6 @@ void print_help()
     printf("arguments:\n");
     printf("\t--debug               enable debug messages\n");
     printf("\t--pin=[PIN]           provide SIM card PIN\n");
-    printf("\t--device=[NAME]       name of device we're running on\n");
 }
 
 int main(int argc, char *argv[])
@@ -487,10 +486,10 @@ int main(int argc, char *argv[])
     int c = 0;
     int opt_i = 0;
     int rc = -1;
-    int device_type = -1;
+    int debug = 0;
 
     struct option opt_l[] = {
-        {"device",  required_argument,  0,  0 },
+        {"help",    no_argument,        0,  0 },
         {"debug",   no_argument,        0,  0 },
         {"pin",     required_argument,  0,  0 },
         {0,         0,                  0,  0 }
@@ -508,8 +507,11 @@ int main(int argc, char *argv[])
 
         switch(c) {
             case 0:
-                if(strcmp(opt_l[opt_i].name, "debug") == 0) {
-                    ipc_client_set_log_handler(client_fmt, modem_log_handler, NULL);
+                if (strncmp(opt_l[opt_i].name, "help", 4) == 0) {
+                    print_help();
+                    exit(1);
+                } else if(strcmp(opt_l[opt_i].name, "debug") == 0) {
+                    debug = 1;
                     printf("[I] Debug enabled\n");
                 } else if(strcmp(opt_l[opt_i].name, "pin") == 0) {
                     if(optarg) {
@@ -521,34 +523,31 @@ int main(int argc, char *argv[])
                             return 1;
                         }
                     }
-                } else if(strcmp(opt_l[opt_i].name, "device") == 0) {
-                    if (optarg) {
-                        if (strncmp(optarg, "crespo", 6) == 0) {
-                            device_type = IPC_DEVICE_CRESPO;
-                        } else {
-                            printf("[E] Unknown device type!\n");
-                            return 1;
-                        }
-                    }
                 }
             break;
         }
     }
 
-    if (device_type == -1) {
-        printf("[E] No device type given; aborting ...\n");
-        return 1;
+    ipc_init();
+    client_fmt = ipc_client_new(IPC_CLIENT_TYPE_FMT);
+
+    if (client_fmt == 0) {
+        printf("[E] Could not create IPC client; aborting ...\n");
+        goto modem_quit;
     }
 
-    client_fmt = ipc_client_new(device_type, IPC_CLIENT_TYPE_FMT);
-    ipc_client_set_log_handler(client_fmt, modem_log_handler_quiet, NULL);
+    if (debug == 0)
+        ipc_client_set_log_handler(client_fmt, modem_log_handler_quiet, NULL);
+    else ipc_client_set_log_handler(client_fmt, modem_log_handler, NULL);
 
     while(opt_i < argc) {
         if(strncmp(argv[optind], "power-on", 8) == 0) {
-            ipc_client_power_on(client_fmt);
+            if (ipc_client_power_on(client_fmt) < 0)
+                printf("[E] Something went wrong while powering modem on\n");
             goto modem_quit;
         } else if(strncmp(argv[optind], "power-off", 9) == 0) {
-            ipc_client_power_off(client_fmt);
+            if (ipc_client_power_off(client_fmt) < 0)
+                printf("[E] Something went wrong while powering modem off\n");
             goto modem_quit;
         } else if (strncmp(argv[optind], "bootstrap", 9) == 0) {
             ipc_client_create_handlers_common_data(client_fmt);
@@ -576,7 +575,9 @@ int main(int argc, char *argv[])
     }
 
 modem_quit:
-    ipc_client_free(client_fmt);
+    if (client_fmt != 0)
+        ipc_client_free(client_fmt);
+    ipc_shutdown();
 
     return 0;
 }

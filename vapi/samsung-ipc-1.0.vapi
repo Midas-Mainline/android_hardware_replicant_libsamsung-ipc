@@ -1196,11 +1196,17 @@ namespace SamsungIpc
     public delegate int TransportCb(uint8[] data);
     public delegate void LogHandlerCb(string message);
 
+    [CCode (cname = "ipc_init")]
+    public void init();
+    [CCode (cname = "ipc_shutdown")]
+    public void shutdown();
+
     [Compact]
     [CCode (cname = "struct ipc_client", cprefix = "ipc_client_")]
     public class Client
     {
-        public Client(DeviceType device_type, ClientType client_type);
+        public Client(ClientType client_type);
+        public Client.for_device(DeviceType device_type, ClientType client_type);
         [CCode (delagate_target_pos = 0.9)]
         public int set_log_handler(LogHandlerCb log_cb);
         public int set_io_handlers(TransportCb write_cb, TransportCb read_cb);
