@@ -23,13 +23,34 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdint.h>
 #include <stdarg.h>
+#include <unistd.h>
+#include <stdbool.h>
+#include <termios.h>
+#include <fcntl.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <asm/types.h>
 
 #include <radio.h>
 
 #include "ipc_private.h"
 
 struct ipc_device_desc devices[IPC_DEVICE_MAX+1];
+
+extern void crespo_ipc_init(void);
+
+void ipc_init(void)
+{
+    crespo_ipc_init();
+}
+
+void ipc_shutdown(void)
+{
+}
 
 void log_handler_default(const char *message, void *user_data)
 {
@@ -57,7 +78,37 @@ void ipc_client_log(struct ipc_client *client, const char *message, ...)
     va_end(args);
 }
 
-struct ipc_client* ipc_client_new(int device_type, int client_type)
+struct ipc_client* ipc_client_new(int client_type)
+{
+    int device_type = -1, in_hardware = 0;
+    char buf[4096];
+
+    // gather device type from /proc/cpuinfo
+    int fd = open("/proc/cpuinfo", O_RDONLY);
+    int bytesread = read(fd, buf, 4096);
+    close(fd);
+
+    // match hardware name with our supported devices
+    char *pch = strtok(buf, "\n");
+    while (pch != NULL)
+    {
+        int rc;
+        if ((rc = strncmp(pch, "Hardware", 9)) == 9)
+        {
+            if (strstr(pch, "herring") != NULL)
+                device_type = IPC_DEVICE_CRESPO;
+        }
+        pch = strtok(NULL, "\n");
+    }
+
+    // validate that we have found any supported device
+    if (device_type == -1)
+        return NULL;
+
+    return ipc_client_new_for_device(device_type, client_type);
+}
+
+struct ipc_client* ipc_client_new_for_device(int device_type, int client_type)
 {
     struct ipc_client *client;
 
@@ -81,7 +132,8 @@ struct ipc_client* ipc_client_new(int device_type, int client_type)
 
     client->handlers = (struct ipc_handlers *) malloc(sizeof(struct ipc_handlers));
     client->log_handler = log_handler_default;
-    memcpy(client->handlers, devices[device_type].handlers , sizeof(struct ipc_handlers));
+    if (devices[device_type].handlers != 0)
+        memcpy(client->handlers, devices[device_type].handlers , sizeof(struct ipc_handlers));
 
     return client;
 }
@@ -91,7 +143,6 @@ int ipc_client_free(struct ipc_client *client)
     free(client->handlers);
     free(client);
     client = NULL;
-
     return 0;
 }
 
@@ -117,7 +168,7 @@ int ipc_client_set_handlers(struct ipc_client *client, struct ipc_handlers *hand
     return 0;
 }
 
-int ipc_client_set_io_handlers(struct ipc_client *client, 
+int ipc_client_set_io_handlers(struct ipc_client *client,
                                ipc_io_handler_cb read, void *read_data,
                                ipc_io_handler_cb write, void *write_data)
 {
