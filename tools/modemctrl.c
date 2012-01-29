@@ -478,16 +478,19 @@ void print_help()
     printf("arguments:\n");
     printf("\t--debug               enable debug messages\n");
     printf("\t--pin=[PIN]           provide SIM card PIN\n");
+    printf("\t--device=[NAME]       name of device we're running on\n");
 }
 
 int main(int argc, char *argv[])
 {
     struct ipc_client *client_fmt;
     int c = 0;
-	int opt_i = 0;
+    int opt_i = 0;
     int rc = -1;
+    int device_type = -1;
 
     struct option opt_l[] = {
+        {"device",  required_argument,  0,  0 },
         {"debug",   no_argument,        0,  0 },
         {"pin",     required_argument,  0,  0 },
         {0,         0,                  0,  0 }
@@ -497,9 +500,6 @@ int main(int argc, char *argv[])
         print_help();
         exit(1);
     }
-
-    client_fmt = ipc_client_new(IPC_CLIENT_TYPE_FMT);
-    ipc_client_set_log_handler(client_fmt, modem_log_handler_quiet, NULL);
 
     while(c >= 0) {
         c = getopt_long(argc, argv, "", opt_l, &opt_i);
@@ -521,42 +521,59 @@ int main(int argc, char *argv[])
                             return 1;
                         }
                     }
+                } else if(strcmp(opt_l[opt_i].name, "device") == 0) {
+                    if (optarg) {
+                        if (strncmp(optarg, "crespo", 6) == 0) {
+                            device_type = IPC_DEVICE_CRESPO;
+                        } else {
+                            printf("[E] Unknown device type!\n");
+                            return 1;
+                        }
+                    }
                 }
             break;
         }
     }
 
-        while(opt_i < argc) {
-            if(strncmp(argv[optind], "power-on", 8) == 0) {
-                ipc_client_power_on(client_fmt);
-                goto modem_quit;
-            } else if(strncmp(argv[optind], "power-off", 9) == 0) {
-                ipc_client_power_off(client_fmt);
-                goto modem_quit;
-            } else if (strncmp(argv[optind], "bootstrap", 9) == 0) {
-                ipc_client_create_handlers_common_data(client_fmt);
-                ipc_client_bootstrap_modem(client_fmt);
-            } else if(strncmp(argv[optind], "start", 5) == 0) {
-                printf("[0] Starting modem on FMT client\n");
-                rc = modem_start(client_fmt);
-                if(rc < 0) {
-                    printf("[E] Something went wrong\n");
-                    modem_stop(client_fmt);
-                    return 1;
-                }
+    if (device_type == -1) {
+        printf("[E] No device type given; aborting ...\n");
+        return 1;
+    }
 
-                printf("[1] Starting modem_read_loop on FMT client\n");
-                modem_read_loop(client_fmt);
+    client_fmt = ipc_client_new(device_type, IPC_CLIENT_TYPE_FMT);
+    ipc_client_set_log_handler(client_fmt, modem_log_handler_quiet, NULL);
 
+    while(opt_i < argc) {
+        if(strncmp(argv[optind], "power-on", 8) == 0) {
+            ipc_client_power_on(client_fmt);
+            goto modem_quit;
+        } else if(strncmp(argv[optind], "power-off", 9) == 0) {
+            ipc_client_power_off(client_fmt);
+            goto modem_quit;
+        } else if (strncmp(argv[optind], "bootstrap", 9) == 0) {
+            ipc_client_create_handlers_common_data(client_fmt);
+            ipc_client_bootstrap_modem(client_fmt);
+        } else if(strncmp(argv[optind], "start", 5) == 0) {
+            printf("[0] Starting modem on FMT client\n");
+            rc = modem_start(client_fmt);
+            if(rc < 0) {
+                printf("[E] Something went wrong\n");
                 modem_stop(client_fmt);
-            } else {
-                printf("[E] Unknown argument: '%s'\n", argv[optind]);
-                print_help();
                 return 1;
             }
 
-            optind++;
+            printf("[1] Starting modem_read_loop on FMT client\n");
+            modem_read_loop(client_fmt);
+
+            modem_stop(client_fmt);
+        } else {
+            printf("[E] Unknown argument: '%s'\n", argv[optind]);
+            print_help();
+            return 1;
         }
+
+        optind++;
+    }
 
 modem_quit:
     ipc_client_free(client_fmt);
