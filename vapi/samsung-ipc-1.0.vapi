@@ -29,6 +29,13 @@ namespace SamsungIpc
         RFS,
     }
 
+    [CCode (cname = "int", cprefix = "IPC_DEVICE_", has_type_id = false)]
+    public enum DeviceType
+    {
+        CRESPO,
+        H1,
+    }
+
     [CCode (cname = "int", cprefix = "IPC_TYPE_", has_type_id = false)]
     public enum RequestType
     {
@@ -1197,7 +1204,7 @@ namespace SamsungIpc
     [CCode (cname = "struct ipc_client", cprefix = "ipc_client_")]
     public class Client
     {
-        public Client(ClientType type);
+        public Client(DeviceType device_type, ClientType client_type);
         [CCode (delagate_target_pos = 0.9)]
         public int set_log_handler(LogHandlerCb log_cb);
         public int set_io_handlers(TransportCb write_cb, TransportCb read_cb);

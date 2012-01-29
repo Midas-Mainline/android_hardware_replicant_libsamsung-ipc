@@ -29,13 +29,19 @@
 
 #include "ipc_private.h"
 
-extern struct ipc_ops ipc_fmt_ops;
-extern struct ipc_ops ipc_rfs_ops;
-extern struct ipc_handlers ipc_default_handlers;
+struct ipc_device_desc devices[IPC_DEVICE_MAX+1];
 
 void log_handler_default(const char *message, void *user_data)
 {
     printf("%s\n", message);
+}
+
+void ipc_register_device_client_handlers(int device, struct ipc_ops *fmt_ops,
+                                         struct ipc_ops *rfs_ops, struct ipc_handlers *handlers)
+{
+    devices[device].fmt_ops = fmt_ops;
+    devices[device].rfs_ops = rfs_ops;
+    devices[device].handlers = handlers;
 }
 
 void ipc_client_log(struct ipc_client *client, const char *message, ...)
@@ -51,30 +57,31 @@ void ipc_client_log(struct ipc_client *client, const char *message, ...)
     va_end(args);
 }
 
-struct ipc_client* ipc_client_new(int client_type)
+struct ipc_client* ipc_client_new(int device_type, int client_type)
 {
     struct ipc_client *client;
-    struct ipc_ops *ops = NULL;
 
-    switch (client_type)
-    {
-        case IPC_CLIENT_TYPE_FMT:
-            ops = &ipc_fmt_ops;
-            break;
-        case IPC_CLIENT_TYPE_RFS:
-            ops = &ipc_rfs_ops;
-            break;
-        default:
-            return NULL;
-    }
+    if (device_type < 0 || device_type > IPC_DEVICE_MAX)
+        return 0;
+    if (client_type < 0 || client_type > IPC_CLIENT_TYPE_RFS)
+        return 0;
 
     client = (struct ipc_client*) malloc(sizeof(struct ipc_client));
     client->type = client_type;
-    client->ops = ops;
+
+    switch (client_type)
+    {
+        case IPC_CLIENT_TYPE_RFS:
+            client->ops = devices[device_type].rfs_ops;
+            break;
+        case IPC_CLIENT_TYPE_FMT:
+            client->ops = devices[device_type].fmt_ops;
+            break;
+    }
+
     client->handlers = (struct ipc_handlers *) malloc(sizeof(struct ipc_handlers));
     client->log_handler = log_handler_default;
-
-    memcpy(client->handlers, &ipc_default_handlers, sizeof(struct ipc_handlers));
+    memcpy(client->handlers, devices[device_type].handlers , sizeof(struct ipc_handlers));
 
     return client;
 }

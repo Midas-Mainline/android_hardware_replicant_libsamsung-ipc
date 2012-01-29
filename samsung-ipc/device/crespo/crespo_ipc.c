@@ -691,7 +691,7 @@ int crespo_ipc_common_data_get_fd(void *io_data)
     return (int) *(common_data);
 }
 
-struct ipc_handlers ipc_default_handlers = {
+struct ipc_handlers crespo_default_handlers = {
     .read = crespo_ipc_read,
     .write = crespo_ipc_write,
     .open = crespo_ipc_open,
@@ -705,16 +705,22 @@ struct ipc_handlers ipc_default_handlers = {
     .common_data_get_fd = crespo_ipc_common_data_get_fd,
 };
 
-struct ipc_ops ipc_fmt_ops = {
+struct ipc_ops crespo_fmt_ops = {
     .send = crespo_ipc_fmt_client_send,
     .recv = crespo_ipc_fmt_client_recv,
     .bootstrap = crespo_modem_bootstrap,
 };
 
-struct ipc_ops ipc_rfs_ops = {
+struct ipc_ops crespo_rfs_ops = {
     .send = crespo_ipc_rfs_client_send,
     .recv = crespo_ipc_rfs_client_recv,
     .bootstrap = NULL,
 };
+
+void crespo_ipc_init(void)
+{
+    ipc_register_device_client_handlers(IPC_DEVICE_CRESPO, &crespo_fmt_ops,
+                                        &crespo_rfs_ops, &crespo_default_handlers);
+}
 
 // vim:ts=4:sw=4:expandtab

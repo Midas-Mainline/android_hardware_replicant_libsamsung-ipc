@@ -27,11 +27,10 @@ libsamsung_ipc_la_SOURCES = \
 	call.c \
 	net.c \
 	sms.c \
-	$(NULL)
-
-libsamsung_ipc_la_SOURCES += \
+	\
 	device/crespo/crespo_ipc.c \
 	$(NULL)
+
 AM_CFLAGS += -DDEVICE_IPC_V4
 
 libsamsung_ipc_la_LIBADD = \

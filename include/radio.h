@@ -26,8 +26,12 @@
 #include "types.h"
 #include "util.h"
 
-#define IPC_CLIENT_TYPE_FMT      0
-#define IPC_CLIENT_TYPE_RFS      1
+#define IPC_CLIENT_TYPE_FMT     0
+#define IPC_CLIENT_TYPE_RFS     1
+
+#define IPC_DEVICE_CRESPO       0
+
+#define IPC_DEVICE_MAX          IPC_DEVICE_CRESPO
 
 #define IPC_COMMAND(f)  ((f->group << 8) | f->index)
 #define IPC_GROUP(m)    (m >> 8)
@@ -59,7 +63,7 @@ typedef void (*ipc_client_log_handler_cb)(const char *message, void *user_data);
 typedef int (*ipc_io_handler_cb)(void *data, unsigned int size, void *io_data);
 typedef int (*ipc_handler_cb)(void *io_data);
 
-struct ipc_client *ipc_client_new(int client_type);
+struct ipc_client *ipc_client_new(int device_type, int client_type);
 int ipc_client_free(struct ipc_client *client);
 
 int ipc_client_set_log_handler(struct ipc_client *client, ipc_client_log_handler_cb log_handler_cb, void *user_data);
