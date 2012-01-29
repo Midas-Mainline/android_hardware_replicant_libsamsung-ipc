@@ -19,15 +19,6 @@ samsung_ipcinclude_HEADERS = \
 	rfs.h \
 	$(NULL)
 
-samsung_ipc_h1includedir = $(includedir)/samsung-ipc-1.0/device/h1/
-samsung_ipc_h1include_HEADERS = \
-	device/h1/call.h \
-	device/h1/sms.h \
-	device/h1/net.h \
-	device/h1/misc.h \
-	device/h1/gen.h
-	$(NULL)
-
 samsung_ipc_v4includedir = $(includedir)/samsung-ipc-1.0/device/ipc-v4/
 samsung_ipc_v4include_HEADERS = \
 	device/ipc-v4/call.h \
