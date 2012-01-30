@@ -26,9 +26,9 @@ libsamsung_ipc_la_SOURCES = \
 	gprs.c \
 	call.c \
 	net.c \
-	sms.c \
 	\
 	device/crespo/crespo_ipc.c \
+	device/aries/aries_ipc.c \
 	$(NULL)
 
 AM_CFLAGS += -DDEVICE_IPC_V4

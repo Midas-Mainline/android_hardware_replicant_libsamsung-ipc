@@ -915,7 +915,7 @@ int aries_ipc_common_data_get_fd(void *io_data)
     return common_data->fd;
 }
 
-struct ipc_handlers ipc_default_handlers = {
+struct ipc_handlers aries_default_handlers = {
     .read = aries_ipc_read,
     .write = aries_ipc_write,
     .open = aries_ipc_open,
@@ -929,16 +929,22 @@ struct ipc_handlers ipc_default_handlers = {
     .common_data_get_fd = aries_ipc_common_data_get_fd,
 };
 
-struct ipc_ops ipc_fmt_ops = {
+struct ipc_ops aries_fmt_ops = {
     .send = aries_ipc_fmt_client_send,
     .recv = aries_ipc_fmt_client_recv,
     .bootstrap = aries_modem_bootstrap,
 };
 
-struct ipc_ops ipc_rfs_ops = {
+struct ipc_ops aries_rfs_ops = {
     .send = aries_ipc_rfs_client_send,
     .recv = aries_ipc_rfs_client_recv,
     .bootstrap = NULL,
 };
+
+void aries_ipc_register(void)
+{
+    ipc_register_device_client_handlers(IPC_DEVICE_ARIES, &aries_fmt_ops,
+                                        &aries_rfs_ops, &aries_default_handlers);
+}
 
 // vim:ts=4:sw=4:expandtab
