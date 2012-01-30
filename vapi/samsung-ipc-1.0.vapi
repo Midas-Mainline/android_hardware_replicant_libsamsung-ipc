@@ -191,7 +191,7 @@ namespace SamsungIpc
 
     namespace Power
     {
-        [CCode (cname = "gint8", cprefix = "IPC_PWR_PHONE_STATE_", has_type_id = false)]
+        [CCode (cname = "gint16", cprefix = "IPC_PWR_PHONE_STATE_", has_type_id = false)]
         public enum PhoneState
         {
             LPM,
