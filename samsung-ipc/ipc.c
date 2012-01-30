@@ -41,11 +41,13 @@
 
 struct ipc_device_desc devices[IPC_DEVICE_MAX+1];
 
-extern void crespo_ipc_init(void);
+extern void crespo_ipc_register(void);
+extern void aries_ipc_register();
 
 void ipc_init(void)
 {
-    crespo_ipc_init();
+    crespo_ipc_register();
+    aries_ipc_register();
 }
 
 void ipc_shutdown(void)
