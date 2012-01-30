@@ -30,8 +30,9 @@
 #define IPC_CLIENT_TYPE_RFS     1
 
 #define IPC_DEVICE_CRESPO       0
+#define IPC_DEVICE_ARIES        1
 
-#define IPC_DEVICE_MAX          IPC_DEVICE_CRESPO
+#define IPC_DEVICE_MAX          IPC_DEVICE_ARIES
 
 #define IPC_COMMAND(f)  ((f->group << 8) | f->index)
 #define IPC_GROUP(m)    (m >> 8)
