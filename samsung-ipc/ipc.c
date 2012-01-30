@@ -41,11 +41,13 @@
 
 struct ipc_device_desc devices[IPC_DEVICE_MAX+1];
 
-extern void crespo_ipc_init(void);
+extern void crespo_ipc_register(void);
+extern void aries_ipc_register();
 
 void ipc_init(void)
 {
-    crespo_ipc_init();
+    crespo_ipc_register();
+    aries_ipc_register();
 }
 
 void ipc_shutdown(void)
@@ -97,6 +99,7 @@ struct ipc_client* ipc_client_new(int client_type)
         {
             if (strstr(pch, "herring") != NULL)
                 device_type = IPC_DEVICE_CRESPO;
+            // FIXME add detection for aries based devices
         }
         pch = strtok(NULL, "\n");
     }

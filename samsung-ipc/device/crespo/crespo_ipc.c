@@ -717,7 +717,7 @@ struct ipc_ops crespo_rfs_ops = {
     .bootstrap = NULL,
 };
 
-void crespo_ipc_init(void)
+void crespo_ipc_register(void)
 {
     ipc_register_device_client_handlers(IPC_DEVICE_CRESPO, &crespo_fmt_ops,
                                         &crespo_rfs_ops, &crespo_default_handlers);
