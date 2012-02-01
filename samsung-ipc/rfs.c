@@ -660,7 +660,7 @@ void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client, struct
     if (rfs_io == NULL)
     {
         ipc_client_log(client, "ERROR: Request message is invalid: aseq = %i", info->aseq);
-        return NULL;
+        return;
     }
 
     rfs_data = info->data + sizeof(struct ipc_rfs_io);
