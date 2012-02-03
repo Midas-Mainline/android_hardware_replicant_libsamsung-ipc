@@ -38,21 +38,7 @@
 #include <radio.h>
 
 #include "ipc_private.h"
-
-struct ipc_device_desc devices[IPC_DEVICE_MAX+1];
-
-extern void crespo_ipc_register(void);
-extern void aries_ipc_register();
-
-void ipc_init(void)
-{
-    crespo_ipc_register();
-    aries_ipc_register();
-}
-
-void ipc_shutdown(void)
-{
-}
+#include "ipc_devices.h"
 
 void log_handler_default(const char *message, void *user_data)
 {
@@ -78,6 +64,51 @@ void ipc_client_log(struct ipc_client *client, const char *message, ...)
     vsprintf(buffer, message, args);
     client->log_handler(buffer, client->log_data);
     va_end(args);
+}
+
+int ipc_device_detect(void)
+{
+    int index = -1;
+    int i;
+
+#ifdef IPC_DEVICE_EXPLICIT
+    for(i=0 ; i < ipc_devices_count ; i++)
+    {
+        if(strcmp(IPC_DEVICE_EXPLICIT, ipc_device[i].name) == 0)
+        {
+            index = i;
+            break;
+        }
+    }
+#else 
+    char buf[4096];
+
+    // gather device type from /proc/cpuinfo
+    int fd = open("/proc/cpuinfo", O_RDONLY);
+    int bytesread = read(fd, buf, 4096);
+    close(fd);
+
+    // match hardware name with our supported devices
+    char *pch = strtok(buf, "\n");
+    while (pch != NULL)
+    {
+        int rc;
+        if ((rc = strncmp(pch, "Hardware", 9)) == 9)
+        {
+            for(i=0 ; i < ipc_devices_count ; i++)
+            {
+                if(strcmp(pch, ipc_devices[i].board_name) == 0)
+                {
+                    index = i;
+                    break;
+                }
+            }
+        }
+        pch = strtok(NULL, "\n");
+    }
+#endif
+
+    return index;
 }
 
 struct ipc_client* ipc_client_new(int client_type)
@@ -114,11 +145,15 @@ struct ipc_client* ipc_client_new(int client_type)
 struct ipc_client* ipc_client_new_for_device(int device_type, int client_type)
 {
     struct ipc_client *client;
+    int device_index = -1;
 
-    if (device_type < 0 || device_type > IPC_DEVICE_MAX)
-        return 0;
+    device_index = ipc_device_detect();
+
+    if(device_index < 0 || device_index > ipc_devices_count)
+        return NULL;
+
     if (client_type < 0 || client_type > IPC_CLIENT_TYPE_RFS)
-        return 0;
+        return NULL;
 
     client = (struct ipc_client*) malloc(sizeof(struct ipc_client));
     client->type = client_type;
@@ -126,17 +161,18 @@ struct ipc_client* ipc_client_new_for_device(int device_type, int client_type)
     switch (client_type)
     {
         case IPC_CLIENT_TYPE_RFS:
-            client->ops = devices[device_type].rfs_ops;
+            client->ops = ipc_devices[device_index].rfs_ops;
             break;
         case IPC_CLIENT_TYPE_FMT:
-            client->ops = devices[device_type].fmt_ops;
+            client->ops = ipc_devices[device_index].fmt_ops;
             break;
     }
 
     client->handlers = (struct ipc_handlers *) malloc(sizeof(struct ipc_handlers));
     client->log_handler = log_handler_default;
-    if (devices[device_type].handlers != 0)
-        memcpy(client->handlers, devices[device_type].handlers , sizeof(struct ipc_handlers));
+
+    if (ipc_devices[device_index].handlers != 0)
+        memcpy(client->handlers, ipc_devices[device_index].handlers, sizeof(struct ipc_handlers));
 
     return client;
 }

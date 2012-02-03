@@ -29,11 +29,6 @@
 #define IPC_CLIENT_TYPE_FMT     0
 #define IPC_CLIENT_TYPE_RFS     1
 
-#define IPC_DEVICE_CRESPO       0
-#define IPC_DEVICE_ARIES        1
-
-#define IPC_DEVICE_MAX          IPC_DEVICE_ARIES
-
 #define IPC_COMMAND(f)  ((f->group << 8) | f->index)
 #define IPC_GROUP(m)    (m >> 8)
 #define IPC_INDEX(m)    (m & 0xff)
@@ -56,11 +51,6 @@ struct ipc_message_info {
 
 struct ipc_client;
 struct ipc_handlers;
-
-extern struct ipc_handlers ipc_default_handlers;
-
-void ipc_init(void);
-void ipc_shutdown(void);
 
 typedef void (*ipc_client_log_handler_cb)(const char *message, void *user_data);
 
