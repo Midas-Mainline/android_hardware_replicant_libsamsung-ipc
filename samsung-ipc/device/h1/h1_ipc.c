@@ -263,7 +263,7 @@ int h1_ipc_common_data_get_fd(void *io_data)
     return (int) *(common_data);
 }
 
-struct ipc_handlers ipc_default_handlers = {
+struct ipc_handlers h1_default_handlers = {
     .open = h1_ipc_open,
     .close = h1_ipc_close,
     .power_on = h1_ipc_power_on,
@@ -277,7 +277,7 @@ struct ipc_handlers ipc_default_handlers = {
     .common_data_get_fd = h1_ipc_common_data_get_fd,
 };
 
-struct ipc_ops ipc_fmt_ops = {
+struct ipc_ops h1_fmt_ops = {
     .send = h1_ipc_send,
     .recv = h1_ipc_recv,
     .bootstrap = NULL,

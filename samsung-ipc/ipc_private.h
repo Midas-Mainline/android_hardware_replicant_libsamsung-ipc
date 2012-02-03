@@ -65,12 +65,6 @@ struct ipc_client {
     struct ipc_handlers *handlers;
 };
 
-struct ipc_device_desc {
-    struct ipc_ops *fmt_ops;
-    struct ipc_ops *rfs_ops;
-    struct ips_handlers *handlers;
-};
-
 void ipc_client_log(struct ipc_client *client, const char *message, ...);
 void ipc_register_device_client_handlers(int device, struct ipc_ops *fmt_ops,
                                          struct ipc_ops *rfs_ops, struct ipc_handlers *handlers);
