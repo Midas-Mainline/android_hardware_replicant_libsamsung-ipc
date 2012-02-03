@@ -520,17 +520,20 @@ namespace SamsungIpc
         }
 
         [CCode (cname = "struct ipc_net_regist_get", destroy_function = "")]
-        public struct RegistrationSetMessage
+        public struct RegistrationGetMessage
         {
             public uint8 net;
-            public uint8 domain;
+            public ServiceDomain domain;
+
+            [CCode (cname = "ipc_net_regist_get")]
+            public void setup( ServiceDomain domain );
 
             public unowned uint8[] data
             {
                 get
                 {
                     unowned uint8[] res = (uint8[])(&this);
-                    res.length = (int) sizeof( RegistrationSetMessage );
+                    res.length = (int) sizeof( RegistrationGetMessage );
                     return res;
                 }
             }
@@ -1027,7 +1030,7 @@ namespace SamsungIpc
             OUTGOING,
         }
 
-        [CCode (cname = "gint8", cprefix = "IPC_SMS_ACK_", has_type_id = false)]
+        [CCode (cname = "gint16", cprefix = "IPC_SMS_ACK_", has_type_id = false)]
         public enum AcknowledgeErrorType
         {
             NO_ERROR,
@@ -1088,9 +1091,10 @@ namespace SamsungIpc
         [CCode (cname = "struct ipc_sms_deliv_report_msg")]
         public struct DeliverReportMessage
         {
-            public uint8 type;
-            public uint16 error;
+            public MessageType type;
+            public AcknowledgeErrorType error;
             public uint8 msg_tpid;
+            public uint8 unk;
 
             public unowned uint8[] data
             {
