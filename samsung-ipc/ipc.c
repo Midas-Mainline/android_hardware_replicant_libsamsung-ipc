@@ -45,14 +45,6 @@ void log_handler_default(const char *message, void *user_data)
     printf("%s\n", message);
 }
 
-void ipc_register_device_client_handlers(int device, struct ipc_ops *fmt_ops,
-                                         struct ipc_ops *rfs_ops, struct ipc_handlers *handlers)
-{
-    devices[device].fmt_ops = fmt_ops;
-    devices[device].rfs_ops = rfs_ops;
-    devices[device].handlers = handlers;
-}
-
 void ipc_client_log(struct ipc_client *client, const char *message, ...)
 {
     assert(client->log_handler != NULL);
@@ -80,7 +72,7 @@ int ipc_device_detect(void)
             break;
         }
     }
-#else 
+#else
     char buf[4096];
 
     // gather device type from /proc/cpuinfo
@@ -112,37 +104,6 @@ int ipc_device_detect(void)
 }
 
 struct ipc_client* ipc_client_new(int client_type)
-{
-    int device_type = -1, in_hardware = 0;
-    char buf[4096];
-
-    // gather device type from /proc/cpuinfo
-    int fd = open("/proc/cpuinfo", O_RDONLY);
-    int bytesread = read(fd, buf, 4096);
-    close(fd);
-
-    // match hardware name with our supported devices
-    char *pch = strtok(buf, "\n");
-    while (pch != NULL)
-    {
-        int rc;
-        if ((rc = strncmp(pch, "Hardware", 9)) == 9)
-        {
-            if (strstr(pch, "herring") != NULL)
-                device_type = IPC_DEVICE_CRESPO;
-            // FIXME add detection for aries based devices
-        }
-        pch = strtok(NULL, "\n");
-    }
-
-    // validate that we have found any supported device
-    if (device_type == -1)
-        return NULL;
-
-    return ipc_client_new_for_device(device_type, client_type);
-}
-
-struct ipc_client* ipc_client_new_for_device(int device_type, int client_type)
 {
     struct ipc_client *client;
     int device_index = -1;

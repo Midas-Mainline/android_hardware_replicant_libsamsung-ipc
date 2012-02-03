@@ -528,7 +528,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    ipc_init();
     client_fmt = ipc_client_new(IPC_CLIENT_TYPE_FMT);
 
     if (client_fmt == 0) {
@@ -577,7 +576,6 @@ int main(int argc, char *argv[])
 modem_quit:
     if (client_fmt != 0)
         ipc_client_free(client_fmt);
-    ipc_shutdown();
 
     return 0;
 }

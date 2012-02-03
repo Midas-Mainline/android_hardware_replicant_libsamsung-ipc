@@ -941,10 +941,4 @@ struct ipc_ops aries_rfs_ops = {
     .bootstrap = NULL,
 };
 
-void aries_ipc_register(void)
-{
-    ipc_register_device_client_handlers(IPC_DEVICE_ARIES, &aries_fmt_ops,
-                                        &aries_rfs_ops, &aries_default_handlers);
-}
-
 // vim:ts=4:sw=4:expandtab

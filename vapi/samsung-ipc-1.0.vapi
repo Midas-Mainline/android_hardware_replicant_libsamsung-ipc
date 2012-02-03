@@ -1200,11 +1200,6 @@ namespace SamsungIpc
     public delegate int TransportCb(uint8[] data);
     public delegate void LogHandlerCb(string message);
 
-    [CCode (cname = "ipc_init")]
-    public void init();
-    [CCode (cname = "ipc_shutdown")]
-    public void shutdown();
-
     [Compact]
     [CCode (cname = "struct ipc_client", cprefix = "ipc_client_")]
     public class Client
