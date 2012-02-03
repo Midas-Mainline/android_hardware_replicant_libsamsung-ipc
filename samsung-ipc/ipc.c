@@ -30,6 +30,7 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <string.h>
+#include <ctype.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -66,7 +67,7 @@ int ipc_device_detect(void)
 #ifdef IPC_DEVICE_EXPLICIT
     for(i=0 ; i < ipc_devices_count ; i++)
     {
-        if(strcmp(IPC_DEVICE_EXPLICIT, ipc_device[i].name) == 0)
+        if(strcmp(IPC_DEVICE_EXPLICIT, ipc_devices[i].name) == 0)
         {
             index = i;
             break;
@@ -87,9 +88,19 @@ int ipc_device_detect(void)
         int rc;
         if ((rc = strncmp(pch, "Hardware", 9)) == 9)
         {
+            char *str = (void *) (pch + 9);
+            int len = strlen(str);
+            char tmp;
+
+            for(i=0 ; i < len ; i++)
+            {
+                tmp = (char) tolower(str[i]);
+                str[i] = tmp;
+            }
+
             for(i=0 ; i < ipc_devices_count ; i++)
             {
-                if(strcmp(pch, ipc_devices[i].board_name) == 0)
+                if(strstr(pch, ipc_devices[i].board_name) != NULL)
                 {
                     index = i;
                     break;

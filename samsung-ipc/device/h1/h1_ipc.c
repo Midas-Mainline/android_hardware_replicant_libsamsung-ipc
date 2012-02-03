@@ -131,7 +131,7 @@ int h1_ipc_send(struct ipc_client *client, struct ipc_message_info *request)
 
     hex_dump(frame, frame_length);
 
-    client->handlers->write(frame, frame_length, client->handlers->io_data);
+    client->handlers->write(frame, frame_length,  client->handlers->write_data);
 
     free(frame);
 
@@ -147,14 +147,14 @@ int h1_ipc_recv(struct ipc_client *client, struct ipc_message_info *response)
     int num_read;
     int left;
 
-    num_read = client->handlers->read((void*)buf, sizeof(buf), client->handlers->io_data);
+    num_read = client->handlers->read((void*)buf, sizeof(buf),  client->handlers->read_data);
 
     if(num_read == sizeof(buf) && *buf == FRAME_START) {
         frame_length = (unsigned short*)&buf[1];
         left = (*frame_length - 3 + 1);
 
         data = (unsigned char*)malloc(left);
-        num_read = client->handlers->read((void*)data, left, client->handlers->io_data);
+        num_read = client->handlers->read((void*)data, left,  client->handlers->read_data);
 
         if(num_read == left && data[left-1] == FRAME_END) {
             ipc = (struct ipc_header*)data;

@@ -45,9 +45,12 @@ samsung-ipc_files := \
 	samsung-ipc/misc.c \
 	samsung-ipc/net.c \
 	samsung-ipc/sec.c \
-	samsung-ipc/device/$(samsung-ipc_device)/$(samsung-ipc_device)_ipc.c
+	samsung-ipc/device/h1/h1_ipc.c \
+	samsung-ipc/device/crespo/crespo_ipc.c \
+	samsung-ipc/device/aries/aries_ipc.c
 
 LOCAL_SRC_FILES := $(samsung-ipc_files)
+LOCAL_CFLAGS += -DIPC_DEVICE_EXPLICIT=\"$(samsung-ipc_device)\"
 
 LOCAL_SHARED_LIBRARIES := libutils
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/include \
