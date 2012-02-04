@@ -126,10 +126,10 @@ int h1_ipc_send(struct ipc_client *client, struct ipc_message_info *request)
     memcpy(payload, request->data, request->length);
 
     ipc_client_log(client, "sending %s %s\n",
-            ipc_command_type_to_str(IPC_COMMAND(request)),
+            ipc_command_to_str(IPC_COMMAND(request)),
             ipc_response_type_to_str(request->type));
 
-    hex_dump(frame, frame_length);
+    ipc_hex_dump(client, frame, frame_length);
 
     client->handlers->write(frame, frame_length,  client->handlers->write_data);
 
@@ -169,10 +169,10 @@ int h1_ipc_recv(struct ipc_client *client, struct ipc_message_info *response)
             memcpy(response->data, (data + sizeof(*ipc)), response->length);
 
             ipc_client_log(client, "received %s %s\n",
-                    ipc_command_type_to_str(IPC_COMMAND(response)),
+                    ipc_command_to_str(IPC_COMMAND(response)),
                     ipc_response_type_to_str(response->type));
 
-            hex_dump(data, num_read-1);
+            ipc_hex_dump(client, data, num_read-1);
 
             return 0;
         }
