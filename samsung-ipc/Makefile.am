@@ -30,6 +30,18 @@ libsamsung_ipc_la_SOURCES = \
 	\
 	device/crespo/crespo_ipc.c \
 	device/aries/aries_ipc.c \
+	device/h1/h1_ipc.c \
+	\
+	ipc_private.h \
+	ipc_devices.h \
+	device/aries/sipc4.h \
+	device/aries/aries_ipc.h \
+	device/aries/onedram.h \
+	device/aries/phonet.h \
+	device/h1 \
+	device/h1/h1_ipc.h \
+	device/crespo/crespo_modem_ctl.h \
+	device/crespo/crespo_ipc.h \
 	$(NULL)
 
 AM_CFLAGS += -DDEVICE_IPC_V4
