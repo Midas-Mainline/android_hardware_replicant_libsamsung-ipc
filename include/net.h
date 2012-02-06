@@ -45,8 +45,8 @@
 #define IPC_NET_PLMN_STATUS_CURRENT                                 0x03
 #define IPC_NET_PLMN_STATUS_FORBIDDEN                               0x04
 
-#define IPC_NET_PLMN_SEL_MANUAL                                     0x00
-#define IPC_NET_PLMN_SEL_AUTO                                       0x01
+#define IPC_NET_PLMN_SEL_MODE_MANUAL                                0x03
+#define IPC_NET_PLMN_SEL_MODE_AUTO                                  0x02
 
 #define IPC_NET_REGISTRATION_STATE_NONE                             0x01
 #define IPC_NET_REGISTRATION_STATE_HOME                             0x02
@@ -88,7 +88,15 @@ struct ipc_net_mode_sel {
     unsigned char mode;
 } __attribute__((__packed__));
 
+struct ipc_net_plmn_sel {
+    unsigned char mode;
+    unsigned char plmn[5];
+    unsigned char unk0;
+    unsigned char unk1;
+} __attribute__((__packed__));
+
 void ipc_net_regist_get(struct ipc_net_regist_get *message, int domain);
+void ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel *message, unsigned char mode, unsigned char *plmn);
 
 #endif
 

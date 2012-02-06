@@ -490,8 +490,8 @@ namespace SamsungIpc
             FORBIDDEN,
         }
 
-        [CCode (cname = "gint8", cprefix = "IPC_NET_PLMN_SEL_", has_type_id = false)]
-        public enum PlmnSelection
+        [CCode (cname = "gint8", cprefix = "IPC_NET_PLMN_SEL_MODE_", has_type_id = false)]
+        public enum PlmnSelectionMode
         {
             MANUAL,
             AUTO,
@@ -611,6 +611,26 @@ namespace SamsungIpc
                 {
                     unowned uint8[] res = (uint8[])(&this);
                     res.length = (int) sizeof( PlmnEntriesMessage );
+                    return res;
+                }
+            }
+        }
+
+        [CCode (cname = "struct ipc_net_plmn_sel", destroy_function = "")]
+        public struct PlmnSelectionMessage
+        {
+            public uint8 mode;
+            public uint8[] plmn;
+
+            [CCode (cname = "ipc_net_plmn_sel_setup")]
+            public void setup(uint8 mode, string plmn);
+
+            public unowned uint8[] data
+            {
+                get
+                {
+                    unowned uint8[] res = (uint8[])(&this);
+                    res.length = (int) sizeof( PlmnSelectionMessage );
                     return res;
                 }
             }

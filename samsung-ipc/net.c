@@ -26,4 +26,20 @@ void ipc_net_regist_get(struct ipc_net_regist_get *message, int domain)
 	message->domain = domain;
 }
 
+void ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel *message, unsigned char mode, unsigned char *plmn)
+{
+    if (mode == IPC_NET_PLMN_SEL_MODE_AUTO)
+    {
+        message->mode = IPC_NET_PLMN_SEL_MODE_AUTO;
+        message->unk1 = 0xff;
+    }
+    else if (mode == IPC_NET_PLMN_SEL_MODE_MANUAL)
+    {
+        message->mode = IPC_NET_PLMN_SEL_MODE_MANUAL;
+        strncpy(message->plmn, plmn, 5);
+        message->unk0 = 0x23;
+        message->unk1 = 0x4;
+    }
+}
+
 // vim:ts=4:sw=4:expandtab
