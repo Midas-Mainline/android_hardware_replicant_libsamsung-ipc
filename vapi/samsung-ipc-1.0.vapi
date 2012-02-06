@@ -532,7 +532,7 @@ namespace SamsungIpc
             public uint8 net;
             public ServiceDomain domain;
 
-            [CCode (cname = "ipc_net_regist_get")]
+            [CCode (cname = "ipc_net_regist_setup")]
             public void setup( ServiceDomain domain );
 
             public unowned uint8[] data

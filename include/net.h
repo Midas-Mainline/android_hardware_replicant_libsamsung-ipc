@@ -82,7 +82,7 @@ struct ipc_net_plmn_entry {
 
 struct ipc_net_plmn_entries {
     unsigned char num;
-};
+} __attribute__((__packed__));
 
 struct ipc_net_mode_sel {
     unsigned char mode;
@@ -95,7 +95,7 @@ struct ipc_net_plmn_sel {
     unsigned char unk1;
 } __attribute__((__packed__));
 
-void ipc_net_regist_get(struct ipc_net_regist_get *message, int domain);
+void ipc_net_regist_setup(struct ipc_net_regist_get *message, unsigned char domain);
 void ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel *message, unsigned char mode, unsigned char *plmn);
 
 #endif

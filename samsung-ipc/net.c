@@ -20,10 +20,10 @@
 
 #include <radio.h>
 
-void ipc_net_regist_get(struct ipc_net_regist_get *message, int domain)
+void ipc_net_regist_setup(struct ipc_net_regist_get *message, unsigned char domain)
 {
-	message->net = 0xff;
-	message->domain = domain;
+    message->net = 0xff;
+    message->domain = domain;
 }
 
 void ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel *message, unsigned char mode, unsigned char *plmn)
