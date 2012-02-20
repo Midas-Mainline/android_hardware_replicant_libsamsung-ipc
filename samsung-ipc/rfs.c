@@ -223,7 +223,6 @@ nv_data_backup_create_write:
         ipc_client_log(client, "nv_data_backup_create: writing nv_data.bin to .nv_data.bak failed too many times\n");
         unlink("/efs/.nv_data.bak");
         goto exit;
-        
     }
 
     /* Read the newly-written .nv_data.bak. */
@@ -617,6 +616,72 @@ int nv_data_write(struct ipc_client *client, int offset, int length, char *buf)
     ipc_client_log(client, "nv_data_write: exit\n");
 
     return 0;
+}
+
+struct ipc_rfs_io_confirm* ipc_rfs_create_io_confirm_for_nv_read_item(struct ipc_client *client, struct ipc_message_info *info)
+{
+    struct ipc_rfs_io *rfs_io = (struct ipc_rfs_io *) info->data;
+    struct ipc_rfs_io_confirm *rfs_io_conf;
+    void *rfs_data;
+    int rc;
+
+    if(rfs_io == NULL)
+    {
+        ipc_client_log(client, "ERROR: Request message is invalid: aseq = %i", info->aseq);
+        return NULL;
+    }
+
+    rfs_io_conf = malloc(rfs_io->length + sizeof(struct ipc_rfs_io_confirm));
+    memset(rfs_io_conf, 0, rfs_io->length + sizeof(struct ipc_rfs_io_confirm));
+    rfs_data = rfs_io_conf + sizeof(struct ipc_rfs_io_confirm);
+
+    ipc_client_log(client, "Asked to read 0x%x bytes at offset 0x%x", rfs_io->length, rfs_io->offset);
+    rc = nv_data_read(client, rfs_io->offset, rfs_io->length, rfs_data);
+
+    ipc_client_log(client, "Read rfs_data dump:");
+    ipc_hex_dump(client, rfs_data, rfs_io->length);
+
+    ipc_client_log(client, "Preparing RFS IO Confirm message (rc is %d)", rc);
+    rfs_io_conf->confirm = rc < 0 ? 0 : 1;
+    rfs_io_conf->offset = rfs_io->offset;
+    rfs_io_conf->length = rfs_io->length;
+
+    // ipc_rfs_send(IPC_RFS_NV_READ_ITEM, rfs_io_conf, rfs_io->length + sizeof(struct ipc_rfs_io_confirm), info->aseq);
+    // free(rfs_io_conf);
+
+    return rfs_io_conf;
+}
+
+struct ipc_rfs_io_confirm* ipc_rfs_create_io_confirm_for_nv_write_item(struct ipc_client *client, struct ipc_message_info *info)
+{
+    struct ipc_rfs_io *rfs_io = (struct ipc_rfs_io *) info->data;
+    struct ipc_rfs_io_confirm *rfs_io_conf;
+    void *rfs_data;
+    int rc;
+
+    if (rfs_io == NULL)
+    {
+        ipc_client_log(client, "ERROR: Request message is invalid: aseq = %i", info->aseq);
+        return;
+    }
+
+    rfs_data = info->data + sizeof(struct ipc_rfs_io);
+
+    ipc_client_log(client, "Write rfs_data dump:");
+    ipc_hex_dump(client, rfs_data, rfs_io->length);
+
+    ipc_client_log(client, "Asked to write 0x%x bytes at offset 0x%x", rfs_io->length, rfs_io->offset);
+    rc = nv_data_write(client, rfs_io->offset, rfs_io->length, rfs_data);
+
+    ipc_client_log(client, "Sending RFS IO Confirm message (rc is %d)", rc);
+    rfs_io_conf = (struct ipc_rfs_io_confirm*) malloc(sizeof(struct ipc_rfs_io_confirm));
+    rfs_io_conf->confirm = rc < 0 ? 0 : 1;
+    rfs_io_conf->offset = rfs_io->offset;
+    rfs_io_conf->length = rfs_io->length;
+
+    // ipc_rfs_send(IPC_RFS_NV_WRITE_ITEM, &rfs_io_conf, sizeof(struct ipc_rfs_io_confirm), info->aseq);
+
+    return rfs_io_conf;
 }
 
 // vim:ts=4:sw=4:expandtab

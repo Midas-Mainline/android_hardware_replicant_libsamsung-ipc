@@ -54,6 +54,9 @@ void nv_data_md5_check(struct ipc_client *client);
 int nv_data_read(struct ipc_client *client, int offset, int length, char *buf);
 int nv_data_write(struct ipc_client *client, int offset, int length, char *buf);
 
+struct ipc_rfs_io_confirm* ipc_rfs_create_io_confirm_for_nv_write_item(struct ipc_client *client, struct ipc_message_info *info);
+struct ipc_rfs_io_confirm* ipc_rfs_create_io_confirm_for_nv_read_item(struct ipc_client *client, struct ipc_message_info *info);
+
 #endif
 
 // vim:ts=4:sw=4:expandtab
