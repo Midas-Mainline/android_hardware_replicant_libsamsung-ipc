@@ -202,7 +202,7 @@ void ipc_hex_dump(struct ipc_client *client, void *data, int size)
     char addrstr[10] = {0};
     char hexstr[ 16*3 + 5] = {0};
     char charstr[16*1 + 5] = {0};
-    for(n=1;n<=size;n++) {
+    for (n=1;n<=size;n++) {
         if (n%16 == 1) {
             /* store address for this line */
             snprintf(addrstr, sizeof(addrstr), "%.4x",
@@ -222,12 +222,12 @@ void ipc_hex_dump(struct ipc_client *client, void *data, int size)
         snprintf(bytestr, sizeof(bytestr), "%c", c);
         strncat(charstr, bytestr, sizeof(charstr)-strlen(charstr)-1);
 
-        if(n%16 == 0) {
+        if (n%16 == 0) {
             /* line completed */
             ipc_client_log(client, "[%4.4s]   %-50.50s  %s", addrstr, hexstr, charstr);
             hexstr[0] = 0;
             charstr[0] = 0;
-        } else if(n%8 == 0) {
+        } else if (n%8 == 0) {
             /* half line: add whitespaces */
             strncat(hexstr, "  ", sizeof(hexstr)-strlen(hexstr)-1);
             strncat(charstr, " ", sizeof(charstr)-strlen(charstr)-1);
@@ -250,27 +250,27 @@ void *ipc_mtd_read(struct ipc_client *client, char *mtd_name, int size, int bloc
     int fd;
     int i;
 
-    if(mtd_name == NULL || size <= 0 || block_size <= 0)
+    if (mtd_name == NULL || size <= 0 || block_size <= 0)
         goto error;
 
     ipc_client_log(client, "ipc_mtd_read: reading 0x%x bytes from %s with 0x%x bytes block size\n", size, mtd_name, block_size);
 
     fd=open(mtd_name, O_RDONLY);
-    if(fd < 0)
+    if (fd < 0)
         goto error;
 
     mtd_p=malloc(size);
-    if(mtd_p == NULL)
+    if (mtd_p == NULL)
         goto error;
 
     memset(mtd_p, 0, size);
 
     data_p=(uint8_t *) mtd_p;
 
-    for(i=0 ; i < size / block_size ; i++)
+    for (i=0 ; i < size / block_size ; i++)
     {
         offs = i * block_size;
-        if(ioctl(fd, MEMGETBADBLOCK, &offs) == 1)
+        if (ioctl(fd, MEMGETBADBLOCK, &offs) == 1)
         {
             ipc_client_log(client, "ipc_mtd_read: warning: bad block at offset %lld\n", (long long int) offs);
             data_p+=block_size;
@@ -298,24 +298,24 @@ void *ipc_file_read(struct ipc_client *client, char *file_name, int size, int bl
     int fd;
     int i;
 
-    if(file_name == NULL || size <= 0 || block_size <= 0)
+    if (file_name == NULL || size <= 0 || block_size <= 0)
         goto error;
 
     ipc_client_log(client, "ipc_file_read: reading 0x%x bytes from %s with 0x%x bytes block size\n", size, file_name, block_size);
 
     fd=open(file_name, O_RDONLY);
-    if(fd < 0)
+    if (fd < 0)
         goto error;
 
     file_p=malloc(size);
-    if(file_p == NULL)
+    if (file_p == NULL)
         goto error;
 
     memset(file_p, 0, size);
 
     data_p=(uint8_t *) file_p;
 
-    for(i=0 ; i < size / block_size ; i++)
+    for (i=0 ; i < size / block_size ; i++)
     {
         read(fd, data_p, block_size);
         data_p+=block_size;

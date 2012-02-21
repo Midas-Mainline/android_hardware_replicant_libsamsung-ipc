@@ -65,9 +65,9 @@ int ipc_device_detect(void)
     int i;
 
 #ifdef IPC_DEVICE_EXPLICIT
-    for(i=0 ; i < ipc_devices_count ; i++)
+    for (i=0 ; i < ipc_devices_count ; i++)
     {
-        if(strcmp(IPC_DEVICE_EXPLICIT, ipc_devices[i].name) == 0)
+        if (strcmp(IPC_DEVICE_EXPLICIT, ipc_devices[i].name) == 0)
         {
             index = i;
             break;
@@ -92,15 +92,15 @@ int ipc_device_detect(void)
             int len = strlen(str);
             char tmp;
 
-            for(i=0 ; i < len ; i++)
+            for (i=0 ; i < len ; i++)
             {
                 tmp = (char) tolower(str[i]);
                 str[i] = tmp;
             }
 
-            for(i=0 ; i < ipc_devices_count ; i++)
+            for (i=0 ; i < ipc_devices_count ; i++)
             {
-                if(strstr(pch, ipc_devices[i].board_name) != NULL)
+                if (strstr(pch, ipc_devices[i].board_name) != NULL)
                 {
                     index = i;
                     break;
@@ -121,7 +121,7 @@ struct ipc_client* ipc_client_new(int client_type)
 
     device_index = ipc_device_detect();
 
-    if(device_index < 0 || device_index > ipc_devices_count)
+    if (device_index < 0 || device_index > ipc_devices_count)
         return NULL;
 
     if (client_type < 0 || client_type > IPC_CLIENT_TYPE_RFS)
@@ -159,7 +159,7 @@ int ipc_client_free(struct ipc_client *client)
 
 int ipc_client_set_log_handler(struct ipc_client *client, ipc_client_log_handler_cb log_handler_cb, void *user_data)
 {
-    if(client == NULL)
+    if (client == NULL)
         return -1;
 
     client->log_handler = log_handler_cb;
@@ -170,7 +170,7 @@ int ipc_client_set_log_handler(struct ipc_client *client, ipc_client_log_handler
 
 int ipc_client_set_handlers(struct ipc_client *client, struct ipc_handlers *handlers)
 {
-    if(client == NULL ||
+    if (client == NULL ||
        handlers == NULL)
         return -1;
 
@@ -183,17 +183,17 @@ int ipc_client_set_io_handlers(struct ipc_client *client,
                                ipc_io_handler_cb read, void *read_data,
                                ipc_io_handler_cb write, void *write_data)
 {
-    if(client == NULL ||
+    if (client == NULL ||
        client->handlers == NULL)
         return -1;
 
-    if(read != NULL)
+    if (read != NULL)
         client->handlers->read = read;
-    if(read_data != NULL)
+    if (read_data != NULL)
         client->handlers->read_data = read_data;
-    if(write != NULL)
+    if (write != NULL)
         client->handlers->write = write;
-    if(write_data != NULL)
+    if (write_data != NULL)
         client->handlers->write_data = write_data;
 
     return 0;
@@ -203,7 +203,7 @@ int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data)
 {
     void *common_data;
 
-    if(client == NULL ||
+    if (client == NULL ||
        client->handlers == NULL ||
        data == NULL)
         return -1;
@@ -223,7 +223,7 @@ int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data)
 
 void *ipc_client_get_handlers_common_data(struct ipc_client *client)
 {
-    if(client == NULL ||
+    if (client == NULL ||
        client->handlers == NULL)
         return NULL;
 
@@ -234,7 +234,7 @@ int ipc_client_create_handlers_common_data(struct ipc_client *client)
 {
     void *common_data;
 
-    if(client == NULL ||
+    if (client == NULL ||
        client->handlers == NULL)
         return -1;
 
@@ -256,14 +256,14 @@ int ipc_client_destroy_handlers_common_data(struct ipc_client *client)
     void *common_data;
     int rc;
 
-    if(client == NULL ||
+    if (client == NULL ||
        client->handlers == NULL ||
        client->handlers->common_data_destroy == NULL)
         return -1;
 
     rc = client->handlers->common_data_destroy(client->handlers->common_data);
 
-    if(rc < 0)
+    if (rc < 0)
         return -1;
 
     common_data = NULL;
@@ -281,7 +281,7 @@ int ipc_client_destroy_handlers_common_data(struct ipc_client *client)
 
 int ipc_client_set_handlers_common_data_fd(struct ipc_client *client, int fd)
 {
-    if(client == NULL ||
+    if (client == NULL ||
        client->handlers == NULL ||
        client->handlers->common_data_set_fd == NULL)
         return -1;
@@ -291,7 +291,7 @@ int ipc_client_set_handlers_common_data_fd(struct ipc_client *client, int fd)
 
 int ipc_client_get_handlers_common_data_fd(struct ipc_client *client)
 {
-    if(client == NULL ||
+    if (client == NULL ||
        client->handlers == NULL ||
        client->handlers->common_data_get_fd == NULL)
         return -1;

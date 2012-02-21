@@ -23,7 +23,7 @@
 
 int ipc_gen_phone_res_check(struct ipc_gen_phone_res *res)
 {
-    if(res == NULL)
+    if (res == NULL)
         return -1;
 
     switch(res->code)
