@@ -18,27 +18,45 @@
  *
  */
 
+#include <string.h>
 #include <radio.h>
 
 void ipc_net_regist_setup(struct ipc_net_regist_get *message, unsigned char domain)
 {
+    //FIXME: could that be IPC_NET_ACCESS_TECHNOLOGY_... (act) ?
     message->net = 0xff;
     message->domain = domain;
 }
 
-void ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel *message, unsigned char mode, unsigned char *plmn)
+void ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel_set *message, unsigned char mode, char *plmn, unsigned char act)
 {
-    if (mode == IPC_NET_PLMN_SEL_MODE_AUTO)
+    int message_plmn_len = sizeof(message->plmn) / sizeof(char);
+    int plmn_len;
+    int i;
+
+    memset(message, 0, sizeof(struct ipc_net_plmn_sel_set));
+
+    if (mode == IPC_NET_PLMN_SEL_AUTO)
     {
-        message->mode = IPC_NET_PLMN_SEL_MODE_AUTO;
-        message->unk1 = 0xff;
+        message->mode = IPC_NET_PLMN_SEL_AUTO;
+        message->act = IPC_NET_ACCESS_TECHNOLOGY_UNKNOWN;
     }
-    else if (mode == IPC_NET_PLMN_SEL_MODE_MANUAL)
+    else if (mode == IPC_NET_PLMN_SEL_MANUAL)
     {
-        message->mode = IPC_NET_PLMN_SEL_MODE_MANUAL;
-        strncpy(message->plmn, plmn, 5);
-        message->unk0 = 0x23;
-        message->unk1 = 0x4;
+        plmn_len = strlen(plmn);
+
+        // Only copy the first (6) bytes if there are more
+        if(plmn_len > message_plmn_len)
+            plmn_len = message_plmn_len;
+
+        strncpy(message->plmn, plmn, plmn_len);
+
+        // If there are less (5 is the usual case) PLMN bytes, fill the rest with '#'
+        if (plmn_len < message_plmn_len)
+            memset((void*) (message->plmn + plmn_len), '#', message_plmn_len - plmn_len);
+
+        message->mode = IPC_NET_PLMN_SEL_MANUAL;
+        message->act = act;
     }
 }
 

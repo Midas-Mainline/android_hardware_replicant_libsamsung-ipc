@@ -33,7 +33,7 @@ struct ipc_net_current_plmn {
     char unk0;
     unsigned char slevel;
     char unk1;
-    unsigned char plmn[5];
+    char plmn[5];
     unsigned char type; // IPC_NET_SERVICE_TYPE_... ?
     unsigned short lac;
 } __attribute__((__packed__));

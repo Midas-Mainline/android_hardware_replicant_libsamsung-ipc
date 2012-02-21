@@ -45,8 +45,8 @@
 #define IPC_NET_PLMN_STATUS_CURRENT                                 0x03
 #define IPC_NET_PLMN_STATUS_FORBIDDEN                               0x04
 
-#define IPC_NET_PLMN_SEL_MODE_MANUAL                                0x03
-#define IPC_NET_PLMN_SEL_MODE_AUTO                                  0x02
+#define IPC_NET_PLMN_SEL_MANUAL                                     0x03
+#define IPC_NET_PLMN_SEL_AUTO                                       0x02
 
 #define IPC_NET_REGISTRATION_STATE_NONE                             0x01
 #define IPC_NET_REGISTRATION_STATE_HOME                             0x02
@@ -57,6 +57,10 @@
 
 #define IPC_NET_SERVICE_DOMAIN_GSM                                  0x02
 #define IPC_NET_SERVICE_DOMAIN_GPRS                                 0x03
+
+#define IPC_NET_MODE_SEL_GSM_UMTS                                   0x01
+#define IPC_NET_MODE_SEL_GSM_ONLY                                   0x02
+#define IPC_NET_MODE_SEL_UMTS_ONLY                                  0x03
 
 struct ipc_net_regist_get {
     unsigned char net;
@@ -85,18 +89,21 @@ struct ipc_net_plmn_entries {
 } __attribute__((__packed__));
 
 struct ipc_net_mode_sel {
-    unsigned char mode;
+    unsigned char mode_sel;
 } __attribute__((__packed__));
 
-struct ipc_net_plmn_sel {
+struct ipc_net_plmn_sel_get {
+    unsigned char plmn_sel;
+} __attribute__((__packed__));
+
+struct ipc_net_plmn_sel_set {
     unsigned char mode;
-    unsigned char plmn[5];
-    unsigned char unk0;
-    unsigned char unk1;
+    char plmn[6]; // 5 plmn bytes + 1 '#' byte
+    unsigned char act; // IPC_NET_ACCESS_TECHNOLOGY_...
 } __attribute__((__packed__));
 
 void ipc_net_regist_setup(struct ipc_net_regist_get *message, unsigned char domain);
-void ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel *message, unsigned char mode, unsigned char *plmn);
+void ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel_set *message, unsigned char mode, char *plmn, unsigned char act);
 
 #endif
 
