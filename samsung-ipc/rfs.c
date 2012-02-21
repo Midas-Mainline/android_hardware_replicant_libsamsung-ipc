@@ -618,7 +618,7 @@ int nv_data_write(struct ipc_client *client, int offset, int length, char *buf)
     return 0;
 }
 
-struct ipc_rfs_io_confirm* ipc_rfs_create_io_confirm_for_nv_read_item(struct ipc_client *client, struct ipc_message_info *info)
+void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client, struct ipc_message_info *info)
 {
     struct ipc_rfs_io *rfs_io = (struct ipc_rfs_io *) info->data;
     struct ipc_rfs_io_confirm *rfs_io_conf;
@@ -646,13 +646,11 @@ struct ipc_rfs_io_confirm* ipc_rfs_create_io_confirm_for_nv_read_item(struct ipc
     rfs_io_conf->offset = rfs_io->offset;
     rfs_io_conf->length = rfs_io->length;
 
-    // ipc_rfs_send(IPC_RFS_NV_READ_ITEM, rfs_io_conf, rfs_io->length + sizeof(struct ipc_rfs_io_confirm), info->aseq);
-    // free(rfs_io_conf);
-
-    return rfs_io_conf;
+    ipc_client_send(client, IPC_RFS_NV_READ_ITEM, 0, rfs_io_conf, rfs_io->length + sizeof(struct ipc_rfs_io_confirm), info->aseq);
+    free(rfs_io_conf);
 }
 
-struct ipc_rfs_io_confirm* ipc_rfs_create_io_confirm_for_nv_write_item(struct ipc_client *client, struct ipc_message_info *info)
+void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client, struct ipc_message_info *info)
 {
     struct ipc_rfs_io *rfs_io = (struct ipc_rfs_io *) info->data;
     struct ipc_rfs_io_confirm *rfs_io_conf;
@@ -679,9 +677,8 @@ struct ipc_rfs_io_confirm* ipc_rfs_create_io_confirm_for_nv_write_item(struct ip
     rfs_io_conf->offset = rfs_io->offset;
     rfs_io_conf->length = rfs_io->length;
 
-    // ipc_rfs_send(IPC_RFS_NV_WRITE_ITEM, &rfs_io_conf, sizeof(struct ipc_rfs_io_confirm), info->aseq);
-
-    return rfs_io_conf;
+    ipc_client_send(client, IPC_RFS_NV_WRITE_ITEM, 0, rfs_io_conf, sizeof(struct ipc_rfs_io_confirm), info->aseq);
+    free(rfs_io_conf);
 }
 
 // vim:ts=4:sw=4:expandtab

@@ -1182,18 +1182,10 @@ namespace SamsungIpc
 
     namespace Rfs
     {
-        [CCode (cname = "struct ipc_rfs_io_confirm", destroy_function = "", free_function = "")]
-        public struct IoConfirm
-        {
-            public uint8 confirm;
-            public uint offset;
-            public uint length;
-        }
-
-        [CCode (cname = "ipc_rfs_create_io_confirm_for_nv_read_item")]
-        public IoConfirm create_io_confirm_for_nv_read_item(Client client, Request req);
-        [CCode (cname = "ipc_rfs_create_io_confirm_for_nv_write_item")]
-        public IoConfirm create_io_confirm_for_nv_write_item(Client client, Request req);
+        [CCode (cname = "ipc_rfs_send_io_confirm_for_nv_read_item")]
+        public void send_io_confirm_for_nv_read_item(Client client, Response req);
+        [CCode (cname = "ipc_rfs_send_io_confirm_for_nv_write_item")]
+        public void send_io_confirm_for_nv_write_item(Client client, Response req);
     }
 
     /* ******************************************************************************** */
