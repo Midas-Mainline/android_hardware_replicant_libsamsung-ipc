@@ -2,6 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
+ * Copyright (C) 2012 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +19,11 @@
  *
  */
 
-#ifndef __DISP_H__
-#define __DISP_H__
+#ifndef __DEVICE_IPC_V4_DISP_H__
+#define __DEVICE_IPC_V4_DISP_H__
 
-#if defined(DEVICE_IPC_V4)
-#include "device/ipc-v4/disp.h"
-#elif defined(DEVICE_H1)
-#include "device/h1/disp.h"
-#endif
-
-#define IPC_DISP_ICON_INFO                  0x0701
-#define IPC_DISP_HOMEZONE_INFO              0x0702
-#define IPC_DISP_RSSI_INFO                  0x0706
-
-struct ipc_disp_rssi_info {
-    unsigned char rssi;
+struct ipc_disp_icon_info {
+    unsigned char rssi, battery, act, reg;
 } __attribute__((__packed__));
 
 #endif
