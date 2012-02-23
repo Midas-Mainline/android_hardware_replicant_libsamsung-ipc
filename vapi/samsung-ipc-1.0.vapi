@@ -1098,8 +1098,8 @@ namespace SamsungIpc
         [CCode (cname = "struct ipc_sms_send_msg")]
         public struct SendMessage
         {
-            public uint8 type;
-            public uint8 msg_type;
+            public MessageType type;
+            public MessageAmountType msg_type;
             public uint8 length;
             public uint8 smsc_len;
 
