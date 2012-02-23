@@ -26,7 +26,7 @@
 #define PSI_DATA_LEN            0x5000
 #define RADIO_IMG_SIZE          0xd80000
 
-#define MAX_MODEM_DATA_SIZE     0x1000
+#define MAX_MODEM_DATA_SIZE     0x50000
 
 int wake_lock(char *lock_name, int len);
 int wake_unlock(char *lock_name, int len);
