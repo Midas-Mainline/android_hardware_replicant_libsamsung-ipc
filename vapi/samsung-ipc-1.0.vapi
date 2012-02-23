@@ -491,11 +491,19 @@ namespace SamsungIpc
             FORBIDDEN,
         }
 
-        [CCode (cname = "gint8", cprefix = "IPC_NET_PLMN_SEL_MODE_", has_type_id = false)]
+        [CCode (cname = "gint8", cprefix = "IPC_NET_PLMN_SEL_", has_type_id = false)]
         public enum PlmnSelectionMode
         {
             MANUAL,
             AUTO,
+        }
+
+        [CCode (cname = "gint8", cprefix = "IPC_NET_MODE_SEL_", has_type_id = false)]
+        public enum NetworkSelectionMode
+        {
+            GSM_UMTS,
+            GSM_ONLY,
+            UMTS_ONLY
         }
 
         [CCode (cname = "gint8", cprefix = "IPC_NET_SERVICE_DOMAIN_", has_type_id = false)]
@@ -617,21 +625,40 @@ namespace SamsungIpc
             }
         }
 
-        [CCode (cname = "struct ipc_net_plmn_sel", destroy_function = "")]
-        public struct PlmnSelectionMessage
+        [CCode (cname = "struct ipc_net_plmn_sel_get", destroy_function = "")]
+        public struct PlmnSelectionGetMessage
         {
-            public uint8 mode;
-            public uint8[] plmn;
-
-            [CCode (cname = "ipc_net_plmn_sel_setup")]
-            public void setup(uint8 mode, string plmn);
+            [CCode (cname = "plmn_sel")]
+            public PlmnSelectionMode mode;
 
             public unowned uint8[] data
             {
                 get
                 {
                     unowned uint8[] res = (uint8[])(&this);
-                    res.length = (int) sizeof( PlmnSelectionMessage );
+                    res.length = (int) sizeof( PlmnSelectionGetMessage );
+                    return res;
+                }
+            }
+
+        }
+
+        [CCode (cname = "struct ipc_net_plmn_sel_set", destroy_function = "")]
+        public struct PlmnSelectionSetMessage
+        {
+            public PlmnSelectionMode mode;
+            public uint8[] plmn;
+            public AccessTechnology act;
+
+            [CCode (cname = "ipc_net_plmn_sel_setup")]
+            public void setup(uint8 mode, string plmn, AccessTechnology act);
+
+            public unowned uint8[] data
+            {
+                get
+                {
+                    unowned uint8[] res = (uint8[])(&this);
+                    res.length = (int) sizeof( PlmnSelectionSetMessage );
                     return res;
                 }
             }
