@@ -539,8 +539,8 @@ int nv_data_read(struct ipc_client *client, int offset, int length, char *buf)
 
     ipc_client_log(client, "nv_data_read: enter\n");
 
-    if (offset <= 0 || length <= 0) {
-        ipc_client_log(client, "nv_data_read: offset or length <= 0\n");
+    if(offset < 0 || length <= 0) {
+        ipc_client_log(client, "nv_data_read: offset < 0 or length <= 0\n");
         return -1;
     }
 
@@ -579,7 +579,7 @@ int nv_data_write(struct ipc_client *client, int offset, int length, char *buf)
 
     ipc_client_log(client, "nv_data_write: enter\n");
 
-    if (offset <= 0 || length <= 0) {
+    if(offset < 0 || length <= 0) {
         ipc_client_log(client, "nv_data_write: offset or length <= 0\n");
         return -1;
     }
