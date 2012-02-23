@@ -638,8 +638,10 @@ void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client, struct 
     ipc_client_log(client, "Asked to read 0x%x bytes at offset 0x%x", rfs_io->length, rfs_io->offset);
     rc = nv_data_read(client, rfs_io->offset, rfs_io->length, rfs_data);
 
+#ifdef DEBUG
     ipc_client_log(client, "Read rfs_data dump:");
     ipc_hex_dump(client, rfs_data, rfs_io->length);
+#endif
 
     ipc_client_log(client, "Preparing RFS IO Confirm message (rc is %d)", rc);
     rfs_io_conf->confirm = rc < 0 ? 0 : 1;
@@ -665,8 +667,10 @@ void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client, struct
 
     rfs_data = info->data + sizeof(struct ipc_rfs_io);
 
+#ifdef DEBUG
     ipc_client_log(client, "Write rfs_data dump:");
     ipc_hex_dump(client, rfs_data, rfs_io->length);
+#endif
 
     ipc_client_log(client, "Asked to write 0x%x bytes at offset 0x%x", rfs_io->length, rfs_io->offset);
     rc = nv_data_write(client, rfs_io->offset, rfs_io->length, rfs_data);
