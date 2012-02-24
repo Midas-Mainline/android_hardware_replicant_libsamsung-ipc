@@ -149,7 +149,7 @@ void modem_set_sec_pin_status(struct ipc_client *client, char *pin1, char *pin2)
 
 void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp)
 {
-    struct ipc_sec_pin_status_noti *pin_status;
+    struct ipc_sec_pin_status_response *pin_status;
     unsigned char type;
     int status;
     char *data;
@@ -157,7 +157,7 @@ void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp
     switch(IPC_COMMAND(resp))
     {
         case IPC_SEC_PIN_STATUS :
-            pin_status = (struct ipc_sec_pin_status_noti *)resp->data;
+            pin_status = (struct ipc_sec_pin_status_response *)resp->data;
 
             switch(pin_status->type)
             {
