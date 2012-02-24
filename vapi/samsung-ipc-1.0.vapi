@@ -261,7 +261,7 @@ namespace SamsungIpc
             STATUS,
         }
 
-        [CCode (cname = "struct ipc_sec_pin_status_noti", destroy_function = "")]
+        [CCode (cname = "struct ipc_sec_pin_status_response", destroy_function = "")]
         public struct SimStatusMessage
         {
             [CCode (cname = "type")]
