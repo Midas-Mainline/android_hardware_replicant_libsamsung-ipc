@@ -65,7 +65,7 @@ struct ipc_message_info;
 #define IPC_SEC_RSIM_COMMAND_UPDATE_BINARY  0xd6
 #define IPC_SEC_RSIM_COMMAND_STATUS         0xf2
 
-struct ipc_sec_pin_status_noti {
+struct ipc_sec_pin_status_response {
     unsigned char type;
     unsigned char key;
 } __attribute__((__packed__));
@@ -79,13 +79,24 @@ struct ipc_sec_pin_status_set {
 } __attribute__((__packed__));
 
 struct ipc_sec_phone_lock_request {
-    unsigned char lock_type;
+    unsigned char type; // IPC_SEC_PIN_SIM_LOCK_...
+    unsigned char lock;
+    unsigned char length;
+    unsigned char password[39];
 };
 
 struct ipc_sec_phone_lock_response {
     unsigned char type;
     unsigned char status;
 } __attribute__((__packed__));
+
+struct ipc_sec_change_locking_pw {
+    unsigned char type; // IPC_SEC_PIN_SIM_LOCK_...
+    unsigned char length_old;
+    unsigned char length_new;
+    unsigned char password_old[39];
+    unsigned char password_new[39];
+}  __attribute__((__packed__));
 
 struct ipc_sec_rsim_access_request {
     unsigned char command;
@@ -108,6 +119,10 @@ struct ipc_sec_lock_info_response {
     unsigned char type;
     unsigned char key;
     unsigned char attempts;
+} __attribute__((__packed__));
+
+struct ipc_sec_sim_icc_type {
+    unsigned char type;
 } __attribute__((__packed__));
 
 void ipc_sec_pin_status_set_setup(struct ipc_sec_pin_status_set *message,
