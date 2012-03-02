@@ -305,8 +305,8 @@ namespace SamsungIpc
             }
         }
 
-        [CCode (cname = "struct ipc_sec_phone_lock_request", destroy_function = "")]
-        public struct PhoneLockRequestMessage
+        [CCode (cname = "struct ipc_sec_phone_lock_get", destroy_function = "")]
+        public struct PhoneLockGetMessage
         {
             public SimStatus lock_type; // FIXME refactor log type from SimStatus in own enum
 
@@ -322,7 +322,7 @@ namespace SamsungIpc
         }
 
         [CCode (cname = "struct ipc_sec_phone_lock_response", destroy_function = "")]
-        public struct PhoneLockResponseMessage
+        public struct PhoneLockGetResponseMessage
         {
             public uint8 type;
             public SimLockStatus status;
@@ -441,7 +441,7 @@ namespace SamsungIpc
         }
 
         [CCode (cname = "struct ipc_disp_rssi_info", destroy_function = "")]
-        public struct RssiInfo
+        public struct RssiInfoMessage
         {
             public uint8 rssi;
 
@@ -450,7 +450,7 @@ namespace SamsungIpc
                 get
                 {
                     unowned uint8[] res = (uint8[])(&this);
-                    res.length = (int) sizeof( RssiInfo );
+                    res.length = (int) sizeof( RssiInfoMessage );
                     return res;
                 }
             }
@@ -719,6 +719,13 @@ namespace SamsungIpc
             MT,
         }
 
+        [CCode (cname = "uint8", cprefix = "IPC_CALL_DTMF_STATE_", has_type_id = false)]
+        public enum DtmfState
+        {
+            START,
+            STOP
+        }
+
         [CCode (cname = "struct ipc_call_outgoing", destroy_function = "")]
         public struct OutgoingMessage
         {
@@ -799,6 +806,26 @@ namespace SamsungIpc
                 {
                     unowned uint8[] res = (uint8[])(&this);
                     res.length = (int) sizeof( StatusMessage );
+                    return res;
+                }
+            }
+        }
+
+        [CCode (cname = "struct ipc_call_cont_dtmf", destroy_function = "")]
+        public struct ContDtmfMessage
+        {
+            public DtmfState state;
+            public uint8 tone;
+
+            [CCode (cname = "ipc_call_cont_dtmf_burst_pack")]
+            public uint8[] pack(uint8[] burst);
+
+            public unowned uint8[] data
+            {
+                get
+                {
+                    unowned uint8[] res = (uint8[])(&this);
+                    res.length = (int) sizeof( ContDtmfMessage );
                     return res;
                 }
             }
