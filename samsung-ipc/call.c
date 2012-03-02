@@ -113,4 +113,22 @@ char* ipc_call_list_response_get_entry_number(struct ipc_message_info *response,
     return number;
 }
 
+unsigned char* ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf *message, unsigned char *burst, int burst_len)
+{
+    unsigned char *data = NULL;
+    int data_len = sizeof(struct ipc_call_cont_dtmf) + burst_len;
+
+    assert(message != 0);
+    assert(burst != 0);
+    assert(burst_len != 0);
+
+    data = (unsigned char*) malloc(sizeof(unsigned char) * data_len);
+    memset(data, 0, data_len);
+
+    memcpy(data, message, sizeof(struct ipc_call_cont_dtmf));
+    memcpy(data + sizeof(struct ipc_call_cont_dtmf), burst, burst_len);
+
+    return data;
+}
+
 // vim:ts=4:sw=4:expandtab

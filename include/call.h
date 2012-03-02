@@ -83,6 +83,7 @@ void ipc_call_outgoing_setup(struct ipc_call_outgoing *message, unsigned char ty
 unsigned int ipc_call_list_response_get_num_entries(struct ipc_message_info *response);
 struct ipc_call_list_entry* ipc_call_list_response_get_entry(struct ipc_message_info *response, unsigned int num);
 char* ipc_call_list_response_get_entry_number(struct ipc_message_info *response, unsigned int num);
+unsigned char* ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf *message, unsigned char *burst, int burst_len);
 
 #endif
 
