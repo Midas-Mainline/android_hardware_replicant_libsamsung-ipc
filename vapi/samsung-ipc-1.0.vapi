@@ -315,7 +315,7 @@ namespace SamsungIpc
                 get
                 {
                     unowned uint8[] res = (uint8[])(&this);
-                    res.length = (int) sizeof( PhoneLockRequestMessage );
+                    res.length = (int) sizeof( PhoneLockGetMessage );
                     return res;
                 }
             }
@@ -332,7 +332,7 @@ namespace SamsungIpc
                 get
                 {
                     unowned uint8[] res = (uint8[])(&this);
-                    res.length = (int) sizeof( PhoneLockResponseMessage );
+                    res.length = (int) sizeof( PhoneLockGetResponseMessage );
                     return res;
                 }
             }
