@@ -12,9 +12,9 @@ bin_PROGRAMS = \
 	$(NULL)
 
 modemctrl_SOURCES = modemctrl.c
-modemctrl_LDADD = $(top_srcdir)/samsung-ipc/libsamsung-ipc.la
+modemctrl_LDADD = $(top_builddir)/samsung-ipc/libsamsung-ipc.la
 modemctrl_LDFLAGS =
 
 samsung_ipc_forward_SOURCES = forward.c
-samsung_ipc_forward_LDADD = $(top_srcdir)/samsung-ipc/libsamsung-ipc.la
+samsung_ipc_forward_LDADD = $(top_builddir)/samsung-ipc/libsamsung-ipc.la
 modemctrl_LDFLAGS =
