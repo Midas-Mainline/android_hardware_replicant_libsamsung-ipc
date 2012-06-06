@@ -844,6 +844,73 @@ int aries_ipc_power_off(void *data)
     return 0;
 }
 
+//TODO: there are also suspend/resume nodes
+
+int aries_ipc_gprs_activate(void *data)
+{
+    int fd = open("/sys/class/net/svnet0/pdp/activate", O_RDWR);
+    char activate_data[] = "1\n";
+    int rc;
+
+    if(fd < 0)
+        return -1;
+
+    rc = write(fd, activate_data, sizeof(activate_data) - 1);
+
+    close(fd);
+
+    if(rc < 0)
+        return -1;
+
+    return 0;
+
+}
+
+int aries_ipc_gprs_deactivate(void *data)
+{
+    int fd = open("/sys/class/net/svnet0/pdp/deactivate", O_RDWR);
+    char deactivate_data[] = "1\n";
+    int rc;
+
+    if(fd < 0)
+        return -1;
+
+    rc = write(fd, deactivate_data, sizeof(deactivate_data) - 1);
+
+    close(fd);
+
+    if(rc < 0)
+        return -1;
+
+    return 0;
+}
+
+int aries_ipc_gprs_get_iface(char **iface)
+{
+    struct ifreq ifr;
+    int fd;
+    int rc;
+    int i;
+
+    memset(&ifr, 0, sizeof(ifr));
+
+    fd = socket(AF_PHONET, SOCK_DGRAM, 0);
+
+    for(i=0 ; i < 3 ; i++) {
+        sprintf(ifr.ifr_name, "pdp%d", i);
+
+        rc = ioctl(fd, SIOCGIFFLAGS, &ifr);
+        if(rc >= 0) {
+            *iface=malloc(strlen(ifr.ifr_name) + 1);
+            memcpy((void *) *iface, ifr.ifr_name, strlen(ifr.ifr_name) + 1);
+            return 0;
+        }
+
+    }
+
+    return -1;
+}
+
 void *aries_ipc_common_data_create(void)
 {
     struct aries_ipc_handlers_common_data *common_data;
@@ -922,6 +989,9 @@ struct ipc_handlers aries_default_handlers = {
     .close = aries_ipc_close,
     .power_on = aries_ipc_power_on,
     .power_off = aries_ipc_power_off,
+    .gprs_activate = aries_ipc_gprs_activate,
+    .gprs_deactivate = aries_ipc_gprs_deactivate,
+    .gprs_get_iface = aries_ipc_gprs_get_iface,
     .common_data = NULL,
     .common_data_create = aries_ipc_common_data_create,
     .common_data_destroy = aries_ipc_common_data_destroy,
