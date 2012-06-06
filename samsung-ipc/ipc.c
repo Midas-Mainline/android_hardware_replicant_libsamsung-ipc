@@ -217,6 +217,8 @@ int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data)
     client->handlers->close_data = common_data;
     client->handlers->power_on_data = common_data;
     client->handlers->power_off_data = common_data;
+    client->handlers->gprs_activate_data = common_data;
+    client->handlers->gprs_deactivate_data = common_data;
 
     return 0;
 }
@@ -247,6 +249,8 @@ int ipc_client_create_handlers_common_data(struct ipc_client *client)
     client->handlers->close_data = common_data;
     client->handlers->power_on_data = common_data;
     client->handlers->power_off_data = common_data;
+    client->handlers->gprs_activate_data = common_data;
+    client->handlers->gprs_deactivate_data = common_data;
 
     return 0;
 }
@@ -275,6 +279,8 @@ int ipc_client_destroy_handlers_common_data(struct ipc_client *client)
     client->handlers->close_data = common_data;
     client->handlers->power_on_data = common_data;
     client->handlers->power_off_data = common_data;
+    client->handlers->gprs_activate_data = common_data;
+    client->handlers->gprs_deactivate_data = common_data;
 
     return 0;
 }
@@ -353,6 +359,37 @@ int ipc_client_power_off(struct ipc_client *client)
         return -1;
 
     return client->handlers->power_off(client->handlers->power_off_data);
+}
+
+// README: This will return -1 whenever such setup isn't needed, though it works
+int ipc_client_gprs_activate(struct ipc_client *client)
+{
+    if (client == NULL ||
+        client->handlers == NULL ||
+        client->handlers->gprs_activate == NULL)
+        return -1;
+
+    return client->handlers->gprs_activate(client->handlers->gprs_activate_data);
+}
+
+int ipc_client_gprs_deactivate(struct ipc_client *client)
+{
+    if (client == NULL ||
+        client->handlers == NULL ||
+        client->handlers->gprs_deactivate == NULL)
+        return -1;
+
+    return client->handlers->gprs_deactivate(client->handlers->gprs_deactivate_data);
+}
+
+int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface)
+{
+    if (client == NULL ||
+        client->handlers == NULL ||
+        client->handlers->gprs_get_iface == NULL)
+        return -1;
+
+    return client->handlers->gprs_get_iface(iface);
 }
 
 int _ipc_client_send(struct ipc_client *client, struct ipc_message_info *request)
