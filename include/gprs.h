@@ -30,6 +30,7 @@
 #define IPC_GPRS_MS_CLASS                   0x0D07
 #define IPC_GPRS_3G_QUAL_SERVICE_PROFILE    0x0D08
 #define IPC_GPRS_IP_CONFIGURATION           0x0D09
+#define IPC_GPRS_PORT_LIST                  0x0D11
 #define IPC_GPRS_DEFINE_SEC_PDP_CONTEXT     0x0D0A
 #define IPC_GPRS_TFT                        0x0D0B
 #define IPC_GPRS_HSDPA_STATUS               0x0D0C
@@ -91,6 +92,11 @@ struct ipc_gprs_current_session_data_counter {
     unsigned char unk[9];
 };
 
+struct ipc_gprs_port_list {
+    unsigned char unk[804];
+};
+
+void ipc_gprs_port_list_setup(struct ipc_gprs_port_list *message);
 void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context *message, int activate, char *username, char *password);
 void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context *message, char *apn);
 

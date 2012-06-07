@@ -23,6 +23,18 @@
 #include <stdlib.h>
 #include <assert.h>
 
+void ipc_gprs_port_list_setup(struct ipc_gprs_port_list *message)
+{
+    // FIXME: These are only known-to-work values used on most devices
+    unsigned char bytes[] = {
+        0x02, 0x04, 0x16, 0x00, 0x17, 0x00, 0x87, 0x00, 0xBD, 0x01
+    };
+
+    memset(message->unk, 0, sizeof(message->unk));
+    memcpy(message->unk, bytes, sizeof(bytes));
+
+}
+
 void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context *message, char *apn)
 {
     assert(message != NULL);
