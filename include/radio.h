@@ -79,6 +79,7 @@ int ipc_client_open(struct ipc_client *client);
 int ipc_client_close(struct ipc_client *client);
 int ipc_client_power_on(struct ipc_client *client);
 int ipc_client_power_off(struct ipc_client *client);
+int ipc_client_gprs_handlers_available(struct ipc_client *client);
 int ipc_client_gprs_activate(struct ipc_client *client);
 int ipc_client_gprs_deactivate(struct ipc_client *client);
 int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface);
