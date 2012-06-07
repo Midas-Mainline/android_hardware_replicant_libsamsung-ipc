@@ -639,6 +639,14 @@ int crespo_ipc_power_off(void *io_data)
     return 0;
 }
 
+int crespo_ipc_gprs_get_iface(char **iface)
+{
+    asprintf(iface, GPRS_IFACE);
+
+    return 0;
+}
+
+
 void *crespo_ipc_common_data_create(void)
 {
     void *io_data;
@@ -698,6 +706,7 @@ struct ipc_handlers crespo_default_handlers = {
     .close = crespo_ipc_close,
     .power_on = crespo_ipc_power_on,
     .power_off = crespo_ipc_power_off,
+    .gprs_get_iface = crespo_ipc_gprs_get_iface,
     .common_data = NULL,
     .common_data_create = crespo_ipc_common_data_create,
     .common_data_destroy = crespo_ipc_common_data_destroy,
