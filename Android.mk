@@ -10,6 +10,11 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_CFLAGS += -Iexternal/openssl/include
 LOCAL_LDFLAGS += -lcrypto
 
+ifeq ($(TARGET_DEVICE),maguro)
+	LOCAL_CFLAGS += -DDEVICE_IPC_V4
+	samsung-ipc_device := xmm6260
+endif
+
 ifeq ($(TARGET_DEVICE),crespo)
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	samsung-ipc_device := crespo
@@ -47,7 +52,13 @@ samsung-ipc_files := \
 	samsung-ipc/sec.c \
 	samsung-ipc/device/h1/h1_ipc.c \
 	samsung-ipc/device/crespo/crespo_ipc.c \
-	samsung-ipc/device/aries/aries_ipc.c
+	samsung-ipc/device/aries/aries_ipc.c \
+	samsung-ipc/device/xmm6260/xmm6260_ipc.c \
+	samsung-ipc/device/xmm6260/fwloader_i9100.c \
+	samsung-ipc/device/xmm6260/fwloader_i9250.c \
+	samsung-ipc/device/xmm6260/io_helpers.c \
+	samsung-ipc/device/xmm6260/log.c \
+	samsung-ipc/device/xmm6260/modemctl_common.c
 
 LOCAL_SRC_FILES := $(samsung-ipc_files)
 LOCAL_CFLAGS += -DIPC_DEVICE_EXPLICIT=\"$(samsung-ipc_device)\"
@@ -64,6 +75,11 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := ipc-modemctrl
 LOCAL_MODULE_TAGS := optional
+
+ifeq ($(TARGET_DEVICE),maguro)
+	LOCAL_CFLAGS += -DDEVICE_IPC_V4
+	samsung-ipc_device := xmm6260
+endif
 
 ifeq ($(TARGET_DEVICE),crespo)
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
