@@ -43,7 +43,7 @@
 
 #include "modemctl_common.h"
 
-extern int boot_modem(void);
+#define IPC_MAX_XFER 4096
 
 int i9100_modem_bootstrap(struct ipc_client *client)
 {
@@ -93,48 +93,34 @@ int xmm6260_ipc_send(struct ipc_client *client, struct ipc_message_info *request
     return 0;
 }
 
-//HACK
-#define IPC_BS 1024
-
 int xmm6260_ipc_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
-    unsigned char buf[IPC_BS] = {};
+    unsigned char buf[IPC_MAX_XFER] = {};
     unsigned char *data;
     unsigned short *frame_length;
 
-    struct ipc_header ipc = {};
+    struct ipc_header ipc = {
+        .length = 0,
+    };
     int num_read = 0;
     int left = 0;
 
-    num_read = client->handlers->read(buf, IPC_BS,// sizeof(ipc),
+    num_read = client->handlers->read(buf, IPC_MAX_XFER,
         client->handlers->read_data);
-
-    ipc_client_log(client, "read %d", num_read);
 
     if (num_read < 0) {
         ipc_client_log(client, "read failed to read ipc length: %d", num_read);
-        
         response->data = 0;
         response->length = 0;
         return 0;
     }
-    else {
-        ipc_client_log(client, "we've read %d", num_read);
-    }
 
     memcpy(&ipc, buf, sizeof(ipc));
-    ipc_client_log(client, "read %d bytes for header", num_read);
-
-    ipc_client_log(client, "ipc: %d bytes in header", ipc.length);
-
     left = ipc.length - num_read;
-    ipc_client_log(client, "left %d bytes of data", left);
    
     if (left > 0) {
         num_read = client->handlers->read(buf + num_read, left,
             client->handlers->read_data);
-        ipc_client_log(client, "read %d bytes of %d left",
-            num_read, left);
     }
 
     memcpy(&ipc, buf, sizeof(ipc));
@@ -230,14 +216,11 @@ int xmm6260_ipc_read(void *data, unsigned int size, void *io_data)
     if(fd < 0)
         return -1;
 
-    printf("%s: wanting %d bytes\n", __func__, size);
-
-    //hack
-    read_select(fd, 100);
+    rc = read_select(fd, 100);
+    if (rc < 0)
+        return -1;
 
     rc = read(fd, data, size);
-    printf("%s: read %d bytes\n", __func__, rc);
-
     if(rc < 0)
         return -1;
 
@@ -354,8 +337,8 @@ struct ipc_ops xmm6260_i9250_fmt_ops = {
 };
 
 struct ipc_ops xmm6260_rfs_ops = {
-    .send = xmm6260_rfs_send,
-    .recv = xmm6260_rfs_recv,
+    .send = xmm6260_ipc_send,
+    .recv = xmm6260_ipc_recv,
     .bootstrap = NULL,
 };
 
