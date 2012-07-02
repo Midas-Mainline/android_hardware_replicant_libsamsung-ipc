@@ -36,12 +36,13 @@ extern struct ipc_device_desc ipc_devices[];
 extern int ipc_devices_count;
 
 // xmm6260
+// Galaxy S2 (I9100)
+// Galaxy Nexus (I9250)
 
 extern struct ipc_handlers xmm6260_default_handlers;
 extern struct ipc_ops xmm6260_i9100_fmt_ops;
 extern struct ipc_ops xmm6260_i9250_fmt_ops;
 extern struct ipc_ops xmm6260_rfs_ops;
-
 
 // h1
 

@@ -23,13 +23,9 @@
 #include "ipc_devices.h"
 
 struct ipc_device_desc ipc_devices[] = {
-#if 0
-    { "xmm6260", "i9100",  &xmm6260_default_handlers, &xmm6260_i9100_fmt_ops,    &xmm6260_rfs_ops },
-    { "xmm6260", "SMDK4210",  &xmm6260_default_handlers,   &xmm6260_i9100_fmt_ops,    &xmm6260_rfs_ops },
-
-    { "xmm6260", "maguro",  &xmm6260_default_handlers, &xmm6260_i9250_fmt_ops,    &xmm6260_rfs_ops },
-#endif
-    { "xmm6260", "Tuna",  &xmm6260_default_handlers, &xmm6260_i9250_fmt_ops,    &xmm6260_rfs_ops },
+    { "galaxys2", "i9100",  &xmm6260_default_handlers,   &xmm6260_i9100_fmt_ops, &xmm6260_rfs_ops },
+    { "galaxys2", "SMDK4210",  &xmm6260_default_handlers,    &xmm6260_i9100_fmt_ops,  &xmm6260_rfs_ops },
+    { "maguro", "Tuna",  &xmm6260_default_handlers,    &xmm6260_i9250_fmt_ops,    &xmm6260_rfs_ops },
     { "crespo", "herring",  &crespo_default_handlers,   &crespo_fmt_ops,    &crespo_rfs_ops },
     { "aries",  "aries",    &aries_default_handlers,    &aries_fmt_ops,     &aries_rfs_ops },
     { "aries",  "gt-p1000", &aries_default_handlers,    &aries_fmt_ops,     &aries_rfs_ops }
