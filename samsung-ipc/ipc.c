@@ -140,6 +140,8 @@ struct ipc_client* ipc_client_new(int client_type)
             break;
     }
 
+    client->fs_ops = ipc_devices[device_index].fs_ops;
+
     client->handlers = (struct ipc_handlers *) malloc(sizeof(struct ipc_handlers));
     client->log_handler = log_handler_default;
 

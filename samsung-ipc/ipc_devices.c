@@ -23,12 +23,54 @@
 #include "ipc_devices.h"
 
 struct ipc_device_desc ipc_devices[] = {
-    { "galaxys2", "i9100",  &xmm6260_default_handlers,   &xmm6260_i9100_fmt_ops, &xmm6260_rfs_ops },
-    { "galaxys2", "smdk4210",  &xmm6260_default_handlers,    &xmm6260_i9100_fmt_ops,  &xmm6260_rfs_ops },
-    { "maguro", "tuna",  &xmm6260_default_handlers,    &xmm6260_i9250_fmt_ops,    &xmm6260_rfs_ops },
-    { "crespo", "herring",  &crespo_default_handlers,   &crespo_fmt_ops,    &crespo_rfs_ops },
-    { "aries",  "aries",    &aries_default_handlers,    &aries_fmt_ops,     &aries_rfs_ops },
-    { "aries",  "gt-p1000", &aries_default_handlers,    &aries_fmt_ops,     &aries_rfs_ops }
+    {   
+        .name = "galaxys2",
+        .board_name = "i9100",
+        .handlers = &xmm6260_default_handlers,
+        .fmt_ops = &xmm6260_i9100_fmt_ops,
+        .rfs_ops = &xmm6260_rfs_ops,
+        .fs_ops = NULL,
+    },
+    {   
+        .name = "galaxys2",
+        .board_name = "smdk4210",
+        .handlers = &xmm6260_default_handlers,
+        .fmt_ops = &xmm6260_i9100_fmt_ops,
+        .rfs_ops = &xmm6260_rfs_ops,
+        .fs_ops = NULL,
+    },
+    {
+        .name = "maguro",
+        .board_name = "tuna",
+        .handlers = &xmm6260_default_handlers,
+        .fmt_ops = &xmm6260_i9250_fmt_ops,
+        .rfs_ops = &xmm6260_rfs_ops,
+        .fs_ops = &xmm6260_i9250_fs_ops,
+    },
+    {
+        .name = "crespo",
+        .board_name = "herring",
+        .handlers = &crespo_default_handlers,
+        .fmt_ops = &crespo_fmt_ops,
+        .rfs_ops = &crespo_rfs_ops,
+        .fs_ops = NULL,
+    },
+    {
+        .name = "aries",
+        .board_name = "aries",
+        .handlers = &aries_default_handlers,
+        .fmt_ops = &aries_fmt_ops,
+        .rfs_ops = &aries_rfs_ops,
+        .fs_ops = NULL,
+    },
+    {
+        .name = "aries",
+        .board_name = "gt-p1000",
+        .handlers = &aries_default_handlers,
+        .fmt_ops = &aries_fmt_ops,
+        .rfs_ops = &aries_rfs_ops,
+        .fs_ops = NULL,
+    }
 };
 
 int ipc_devices_count = sizeof(ipc_devices) / sizeof(struct ipc_device_desc);

@@ -431,4 +431,12 @@ struct ipc_ops xmm6260_rfs_ops = {
     .bootstrap = NULL,
 };
 
+struct ipc_fs_ops xmm6260_i9250_fs_ops = {
+    .nv_data_path = "/factory/nv_data.bin",
+    .nv_data_md5_path = "/factory/nv_data.bin.md5",
+    .nv_state_path = "/factory/.nv_state",
+    .nv_data_bak_path = "/factory/.nv_data.bak",
+    .nv_data_md5_bak_path = "/factory/.nv_data.bak.md5",
+};
+
 // vim:ts=4:sw=4:expandtab

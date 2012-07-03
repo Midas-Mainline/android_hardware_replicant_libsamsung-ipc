@@ -63,6 +63,14 @@ struct ipc_handlers {
     int (*common_data_get_fd)(void *io_data);
 };
 
+struct ipc_fs_ops {
+    char *nv_data_path;
+    char *nv_data_md5_path;
+    char *nv_state_path;
+    char *nv_data_bak_path;
+    char *nv_data_md5_bak_path;
+};
+
 struct ipc_client {
     int type;
 
@@ -71,6 +79,7 @@ struct ipc_client {
 
     struct ipc_ops *ops;
     struct ipc_handlers *handlers;
+    struct ipc_fs_ops *fs_ops;
 };
 
 void ipc_client_log(struct ipc_client *client, const char *message, ...);

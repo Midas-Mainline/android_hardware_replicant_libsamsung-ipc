@@ -30,6 +30,7 @@ struct ipc_device_desc {
     struct ipc_handlers *handlers;
     struct ipc_ops *fmt_ops;
     struct ipc_ops *rfs_ops;
+    struct ipc_fs_ops *fs_ops;
 };
 
 extern struct ipc_device_desc ipc_devices[];
@@ -40,9 +41,10 @@ extern int ipc_devices_count;
 // Galaxy Nexus (I9250)
 
 extern struct ipc_handlers xmm6260_default_handlers;
+extern struct ipc_ops xmm6260_rfs_ops;
 extern struct ipc_ops xmm6260_i9100_fmt_ops;
 extern struct ipc_ops xmm6260_i9250_fmt_ops;
-extern struct ipc_ops xmm6260_rfs_ops;
+extern struct ipc_fs_ops xmm6260_i9250_fs_ops;
 
 // h1
 
