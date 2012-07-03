@@ -26,6 +26,12 @@
 
 extern struct ipc_handlers xmm6260_ipc_default_handlers;
 
+struct rfs_hdr {
+        uint32_t size;
+        uint8_t cmd;
+        uint8_t id;
+} __attribute__ ((packed));
+
 #endif
 
 // vim:ts=4:sw=4:expandtab

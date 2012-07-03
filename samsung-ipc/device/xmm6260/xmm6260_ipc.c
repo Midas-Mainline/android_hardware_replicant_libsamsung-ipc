@@ -2,7 +2,8 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
- * based on xmm6260 IPC code which is:
+ * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
+ * based on crespo IPC code which is:
  *
  * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
  *                    Joerie de Gram <j.de.gram@gmail.com>
@@ -146,13 +147,95 @@ int xmm6260_ipc_recv(struct ipc_client *client, struct ipc_message_info *respons
 
 int xmm6260_rfs_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
-    printf("+%s\n", __func__);
+    unsigned char buf[IPC_MAX_XFER] = {};
+    struct rfs_hdr header;
+    int header_recv = 0;
+    int count=0;
+    int rc;
+
+    do {
+        rc = client->handlers->read(buf, IPC_MAX_XFER, client->handlers->read_data);
+
+        if (rc < 0) {
+            ipc_client_log(client, "Failed to read RFS data.");
+            return -1;
+        }
+
+        // We didn't recieve the header yet
+        if (!header_recv) {
+            if (rc < sizeof(struct rfs_hdr)) {
+                ipc_client_log(client, "Failed to read RFS data.");
+                return -1;
+            }
+
+            memcpy((void *) &header, (void *) buf, sizeof(struct rfs_hdr));
+
+            if (header.size < sizeof(struct rfs_hdr)) {
+                ipc_client_log(client, "Invalid size in header");
+                return -1;
+            }
+
+            response->mseq = 0;
+            response->aseq = header.id;
+            response->group = IPC_GROUP_RFS;
+            response->index = header.cmd;
+            response->type = 0;
+            response->length = header.size - sizeof(struct rfs_hdr);
+            response->data = NULL;
+
+            ipc_client_log(client, "READ %d bytes, header size says %d", rc, header.size);
+
+            ipc_client_log(client, "crespo_ipc_rfs_client_recv: RECV RFS (id=%d cmd=%d size=%d)!", header.id, header.cmd, header.size);
+            ipc_client_log(client, "crespo_ipc_rfs_client_recv: IPC response (aseq=0x%02x command=%s (0x%04x))",
+                response->mseq, ipc_command_to_str(IPC_COMMAND(response)), IPC_COMMAND(response));
+
+            if (response->length > 0) {
+                response->data = malloc(response->length);
+                memcpy(response->data, (void *) (buf + sizeof(struct rfs_hdr)), rc - sizeof(struct rfs_hdr));
+                ipc_client_log(client, "writing at offset 0 %d bytes", rc - sizeof(struct rfs_hdr));
+            }
+
+            header_recv = 1;
+        } else {
+            // Still reading data, with no header
+            memcpy((void *) (response->data + count - sizeof(struct rfs_hdr)), buf, rc);
+        }
+
+        count += rc;
+    } while (count < header.size);
+
     return 0;
 }
+
 int xmm6260_rfs_send(struct ipc_client *client, struct ipc_message_info *request)
 {
-    printf("+%s\n", __func__);
-    return 0;
+    struct rfs_hdr *header = NULL;
+    void *data = NULL;
+    int data_length;
+    int rc;
+
+    if (request->length < 0) {
+        ipc_client_log(client, "Invalid data length!");
+        return -1;
+    }
+
+    data_length = sizeof(struct rfs_hdr) + request->length;
+    data = malloc(data_length);
+    memset(data, 0, data_length);
+
+    header = (struct rfs_hdr *) data;
+    header->id = request->mseq;
+    header->cmd = request->index;
+    header->size = data_length;
+
+    memcpy((void *) (data + sizeof(struct rfs_hdr)), request->data, request->length);
+
+    ipc_client_log(client, "crespo_ipc_rfs_client_send: SEND RFS (id=%d cmd=%d size=%d)!", header->id, header->cmd, header->size);
+    ipc_client_log(client, "crespo_ipc_rfs_client_send: IPC request (mseq=0x%02x command=%s (0x%04x))",
+                    request->mseq, ipc_command_to_str(IPC_COMMAND(request)), IPC_COMMAND(request));
+
+    rc = client->handlers->write(data, data_length, client->handlers->write_data);
+    return rc;
 }
 
 int xmm6260_ipc_open(void *data, unsigned int size, void *io_data)
@@ -293,6 +376,7 @@ int xmm6260_ipc_common_data_set_fd(void *io_data, int fd)
         return -1;
 
     common_data = (int *) io_data;
+    // won't work
     common_data = &fd;
 
     return 0;
@@ -337,8 +421,8 @@ struct ipc_ops xmm6260_i9250_fmt_ops = {
 };
 
 struct ipc_ops xmm6260_rfs_ops = {
-    .send = xmm6260_ipc_send,
-    .recv = xmm6260_ipc_recv,
+    .send = xmm6260_rfs_send,
+    .recv = xmm6260_rfs_recv,
     .bootstrap = NULL,
 };
 
