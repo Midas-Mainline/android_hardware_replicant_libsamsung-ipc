@@ -44,6 +44,11 @@ struct ipc_rfs_io_confirm {
 } __attribute__((__packed__));
 
 void md5hash2string(char *out, uint8_t *in);
+char *nv_data_path(struct ipc_client *client);
+char *nv_data_md5_path(struct ipc_client *client);
+char *nv_state_path(struct ipc_client *client);
+char *nv_data_bak_path(struct ipc_client *client);
+char *nv_data_md5_bak_path(struct ipc_client *client);
 void nv_data_generate(struct ipc_client *client);
 void nv_data_md5_compute(void *data_p, int size, void *hash);
 void nv_data_md5_generate(struct ipc_client *client);
