@@ -22,6 +22,8 @@
 #ifndef __MODEMCTL_COMMON_H__
 #define __MODEMCTL_COMMON_H__
 
+#include <radio.h>
+
 #include "common.h"
 #include "log.h"
 #include "io_helpers.h" 
@@ -48,6 +50,8 @@ typedef struct {
 	int radio_fd;
 	char *radio_data;
 	struct stat radio_stat;
+
+	struct ipc_client *client;
 } fwloader_context;
 
 /*
@@ -144,7 +148,7 @@ int modemctl_modem_boot_power(fwloader_context *ctx, bool enabled);
  * @return Negative value indicating error code
  * @return zero on success
  */
-int boot_modem_i9100(void);
+int boot_modem_i9100(struct ipc_client *client);
 
 /* 
  * @brief Boots the modem on the I9250 (Galaxy Nexus) board
@@ -152,7 +156,7 @@ int boot_modem_i9100(void);
  * @return Negative value indicating error code
  * @return zero on success
  */
-int boot_modem_i9250(void);
+int boot_modem_i9250(struct ipc_client *client);
 
 /* 
  * @brief Calculate the checksum for the XMM6260 bootloader protocol

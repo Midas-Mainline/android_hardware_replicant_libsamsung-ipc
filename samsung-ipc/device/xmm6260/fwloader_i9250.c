@@ -20,6 +20,7 @@
  */
 
 #include "modemctl_common.h"
+#include "ipc_private.h"
 
 /*
  * i9250 (Galaxy Nexus) board-specific code
@@ -517,10 +518,13 @@ fail:
 	return ret;
 }
 
-static int send_secure_image(fwloader_context *ctx, uint32_t addr,
-	enum xmm6260_image type)
+static int send_secure_data(fwloader_context *ctx, uint32_t addr,
+	void *data, int data_len)
 {
 	int ret = 0;
+	int count = 0;
+	char *data_p = (char *) data;
+
 	if ((ret = bootloader_cmd(ctx, ReqFlashSetAddress, &addr, 4)) < 0) {
 		_e("failed to send ReqFlashSetAddress");
 		goto fail;
@@ -529,28 +533,36 @@ static int send_secure_image(fwloader_context *ctx, uint32_t addr,
 		_d("sent ReqFlashSetAddress");
 	}
 
-	uint32_t offset = i9250_radio_parts[type].offset;
-	uint32_t length = i9250_radio_parts[type].length;
+	while (count < data_len) {
+		int rest = data_len - count;
+		int chunk = rest < SEC_DOWNLOAD_CHUNK ? rest : SEC_DOWNLOAD_CHUNK;
 
-	char *start = ctx->radio_data + offset;
-	char *end = start + length;
-
-	while (start < end) {
-		unsigned rest = end - start;
-		unsigned chunk = rest < SEC_DOWNLOAD_CHUNK ? rest : SEC_DOWNLOAD_CHUNK;
-
-		ret = bootloader_cmd(ctx, ReqFlashWriteBlock, start, chunk);
+		ret = bootloader_cmd(ctx, ReqFlashWriteBlock, data_p, chunk);
 		if (ret < 0) {
 			_e("failed to send data chunk");
 			goto fail;
 		}
 
-		start += chunk;
+		data_p += chunk;
+		count += chunk;
 	}
 
 	usleep(SEC_DOWNLOAD_DELAY_US);
 
 fail:
+	return ret;
+}
+
+static int send_secure_image(fwloader_context *ctx, uint32_t addr,
+	enum xmm6260_image type)
+{
+	uint32_t offset = i9250_radio_parts[type].offset;
+	uint32_t length = i9250_radio_parts[type].length;
+	char *start = ctx->radio_data + offset;
+	int ret = 0;
+
+	ret = send_secure_data(ctx, addr, start, length);
+
 	return ret;
 }
 
@@ -597,7 +609,8 @@ static int send_SecureImage_i9250(fwloader_context *ctx) {
 	uint32_t sec_off = i9250_radio_parts[SECURE_IMAGE].offset;
 	uint32_t sec_len = i9250_radio_parts[SECURE_IMAGE].length;
 	void *sec_img = ctx->radio_data + sec_off;
-	
+	void *nv_data = NULL;
+
 	if ((ret = bootloader_cmd(ctx, ReqSecStart, sec_img, sec_len)) < 0) {
 		_e("failed to write ReqSecStart");
 		goto fail;
@@ -614,13 +627,24 @@ static int send_SecureImage_i9250(fwloader_context *ctx) {
 		_d("sent FIRMWARE image");
 	}
 	
-	if ((ret = send_secure_image(ctx, NVDATA_LOAD_ADDR, NVDATA)) < 0) {
+	nv_data_check(ctx->client);
+	nv_data_md5_check(ctx->client);
+
+	nv_data = ipc_file_read(ctx->client, nv_data_path(ctx->client), 2 << 20, 1024);
+	if (nv_data == NULL) {
+		_e("failed to read NVDATA image");
+		goto fail;
+	}
+
+	if ((ret = send_secure_data(ctx, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
 		_e("failed to send NVDATA image");
 		goto fail;
 	}
 	else {
 		_d("sent NVDATA image");
 	}
+
+	free(nv_data);
 
 	if ((ret = send_mps_data(ctx)) < 0) {
 		_e("failed to send MPS data");
@@ -654,10 +678,12 @@ fail:
 	return ret;
 }
 
-int boot_modem_i9250(void) {
+int boot_modem_i9250(struct ipc_client *client) {
 	int ret = -1;
 	fwloader_context ctx;
 	memset(&ctx, 0, sizeof(ctx));
+
+	ctx.client = client;
 
 	ctx.radio_fd = open(I9250_RADIO_IMAGE, O_RDONLY);
 	if (ctx.radio_fd < 0) {
