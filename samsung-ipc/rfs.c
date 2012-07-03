@@ -33,7 +33,7 @@
 
 #include "ipc_private.h"
 
-static inline char *nv_data_path(struct ipc_client *client) {
+char *nv_data_path(struct ipc_client *client) {
     if (!client) {
         ipc_client_log(client, "%s: client is NULL\n", __func__);
         goto fail;
@@ -46,7 +46,7 @@ fail:
     return "/efs/nv_data.bin";
 }
 
-static inline char *nv_data_md5_path(struct ipc_client *client) {
+char *nv_data_md5_path(struct ipc_client *client) {
     if (!client) {
         ipc_client_log(client, "%s: client is NULL\n", __func__);
         goto fail;
@@ -59,7 +59,7 @@ fail:
     return "/efs/nv_data.bin.md5";
 }
 
-static inline char *nv_state_path(struct ipc_client *client) {
+char *nv_state_path(struct ipc_client *client) {
     if (!client) {
         ipc_client_log(client, "%s: client is NULL\n", __func__);
         goto fail;
@@ -72,7 +72,7 @@ fail:
     return "/efs/.nv_state";
 }
 
-static inline char *nv_data_bak_path(struct ipc_client *client) {
+char *nv_data_bak_path(struct ipc_client *client) {
     if (!client) {
         ipc_client_log(client, "%s: client is NULL\n", __func__);
         goto fail;
@@ -86,7 +86,7 @@ fail:
     return "/efs/.nv_data.bak";
 }
 
-static inline char *nv_data_md5_bak_path(struct ipc_client *client) {
+char *nv_data_md5_bak_path(struct ipc_client *client) {
     if (!client) {
         ipc_client_log(client, "%s: client is NULL\n", __func__);
         goto fail;
