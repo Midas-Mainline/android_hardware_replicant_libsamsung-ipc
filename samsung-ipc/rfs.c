@@ -146,7 +146,7 @@ void nv_data_md5_generate(struct ipc_client *client)
 
     ipc_client_log(client, "nv_data_md5_generate: generating MD5 hash\n");
     nv_data_p=ipc_file_read(client, nv_data_path(client),
-        NV_DATA_SIZE, NV_DATA_SIZE / 10);
+        NV_DATA_SIZE, 0x1000);
     nv_data_md5_compute(nv_data_p, NV_DATA_SIZE, nv_data_md5_hash);
     free(nv_data_p);
 
@@ -224,7 +224,7 @@ void nv_data_backup_create(struct ipc_client *client)
 
     /* Read the content of the backup file. */
     nv_data_p=ipc_file_read(client, nv_data_path(client),
-        NV_DATA_SIZE, NV_DATA_SIZE / 10);
+        NV_DATA_SIZE, 0x1000);
 
     /* Compute the backup file MD5 hash. */
     nv_data_md5_compute(nv_data_p, NV_DATA_SIZE, nv_data_md5_hash);
@@ -295,7 +295,7 @@ nv_data_backup_create_write:
     }
 
     /* Read the newly-written .nv_data.bak. */
-    nv_data_bak_p=ipc_file_read(client, nv_data_bak_path(client), NV_DATA_SIZE, NV_DATA_SIZE / 10);
+    nv_data_bak_p=ipc_file_read(client, nv_data_bak_path(client), NV_DATA_SIZE, 0x1000);
 
     /* Compute the MD5 hash for nv_data.bin. */
     nv_data_md5_compute(nv_data_bak_p, NV_DATA_SIZE, nv_data_md5_hash);
@@ -384,7 +384,7 @@ void nv_data_backup_restore(struct ipc_client *client)
     memset(nv_data_md5_hash_string, 0, MD5_STRING_SIZE);
 
     /* Read the content of the backup file. */
-    nv_data_bak_p=ipc_file_read(client, nv_data_bak_path(client), NV_DATA_SIZE, NV_DATA_SIZE / 10);
+    nv_data_bak_p=ipc_file_read(client, nv_data_bak_path(client), NV_DATA_SIZE, 0x1000);
 
     /* Compute the backup file MD5 hash. */
     nv_data_md5_compute(nv_data_bak_p, NV_DATA_SIZE, nv_data_md5_hash);
@@ -456,7 +456,7 @@ nv_data_backup_restore_write:
     }
 
     /* Read the newly-written nv_data.bin. */
-    nv_data_p=ipc_file_read(client, nv_data_path(client), NV_DATA_SIZE, NV_DATA_SIZE / 10);
+    nv_data_p=ipc_file_read(client, nv_data_path(client), NV_DATA_SIZE, 0x1000);
 
     /* Compute the MD5 hash for nv_data.bin. */
     nv_data_md5_compute(nv_data_p, NV_DATA_SIZE, nv_data_md5_hash);
@@ -569,7 +569,7 @@ void nv_data_md5_check(struct ipc_client *client)
     memset(nv_data_md5_hash_read, 0, MD5_STRING_SIZE);
     memset(nv_data_md5_hash_string, 0, MD5_STRING_SIZE);
 
-    nv_data_p=ipc_file_read(client, nv_data_path(client), NV_DATA_SIZE, 1024);
+    nv_data_p=ipc_file_read(client, nv_data_path(client), NV_DATA_SIZE, 0x1000);
     data_p=nv_data_p;
 
     nv_data_md5_compute(data_p, NV_DATA_SIZE, nv_data_md5_hash);
