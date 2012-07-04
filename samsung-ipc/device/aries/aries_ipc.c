@@ -911,6 +911,17 @@ int aries_ipc_gprs_get_iface(char **iface)
     return -1;
 }
 
+int aries_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap)
+{
+    if (cap == NULL)
+        return -1;
+
+    cap->port_list = 1;
+    cap->cid_max = 3;
+
+    return 0;
+}
+
 void *aries_ipc_common_data_create(void)
 {
     struct aries_ipc_handlers_common_data *common_data;
@@ -992,6 +1003,7 @@ struct ipc_handlers aries_default_handlers = {
     .gprs_activate = aries_ipc_gprs_activate,
     .gprs_deactivate = aries_ipc_gprs_deactivate,
     .gprs_get_iface = aries_ipc_gprs_get_iface,
+    .gprs_get_capabilities = aries_ipc_gprs_get_capabilities,
     .common_data = NULL,
     .common_data_create = aries_ipc_common_data_create,
     .common_data_destroy = aries_ipc_common_data_destroy,

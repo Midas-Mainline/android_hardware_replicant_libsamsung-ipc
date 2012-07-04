@@ -646,6 +646,16 @@ int crespo_ipc_gprs_get_iface(char **iface)
     return 0;
 }
 
+int crespo_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap)
+{
+    if (cap == NULL)
+        return -1;
+
+    cap->port_list = 0;
+    cap->cid_max = 1;
+
+    return 0;
+}
 
 void *crespo_ipc_common_data_create(void)
 {
@@ -707,6 +717,7 @@ struct ipc_handlers crespo_default_handlers = {
     .power_on = crespo_ipc_power_on,
     .power_off = crespo_ipc_power_off,
     .gprs_get_iface = crespo_ipc_gprs_get_iface,
+    .gprs_get_capabilities = crespo_ipc_gprs_get_capabilities,
     .common_data = NULL,
     .common_data_create = crespo_ipc_common_data_create,
     .common_data_destroy = crespo_ipc_common_data_destroy,
