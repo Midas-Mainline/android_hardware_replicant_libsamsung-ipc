@@ -407,6 +407,16 @@ int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface)
     return client->handlers->gprs_get_iface(iface);
 }
 
+int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_client_gprs_capabilities *cap)
+{
+    if (client == NULL ||
+        client->handlers == NULL ||
+        client->handlers->gprs_get_capabilities == NULL)
+        return -1;
+
+    return client->handlers->gprs_get_capabilities(cap);
+}
+
 int _ipc_client_send(struct ipc_client *client, struct ipc_message_info *request)
 {
     if (client == NULL ||

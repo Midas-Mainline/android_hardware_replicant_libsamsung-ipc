@@ -47,12 +47,12 @@ struct ipc_handlers {
     void *power_off_data;
 
     /* GPRS handlers */
-
     ipc_handler_cb gprs_activate;
     void *gprs_activate_data;
     ipc_handler_cb gprs_deactivate;
     void *gprs_deactivate_data;
     int (*gprs_get_iface)(char **iface);
+    int (*gprs_get_capabilities)(struct ipc_client_gprs_capabilities *cap);
 
     /* Handlers common data*/
     void *common_data;

@@ -52,6 +52,11 @@ struct ipc_message_info {
 struct ipc_client;
 struct ipc_handlers;
 
+struct ipc_client_gprs_capabilities {
+    int port_list;
+    int cid_max;
+};
+
 typedef void (*ipc_client_log_handler_cb)(const char *message, void *user_data);
 
 typedef int (*ipc_io_handler_cb)(void *data, unsigned int size, void *io_data);
@@ -83,6 +88,7 @@ int ipc_client_gprs_handlers_available(struct ipc_client *client);
 int ipc_client_gprs_activate(struct ipc_client *client);
 int ipc_client_gprs_deactivate(struct ipc_client *client);
 int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface);
+int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_client_gprs_capabilities *cap);
 
 int ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response);
 
