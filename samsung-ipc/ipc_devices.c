@@ -23,30 +23,6 @@
 #include "ipc_devices.h"
 
 struct ipc_device_desc ipc_devices[] = {
-    {   
-        .name = "galaxys2",
-        .board_name = "i9100",
-        .handlers = &xmm6260_default_handlers,
-        .fmt_ops = &xmm6260_i9100_fmt_ops,
-        .rfs_ops = &xmm6260_rfs_ops,
-        .fs_ops = NULL,
-    },
-    {   
-        .name = "galaxys2",
-        .board_name = "smdk4210",
-        .handlers = &xmm6260_default_handlers,
-        .fmt_ops = &xmm6260_i9100_fmt_ops,
-        .rfs_ops = &xmm6260_rfs_ops,
-        .fs_ops = NULL,
-    },
-    {
-        .name = "maguro",
-        .board_name = "tuna",
-        .handlers = &xmm6260_default_handlers,
-        .fmt_ops = &xmm6260_i9250_fmt_ops,
-        .rfs_ops = &xmm6260_rfs_ops,
-        .fs_ops = &xmm6260_i9250_fs_ops,
-    },
     {
         .name = "crespo",
         .board_name = "herring",
@@ -70,6 +46,30 @@ struct ipc_device_desc ipc_devices[] = {
         .fmt_ops = &aries_fmt_ops,
         .rfs_ops = &aries_rfs_ops,
         .fs_ops = NULL,
+    },
+    {   
+        .name = "galaxys2",
+        .board_name = "i9100",
+        .handlers = &xmm6260_default_handlers,
+        .fmt_ops = &xmm6260_i9100_fmt_ops,
+        .rfs_ops = &xmm6260_rfs_ops,
+        .fs_ops = NULL,
+    },
+    {   
+        .name = "galaxys2",
+        .board_name = "smdk4210",
+        .handlers = &xmm6260_default_handlers,
+        .fmt_ops = &xmm6260_i9100_fmt_ops,
+        .rfs_ops = &xmm6260_rfs_ops,
+        .fs_ops = NULL,
+    },
+    {
+        .name = "maguro",
+        .board_name = "tuna",
+        .handlers = &xmm6260_default_handlers,
+        .fmt_ops = &xmm6260_i9250_fmt_ops,
+        .rfs_ops = &xmm6260_rfs_ops,
+        .fs_ops = &xmm6260_i9250_fs_ops,
     }
 };
 
