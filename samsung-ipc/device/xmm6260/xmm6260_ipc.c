@@ -346,6 +346,25 @@ int xmm6260_ipc_power_off(void *io_data)
     return 0;
 }
 
+int xmm6260_ipc_gprs_get_iface(char **iface)
+{
+    // TODO: depends on CID
+    asprintf(iface, "rmnet0");
+
+    return 0;
+}
+
+int xmm6260_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap)
+{
+    if (cap == NULL)
+        return -1;
+
+    cap->port_list = 1;
+    cap->cid_max = 3;
+
+    return 0;
+}
+
 void *xmm6260_ipc_common_data_create(void)
 {
     void *io_data;
@@ -406,6 +425,8 @@ struct ipc_handlers xmm6260_default_handlers = {
     .close = xmm6260_ipc_close,
     .power_on = xmm6260_ipc_power_on,
     .power_off = xmm6260_ipc_power_off,
+    .gprs_get_iface = xmm6260_ipc_gprs_get_iface,
+    .gprs_get_capabilities = xmm6260_ipc_gprs_get_capabilities,
     .common_data = NULL,
     .common_data_create = xmm6260_ipc_common_data_create,
     .common_data_destroy = xmm6260_ipc_common_data_destroy,
