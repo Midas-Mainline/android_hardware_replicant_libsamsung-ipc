@@ -27,14 +27,35 @@ struct ipc_device_desc {
     char *name;
     char *board_name;
 
-    struct ipc_handlers *handlers;
     struct ipc_ops *fmt_ops;
     struct ipc_ops *rfs_ops;
-    struct ipc_fs_ops *fs_ops;
+    struct ipc_handlers *handlers;
+    struct ipc_gprs_specs *gprs_specs;
+    struct ipc_nv_data_specs *nv_data_specs;
 };
 
 extern struct ipc_device_desc ipc_devices[];
 extern int ipc_devices_count;
+
+// h1
+
+extern struct ipc_ops h1_fmt_ops;
+extern struct ipc_ops h1_rfs_ops;
+extern struct ipc_handlers h1_default_handlers;
+
+// crespo
+
+extern struct ipc_ops crespo_fmt_ops;
+extern struct ipc_ops crespo_rfs_ops;
+extern struct ipc_handlers crespo_default_handlers;
+extern struct ipc_gprs_specs crespo_gprs_specs;
+
+// aries
+
+extern struct ipc_ops aries_fmt_ops;
+extern struct ipc_ops aries_rfs_ops;
+extern struct ipc_handlers aries_default_handlers;
+extern struct ipc_gprs_specs aries_gprs_specs;
 
 // xmm6260
 // Galaxy S2 (I9100)
@@ -44,24 +65,8 @@ extern struct ipc_handlers xmm6260_default_handlers;
 extern struct ipc_ops xmm6260_rfs_ops;
 extern struct ipc_ops xmm6260_i9100_fmt_ops;
 extern struct ipc_ops xmm6260_i9250_fmt_ops;
-extern struct ipc_fs_ops xmm6260_i9250_fs_ops;
-
-// h1
-
-extern struct ipc_handlers h1_default_handlers;
-extern struct ipc_ops h1_fmt_ops;
-extern struct ipc_ops h1_rfs_ops;
-
-// crespo
-
-extern struct ipc_handlers crespo_default_handlers;
-extern struct ipc_ops crespo_fmt_ops;
-extern struct ipc_ops crespo_rfs_ops;
-
-// aries
-extern struct ipc_handlers aries_default_handlers;
-extern struct ipc_ops aries_fmt_ops;
-extern struct ipc_ops aries_rfs_ops;
+extern struct ipc_gprs_specs xmm6260_gprs_specs;
+extern struct ipc_gprs_specs xmm6260_nv_data_specs;
 
 #endif
 

@@ -140,9 +140,10 @@ struct ipc_client* ipc_client_new(int client_type)
             break;
     }
 
-    client->fs_ops = ipc_devices[device_index].fs_ops;
-
     client->handlers = (struct ipc_handlers *) malloc(sizeof(struct ipc_handlers));
+    client->gprs_specs = ipc_devices[device_index].gprs_specs;
+    client->nv_data_specs = ipc_devices[device_index].nv_data_specs;
+
     client->log_handler = log_handler_default;
 
     if (ipc_devices[device_index].handlers != 0)
@@ -370,8 +371,7 @@ int ipc_client_gprs_handlers_available(struct ipc_client *client)
         return -1;
 
     if(client->handlers->gprs_activate != NULL && 
-        client->handlers->gprs_deactivate != NULL &&
-        client->handlers->gprs_get_iface != NULL)
+        client->handlers->gprs_deactivate != NULL)
         return 1;
     else
         return 0;
@@ -400,21 +400,21 @@ int ipc_client_gprs_deactivate(struct ipc_client *client)
 int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface)
 {
     if (client == NULL ||
-        client->handlers == NULL ||
-        client->handlers->gprs_get_iface == NULL)
+        client->gprs_specs == NULL ||
+        client->gprs_specs->gprs_get_iface == NULL)
         return -1;
 
-    return client->handlers->gprs_get_iface(iface);
+    return client->gprs_specs->gprs_get_iface(iface);
 }
 
 int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_client_gprs_capabilities *cap)
 {
     if (client == NULL ||
-        client->handlers == NULL ||
-        client->handlers->gprs_get_capabilities == NULL)
+        client->gprs_specs == NULL ||
+        client->gprs_specs->gprs_get_capabilities == NULL)
         return -1;
 
-    return client->handlers->gprs_get_capabilities(cap);
+    return client->gprs_specs->gprs_get_capabilities(cap);
 }
 
 int _ipc_client_send(struct ipc_client *client, struct ipc_message_info *request)

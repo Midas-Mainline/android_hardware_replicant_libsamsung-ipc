@@ -418,22 +418,6 @@ int xmm6260_ipc_common_data_get_fd(void *io_data)
     return (int) *(common_data);
 }
 
-struct ipc_handlers xmm6260_default_handlers = {
-    .read = xmm6260_ipc_read,
-    .write = xmm6260_ipc_write,
-    .open = xmm6260_ipc_open,
-    .close = xmm6260_ipc_close,
-    .power_on = xmm6260_ipc_power_on,
-    .power_off = xmm6260_ipc_power_off,
-    .gprs_get_iface = xmm6260_ipc_gprs_get_iface,
-    .gprs_get_capabilities = xmm6260_ipc_gprs_get_capabilities,
-    .common_data = NULL,
-    .common_data_create = xmm6260_ipc_common_data_create,
-    .common_data_destroy = xmm6260_ipc_common_data_destroy,
-    .common_data_set_fd = xmm6260_ipc_common_data_set_fd,
-    .common_data_get_fd = xmm6260_ipc_common_data_get_fd,
-};
-
 struct ipc_ops xmm6260_i9100_fmt_ops = {
     .send = xmm6260_ipc_send,
     .recv = xmm6260_ipc_recv,
@@ -452,7 +436,27 @@ struct ipc_ops xmm6260_rfs_ops = {
     .bootstrap = NULL,
 };
 
-struct ipc_fs_ops xmm6260_i9250_fs_ops = {
+struct ipc_handlers xmm6260_default_handlers = {
+    .read = xmm6260_ipc_read,
+    .write = xmm6260_ipc_write,
+    .open = xmm6260_ipc_open,
+    .close = xmm6260_ipc_close,
+    .power_on = xmm6260_ipc_power_on,
+    .power_off = xmm6260_ipc_power_off,
+    .common_data = NULL,
+    .common_data_create = xmm6260_ipc_common_data_create,
+    .common_data_destroy = xmm6260_ipc_common_data_destroy,
+    .common_data_set_fd = xmm6260_ipc_common_data_set_fd,
+    .common_data_get_fd = xmm6260_ipc_common_data_get_fd,
+};
+
+struct ipc_gprs_specs xmm6260_gprs_specs = {
+    .gprs_get_iface = xmm6260_ipc_gprs_get_iface,
+    .gprs_get_capabilities = xmm6260_ipc_gprs_get_capabilities,
+};
+
+
+struct ipc_nv_data_specs xmm6260_nv_data_specs = {
     .nv_data_path = "/factory/nv_data.bin",
     .nv_data_md5_path = "/factory/nv_data.bin.md5",
     .nv_state_path = "/factory/.nv_state",

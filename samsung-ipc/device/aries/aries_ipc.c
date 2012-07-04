@@ -364,12 +364,12 @@ boot_loop_start:
     /* Write nv_data.bin to modem_ctl. */
     ipc_client_log(client, "aries_ipc_bootstrap: write nv_data to onedram");
 
-    nv_data_p = ipc_file_read(client, "/efs/nv_data.bin", NV_DATA_SIZE, 1024);
+    nv_data_p = ipc_file_read(client, nv_data_path(client), nv_data_size(client), nv_data_chunk_size(client));
     if (nv_data_p == NULL)
         goto error;
     data_p = nv_data_p;
 
-    memcpy(onedram_p + RADIO_IMG_MAX_SIZE, data_p, NV_DATA_SIZE);
+    memcpy(onedram_p + RADIO_IMG_MAX_SIZE, data_p, nv_data_size(client));
 
     free(nv_data_p);
 
@@ -993,24 +993,6 @@ int aries_ipc_common_data_get_fd(void *io_data)
     return common_data->fd;
 }
 
-struct ipc_handlers aries_default_handlers = {
-    .read = aries_ipc_read,
-    .write = aries_ipc_write,
-    .open = aries_ipc_open,
-    .close = aries_ipc_close,
-    .power_on = aries_ipc_power_on,
-    .power_off = aries_ipc_power_off,
-    .gprs_activate = aries_ipc_gprs_activate,
-    .gprs_deactivate = aries_ipc_gprs_deactivate,
-    .gprs_get_iface = aries_ipc_gprs_get_iface,
-    .gprs_get_capabilities = aries_ipc_gprs_get_capabilities,
-    .common_data = NULL,
-    .common_data_create = aries_ipc_common_data_create,
-    .common_data_destroy = aries_ipc_common_data_destroy,
-    .common_data_set_fd = aries_ipc_common_data_set_fd,
-    .common_data_get_fd = aries_ipc_common_data_get_fd,
-};
-
 struct ipc_ops aries_fmt_ops = {
     .send = aries_ipc_fmt_client_send,
     .recv = aries_ipc_fmt_client_recv,
@@ -1021,6 +1003,27 @@ struct ipc_ops aries_rfs_ops = {
     .send = aries_ipc_rfs_client_send,
     .recv = aries_ipc_rfs_client_recv,
     .bootstrap = NULL,
+};
+
+struct ipc_handlers aries_default_handlers = {
+    .read = aries_ipc_read,
+    .write = aries_ipc_write,
+    .open = aries_ipc_open,
+    .close = aries_ipc_close,
+    .power_on = aries_ipc_power_on,
+    .power_off = aries_ipc_power_off,
+    .gprs_activate = aries_ipc_gprs_activate,
+    .gprs_deactivate = aries_ipc_gprs_deactivate,
+    .common_data = NULL,
+    .common_data_create = aries_ipc_common_data_create,
+    .common_data_destroy = aries_ipc_common_data_destroy,
+    .common_data_set_fd = aries_ipc_common_data_set_fd,
+    .common_data_get_fd = aries_ipc_common_data_get_fd,
+};
+
+struct ipc_gprs_specs aries_gprs_specs = {
+    .gprs_get_iface = aries_ipc_gprs_get_iface,
+    .gprs_get_capabilities = aries_ipc_gprs_get_capabilities,
 };
 
 // vim:ts=4:sw=4:expandtab

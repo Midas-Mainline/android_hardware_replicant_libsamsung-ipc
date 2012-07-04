@@ -51,8 +51,6 @@ struct ipc_handlers {
     void *gprs_activate_data;
     ipc_handler_cb gprs_deactivate;
     void *gprs_deactivate_data;
-    int (*gprs_get_iface)(char **iface);
-    int (*gprs_get_capabilities)(struct ipc_client_gprs_capabilities *cap);
 
     /* Handlers common data*/
     void *common_data;
@@ -63,12 +61,20 @@ struct ipc_handlers {
     int (*common_data_get_fd)(void *io_data);
 };
 
-struct ipc_fs_ops {
+struct ipc_gprs_specs {
+    int (*gprs_get_iface)(char **iface);
+    int (*gprs_get_capabilities)(struct ipc_client_gprs_capabilities *cap);
+};
+
+struct ipc_nv_data_specs {
     char *nv_data_path;
     char *nv_data_md5_path;
-    char *nv_state_path;
     char *nv_data_bak_path;
     char *nv_data_md5_bak_path;
+    char *nv_state_path;
+    char *nv_data_secret;
+    int nv_data_size;
+    int nv_data_chunk_size;
 };
 
 struct ipc_client {
@@ -79,7 +85,8 @@ struct ipc_client {
 
     struct ipc_ops *ops;
     struct ipc_handlers *handlers;
-    struct ipc_fs_ops *fs_ops;
+    struct ipc_gprs_specs *gprs_specs;
+    struct ipc_nv_data_specs *nv_data_specs;
 };
 
 void ipc_client_log(struct ipc_client *client, const char *message, ...);

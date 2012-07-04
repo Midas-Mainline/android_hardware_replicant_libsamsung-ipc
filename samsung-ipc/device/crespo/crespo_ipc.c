@@ -275,7 +275,7 @@ boot_loop_start:
     /* Write nv_data.bin to modem_ctl. */
     ipc_client_log(client, "crespo_ipc_bootstrap: write nv_data to modem_ctl");
 
-    nv_data_p = ipc_file_read(client, "/efs/nv_data.bin", NV_DATA_SIZE, 1024);
+    nv_data_p = ipc_file_read(client, nv_data_path(client), nv_data_size(client), nv_data_chunk_size(client));
     if (nv_data_p == NULL)
         goto error;
     data_p = nv_data_p;
@@ -284,8 +284,8 @@ boot_loop_start:
 
     for(i=0 ; i < 2 ; i++)
     {
-        write(modem_ctl_fd, data_p, NV_DATA_SIZE / 2);
-        data_p += NV_DATA_SIZE / 2;
+        write(modem_ctl_fd, data_p, nv_data_size(client) / 2);
+        data_p += nv_data_size(client) / 2;
     }
 
     free(nv_data_p);
@@ -709,22 +709,6 @@ int crespo_ipc_common_data_get_fd(void *io_data)
     return (int) *(common_data);
 }
 
-struct ipc_handlers crespo_default_handlers = {
-    .read = crespo_ipc_read,
-    .write = crespo_ipc_write,
-    .open = crespo_ipc_open,
-    .close = crespo_ipc_close,
-    .power_on = crespo_ipc_power_on,
-    .power_off = crespo_ipc_power_off,
-    .gprs_get_iface = crespo_ipc_gprs_get_iface,
-    .gprs_get_capabilities = crespo_ipc_gprs_get_capabilities,
-    .common_data = NULL,
-    .common_data_create = crespo_ipc_common_data_create,
-    .common_data_destroy = crespo_ipc_common_data_destroy,
-    .common_data_set_fd = crespo_ipc_common_data_set_fd,
-    .common_data_get_fd = crespo_ipc_common_data_get_fd,
-};
-
 struct ipc_ops crespo_fmt_ops = {
     .send = crespo_ipc_fmt_client_send,
     .recv = crespo_ipc_fmt_client_recv,
@@ -735,6 +719,25 @@ struct ipc_ops crespo_rfs_ops = {
     .send = crespo_ipc_rfs_client_send,
     .recv = crespo_ipc_rfs_client_recv,
     .bootstrap = NULL,
+};
+
+struct ipc_handlers crespo_default_handlers = {
+    .read = crespo_ipc_read,
+    .write = crespo_ipc_write,
+    .open = crespo_ipc_open,
+    .close = crespo_ipc_close,
+    .power_on = crespo_ipc_power_on,
+    .power_off = crespo_ipc_power_off,
+    .common_data = NULL,
+    .common_data_create = crespo_ipc_common_data_create,
+    .common_data_destroy = crespo_ipc_common_data_destroy,
+    .common_data_set_fd = crespo_ipc_common_data_set_fd,
+    .common_data_get_fd = crespo_ipc_common_data_get_fd,
+};
+
+struct ipc_gprs_specs crespo_gprs_specs = {
+    .gprs_get_iface = crespo_ipc_gprs_get_iface,
+    .gprs_get_capabilities = crespo_ipc_gprs_get_capabilities,
 };
 
 // vim:ts=4:sw=4:expandtab
