@@ -23,7 +23,6 @@
  */
 
 #include "io_helpers.h"
-#include "log.h"
 
 #define DEFAULT_TIMEOUT 50
 
@@ -42,12 +41,12 @@ int expect(int fd, unsigned timeout) {
     ret = select(fd + 1, &read_set, 0, 0, &tv);
 
     if (ret < 0) {
-        _e("failed to select the fd %d ret=%d: %s", fd, ret, strerror(errno));
+        // _e("failed to select the fd %d ret=%d: %s", fd, ret, strerror(errno));
         goto fail;
     }
 
     if (ret < 1 || !FD_ISSET(fd, &read_set)) {
-        _d("fd %d not in fd set", fd);
+        // _d("fd %d not in fd set", fd);
         goto fail;
     }
 
@@ -58,11 +57,8 @@ fail:
 int expect_read(int fd, void *buf, size_t size) {
     int ret;
     if ((ret = expect(fd, DEFAULT_TIMEOUT)) < 1) {
-        _e("failed to select the fd %d", fd);
+        // _e("failed to select the fd %d", fd);
         return ret;
-    }
-    else {
-        _d("selected %d fds for fd=%d", ret, fd);
     }
 
     return read(fd, buf, size);
@@ -73,11 +69,10 @@ int expect_data(int fd, void *data, size_t size) {
     char buf[size];
     if ((ret = expect_read(fd, buf, size)) != size) {
         ret = -1;
-        _e("failed to receive data");
+        // _e("failed to receive data");
         return ret;
     }
     ret = memcmp(buf, data, size);
-    hexdump(buf, size);
 
     return ret;
 }

@@ -35,7 +35,7 @@ int modemctl_link_set_active(struct ipc_client *client,
     ret = ioctl(io_data->link_fd, ioctl_code, &status);
 
     if (ret < 0) {
-        _d("failed to set link active to %d", enabled);
+        ipc_client_log(client, "failed to set link active to %d", enabled);
         goto fail;
     }
 
@@ -54,7 +54,7 @@ int modemctl_link_set_enabled(struct ipc_client *client,
     ret = ioctl(io_data->link_fd, ioctl_code, &status);
 
     if (ret < 0) {
-        _d("failed to set link state to %d", enabled);
+        ipc_client_log(client, "failed to set link state to %d", enabled);
         goto fail;
     }
 

@@ -61,7 +61,6 @@ samsung-ipc_files := \
 	samsung-ipc/device/xmm6260/fwloader_i9100.c \
 	samsung-ipc/device/xmm6260/fwloader_i9250.c \
 	samsung-ipc/device/xmm6260/io_helpers.c \
-	samsung-ipc/device/xmm6260/log.c \
 	samsung-ipc/device/xmm6260/modemctl_common.c \
 	samsung-ipc/device/xmm6260/xmm6260_ipc.c
 

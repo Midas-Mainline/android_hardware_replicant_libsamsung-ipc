@@ -25,7 +25,6 @@
 #include <radio.h>
 
 #include "common.h"
-#include "log.h"
 #include "io_helpers.h"
 
 //Samsung IOCTLs

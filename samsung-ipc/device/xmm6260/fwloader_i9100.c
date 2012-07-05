@@ -89,7 +89,7 @@ static int i9100_send_image(struct ipc_client *client,
     int ret = -1;
 
     if (type >= io_data->radio_parts_count) {
-        _e("bad image type %x", type);
+        ipc_client_log(client, "Error: bad image type %x", type);
         goto fail;
     }
 
@@ -100,13 +100,13 @@ static int i9100_send_image(struct ipc_client *client,
     size_t end = length + start;
 
     //dump some image bytes
-    _d("image start");
+    ipc_client_log(client, "image start");
 //    hexdump(io_data->radio_data + start, length);
 
     while (start < end) {
         ret = write(io_data->boot_fd, io_data->radio_data + start, end - start);
         if (ret < 0) {
-            _d("failed to write image chunk");
+            ipc_client_log(client, "failed to write image chunk");
             goto fail;
         }
         start += ret;
@@ -115,11 +115,11 @@ static int i9100_send_image(struct ipc_client *client,
     unsigned char crc = calculateCRC(io_data->radio_data, offset, length);
 
     if ((ret = write(io_data->boot_fd, &crc, 1)) < 1) {
-        _d("failed to write CRC");
+        ipc_client_log(client, "failed to write CRC");
         goto fail;
     }
     else {
-        _d("wrote CRC %x", crc);
+        ipc_client_log(client, "wrote CRC %x", crc);
     }
 
     return 0;
@@ -140,12 +140,12 @@ static int i9100_send_psi(struct ipc_client *client, struct modemctl_io_data *io
     int ret = -1;
 
     if ((ret = write(io_data->boot_fd, &hdr, sizeof(hdr))) != sizeof(hdr)) {
-        _d("%s: failed to write header, ret %d", __func__, ret);
+        ipc_client_log(client, "%s: failed to write header, ret %d", __func__, ret);
         goto fail;
     }
 
     if ((ret = i9100_send_image(client, io_data, PSI)) < 0) {
-        _e("failed to send PSI image");
+        ipc_client_log(client, "Error: failed to send PSI image");
         goto fail;
     }
 
@@ -153,28 +153,27 @@ static int i9100_send_psi(struct ipc_client *client, struct modemctl_io_data *io
     for (i = 0; i < 22; i++) {
         char ack;
         if (expect_read(io_data->boot_fd, &ack, 1) < 1) {
-            _d("failed to read ACK byte %d", i);
+            ipc_client_log(client, "failed to read ACK byte %d", i);
             goto fail;
         }
-        _d("%02x ", ack);
     }
 
     if ((ret = expect_data(io_data->boot_fd, "\x1", 1)) < 0) {
-        _d("failed to wait for first ACK");
+        ipc_client_log(client, "failed to wait for first ACK");
         goto fail;
     }
 
     if ((ret = expect_data(io_data->boot_fd, "\x1", 1)) < 0) {
-        _d("failed to wait for second ACK");
+        ipc_client_log(client, "failed to wait for second ACK");
         goto fail;
     }
 
     if ((ret = expect_data(io_data->boot_fd, PSI_ACK_MAGIC, 2)) < 0) {
-        _e("failed to receive PSI ACK");
+        ipc_client_log(client, "Error: failed to receive PSI ACK");
         goto fail;
     }
     else {
-        _d("received PSI ACK");
+        ipc_client_log(client, "received PSI ACK");
     }
 
     return 0;
@@ -190,22 +189,22 @@ static int i9100_send_ebl(struct ipc_client *client, struct modemctl_io_data *io
     unsigned length = i9100_radio_parts[EBL].length;
 
     if ((ret = write(fd, &length, sizeof(length))) < 0) {
-        _e("failed to write EBL length");
+        ipc_client_log(client, "Error: failed to write EBL length");
         goto fail;
     }
 
     if ((ret = expect_data(fd, EBL_HDR_ACK_MAGIC, 2)) < 0) {
-        _e("failed to wait for EBL header ACK");
+        ipc_client_log(client, "Error: failed to wait for EBL header ACK");
         goto fail;
     }
 
     if ((ret = i9100_send_image(client, io_data, EBL)) < 0) {
-        _e("failed to send EBL image");
+        ipc_client_log(client, "Error: failed to send EBL image");
         goto fail;
     }
 
     if ((ret = expect_data(fd, EBL_IMG_ACK_MAGIC, 2)) < 0) {
-        _e("failed to wait for EBL image ACK");
+        ipc_client_log(client, "Error: failed to wait for EBL image ACK");
         goto fail;
     }
 
@@ -222,7 +221,7 @@ static int i9100_boot_cmd(struct ipc_client *client,
     int ret = 0;
     char *cmd_data = 0;
     if (cmd >= ARRAY_SIZE(i9100_boot_cmd_desc)) {
-        _e("bad command %x\n", cmd);
+        ipc_client_log(client, "Error: bad command %x\n", cmd);
         goto done_or_fail;
     }
 
@@ -246,7 +245,7 @@ static int i9100_boot_cmd(struct ipc_client *client,
 
     cmd_data = (char*)malloc(buf_size);
     if (!cmd_data) {
-        _e("failed to allocate command buffer");
+        ipc_client_log(client, "Error: failed to allocate command buffer");
         ret = -ENOMEM;
         goto done_or_fail;
     }
@@ -254,21 +253,16 @@ static int i9100_boot_cmd(struct ipc_client *client,
     memcpy(cmd_data, &header, sizeof(header));
     memcpy(cmd_data + sizeof(header), data, data_size);
 
-    _d("bootloader cmd packet");
-    hexdump(cmd_data, buf_size);
-
     if ((ret = write(io_data->boot_fd, cmd_data, buf_size)) < 0) {
-        _e("failed to write command to socket");
+        ipc_client_log(client, "Error: failed to write command to socket");
         goto done_or_fail;
     }
 
     if ((unsigned)ret != buf_size) {
-        _e("written %d bytes of %d", ret, buf_size);
+        ipc_client_log(client, "Error: written %d bytes of %d", ret, buf_size);
         ret = -EINVAL;
         goto done_or_fail;
     }
-
-    _d("sent command %x magic=%x", header.cmd, header.check);
 
     if (!i9100_boot_cmd_desc[cmd].need_ack) {
         ret = 0;
@@ -279,35 +273,32 @@ static int i9100_boot_cmd(struct ipc_client *client,
         .check = 0,
     };
     if ((ret = expect_read(io_data->boot_fd, &ack, sizeof(ack))) < 0) {
-        _e("failed to receive ack for cmd %x", header.cmd);
+        ipc_client_log(client, "Error: failed to receive ack for cmd %x", header.cmd);
         goto done_or_fail;
     }
 
     if (ret != sizeof(ack)) {
-        _e("received %x bytes of %x for ack", ret, sizeof(ack));
+        ipc_client_log(client, "Error: received %x bytes of %x for ack", ret, sizeof(ack));
         ret = -EINVAL;
         goto done_or_fail;
     }
 
-    hexdump(&ack, sizeof(ack));
-
     if (ack.cmd != header.cmd) {
-        _e("ack cmd %x does not match request %x", ack.cmd, header.cmd);
+        ipc_client_log(client, "Error: ack cmd %x does not match request %x", ack.cmd, header.cmd);
         ret = -EINVAL;
         goto done_or_fail;
     }
 
     if ((ret = expect_read(io_data->boot_fd, cmd_data, cmd_size)) < 0) {
-        _e("failed to receive reply data");
+        ipc_client_log(client, "Error: failed to receive reply data");
         goto done_or_fail;
     }
 
     if ((unsigned)ret != cmd_size) {
-        _e("received %x bytes of %x for reply data", ret, cmd_size);
+        ipc_client_log(client, "Error: received %x bytes of %x for reply data", ret, cmd_size);
         ret = -EINVAL;
         goto done_or_fail;
     }
-    hexdump(cmd_data, cmd_size);
 
 done_or_fail:
 
@@ -325,21 +316,20 @@ static int i9100_boot_info_ack(struct ipc_client *client,
     struct i9100_boot_info info;
 
     if ((ret = expect_read(io_data->boot_fd, &info, sizeof(info))) != sizeof(info)) {
-        _e("failed to receive Boot Info ret=%d", ret);
+        ipc_client_log(client, "Error: failed to receive Boot Info ret=%d", ret);
         ret = -1;
         goto fail;
     }
     else {
-        _d("received Boot Info");
-        hexdump(&info, sizeof(info));
+        ipc_client_log(client, "received Boot Info");
     }
 
     if ((ret = i9100_boot_cmd(client, io_data, SetPortConf, &info, sizeof(info))) < 0) {
-        _e("failed to send SetPortConf command");
+        ipc_client_log(client, "Error: failed to send SetPortConf command");
         goto fail;
     }
     else {
-        _d("sent SetPortConf command");
+        ipc_client_log(client, "sent SetPortConf command");
     }
 
     return 0;
@@ -357,11 +347,11 @@ static int i9100_send_image_data(struct ipc_client *client,
     char *data_p = (char *) data;
 
     if ((ret = i9100_boot_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
-        _e("failed to send ReqFlashSetAddress");
+        ipc_client_log(client, "Error: failed to send ReqFlashSetAddress");
         goto fail;
     }
     else {
-        _d("sent ReqFlashSetAddress");
+        ipc_client_log(client, "sent ReqFlashSetAddress");
     }
 
     while (count < data_len) {
@@ -370,7 +360,7 @@ static int i9100_send_image_data(struct ipc_client *client,
 
         ret = i9100_boot_cmd(client, io_data, ReqFlashWriteBlock, data_p, chunk);
         if (ret < 0) {
-            _e("failed to send data chunk");
+            ipc_client_log(client, "Error: failed to send data chunk");
             goto fail;
         }
 
@@ -408,19 +398,19 @@ static int i9100_send_secure_images(struct ipc_client *client,
     void *nv_data = NULL;
 
     if ((ret = i9100_boot_cmd(client, io_data, ReqSecStart, sec_img, sec_len)) < 0) {
-        _e("failed to write ReqSecStart");
+        ipc_client_log(client, "Error: failed to write ReqSecStart");
         goto fail;
     }
     else {
-        _d("sent ReqSecStart");
+        ipc_client_log(client, "sent ReqSecStart");
     }
 
     if ((ret = i9100_send_image_addr(client, io_data, FW_LOAD_ADDR, FIRMWARE)) < 0) {
-        _e("failed to send FIRMWARE image");
+        ipc_client_log(client, "Error: failed to send FIRMWARE image");
         goto fail;
     }
     else {
-        _d("sent FIRMWARE image");
+        ipc_client_log(client, "sent FIRMWARE image");
     }
 
     nv_data_check(client);
@@ -428,16 +418,16 @@ static int i9100_send_secure_images(struct ipc_client *client,
 
     nv_data = ipc_file_read(client, nv_data_path(client), 2 << 20, 1024);
     if (nv_data == NULL) {
-        _e("failed to read NVDATA image");
+        ipc_client_log(client, "Error: failed to read NVDATA image");
         goto fail;
     }
 
     if ((ret = i9100_send_image_data(client, io_data, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
-        _e("failed to send NVDATA image");
+        ipc_client_log(client, "Error: failed to send NVDATA image");
         goto fail;
     }
     else {
-        _d("sent NVDATA image");
+        ipc_client_log(client, "sent NVDATA image");
     }
 
     free(nv_data);
@@ -445,21 +435,21 @@ static int i9100_send_secure_images(struct ipc_client *client,
     if ((ret = i9100_boot_cmd(client, io_data, ReqSecEnd,
         BL_END_MAGIC, BL_END_MAGIC_LEN)) < 0)
     {
-        _e("failed to write ReqSecEnd");
+        ipc_client_log(client, "Error: failed to write ReqSecEnd");
         goto fail;
     }
     else {
-        _d("sent ReqSecEnd");
+        ipc_client_log(client, "sent ReqSecEnd");
     }
 
     ret = i9100_boot_cmd(client, io_data, ReqForceHwReset,
         BL_RESET_MAGIC, BL_RESET_MAGIC_LEN);
     if (ret < 0) {
-        _e("failed to write ReqForceHwReset");
+        ipc_client_log(client, "Error: failed to write ReqForceHwReset");
         goto fail;
     }
     else {
-        _d("sent ReqForceHwReset");
+        ipc_client_log(client, "sent ReqForceHwReset");
     }
 
 fail:
@@ -476,26 +466,26 @@ fail:
 static int i9100_ehci_setpower(struct ipc_client *client, bool enabled) {
     int ret = -1;
 
-    _d("%s: enabled=%d", __func__, enabled);
+    ipc_client_log(client, "%s: enabled=%d", __func__, enabled);
 
     int ehci_fd = open(I9100_EHCI_PATH, O_RDWR);
     if (ehci_fd < 0) {
-        _e("failed to open EHCI fd");
+        ipc_client_log(client, "Error: failed to open EHCI fd");
         ret = -ENODEV;
         goto fail;
     }
     else {
-        _d("opened EHCI %s: fd=%d", I9100_EHCI_PATH, ehci_fd);
+        ipc_client_log(client, "opened EHCI %s: fd=%d", I9100_EHCI_PATH, ehci_fd);
     }
 
     ret = write(ehci_fd, enabled ? "1" : "0", 1);
 
     //must write exactly one byte
     if (ret <= 0) {
-        _e("failed to set EHCI power");
+        ipc_client_log(client, "Error: failed to set EHCI power");
     }
     else {
-        _d("set EHCI power");
+        ipc_client_log(client, "set EHCI power");
     }
 
 fail:
@@ -513,11 +503,11 @@ static int i9100_reboot_modem(struct ipc_client *client,
     //wait for link to become ready before redetection
     if (!hard) {
         if ((ret = modemctl_wait_link_ready(client, io_data)) < 0) {
-            _e("failed to wait for link to get ready for redetection");
+            ipc_client_log(client, "Error: failed to wait for link to get ready for redetection");
             goto fail;
         }
         else {
-            _d("link ready for redetection");
+            ipc_client_log(client, "link ready for redetection");
         }
     }
 
@@ -526,36 +516,36 @@ static int i9100_reboot_modem(struct ipc_client *client,
      */
     if (hard) {
         if ((ret = modemctl_modem_power(client, io_data, false)) < 0) {
-            _e("failed to disable xmm6260 power");
+            ipc_client_log(client, "Error: failed to disable xmm6260 power");
             goto fail;
         }
         else {
-            _d("disabled xmm6260 power");
+            ipc_client_log(client, "disabled xmm6260 power");
         }
     }
 
     if ((ret = modemctl_link_set_enabled(client, io_data, false)) < 0) {
-        _e("failed to disable I9100 HSIC link");
+        ipc_client_log(client, "Error: failed to disable I9100 HSIC link");
         goto fail;
     }
     else {
-        _d("disabled I9100 HSIC link");
+        ipc_client_log(client, "disabled I9100 HSIC link");
     }
 
     if ((ret = i9100_ehci_setpower(client, false)) < 0) {
-        _e("failed to disable I9100 EHCI");
+        ipc_client_log(client, "Error: failed to disable I9100 EHCI");
         goto fail;
     }
     else {
-        _d("disabled I9100 EHCI");
+        ipc_client_log(client, "disabled I9100 EHCI");
     }
 
     if ((ret = modemctl_link_set_active(client, io_data, false)) < 0) {
-        _e("failed to deactivate I9100 HSIC link");
+        ipc_client_log(client, "Error: failed to deactivate I9100 HSIC link");
         goto fail;
     }
     else {
-        _d("deactivated I9100 HSIC link");
+        ipc_client_log(client, "deactivated I9100 HSIC link");
     }
 
     /*
@@ -563,45 +553,45 @@ static int i9100_reboot_modem(struct ipc_client *client,
      */
 
     if ((ret = modemctl_link_set_enabled(client, io_data, true)) < 0) {
-        _e("failed to enable I9100 HSIC link");
+        ipc_client_log(client, "Error: failed to enable I9100 HSIC link");
         goto fail;
     }
     else {
-        _d("enabled I9100 HSIC link");
+        ipc_client_log(client, "enabled I9100 HSIC link");
     }
 
     if ((ret = i9100_ehci_setpower(client, true)) < 0) {
-        _e("failed to enable I9100 EHCI");
+        ipc_client_log(client, "Error: failed to enable I9100 EHCI");
         goto fail;
     }
     else {
-        _d("enabled I9100 EHCI");
+        ipc_client_log(client, "enabled I9100 EHCI");
     }
 
     if ((ret = modemctl_link_set_active(client, io_data, true)) < 0) {
-        _e("failed to activate I9100 HSIC link");
+        ipc_client_log(client, "Error: failed to activate I9100 HSIC link");
         goto fail;
     }
     else {
-        _d("activated I9100 HSIC link");
+        ipc_client_log(client, "activated I9100 HSIC link");
     }
 
     if (hard) {
         if ((ret = modemctl_modem_power(client, io_data, true)) < 0) {
-            _e("failed to enable xmm6260 power");
+            ipc_client_log(client, "Error: failed to enable xmm6260 power");
             goto fail;
         }
         else {
-            _d("enabled xmm6260 power");
+            ipc_client_log(client, "enabled xmm6260 power");
         }
     }
 
     if ((ret = modemctl_wait_link_ready(client, io_data)) < 0) {
-        _e("failed to wait for link to get ready");
+        ipc_client_log(client, "Error: failed to wait for link to get ready");
         goto fail;
     }
     else {
-        _d("link ready");
+        ipc_client_log(client, "link ready");
     }
 
 fail:
@@ -618,116 +608,116 @@ int i9100_boot_modem(struct ipc_client *client) {
 
     io_data.radio_fd = open(RADIO_IMAGE, O_RDONLY);
     if (io_data.radio_fd < 0) {
-        _e("failed to open radio firmware");
+        ipc_client_log(client, "Error: failed to open radio firmware");
         goto fail;
     }
     else {
-        _d("opened radio image %s, fd=%d", RADIO_IMAGE, io_data.radio_fd);
+        ipc_client_log(client, "opened radio image %s, fd=%d", RADIO_IMAGE, io_data.radio_fd);
     }
 
     if (fstat(io_data.radio_fd, &io_data.radio_stat) < 0) {
-        _e("failed to stat radio image, error %s", strerror(errno));
+        ipc_client_log(client, "Error: failed to stat radio image, error %s", strerror(errno));
         goto fail;
     }
 
     io_data.radio_data = mmap(0, RADIO_MAP_SIZE, PROT_READ, MAP_SHARED,
         io_data.radio_fd, 0);
     if (io_data.radio_data == MAP_FAILED) {
-        _e("failed to mmap radio image, error %s", strerror(errno));
+        ipc_client_log(client, "Error: failed to mmap radio image, error %s", strerror(errno));
         goto fail;
     }
 
     io_data.boot_fd = open(BOOT_DEV, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (io_data.boot_fd < 0) {
-        _e("failed to open boot device");
+        ipc_client_log(client, "Error: failed to open boot device");
         goto fail;
     }
     else {
-        _d("opened boot device %s, fd=%d", BOOT_DEV, io_data.boot_fd);
+        ipc_client_log(client, "opened boot device %s, fd=%d", BOOT_DEV, io_data.boot_fd);
     }
 
     io_data.link_fd = open(LINK_PM, O_RDWR);
     if (io_data.link_fd < 0) {
-        _e("failed to open link device");
+        ipc_client_log(client, "Error: failed to open link device");
         goto fail;
     }
     else {
-        _d("opened link device %s, fd=%d", LINK_PM, io_data.link_fd);
+        ipc_client_log(client, "opened link device %s, fd=%d", LINK_PM, io_data.link_fd);
     }
 
     if (i9100_reboot_modem(client, &io_data, true)) {
-        _e("failed to hard reset modem");
+        ipc_client_log(client, "Error: failed to hard reset modem");
         goto fail;
     }
     else {
-        _d("modem hard reset done");
+        ipc_client_log(client, "modem hard reset done");
     }
 
     /*
      * Now, actually load the firmware
      */
     if (write(io_data.boot_fd, "ATAT", 4) != 4) {
-        _e("failed to write ATAT to boot socket");
+        ipc_client_log(client, "Error: failed to write ATAT to boot socket");
         goto fail;
     }
     else {
-        _d("written ATAT to boot socket, waiting for ACK");
+        ipc_client_log(client, "written ATAT to boot socket, waiting for ACK");
     }
 
     char buf[2];
     if (expect_read(io_data.boot_fd, buf, 1) < 0) {
-        _e("failed to receive bootloader ACK");
+        ipc_client_log(client, "Error: failed to receive bootloader ACK");
         goto fail;
     }
     if (expect_read(io_data.boot_fd, buf + 1, 1) < 0) {
-        _e("failed to receive chip IP ACK");
+        ipc_client_log(client, "Error: failed to receive chip IP ACK");
         goto fail;
     }
-    _i("receive ID: [%02x %02x]", buf[0], buf[1]);
+    ipc_client_log(client, "receive ID: [%02x %02x]", buf[0], buf[1]);
 
     if ((ret = i9100_send_psi(client, &io_data)) < 0) {
-        _e("failed to upload PSI");
+        ipc_client_log(client, "Error: failed to upload PSI");
         goto fail;
     }
     else {
-        _d("PSI download complete");
+        ipc_client_log(client, "PSI download complete");
     }
 
     if ((ret = i9100_send_ebl(client, &io_data)) < 0) {
-        _e("failed to upload EBL");
+        ipc_client_log(client, "Error: failed to upload EBL");
         goto fail;
     }
     else {
-        _d("EBL download complete");
+        ipc_client_log(client, "EBL download complete");
     }
 
     if ((ret = i9100_boot_info_ack(client, &io_data)) < 0) {
-        _e("failed to receive Boot Info");
+        ipc_client_log(client, "Error: failed to receive Boot Info");
         goto fail;
     }
     else {
-        _d("Boot Info ACK done");
+        ipc_client_log(client, "Boot Info ACK done");
     }
 
     if ((ret = i9100_send_secure_images(client, &io_data)) < 0) {
-        _e("failed to upload Secure Image");
+        ipc_client_log(client, "Error: failed to upload Secure Image");
         goto fail;
     }
     else {
-        _d("Secure Image download complete");
+        ipc_client_log(client, "Secure Image download complete");
     }
 
     usleep(POST_BOOT_TIMEOUT_US);
 
     if ((ret = i9100_reboot_modem(client, &io_data, false))) {
-        _e("failed to soft reset modem");
+        ipc_client_log(client, "Error: failed to soft reset modem");
         goto fail;
     }
     else {
-        _d("modem soft reset done");
+        ipc_client_log(client, "modem soft reset done");
     }
 
-    _i("online");
+    ipc_client_log(client, "Modem is online!");
     ret = 0;
 
 fail:

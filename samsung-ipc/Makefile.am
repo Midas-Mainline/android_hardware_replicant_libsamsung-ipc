@@ -41,8 +41,6 @@ libsamsung_ipc_la_SOURCES = \
 	device/xmm6260/fwloader_i9250.c \
 	device/xmm6260/io_helpers.c \
 	device/xmm6260/io_helpers.h \
-	device/xmm6260/log.c \
-	device/xmm6260/log.h \
 	device/xmm6260/modem_prj.h \
 	device/xmm6260/modemctl_common.c \
 	device/xmm6260/modemctl_common.h \
