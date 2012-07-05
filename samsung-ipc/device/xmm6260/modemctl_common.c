@@ -25,13 +25,14 @@
 /*
  * modemctl generic functions
  */
-int modemctl_link_set_active(fwloader_context *ctx, bool enabled) {
+int modemctl_link_set_active(struct ipc_client *client,
+    struct modemctl_io_data *io_data, bool enabled) {
     unsigned status = enabled;
     int ret;
     unsigned long ioctl_code;
 
     ioctl_code = IOCTL_LINK_CONTROL_ACTIVE;
-    ret = c_ioctl(ctx->link_fd, ioctl_code, &status);
+    ret = ioctl(io_data->link_fd, ioctl_code, &status);
 
     if (ret < 0) {
         _d("failed to set link active to %d", enabled);
@@ -43,13 +44,14 @@ fail:
     return ret;
 }
 
-int modemctl_link_set_enabled(fwloader_context *ctx, bool enabled) {
+int modemctl_link_set_enabled(struct ipc_client *client,
+    struct modemctl_io_data *io_data, bool enabled) {
     unsigned status = enabled;
     int ret;
     unsigned long ioctl_code;
 
     ioctl_code = IOCTL_LINK_CONTROL_ENABLE;
-    ret = c_ioctl(ctx->link_fd, ioctl_code, &status);
+    ret = ioctl(io_data->link_fd, ioctl_code, &status);
 
     if (ret < 0) {
         _d("failed to set link state to %d", enabled);
@@ -61,7 +63,8 @@ fail:
     return ret;
 }
 
-int modemctl_wait_link_ready(fwloader_context *ctx) {
+int modemctl_wait_link_ready(struct ipc_client *client,
+    struct modemctl_io_data *io_data) {
     int ret;
 
     struct timeval tv_start = {};
@@ -73,7 +76,7 @@ int modemctl_wait_link_ready(fwloader_context *ctx) {
     long diff = 0;
 
     do {
-        ret = c_ioctl(ctx->link_fd, IOCTL_LINK_CONNECTED, 0);
+        ret = ioctl(io_data->link_fd, IOCTL_LINK_CONNECTED, 0);
         if (ret < 0) {
             goto fail;
         }
@@ -90,12 +93,13 @@ int modemctl_wait_link_ready(fwloader_context *ctx) {
     } while (diff < LINK_TIMEOUT_MS);
 
     ret = -ETIMEDOUT;
-    
+
 fail:
     return ret;
 }
 
-int modemctl_wait_modem_online(fwloader_context *ctx) {
+int modemctl_wait_modem_online(struct ipc_client *client,
+    struct modemctl_io_data *io_data) {
     int ret;
 
     struct timeval tv_start = {};
@@ -107,7 +111,7 @@ int modemctl_wait_modem_online(fwloader_context *ctx) {
     long diff = 0;
 
     do {
-        ret = c_ioctl(ctx->boot_fd, IOCTL_MODEM_STATUS, 0);
+        ret = ioctl(io_data->boot_fd, IOCTL_MODEM_STATUS, 0);
         if (ret < 0) {
             goto fail;
         }
@@ -124,27 +128,29 @@ int modemctl_wait_modem_online(fwloader_context *ctx) {
     } while (diff < LINK_TIMEOUT_MS);
 
     ret = -ETIMEDOUT;
-    
+
 fail:
     return ret;
 }
 
-int modemctl_modem_power(fwloader_context *ctx, bool enabled) {
+int modemctl_modem_power(struct ipc_client *client,
+    struct modemctl_io_data *io_data, bool enabled) {
     if (enabled) {
-        return c_ioctl(ctx->boot_fd, IOCTL_MODEM_ON, 0);
+        return ioctl(io_data->boot_fd, IOCTL_MODEM_ON, 0);
     }
     else {
-        return c_ioctl(ctx->boot_fd, IOCTL_MODEM_OFF, 0);
+        return ioctl(io_data->boot_fd, IOCTL_MODEM_OFF, 0);
     }
     return -1;
 }
 
-int modemctl_modem_boot_power(fwloader_context *ctx, bool enabled) {
+int modemctl_modem_boot_power(struct ipc_client *client,
+    struct modemctl_io_data *io_data, bool enabled) {
     if (enabled) {
-        return c_ioctl(ctx->boot_fd, IOCTL_MODEM_BOOT_ON, 0);
+        return ioctl(io_data->boot_fd, IOCTL_MODEM_BOOT_ON, 0);
     }
     else {
-        return c_ioctl(ctx->boot_fd, IOCTL_MODEM_BOOT_OFF, 0);
+        return ioctl(io_data->boot_fd, IOCTL_MODEM_BOOT_OFF, 0);
     }
     return -1;
 }
@@ -153,7 +159,7 @@ unsigned char calculateCRC(void* data, size_t offset, size_t length)
 {
     unsigned char crc = 0;
     unsigned char *ptr = (unsigned char*)(data + offset);
-    
+
     while (length--) {
         crc ^= *ptr++;
     }

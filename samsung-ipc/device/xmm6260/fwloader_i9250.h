@@ -33,10 +33,10 @@
 #define I9250_PSI_START_MAGIC "\xff\xf0\x00\x30"
 #define I9250_PSI_CMD_EXEC "\x08\x00\x00\x00"
 #define I9250_PSI_EXEC_DATA "\x00\x00\x00\x00\x02\x00\x02\x00"
-#define I9250_PSI_READY_ACK "\x00\xaa\x00\x00" 
+#define I9250_PSI_READY_ACK "\x00\xaa\x00\x00"
 
 #define I9250_EBL_IMG_ACK_MAGIC "\x51\xa5\x00\x00"
-#define I9250_EBL_HDR_ACK_MAGIC "\xcc\xcc\x00\x00" 
+#define I9250_EBL_HDR_ACK_MAGIC "\xcc\xcc\x00\x00"
 
 #define I9250_MPS_IMAGE_PATH "/factory/imei/mps_code.dat"
 #define I9250_MPS_LOAD_ADDR 0x61080000
@@ -51,13 +51,8 @@
 #define BL_END_MAGIC "\x00\x00"
 #define BL_END_MAGIC_LEN 2
 
-#define BL_RESET_MAGIC "\x01\x10\x11\x00" 
+#define BL_RESET_MAGIC "\x01\x10\x11\x00"
 #define BL_RESET_MAGIC_LEN 4
-
-struct i9250_radio_part {
-    size_t offset;
-    size_t length;
-};
 
 /*
  * on I9250, all commands need ACK and we do not need to

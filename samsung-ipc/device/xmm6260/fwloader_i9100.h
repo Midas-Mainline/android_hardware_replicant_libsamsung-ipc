@@ -37,7 +37,7 @@
 #define BL_END_MAGIC "\x00\x00"
 #define BL_END_MAGIC_LEN 2
 
-#define BL_RESET_MAGIC "\x01\x10\x11\x00" 
+#define BL_RESET_MAGIC "\x01\x10\x11\x00"
 #define BL_RESET_MAGIC_LEN 4
 
 #define SEC_DOWNLOAD_CHUNK 16384
@@ -47,11 +47,6 @@
 
 #define FW_LOAD_ADDR 0x60300000
 #define NVDATA_LOAD_ADDR 0x60e80000
-
-struct i9100_radio_part {
-    size_t offset;
-    size_t length;
-};
 
 struct i9100_boot_cmd_desc {
     unsigned code;

@@ -26,7 +26,7 @@
 
 #include "common.h"
 #include "log.h"
-#include "io_helpers.h" 
+#include "io_helpers.h"
 
 //Samsung IOCTLs
 #include "modem_prj.h"
@@ -43,16 +43,10 @@
 
 #define RADIO_MAP_SIZE (16 << 20)
 
-typedef struct {
-    int link_fd;
-    int boot_fd;
-
-    int radio_fd;
-    char *radio_data;
-    struct stat radio_stat;
-
-    struct ipc_client *client;
-} fwloader_context;
+struct xmm6260_radio_part {
+    size_t offset;
+    size_t length;
+};
 
 /*
  * Components of the Samsung XMM6260 firmware
@@ -80,85 +74,93 @@ enum xmm6260_boot_cmd {
     ReqFlashWriteBlock,
 };
 
+struct modemctl_io_data {
+    int link_fd;
+    int boot_fd;
+
+    int radio_fd;
+    char *radio_data;
+    struct stat radio_stat;
+
+    struct xmm6260_radio_part *radio_parts;
+    int radio_parts_count;
+};
+
 /*
  * Function prototypes
  */
 
-/* 
+/*
  * @brief Activates the modem <-> cpu link data transfer
  *
- * @param ctx [in] firmware loader context
+ * @param client [in] ipc client
+ * @param io_data [in] modemctl-specific data
  * @param enabled [in] whether to enable or disable link data transport
  * @return Negative value indicating error code
  * @return ioctl call result
  */
-int modemctl_link_set_active(fwloader_context *ctx, bool enabled);
+int modemctl_link_set_active(struct ipc_client *client,
+    struct modemctl_io_data *io_data, bool enabled);
 
-/* 
+/*
  * @brief Activates the modem <-> cpu link connection
  *
- * @param ctx [in] firmware loader context
+ * @param client [in] ipc client
+ * @param io_data [in] modemctl-specific data
  * @param enabled [in] the state to set link to
  * @return Negative value indicating error code
  * @return ioctl call result
  */
-int modemctl_link_set_enabled(fwloader_context *ctx, bool enabled);
+int modemctl_link_set_enabled(struct ipc_client *client,
+    struct modemctl_io_data *io_data, bool enabled);
 
-/* 
+/*
  * @brief Poll the link until it gets ready or times out
  *
- * @param ctx [in] firmware loader context
+ * @param client [in] ipc client
+ * @param io_data [in] modemctl-specific data
  * @return Negative value indicating error code
  * @return ioctl call result
  */
-int modemctl_wait_link_ready(fwloader_context *ctx);
+int modemctl_wait_link_ready(struct ipc_client *client,
+    struct modemctl_io_data *io_data);
 
-/* 
+/*
  * @brief Poll the modem until it gets online or times out
  *
- * @param ctx [in] firmware loader context
+ * @param client [in] ipc client
+ * @param io_data [in] modemctl-specific data
  * @return Negative value indicating error code
  * @return ioctl call result
  */
-int modemctl_wait_modem_online(fwloader_context *ctx);
+int modemctl_wait_modem_online(struct ipc_client *client,
+    struct modemctl_io_data *io_data);
 
-/* 
+/*
  * @brief Sets the modem power
  *
- * @param ctx [in] firmware loader context
+ * @param client [in] ipc client
+ * @param io_data [in] modemctl-specific data
  * @param enabled [in] whether to enable or disable modem power
  * @return Negative value indicating error code
  * @return ioctl call result
  */
-int modemctl_modem_power(fwloader_context *ctx, bool enabled);
+int modemctl_modem_power(struct ipc_client *client,
+    struct modemctl_io_data *io_data, bool enabled);
 
-/* 
+/*
  * @brief Sets the modem bootloader power/UART configuration
  *
- * @param ctx [in] firmware loader context
+ * @param client [in] ipc client
+ * @param io_data [in] modemctl-specific data
  * @param enabled [in] whether to enable or disable power
  * @return Negative value indicating error code
  * @return ioctl call result
  */
-int modemctl_modem_boot_power(fwloader_context *ctx, bool enabled);
+int modemctl_modem_boot_power(struct ipc_client *client,
+    struct modemctl_io_data *io_data, bool enabled);
 
-/* 
- * @brief Boots the modem on the I9100 (Galaxy S2) board
- *
- * @return Negative value indicating error code
- * @return zero on success
- */
-int boot_modem_i9100(struct ipc_client *client);
-
-/* 
- * @brief Boots the modem on the I9250 (Galaxy Nexus) board
- *
- * @return Negative value indicating error code
- * @return zero on success
- */
-int boot_modem_i9250(struct ipc_client *client);
-
-/* 
+/*
  * @brief Calculate the checksum for the XMM6260 bootloader protocol
  *
  * @param data [in] the data to calculate the checksum for

@@ -27,7 +27,7 @@
  * Locations of the firmware components in the Samsung firmware
  */
 
-struct i9100_radio_part i9100_radio_parts[] = {
+struct xmm6260_radio_part i9100_radio_parts[] = {
     [PSI] = {
         .offset = 0,
         .length = 0xf000,
@@ -83,26 +83,27 @@ struct i9100_boot_cmd_desc i9100_boot_cmd_desc[] = {
     }
 };
 
-static int send_image(fwloader_context *ctx, enum xmm6260_image type) {
+static int send_image(struct ipc_client *client,
+    struct modemctl_io_data *io_data, enum xmm6260_image type) {
     int ret = -1;
-    
-    if (type >= ARRAY_SIZE(i9100_radio_parts)) {
+
+    if (type >= io_data->radio_parts_count) {
         _e("bad image type %x", type);
         goto fail;
     }
 
-    size_t length = i9100_radio_parts[type].length;
-    size_t offset = i9100_radio_parts[type].offset;
+    size_t length = io_data->radio_parts[type].length;
+    size_t offset = io_data->radio_parts[type].offset;
 
     size_t start = offset;
     size_t end = length + start;
 
     //dump some image bytes
     _d("image start");
-    hexdump(ctx->radio_data + start, length);
+//    hexdump(io_data->radio_data + start, length);
 
     while (start < end) {
-        ret = write(ctx->boot_fd, ctx->radio_data + start, end - start);
+        ret = write(io_data->boot_fd, io_data->radio_data + start, end - start);
         if (ret < 0) {
             _d("failed to write image chunk");
             goto fail;
@@ -110,9 +111,9 @@ static int send_image(fwloader_context *ctx, enum xmm6260_image type) {
         start += ret;
     }
 
-    unsigned char crc = calculateCRC(ctx->radio_data, offset, length);
+    unsigned char crc = calculateCRC(io_data->radio_data, offset, length);
 
-    if ((ret = write(ctx->boot_fd, &crc, 1)) < 1) {
+    if ((ret = write(io_data->boot_fd, &crc, 1)) < 1) {
         _d("failed to write CRC");
         goto fail;
     }
@@ -126,7 +127,7 @@ fail:
     return ret;
 }
 
-static int send_PSI(fwloader_context *ctx) {
+static int send_PSI(struct ipc_client *client, struct modemctl_io_data *io_data) {
     size_t length = i9100_radio_parts[PSI].length;
 
     struct i9100_psi_header hdr = {
@@ -135,13 +136,13 @@ static int send_PSI(fwloader_context *ctx) {
         .padding = 0xff,
     };
     int ret = -1;
-    
-    if ((ret = write(ctx->boot_fd, &hdr, sizeof(hdr))) != sizeof(hdr)) {
+
+    if ((ret = write(io_data->boot_fd, &hdr, sizeof(hdr))) != sizeof(hdr)) {
         _d("%s: failed to write header, ret %d", __func__, ret);
         goto fail;
     }
 
-    if ((ret = send_image(ctx, PSI)) < 0) {
+    if ((ret = send_image(client, io_data, PSI)) < 0) {
         _e("failed to send PSI image");
         goto fail;
     }
@@ -149,24 +150,24 @@ static int send_PSI(fwloader_context *ctx) {
     int i;
     for (i = 0; i < 22; i++) {
         char ack;
-        if (receive(ctx->boot_fd, &ack, 1) < 1) {
+        if (receive(io_data->boot_fd, &ack, 1) < 1) {
             _d("failed to read ACK byte %d", i);
             goto fail;
         }
         _d("%02x ", ack);
     }
 
-    if ((ret = expect_data(ctx->boot_fd, "\x1", 1)) < 0) {
+    if ((ret = expect_data(io_data->boot_fd, "\x1", 1)) < 0) {
         _d("failed to wait for first ACK");
         goto fail;
     }
 
-    if ((ret = expect_data(ctx->boot_fd, "\x1", 1)) < 0) {
+    if ((ret = expect_data(io_data->boot_fd, "\x1", 1)) < 0) {
         _d("failed to wait for second ACK");
         goto fail;
     }
-    
-    if ((ret = expect_data(ctx->boot_fd, PSI_ACK_MAGIC, 2)) < 0) {
+
+    if ((ret = expect_data(io_data->boot_fd, PSI_ACK_MAGIC, 2)) < 0) {
         _e("failed to receive PSI ACK");
         goto fail;
     }
@@ -180,9 +181,9 @@ fail:
     return ret;
 }
 
-static int send_EBL(fwloader_context *ctx) {
+static int send_EBL(struct ipc_client *client, struct modemctl_io_data *io_data) {
     int ret;
-    int fd = ctx->boot_fd;
+    int fd = io_data->boot_fd;
     unsigned length = i9100_radio_parts[EBL].length;
 
     if ((ret = write(fd, &length, sizeof(length))) < 0) {
@@ -194,12 +195,12 @@ static int send_EBL(fwloader_context *ctx) {
         _e("failed to wait for EBL header ACK");
         goto fail;
     }
-    
-    if ((ret = send_image(ctx, EBL)) < 0) {
+
+    if ((ret = send_image(client, io_data, EBL)) < 0) {
         _e("failed to send EBL image");
         goto fail;
     }
-    
+
     if ((ret = expect_data(fd, EBL_IMG_ACK_MAGIC, 2)) < 0) {
         _e("failed to wait for EBL image ACK");
         goto fail;
@@ -211,7 +212,8 @@ fail:
     return ret;
 }
 
-static int bootloader_cmd(fwloader_context *ctx, enum xmm6260_boot_cmd cmd,
+static int bootloader_cmd(struct ipc_client *client,
+    struct modemctl_io_data *io_data, enum xmm6260_boot_cmd cmd,
     void *data, size_t data_size)
 {
     int ret = 0;
@@ -252,7 +254,7 @@ static int bootloader_cmd(fwloader_context *ctx, enum xmm6260_boot_cmd cmd,
     _d("bootloader cmd packet");
     hexdump(cmd_data, buf_size);
 
-    if ((ret = write(ctx->boot_fd, cmd_data, buf_size)) < 0) {
+    if ((ret = write(io_data->boot_fd, cmd_data, buf_size)) < 0) {
         _e("failed to write command to socket");
         goto done_or_fail;
     }
@@ -273,7 +275,7 @@ static int bootloader_cmd(fwloader_context *ctx, enum xmm6260_boot_cmd cmd,
     struct i9100_boot_cmd ack = {
         .check = 0,
     };
-    if ((ret = receive(ctx->boot_fd, &ack, sizeof(ack))) < 0) {
+    if ((ret = receive(io_data->boot_fd, &ack, sizeof(ack))) < 0) {
         _e("failed to receive ack for cmd %x", header.cmd);
         goto done_or_fail;
     }
@@ -292,7 +294,7 @@ static int bootloader_cmd(fwloader_context *ctx, enum xmm6260_boot_cmd cmd,
         goto done_or_fail;
     }
 
-    if ((ret = receive(ctx->boot_fd, cmd_data, cmd_size)) < 0) {
+    if ((ret = receive(io_data->boot_fd, cmd_data, cmd_size)) < 0) {
         _e("failed to receive reply data");
         goto done_or_fail;
     }
@@ -313,11 +315,12 @@ done_or_fail:
     return ret;
 }
 
-static int ack_BootInfo(fwloader_context *ctx) {
+static int ack_BootInfo(struct ipc_client *client,
+    struct modemctl_io_data *io_data) {
     int ret;
     struct i9100_boot_info info;
-    
-    if ((ret = receive(ctx->boot_fd, &info, sizeof(info))) != sizeof(info)) {
+
+    if ((ret = receive(io_data->boot_fd, &info, sizeof(info))) != sizeof(info)) {
         _e("failed to receive Boot Info ret=%d", ret);
         ret = -1;
         goto fail;
@@ -327,7 +330,7 @@ static int ack_BootInfo(fwloader_context *ctx) {
         hexdump(&info, sizeof(info));
     }
 
-    if ((ret = bootloader_cmd(ctx, SetPortConf, &info, sizeof(info))) < 0) {
+    if ((ret = bootloader_cmd(client, io_data, SetPortConf, &info, sizeof(info))) < 0) {
         _e("failed to send SetPortConf command");
         goto fail;
     }
@@ -341,14 +344,15 @@ fail:
     return ret;
 }
 
-static int send_image_data(fwloader_context *ctx, uint32_t addr,
+static int send_image_data(struct ipc_client *client,
+    struct modemctl_io_data *io_data, uint32_t addr,
     void *data, int data_len)
 {
     int ret = 0;
     int count = 0;
     char *data_p = (char *) data;
 
-    if ((ret = bootloader_cmd(ctx, ReqFlashSetAddress, &addr, 4)) < 0) {
+    if ((ret = bootloader_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
         _e("failed to send ReqFlashSetAddress");
         goto fail;
     }
@@ -360,7 +364,7 @@ static int send_image_data(fwloader_context *ctx, uint32_t addr,
         int rest = data_len - count;
         int chunk = rest < SEC_DOWNLOAD_CHUNK ? rest : SEC_DOWNLOAD_CHUNK;
 
-        ret = bootloader_cmd(ctx, ReqFlashWriteBlock, data_p, chunk);
+        ret = bootloader_cmd(client, io_data, ReqFlashWriteBlock, data_p, chunk);
         if (ret < 0) {
             _e("failed to send data chunk");
             goto fail;
@@ -376,28 +380,29 @@ fail:
     return ret;
 }
 
-static int send_image_addr(fwloader_context *ctx, uint32_t addr,
-    enum xmm6260_image type)
+static int send_image_addr(struct ipc_client *client,
+    struct modemctl_io_data *io_data, uint32_t addr, enum xmm6260_image type)
 {
     uint32_t offset = i9100_radio_parts[type].offset;
     uint32_t length = i9100_radio_parts[type].length;
-    char *start = ctx->radio_data + offset;
+    char *start = io_data->radio_data + offset;
     int ret = 0;
 
-    ret = send_image_data(ctx, addr, start, length);
+    ret = send_image_data(client, io_data, addr, start, length);
 
     return ret;
 }
 
-static int send_SecureImage(fwloader_context *ctx) {
+static int send_SecureImage(struct ipc_client *client,
+    struct modemctl_io_data *io_data) {
     int ret = 0;
 
     uint32_t sec_off = i9100_radio_parts[SECURE_IMAGE].offset;
     uint32_t sec_len = i9100_radio_parts[SECURE_IMAGE].length;
-    void *sec_img = ctx->radio_data + sec_off;
+    void *sec_img = io_data->radio_data + sec_off;
     void *nv_data = NULL;
 
-    if ((ret = bootloader_cmd(ctx, ReqSecStart, sec_img, sec_len)) < 0) {
+    if ((ret = bootloader_cmd(client, io_data, ReqSecStart, sec_img, sec_len)) < 0) {
         _e("failed to write ReqSecStart");
         goto fail;
     }
@@ -405,7 +410,7 @@ static int send_SecureImage(fwloader_context *ctx) {
         _d("sent ReqSecStart");
     }
 
-    if ((ret = send_image_addr(ctx, FW_LOAD_ADDR, FIRMWARE)) < 0) {
+    if ((ret = send_image_addr(client, io_data, FW_LOAD_ADDR, FIRMWARE)) < 0) {
         _e("failed to send FIRMWARE image");
         goto fail;
     }
@@ -413,16 +418,16 @@ static int send_SecureImage(fwloader_context *ctx) {
         _d("sent FIRMWARE image");
     }
 
-    nv_data_check(ctx->client);
-    nv_data_md5_check(ctx->client);
+    nv_data_check(client);
+    nv_data_md5_check(client);
 
-    nv_data = ipc_file_read(ctx->client, nv_data_path(ctx->client), 2 << 20, 1024);
+    nv_data = ipc_file_read(client, nv_data_path(client), 2 << 20, 1024);
     if (nv_data == NULL) {
         _e("failed to read NVDATA image");
         goto fail;
     }
 
-    if ((ret = send_image_data(ctx, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
+    if ((ret = send_image_data(client, io_data, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
         _e("failed to send NVDATA image");
         goto fail;
     }
@@ -432,7 +437,7 @@ static int send_SecureImage(fwloader_context *ctx) {
 
     free(nv_data);
 
-    if ((ret = bootloader_cmd(ctx, ReqSecEnd,
+    if ((ret = bootloader_cmd(client, io_data, ReqSecEnd,
         BL_END_MAGIC, BL_END_MAGIC_LEN)) < 0)
     {
         _e("failed to write ReqSecEnd");
@@ -442,7 +447,7 @@ static int send_SecureImage(fwloader_context *ctx) {
         _d("sent ReqSecEnd");
     }
 
-    ret = bootloader_cmd(ctx, ReqForceHwReset,
+    ret = bootloader_cmd(client, io_data, ReqForceHwReset,
         BL_RESET_MAGIC, BL_RESET_MAGIC_LEN);
     if (ret < 0) {
         _e("failed to write ReqForceHwReset");
@@ -463,11 +468,11 @@ fail:
 /*
  * Power management
  */
-static int i9100_ehci_setpower(bool enabled) {
+static int i9100_ehci_setpower(struct ipc_client *client, bool enabled) {
     int ret = -1;
-    
+
     _d("%s: enabled=%d", __func__, enabled);
-    
+
     int ehci_fd = open(I9100_EHCI_PATH, O_RDWR);
     if (ehci_fd < 0) {
         _e("failed to open EHCI fd");
@@ -496,12 +501,13 @@ fail:
     return ret;
 }
 
-static int reboot_modem_i9100(fwloader_context *ctx, bool hard) {
+static int reboot_modem_i9100(struct ipc_client *client,
+    struct modemctl_io_data *io_data, bool hard) {
     int ret;
-    
+
     //wait for link to become ready before redetection
     if (!hard) {
-        if ((ret = modemctl_wait_link_ready(ctx)) < 0) {
+        if ((ret = modemctl_wait_link_ready(client, io_data)) < 0) {
             _e("failed to wait for link to get ready for redetection");
             goto fail;
         }
@@ -513,8 +519,8 @@ static int reboot_modem_i9100(fwloader_context *ctx, bool hard) {
     /*
      * Disable the hardware to ensure consistent state
      */
-    if (hard) {    
-        if ((ret = modemctl_modem_power(ctx, false)) < 0) {
+    if (hard) {
+        if ((ret = modemctl_modem_power(client, io_data, false)) < 0) {
             _e("failed to disable xmm6260 power");
             goto fail;
         }
@@ -522,44 +528,44 @@ static int reboot_modem_i9100(fwloader_context *ctx, bool hard) {
             _d("disabled xmm6260 power");
         }
     }
-    
-    if ((ret = modemctl_link_set_enabled(ctx, false)) < 0) {
+
+    if ((ret = modemctl_link_set_enabled(client, io_data, false)) < 0) {
         _e("failed to disable I9100 HSIC link");
         goto fail;
     }
     else {
         _d("disabled I9100 HSIC link");
     }
-    
-    if ((ret = i9100_ehci_setpower(false)) < 0) {
+
+    if ((ret = i9100_ehci_setpower(client, false)) < 0) {
         _e("failed to disable I9100 EHCI");
         goto fail;
     }
     else {
         _d("disabled I9100 EHCI");
     }
-    
-    if ((ret = modemctl_link_set_active(ctx, false)) < 0) {
+
+    if ((ret = modemctl_link_set_active(client, io_data, false)) < 0) {
         _e("failed to deactivate I9100 HSIC link");
         goto fail;
     }
     else {
         _d("deactivated I9100 HSIC link");
     }
-    
+
     /*
      * Now, initialize the hardware
      */
-    
-    if ((ret = modemctl_link_set_enabled(ctx, true)) < 0) {
+
+    if ((ret = modemctl_link_set_enabled(client, io_data, true)) < 0) {
         _e("failed to enable I9100 HSIC link");
         goto fail;
     }
     else {
         _d("enabled I9100 HSIC link");
     }
-    
-    if ((ret = i9100_ehci_setpower(true)) < 0) {
+
+    if ((ret = i9100_ehci_setpower(client, true)) < 0) {
         _e("failed to enable I9100 EHCI");
         goto fail;
     }
@@ -567,16 +573,16 @@ static int reboot_modem_i9100(fwloader_context *ctx, bool hard) {
         _d("enabled I9100 EHCI");
     }
 
-    if ((ret = modemctl_link_set_active(ctx, true)) < 0) {
+    if ((ret = modemctl_link_set_active(client, io_data, true)) < 0) {
         _e("failed to activate I9100 HSIC link");
         goto fail;
     }
     else {
         _d("activated I9100 HSIC link");
     }
-    
+
     if (hard) {
-        if ((ret = modemctl_modem_power(ctx, true)) < 0) {
+        if ((ret = modemctl_modem_power(client, io_data, true)) < 0) {
             _e("failed to enable xmm6260 power");
             goto fail;
         }
@@ -585,65 +591,66 @@ static int reboot_modem_i9100(fwloader_context *ctx, bool hard) {
         }
     }
 
-    if ((ret = modemctl_wait_link_ready(ctx)) < 0) {
+    if ((ret = modemctl_wait_link_ready(client, io_data)) < 0) {
         _e("failed to wait for link to get ready");
         goto fail;
     }
     else {
         _d("link ready");
     }
-    
+
 fail:
     return ret;
 }
 
 int boot_modem_i9100(struct ipc_client *client) {
     int ret = 0;
-    fwloader_context ctx;
-    memset(&ctx, 0, sizeof(ctx));
+    struct modemctl_io_data io_data;
+    memset(&io_data, 0, sizeof(client, io_data));
 
-    ctx.client = client;
+    io_data.radio_parts = i9100_radio_parts;
+    io_data.radio_parts_count = ARRAY_SIZE(i9100_radio_parts);
 
-    ctx.radio_fd = open(RADIO_IMAGE, O_RDONLY);
-    if (ctx.radio_fd < 0) {
+    io_data.radio_fd = open(RADIO_IMAGE, O_RDONLY);
+    if (io_data.radio_fd < 0) {
         _e("failed to open radio firmware");
         goto fail;
     }
     else {
-        _d("opened radio image %s, fd=%d", RADIO_IMAGE, ctx.radio_fd);
+        _d("opened radio image %s, fd=%d", RADIO_IMAGE, io_data.radio_fd);
     }
 
-    if (fstat(ctx.radio_fd, &ctx.radio_stat) < 0) {
+    if (fstat(io_data.radio_fd, &io_data.radio_stat) < 0) {
         _e("failed to stat radio image, error %s", strerror(errno));
         goto fail;
     }
 
-    ctx.radio_data = mmap(0, RADIO_MAP_SIZE, PROT_READ, MAP_SHARED,
-        ctx.radio_fd, 0);
-    if (ctx.radio_data == MAP_FAILED) {
+    io_data.radio_data = mmap(0, RADIO_MAP_SIZE, PROT_READ, MAP_SHARED,
+        io_data.radio_fd, 0);
+    if (io_data.radio_data == MAP_FAILED) {
         _e("failed to mmap radio image, error %s", strerror(errno));
         goto fail;
     }
 
-    ctx.boot_fd = open(BOOT_DEV, O_RDWR | O_NOCTTY | O_NONBLOCK);
-    if (ctx.boot_fd < 0) {
+    io_data.boot_fd = open(BOOT_DEV, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    if (io_data.boot_fd < 0) {
         _e("failed to open boot device");
         goto fail;
     }
     else {
-        _d("opened boot device %s, fd=%d", BOOT_DEV, ctx.boot_fd);
+        _d("opened boot device %s, fd=%d", BOOT_DEV, io_data.boot_fd);
     }
 
-    ctx.link_fd = open(LINK_PM, O_RDWR);
-    if (ctx.link_fd < 0) {
+    io_data.link_fd = open(LINK_PM, O_RDWR);
+    if (io_data.link_fd < 0) {
         _e("failed to open link device");
         goto fail;
     }
     else {
-        _d("opened link device %s, fd=%d", LINK_PM, ctx.link_fd);
+        _d("opened link device %s, fd=%d", LINK_PM, io_data.link_fd);
     }
 
-    if (reboot_modem_i9100(&ctx, true)) {
+    if (reboot_modem_i9100(client, &io_data, true)) {
         _e("failed to hard reset modem");
         goto fail;
     }
@@ -654,7 +661,7 @@ int boot_modem_i9100(struct ipc_client *client) {
     /*
      * Now, actually load the firmware
      */
-    if (write(ctx.boot_fd, "ATAT", 4) != 4) {
+    if (write(io_data.boot_fd, "ATAT", 4) != 4) {
         _e("failed to write ATAT to boot socket");
         goto fail;
     }
@@ -663,17 +670,17 @@ int boot_modem_i9100(struct ipc_client *client) {
     }
 
     char buf[2];
-    if (receive(ctx.boot_fd, buf, 1) < 0) {
+    if (receive(io_data.boot_fd, buf, 1) < 0) {
         _e("failed to receive bootloader ACK");
         goto fail;
     }
-    if (receive(ctx.boot_fd, buf + 1, 1) < 0) {
+    if (receive(io_data.boot_fd, buf + 1, 1) < 0) {
         _e("failed to receive chip IP ACK");
         goto fail;
     }
     _i("receive ID: [%02x %02x]", buf[0], buf[1]);
 
-    if ((ret = send_PSI(&ctx)) < 0) {
+    if ((ret = send_PSI(client, &io_data)) < 0) {
         _e("failed to upload PSI");
         goto fail;
     }
@@ -681,7 +688,7 @@ int boot_modem_i9100(struct ipc_client *client) {
         _d("PSI download complete");
     }
 
-    if ((ret = send_EBL(&ctx)) < 0) {
+    if ((ret = send_EBL(client, &io_data)) < 0) {
         _e("failed to upload EBL");
         goto fail;
     }
@@ -689,7 +696,7 @@ int boot_modem_i9100(struct ipc_client *client) {
         _d("EBL download complete");
     }
 
-    if ((ret = ack_BootInfo(&ctx)) < 0) {
+    if ((ret = ack_BootInfo(client, &io_data)) < 0) {
         _e("failed to receive Boot Info");
         goto fail;
     }
@@ -697,7 +704,7 @@ int boot_modem_i9100(struct ipc_client *client) {
         _d("Boot Info ACK done");
     }
 
-    if ((ret = send_SecureImage(&ctx)) < 0) {
+    if ((ret = send_SecureImage(client, &io_data)) < 0) {
         _e("failed to upload Secure Image");
         goto fail;
     }
@@ -707,7 +714,7 @@ int boot_modem_i9100(struct ipc_client *client) {
 
     usleep(POST_BOOT_TIMEOUT_US);
 
-    if ((ret = reboot_modem_i9100(&ctx, false))) {
+    if ((ret = reboot_modem_i9100(client, &io_data, false))) {
         _e("failed to soft reset modem");
         goto fail;
     }
@@ -719,20 +726,20 @@ int boot_modem_i9100(struct ipc_client *client) {
     ret = 0;
 
 fail:
-    if (ctx.radio_data != MAP_FAILED) {
-        munmap(ctx.radio_data, RADIO_MAP_SIZE);
+    if (io_data.radio_data != MAP_FAILED) {
+        munmap(io_data.radio_data, RADIO_MAP_SIZE);
     }
 
-    if (ctx.link_fd >= 0) {
-        close(ctx.link_fd);
+    if (io_data.link_fd >= 0) {
+        close(io_data.link_fd);
     }
 
-    if (ctx.radio_fd >= 0) {
-        close(ctx.radio_fd);
+    if (io_data.radio_fd >= 0) {
+        close(io_data.radio_fd);
     }
 
-    if (ctx.boot_fd >= 0) {
-        close(ctx.boot_fd);
+    if (io_data.boot_fd >= 0) {
+        close(io_data.boot_fd);
     }
 
     return ret;
