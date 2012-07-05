@@ -105,7 +105,6 @@ int aries_modem_bootstrap(struct ipc_client *client)
     int onedram_fd = -1;
 
     /* Control variables. */
-    int boot_tries_count = 0;
     int rc = 0;
 
     /* Boot variables */
@@ -136,13 +135,6 @@ int aries_modem_bootstrap(struct ipc_client *client)
 
     ipc_client_log(client, "aries_ipc_bootstrap: enter");
 
-boot_loop_start:
-    if(boot_tries_count > 5)
-    {
-        ipc_client_log(client, "aries_ipc_bootstrap: boot has failed too many times.");
-        goto error;
-    }
-
     /* Read the radio.img image. */
     ipc_client_log(client, "aries_ipc_bootstrap: reading radio image");
     radio_img_p = ipc_mtd_read(client, "/dev/block/bml12", RADIO_IMG_READ_SIZE, RADIO_IMG_READ_SIZE);
@@ -151,7 +143,7 @@ boot_loop_start:
     ipc_client_log(client, "aries_ipc_bootstrap: open onedram");
     onedram_fd=open("/dev/onedram", O_RDWR);
     if(onedram_fd < 0)
-        goto error_loop;
+        goto error;
 
     /* Reset the modem before init to send the first part of modem.img. */
     ipc_client_log(client, "aries_ipc_bootstrap: turning %s iface down", PHONET_IFACE);
@@ -170,7 +162,7 @@ boot_loop_start:
     ipc_client_log(client, "aries_ipc_bootstrap: open s3c2410_serial3");
     s3c2410_serial3_fd=open("/dev/s3c2410_serial3", O_RDWR);
     if(s3c2410_serial3_fd < 0)
-        goto error_loop;
+        goto error;
 
     /* Setup the s3c2410 serial. */
     ipc_client_log(client, "aries_ipc_bootstrap: setup s3c2410_serial3");
@@ -203,7 +195,7 @@ boot_loop_start:
     if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-        goto error_loop;
+        goto error;
     }
 
     /* Get and check bootcore version. */
@@ -211,7 +203,7 @@ boot_loop_start:
     ipc_client_log(client, "aries_ipc_bootstrap: got bootcore version: 0x%x", bootcore_version);
 
     if(bootcore_version != BOOTCORE_VERSION)
-        goto error_loop;
+        goto error;
 
     timeout.tv_sec=5;
     timeout.tv_usec=0;
@@ -219,7 +211,7 @@ boot_loop_start:
     if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-        goto error_loop;
+        goto error;
     }
 
     /* Get info_size. */
@@ -232,7 +224,7 @@ boot_loop_start:
     if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-        goto error_loop;
+        goto error;
     }
 
     /* Send PSI magic. */
@@ -263,7 +255,7 @@ boot_loop_start:
         if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
         {
             ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-            goto error_loop;
+            goto error;
         }
 
         write(s3c2410_serial3_fd, data_p, 1);
@@ -280,7 +272,7 @@ boot_loop_start:
     if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-        goto error_loop;
+        goto error;
     }
 
     write(s3c2410_serial3_fd, &crc_byte, sizeof(crc_byte));
@@ -296,7 +288,7 @@ boot_loop_start:
         if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
         {
             ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-            goto error_loop;
+            goto error;
         }
 
         read(s3c2410_serial3_fd, &data, sizeof(data));
@@ -304,7 +296,7 @@ boot_loop_start:
         if(i > 50)
         {
             ipc_client_log(client, "aries_ipc_bootstrap: fairly too much attempts to get ACK");
-            goto error_loop;
+            goto error;
         }
     }
 
@@ -321,7 +313,7 @@ boot_loop_start:
     if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-        goto error_loop;
+        goto error;
     }
 
     read(onedram_fd, &onedram_data, sizeof(onedram_data));
@@ -329,7 +321,7 @@ boot_loop_start:
     if(onedram_data != ONEDRAM_INIT_READ)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: wrong onedram init magic (got 0x%04x)", onedram_data);
-        goto error_loop;
+        goto error;
     }
 
     ipc_client_log(client, "aries_ipc_bootstrap: got 0x%04x", onedram_data);
@@ -344,7 +336,7 @@ boot_loop_start:
     if(onedram_p == NULL || onedram_p < 0 || onedram_p == 0xffffffff)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: could not map onedram to memory");
-        goto error_loop;
+        goto error;
     }
  
     // it sometimes hangs here
@@ -378,7 +370,7 @@ boot_loop_start:
     if(ioctl(onedram_fd, ONEDRAM_REL_SEM) < 0)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: ONEDRAM_REL_SEM ioctl on onedram failed");
-        goto error_loop;
+        goto error;
     }
 
     onedram_data = ONEDRAM_DEINIT_CMD;
@@ -392,7 +384,7 @@ boot_loop_start:
     if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-        goto error_loop;
+        goto error;
     }
 
     read(onedram_fd, &onedram_data, sizeof(onedram_data));
@@ -400,7 +392,7 @@ boot_loop_start:
     if(onedram_data != ONEDRAM_DEINIT_READ)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: wrong onedram deinit magic (got 0x%04x)", onedram_data);
-        goto error_loop;
+        goto error;
     }
 
     ipc_client_log(client, "aries_ipc_bootstrap: got 0x%04x", onedram_data);
@@ -410,16 +402,10 @@ boot_loop_start:
     rc = 0;
     goto exit;
 
-error_loop:
-    ipc_client_log(client, "aries_ipc_bootstrap: something went wrong");
-    boot_tries_count++;
-    sleep(2);
-
-    goto boot_loop_start;
-
 error:
     ipc_client_log(client, "aries_ipc_bootstrap: something went wrong");
     rc = -1;
+
 exit:
     ipc_client_log(client, "aries_ipc_bootstrap: exit");
     return rc;

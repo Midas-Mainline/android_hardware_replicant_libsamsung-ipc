@@ -72,7 +72,6 @@ int crespo_modem_bootstrap(struct ipc_client *client)
     int modem_ctl_fd = -1;
 
     /* Control variables. */
-    int boot_tries_count = 0;
     int rc = 0;
 
     /* Boot variables */
@@ -101,13 +100,6 @@ int crespo_modem_bootstrap(struct ipc_client *client)
 
     ipc_client_log(client, "crespo_ipc_bootstrap: enter");
 
-boot_loop_start:
-    if(boot_tries_count > 5)
-    {
-        ipc_client_log(client, "crespo_ipc_bootstrap: boot has failed too many times.");
-        goto error;
-    }
-
     /* Read the radio.img image. */
     ipc_client_log(client, "crespo_ipc_bootstrap: reading radio image");
     radio_img_p = ipc_mtd_read(client, "/dev/mtd/mtd5ro", RADIO_IMG_SIZE, 0x1000);
@@ -121,7 +113,7 @@ boot_loop_start:
     ipc_client_log(client, "crespo_ipc_bootstrap: open modem_ctl");
     modem_ctl_fd=open("/dev/modem_ctl", O_RDWR | O_NDELAY);
     if(modem_ctl_fd < 0)
-        goto error_loop;
+        goto error;
 
     /* Reset the modem before init to send the first part of modem.img. */
     ioctl(modem_ctl_fd, IOCTL_MODEM_RESET);
@@ -130,7 +122,7 @@ boot_loop_start:
     ipc_client_log(client, "crespo_ipc_bootstrap: open s3c2410_serial3");
     s3c2410_serial3_fd=open("/dev/s3c2410_serial3", O_RDWR | O_NDELAY);
     if(s3c2410_serial3_fd < 0)
-        goto error_loop;
+        goto error;
 
     /* Setup the s3c2410 serial. */
     ipc_client_log(client, "crespo_ipc_bootstrap: setup s3c2410_serial3");
@@ -158,7 +150,7 @@ boot_loop_start:
     ipc_client_log(client, "crespo_ipc_bootstrap: got bootcore version: 0x%x", bootcore_version);
 
     if(bootcore_version != BOOTCORE_VERSION)
-        goto error_loop;
+        goto error;
 
     /* Get info_size. */
     read(s3c2410_serial3_fd, &info_size, sizeof(info_size));
@@ -196,7 +188,7 @@ boot_loop_start:
         if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
         {
             ipc_client_log(client, "crespo_ipc_bootstrap: select timeout passed");
-            goto error_loop;
+            goto error;
         }
 
         write(s3c2410_serial3_fd, data_p, 1);
@@ -210,7 +202,7 @@ boot_loop_start:
     if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
     {
         ipc_client_log(client, "crespo_ipc_bootstrap: select timeout passed");
-        goto error_loop;
+        goto error;
     }
 
     write(s3c2410_serial3_fd, &crc_byte, sizeof(crc_byte));
@@ -223,7 +215,7 @@ boot_loop_start:
         if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
         {
             ipc_client_log(client, "crespo_ipc_bootstrap: select timeout passed");
-            goto error_loop;
+            goto error;
         }
 
         read(s3c2410_serial3_fd, &data, sizeof(data));
@@ -231,7 +223,7 @@ boot_loop_start:
         if(i > 50)
         {
             ipc_client_log(client, "crespo_ipc_bootstrap: fairly too much attempts to get ACK");
-            goto error_loop;
+            goto error;
         }
     }
 
@@ -255,7 +247,7 @@ boot_loop_start:
         if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
         {
             ipc_client_log(client, "crespo_ipc_bootstrap: select timeout passed");
-            goto error_loop;
+            goto error;
         }
 
         write(modem_ctl_fd, data_p, block_size);
@@ -295,16 +287,10 @@ boot_loop_start:
     rc = 0;
     goto exit;
 
-error_loop:
-    ipc_client_log(client, "%s: something went wrong", __func__);
-    boot_tries_count++;
-    sleep(2);
-
-    goto boot_loop_start;
-
 error:
     ipc_client_log(client, "%s: something went wrong", __func__);
     rc = -1;
+
 exit:
     ipc_client_log(client, "crespo_ipc_bootstrap: exit");
     return rc;
