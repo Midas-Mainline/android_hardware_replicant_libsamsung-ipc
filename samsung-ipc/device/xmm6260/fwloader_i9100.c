@@ -26,10 +26,8 @@
 /*
  * Locations of the firmware components in the Samsung firmware
  */
-static struct xmm6260_offset {
-    size_t offset;
-    size_t length;
-} i9100_radio_parts[] = {
+
+struct i9100_radio_part i9100_radio_parts[] = {
     [PSI] = {
         .offset = 0,
         .length = 0xf000,
@@ -52,11 +50,7 @@ static struct xmm6260_offset {
     }
 };
 
-struct {
-    unsigned code;
-    size_t data_size;
-    bool need_ack;
-} i9100_boot_cmd_desc[] = {
+struct i9100_boot_cmd_desc i9100_boot_cmd_desc[] = {
     [SetPortConf] = {
         .code = 0x86,
         .data_size = 0x800,
@@ -86,24 +80,8 @@ struct {
         .code = 0x804,
         .data_size = 0x4000,
         .need_ack = 0,
-    },
+    }
 };
-
-typedef struct {
-    uint8_t magic;
-    uint16_t length;
-    uint8_t padding;
-} __attribute__((packed)) psi_header_t;
-
-typedef struct {
-    uint8_t data[76];
-} __attribute__((packed)) boot_info_t;
-
-typedef struct {
-    uint16_t check;
-    uint16_t cmd;
-    uint32_t data_size;
-} __attribute__((packed)) bootloader_cmd_t;
 
 static int send_image(fwloader_context *ctx, enum xmm6260_image type) {
     int ret = -1;
@@ -151,7 +129,7 @@ fail:
 static int send_PSI(fwloader_context *ctx) {
     size_t length = i9100_radio_parts[PSI].length;
 
-    psi_header_t hdr = {
+    struct i9100_psi_header hdr = {
         .magic = XMM_PSI_MAGIC,
         .length = length,
         .padding = 0xff,
@@ -252,7 +230,7 @@ static int bootloader_cmd(fwloader_context *ctx, enum xmm6260_boot_cmd cmd,
         magic += ptr[i];
     }
 
-    bootloader_cmd_t header = {
+    struct i9100_boot_cmd header = {
         .check = magic,
         .cmd = cmd_code,
         .data_size = data_size,
@@ -292,7 +270,7 @@ static int bootloader_cmd(fwloader_context *ctx, enum xmm6260_boot_cmd cmd,
         goto done_or_fail;
     }
 
-    bootloader_cmd_t ack = {
+    struct i9100_boot_cmd ack = {
         .check = 0,
     };
     if ((ret = receive(ctx->boot_fd, &ack, sizeof(ack))) < 0) {
@@ -337,7 +315,7 @@ done_or_fail:
 
 static int ack_BootInfo(fwloader_context *ctx) {
     int ret;
-    boot_info_t info;
+    struct i9100_boot_info info;
     
     if ((ret = receive(ctx->boot_fd, &info, sizeof(info))) != sizeof(info)) {
         _e("failed to receive Boot Info ret=%d", ret);

@@ -48,6 +48,33 @@
 #define FW_LOAD_ADDR 0x60300000
 #define NVDATA_LOAD_ADDR 0x60e80000
 
+struct i9100_radio_part {
+    size_t offset;
+    size_t length;
+};
+
+struct i9100_boot_cmd_desc {
+    unsigned code;
+    size_t data_size;
+    bool need_ack;
+};
+
+struct i9100_psi_header {
+    uint8_t magic;
+    uint16_t length;
+    uint8_t padding;
+} __attribute__((packed));
+
+struct i9100_boot_info {
+    uint8_t data[76];
+} __attribute__((packed));
+
+struct i9100_boot_cmd {
+    uint16_t check;
+    uint16_t cmd;
+    uint32_t data_size;
+} __attribute__((packed));
+
 #endif
 
 // vim:ts=4:sw=4:expandtab
