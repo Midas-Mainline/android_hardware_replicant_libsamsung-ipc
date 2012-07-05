@@ -21,36 +21,7 @@
 
 #include "modemctl_common.h"
 #include "ipc_private.h"
-
-/*
- * I9100 specific implementation
- */
-#define RADIO_IMAGE "/dev/block/mmcblk0p8"
-#define NVDATA_IMAGE "/efs/nv_data.bin"
-#define I9100_EHCI_PATH "/sys/devices/platform/s5p-ehci/ehci_power"
-
-#define LINK_POLL_DELAY_US (50 * 1000)
-#define LINK_TIMEOUT_MS 2000
-
-#define XMM_PSI_MAGIC 0x30
-#define PSI_ACK_MAGIC "\x00\xaa"
-
-#define EBL_HDR_ACK_MAGIC "\xcc\xcc"
-#define EBL_IMG_ACK_MAGIC "\x51\xa5"
-
-#define BL_END_MAGIC "\x00\x00"
-#define BL_END_MAGIC_LEN 2
-
-#define BL_RESET_MAGIC "\x01\x10\x11\x00" 
-#define BL_RESET_MAGIC_LEN 4
-
-#define SEC_DOWNLOAD_CHUNK 16384
-#define SEC_DOWNLOAD_DELAY_US (500 * 1000)
-
-#define POST_BOOT_TIMEOUT_US (600 * 1000)
-
-#define FW_LOAD_ADDR 0x60300000
-#define NVDATA_LOAD_ADDR 0x60e80000
+#include "fwloader_i9100.h"
 
 /*
  * Locations of the firmware components in the Samsung firmware

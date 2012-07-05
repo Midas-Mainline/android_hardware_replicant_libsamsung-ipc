@@ -24,6 +24,8 @@
 #ifndef __XMM6260_IPC_H__
 #define __XMM6260_IPC_H__
 
+#define IPC_MAX_XFER 4096
+
 extern struct ipc_handlers xmm6260_ipc_default_handlers;
 
 struct rfs_hdr {

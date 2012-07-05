@@ -44,8 +44,6 @@
 
 #include "modemctl_common.h"
 
-#define IPC_MAX_XFER 4096
-
 int i9100_modem_bootstrap(struct ipc_client *client)
 {
     return boot_modem_i9100(client);

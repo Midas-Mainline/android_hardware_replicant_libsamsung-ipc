@@ -21,41 +21,7 @@
 
 #include "modemctl_common.h"
 #include "ipc_private.h"
-
-/*
- * i9250 (Galaxy Nexus) board-specific code
- */
-#define I9250_RADIO_IMAGE "/dev/block/platform/omap/omap_hsmmc.0/by-name/radio"
-#define I9250_SECOND_BOOT_DEV "/dev/umts_boot1"
-
-#define I9250_BOOT_LAST_MARKER 0x0030ffff
-#define I9250_BOOT_REPLY_MAX 20
-
-#define I9250_GENERAL_ACK "\x02\x00\x00\x00"
-
-#define I9250_PSI_START_MAGIC "\xff\xf0\x00\x30"
-#define I9250_PSI_CMD_EXEC "\x08\x00\x00\x00"
-#define I9250_PSI_EXEC_DATA "\x00\x00\x00\x00\x02\x00\x02\x00"
-#define I9250_PSI_READY_ACK "\x00\xaa\x00\x00" 
-
-#define I9250_EBL_IMG_ACK_MAGIC "\x51\xa5\x00\x00"
-#define I9250_EBL_HDR_ACK_MAGIC "\xcc\xcc\x00\x00" 
-
-#define I9250_MPS_IMAGE_PATH "/factory/imei/mps_code.dat"
-#define I9250_MPS_LOAD_ADDR 0x61080000
-#define I9250_MPS_LENGTH 3
-
-#define SEC_DOWNLOAD_CHUNK 0xdfc2
-#define SEC_DOWNLOAD_DELAY_US (500 * 1000)
-
-	#define FW_LOAD_ADDR 0x60300000
-#define NVDATA_LOAD_ADDR 0x60e80000
-
-#define BL_END_MAGIC "\x00\x00"
-#define BL_END_MAGIC_LEN 2
-
-#define BL_RESET_MAGIC "\x01\x10\x11\x00" 
-#define BL_RESET_MAGIC_LEN 4
+#include "fwloader_i9250.h"
 
 typedef struct {
 	uint32_t total_size;
