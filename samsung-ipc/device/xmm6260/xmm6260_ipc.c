@@ -71,11 +71,7 @@ int xmm6260_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_in
     payload = (frame + sizeof(*hdr));
     memcpy(payload, request->data, request->length);
 
-    ipc_client_log(client, "sending %s %s\n",
-            ipc_command_to_str(IPC_COMMAND(request)),
-            ipc_response_type_to_str(request->type));
-
-    ipc_hex_dump(client, frame, frame_length);
+    ipc_client_log_send(client, request, __func__);
 
     client->handlers->write(frame, frame_length,  client->handlers->write_data);
 
@@ -126,11 +122,7 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
     response->data = (unsigned char*)malloc(response->length);
     memcpy(response->data, buf + sizeof(ipc), response->length);
 
-    ipc_client_log(client, "received %s %s\n",
-        ipc_command_to_str(IPC_COMMAND(response)),
-    
-    ipc_response_type_to_str(response->type));
-    ipc_hex_dump(client, response->data, left);
+    ipc_client_log_recv(client, response, __func__);
 
     return 0;
 }
@@ -174,22 +166,10 @@ int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_in
             response->length = header.size - sizeof(struct rfs_hdr);
             response->data = NULL;
 
-            ipc_client_log(client, "READ %d bytes, header size says %d",
-                rc, header.size);
-            ipc_client_log(client, "%s: RECV RFS (id=%d cmd=%d size=%d)!",
-                __func__, header.id, header.cmd, header.size);
-            ipc_client_log(client,
-                "%s: IPC response (aseq=0x%02x command=%s (0x%04x))",
-                __func__, response->mseq,
-                ipc_command_to_str(IPC_COMMAND(response)),
-                IPC_COMMAND(response));
-
             if (response->length > 0) {
                 response->data = malloc(response->length);
                 memcpy(response->data,
                     (void *) (buf + sizeof(struct rfs_hdr)),
-                    rc - sizeof(struct rfs_hdr));
-                ipc_client_log(client, "writing at offset 0 %d bytes",
                     rc - sizeof(struct rfs_hdr));
             }
 
@@ -201,6 +181,8 @@ int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_in
 
         count += rc;
     } while (count < header.size);
+
+    ipc_client_log_recv(client, response, __func__);
 
     return 0;
 }
@@ -223,11 +205,7 @@ int xmm6260_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_in
 
     memcpy((void *) (data + sizeof(struct rfs_hdr)), request->data, request->length);
 
-    ipc_client_log(client, "%s: SEND RFS (id=%d cmd=%d size=%d)!",
-        __func__, header->id, header->cmd, header->size);
-    ipc_client_log(client, "%s: IPC request (mseq=0x%02x command=%s (0x%04x))",
-        __func__, request->mseq, ipc_command_to_str(IPC_COMMAND(request)),
-        IPC_COMMAND(request));
+    ipc_client_log_send(client, request, __func__);
 
     rc = client->handlers->write(data, data_length, client->handlers->write_data);
     return rc;

@@ -98,6 +98,10 @@ void ipc_client_send_get(struct ipc_client *client, const unsigned short command
 void ipc_client_send_exec(struct ipc_client *client, const unsigned short command, unsigned char mseq);
 
 /* Utility functions */
+void ipc_client_log_recv(struct ipc_client *client,
+    struct ipc_message_info *response, char *prefix);
+void ipc_client_log_send(struct ipc_client *client,
+    struct ipc_message_info *request, char *prefix);
 const char *ipc_response_type_to_str(int type);
 const char *ipc_request_type_to_str(int type);
 const char *ipc_command_to_str(int command);
