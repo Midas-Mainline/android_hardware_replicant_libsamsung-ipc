@@ -24,7 +24,6 @@
 #include <stdint.h>
 
 #include "types.h"
-#include "util.h"
 
 #define IPC_CLIENT_TYPE_FMT     0
 #define IPC_CLIENT_TYPE_RFS     1

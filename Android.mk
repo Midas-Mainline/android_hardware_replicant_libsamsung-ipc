@@ -49,7 +49,6 @@ samsung-ipc_files := \
 	samsung-ipc/ipc.c \
 	samsung-ipc/ipc_util.c \
 	samsung-ipc/ipc_devices.c \
-	samsung-ipc/util.c \
 	samsung-ipc/rfs.c \
 	samsung-ipc/gen.c \
 	samsung-ipc/gprs.c \
