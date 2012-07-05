@@ -368,8 +368,7 @@ int xmm6260_ipc_common_data_set_fd(void *io_data, int fd)
         return -1;
 
     common_data = (int *) io_data;
-    // won't work
-    common_data = &fd;
+    *common_data = fd;
 
     return 0;
 }
