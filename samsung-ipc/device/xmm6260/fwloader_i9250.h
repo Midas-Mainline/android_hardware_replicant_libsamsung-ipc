@@ -54,6 +54,49 @@
 #define BL_RESET_MAGIC "\x01\x10\x11\x00" 
 #define BL_RESET_MAGIC_LEN 4
 
+struct i9250_radio_part {
+    size_t offset;
+    size_t length;
+};
+
+/*
+ * on I9250, all commands need ACK and we do not need to
+ * allocate a fixed size buffer
+ */
+struct i9250_boot_cmd_desc {
+    unsigned code;
+    bool long_tail;
+    bool no_ack;
+};
+
+struct i9250_boot_cmd_header {
+    uint32_t total_size;
+    uint16_t hdr_magic;
+    uint16_t cmd;
+    uint16_t data_size;
+} __attribute__((packed));
+
+#define DECLARE_BOOT_CMD_HEADER(name, code, size) \
+struct i9250_boot_cmd_header name = {\
+    .total_size = size + 10,\
+    .hdr_magic = 2,\
+    .cmd = code,\
+    .data_size = size,\
+}
+
+struct i9250_boot_tail_header {
+    uint16_t checksum;
+    uint16_t tail_magic;
+    uint8_t unknown[2];
+} __attribute__((packed));
+
+#define DECLARE_BOOT_TAIL_HEADER(name, checksum) \
+struct i9250_boot_tail_header name = {\
+    .checksum = checksum,\
+    .tail_magic = 3,\
+    .unknown = "\xea\xea",\
+}
+
 #endif
 
 // vim:ts=4:sw=4:expandtab

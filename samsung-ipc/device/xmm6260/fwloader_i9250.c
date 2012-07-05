@@ -23,41 +23,11 @@
 #include "ipc_private.h"
 #include "fwloader_i9250.h"
 
-typedef struct {
-    uint32_t total_size;
-    uint16_t hdr_magic;
-    uint16_t cmd;
-    uint16_t data_size;
-} __attribute__((packed)) bootloader_cmd_hdr_t;
-
-#define DECLARE_BOOT_CMD_HEADER(name, code, size) \
-bootloader_cmd_hdr_t name = {\
-    .total_size = size + 10,\
-    .hdr_magic = 2,\
-    .cmd = code,\
-    .data_size = size,\
-}
-
-typedef struct {
-    uint16_t checksum;
-    uint16_t tail_magic;
-    uint8_t unknown[2];
-} __attribute__((packed)) bootloader_cmd_tail_t;
-
-#define DECLARE_BOOT_TAIL_HEADER(name, checksum) \
-bootloader_cmd_tail_t name = {\
-    .checksum = checksum,\
-    .tail_magic = 3,\
-    .unknown = "\xea\xea",\
-}
-
 /*
  * Locations of the firmware components in the Samsung firmware
  */
-static struct xmm6260_offset {
-    size_t offset;
-    size_t length;
-} i9250_radio_parts[] = {
+
+struct i9250_radio_part i9250_radio_parts[] = {
     [PSI] = {
         .offset = 0,
         .length = 0xf000,
@@ -80,16 +50,7 @@ static struct xmm6260_offset {
     }
 };
 
-/*
- * on I9250, all commands need ACK and we do not need to
- * allocate a fixed size buffer
- */
-
-struct {
-    unsigned code;
-    bool long_tail;
-    bool no_ack;
-} i9250_boot_cmd_desc[] = {
+struct i9250_boot_cmd_desc i9250_boot_cmd_desc[] = {
     [SetPortConf] = {
         .code = 0x86,
         .long_tail = 1,
@@ -408,9 +369,9 @@ static int bootloader_cmd(fwloader_context *ctx,
     _d("received ack");
     hexdump(cmd_data, ack_length + 4);
 
-    bootloader_cmd_hdr_t *ack_hdr = (bootloader_cmd_hdr_t*)cmd_data;
-    bootloader_cmd_tail_t *ack_tail = (bootloader_cmd_tail_t*)
-        (cmd_data + ack_length + 4 - sizeof(bootloader_cmd_tail_t));
+    struct i9250_boot_cmd_header *ack_hdr = (struct i9250_boot_cmd_header*)cmd_data;
+    struct i9250_boot_tail_header *ack_tail = (struct i9250_boot_tail_header*)
+        (cmd_data + ack_length + 4 - sizeof(struct i9250_boot_tail_header));
     
     _d("ack code 0x%x checksum 0x%x", ack_hdr->cmd, ack_tail->checksum);
     if (ack_hdr->cmd != header.cmd) {
