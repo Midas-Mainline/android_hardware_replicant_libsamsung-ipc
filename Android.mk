@@ -8,6 +8,7 @@ LOCAL_MODULE := libsamsung-ipc
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_C_INCLUDES := external/openssl/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/samsung-ipc/device/xmm6260/
 LOCAL_LDFLAGS += -lcrypto
 
 ifeq ($(TARGET_DEVICE),crespo)
@@ -16,7 +17,6 @@ ifeq ($(TARGET_DEVICE),crespo)
 endif
 
 ifeq ($(TARGET_DEVICE),galaxys2)
-	LOCAL_C_INCLUDES += $(LOCAL_PATH)/samsung-ipc/device/xmm6260/
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	samsung-ipc_device := galaxys2
 endif
@@ -36,7 +36,6 @@ ifeq ($(TARGET_DEVICE),h1)
 endif
 
 ifeq ($(TARGET_DEVICE),maguro)
-	LOCAL_C_INCLUDES += $(LOCAL_PATH)/samsung-ipc/device/xmm6260/
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	samsung-ipc_device := maguro
 endif
