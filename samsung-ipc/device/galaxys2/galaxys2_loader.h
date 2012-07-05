@@ -1,6 +1,7 @@
 /*
- * Firmware loader for Samsung I9100 and I9250
+ * Firmware loader for Samsung I9100 (galaxys2)
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
+ * Copyright (C) 2012 Paul Kocialkowski <contact@paulk.fr>
  *
  * based on the incomplete C++ implementation which is
  * Copyright (C) 2012 Sergey Gridasov <grindars@gmail.com>
@@ -19,8 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __FWLOADER_I9100_IPC_H__
-#define __FWLOADER_I9100_IPC_H__
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+#ifndef __GALAXYS2_LOADER_H__
+#define __GALAXYS2_LOADER_H__
 
 #define RADIO_IMAGE "/dev/block/mmcblk0p8"
 #define I9100_EHCI_PATH "/sys/devices/platform/s5p-ehci/ehci_power"
@@ -48,27 +53,29 @@
 #define FW_LOAD_ADDR 0x60300000
 #define NVDATA_LOAD_ADDR 0x60e80000
 
-struct i9100_boot_cmd_desc {
+struct galaxys2_boot_cmd_desc {
     unsigned code;
     size_t data_size;
     bool need_ack;
 };
 
-struct i9100_psi_header {
+struct galaxys2_psi_header {
     uint8_t magic;
     uint16_t length;
     uint8_t padding;
 } __attribute__((packed));
 
-struct i9100_boot_info {
+struct galaxys2_boot_info {
     uint8_t data[76];
 } __attribute__((packed));
 
-struct i9100_boot_cmd {
+struct galaxys2_boot_cmd {
     uint16_t check;
     uint16_t cmd;
     uint32_t data_size;
 } __attribute__((packed));
+
+int galaxys2_modem_bootstrap(struct ipc_client *client);
 
 #endif
 

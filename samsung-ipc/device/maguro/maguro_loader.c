@@ -1,6 +1,7 @@
 /*
- * Firmware loader for Samsung I9100 and I9250
+ * Firmware loader for Samsung I9250 (maguro)
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
+ * Copyright (C) 2012 Paul Kocialkowski <contact@paulk.fr>
  *
  * based on the incomplete C++ implementation which is
  * Copyright (C) 2012 Sergey Gridasov <grindars@gmail.com>
@@ -19,15 +20,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "modemctl_common.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
+#include <getopt.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+
+//for timeval
+#include <sys/time.h>
+
+//for mmap
+#include <sys/mman.h>
+#include <sys/stat.h>
+
 #include "ipc_private.h"
-#include "fwloader_i9250.h"
+
+#include "maguro_loader.h"
+#include "xmm6260_loader.h"
+#include "xmm6260_modemctl.h"
+#include "modem_prj.h"
+
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 /*
  * Locations of the firmware components in the Samsung firmware
  */
 
-struct xmm6260_radio_part i9250_radio_parts[] = {
+struct xmm6260_radio_part maguro_radio_parts[] = {
     [PSI] = {
         .offset = 0,
         .length = 0xf000,
@@ -50,7 +74,7 @@ struct xmm6260_radio_part i9250_radio_parts[] = {
     }
 };
 
-struct i9250_boot_cmd_desc i9250_boot_cmd_desc[] = {
+struct maguro_boot_cmd_desc maguro_boot_cmd_desc[] = {
     [SetPortConf] = {
         .code = 0x86,
         .long_tail = 1,
@@ -76,23 +100,23 @@ struct i9250_boot_cmd_desc i9250_boot_cmd_desc[] = {
     },
 };
 
-static int i9250_send_image(struct ipc_client *client,
+static int maguro_send_image(struct ipc_client *client,
     struct modemctl_io_data *io_data, enum xmm6260_image type)
 {
     int ret = -1;
 
-    if (type >= ARRAY_SIZE(i9250_radio_parts)) {
+    if (type >= ARRAY_SIZE(maguro_radio_parts)) {
         ipc_client_log(client, "Error: bad image type %x", type);
         goto fail;
     }
 
-    size_t length = i9250_radio_parts[type].length;
-    size_t offset = i9250_radio_parts[type].offset;
+    size_t length = maguro_radio_parts[type].length;
+    size_t offset = maguro_radio_parts[type].offset;
 
     size_t start = offset;
     size_t end = length + start;
 
-    unsigned char crc = calculateCRC(io_data->radio_data, offset, length);
+    unsigned char crc = xmm6260_crc_calculate(io_data->radio_data, offset, length);
 
     //dump some image bytes
     ipc_client_log(client, "image start");
@@ -138,7 +162,7 @@ fail:
     return ret;
 }
 
-static int i9250_send_psi(struct ipc_client *client,
+static int maguro_send_psi(struct ipc_client *client,
     struct modemctl_io_data *io_data)
 {
     int ret = -1;
@@ -148,7 +172,7 @@ static int i9250_send_psi(struct ipc_client *client,
         goto fail;
     }
 
-    if ((ret = i9250_send_image(client, io_data, PSI)) < 0) {
+    if ((ret = maguro_send_image(client, io_data, PSI)) < 0) {
         ipc_client_log(client, "Error: failed to send PSI image");
         goto fail;
     }
@@ -176,12 +200,12 @@ fail:
     return ret;
 }
 
-static int i9250_send_ebl(struct ipc_client *client,
+static int maguro_send_ebl(struct ipc_client *client,
     struct modemctl_io_data *io_data)
 {
     int ret;
     int fd = io_data->boot_fd;
-    unsigned length = i9250_radio_parts[EBL].length;
+    unsigned length = maguro_radio_parts[EBL].length;
 
     if ((ret = write(fd, "\x04\x00\x00\x00", 4)) != 4) {
         ipc_client_log(client, "Error: failed to write length of EBL length ('4') ");
@@ -209,7 +233,7 @@ static int i9250_send_ebl(struct ipc_client *client,
         goto fail;
     }
 
-    if ((ret = i9250_send_image(client, io_data, EBL)) < 0) {
+    if ((ret = maguro_send_image(client, io_data, EBL)) < 0) {
         ipc_client_log(client, "Error: failed to send EBL image");
         goto fail;
     }
@@ -236,18 +260,18 @@ fail:
     return ret;
 }
 
-static int i9250_boot_cmd(struct ipc_client *client,
+static int maguro_boot_cmd(struct ipc_client *client,
     struct modemctl_io_data *io_data, enum xmm6260_boot_cmd cmd,
     void *data, size_t data_size)
 {
     int ret = 0;
     char *cmd_data = 0;
-    if (cmd >= ARRAY_SIZE(i9250_boot_cmd_desc)) {
+    if (cmd >= ARRAY_SIZE(maguro_boot_cmd_desc)) {
         ipc_client_log(client, "Error: bad command %x\n", cmd);
         goto done_or_fail;
     }
 
-    unsigned cmd_code = i9250_boot_cmd_desc[cmd].code;
+    unsigned cmd_code = maguro_boot_cmd_desc[cmd].code;
 
     uint16_t checksum = (data_size & 0xffff) + cmd_code;
     unsigned char *ptr = (unsigned char*)data;
@@ -260,7 +284,7 @@ static int i9250_boot_cmd(struct ipc_client *client,
     DECLARE_BOOT_TAIL_HEADER(tail, checksum);
 
     size_t tail_size = sizeof(tail);
-    if (!i9250_boot_cmd_desc[cmd].long_tail) {
+    if (!maguro_boot_cmd_desc[cmd].long_tail) {
         tail_size -= 2;
     }
 
@@ -289,7 +313,7 @@ static int i9250_boot_cmd(struct ipc_client *client,
         goto done_or_fail;
     }
 
-    if (i9250_boot_cmd_desc[cmd].no_ack) {
+    if (maguro_boot_cmd_desc[cmd].no_ack) {
         ipc_client_log(client, "not waiting for ACK");
         goto done_or_fail;
     }
@@ -320,9 +344,9 @@ static int i9250_boot_cmd(struct ipc_client *client,
 
     ipc_client_log(client, "received ack");
 
-    struct i9250_boot_cmd_header *ack_hdr = (struct i9250_boot_cmd_header*)cmd_data;
-    struct i9250_boot_tail_header *ack_tail = (struct i9250_boot_tail_header*)
-        (cmd_data + ack_length + 4 - sizeof(struct i9250_boot_tail_header));
+    struct maguro_boot_cmd_header *ack_hdr = (struct maguro_boot_cmd_header*)cmd_data;
+    struct maguro_boot_tail_header *ack_tail = (struct maguro_boot_tail_header*)
+        (cmd_data + ack_length + 4 - sizeof(struct maguro_boot_tail_header));
 
     ipc_client_log(client, "ack code 0x%x checksum 0x%x", ack_hdr->cmd, ack_tail->checksum);
     if (ack_hdr->cmd != header.cmd) {
@@ -342,7 +366,7 @@ done_or_fail:
     return ret;
 }
 
-static int i9250_boot_info_ack(struct ipc_client *client,
+static int maguro_boot_info_ack(struct ipc_client *client,
     struct modemctl_io_data *io_data)
 {
     int ret = -1;
@@ -378,7 +402,7 @@ static int i9250_boot_info_ack(struct ipc_client *client,
 
     ipc_client_log(client, "received Boot Info");
 
-    ret = i9250_boot_cmd(client, io_data, SetPortConf, boot_info, boot_info_length);
+    ret = maguro_boot_cmd(client, io_data, SetPortConf, boot_info, boot_info_length);
     if (ret < 0) {
         ipc_client_log(client, "Error: failed to send SetPortConf command");
         goto fail;
@@ -397,7 +421,7 @@ fail:
     return ret;
 }
 
-static int i9250_send_image_data(struct ipc_client *client,
+static int maguro_send_image_data(struct ipc_client *client,
     struct modemctl_io_data *io_data, uint32_t addr,
     void *data, int data_len)
 {
@@ -405,7 +429,7 @@ static int i9250_send_image_data(struct ipc_client *client,
     int count = 0;
     char *data_p = (char *) data;
 
-    if ((ret = i9250_boot_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
+    if ((ret = maguro_boot_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
         ipc_client_log(client, "Error: failed to send ReqFlashSetAddress");
         goto fail;
     }
@@ -417,7 +441,7 @@ static int i9250_send_image_data(struct ipc_client *client,
         int rest = data_len - count;
         int chunk = rest < SEC_DOWNLOAD_CHUNK ? rest : SEC_DOWNLOAD_CHUNK;
 
-        ret = i9250_boot_cmd(client, io_data, ReqFlashWriteBlock, data_p, chunk);
+        ret = maguro_boot_cmd(client, io_data, ReqFlashWriteBlock, data_p, chunk);
         if (ret < 0) {
             ipc_client_log(client, "Error: failed to send data chunk");
             goto fail;
@@ -433,20 +457,20 @@ fail:
     return ret;
 }
 
-static int i9250_send_image_addr(struct ipc_client *client,
+static int maguro_send_image_addr(struct ipc_client *client,
     struct modemctl_io_data *io_data, uint32_t addr, enum xmm6260_image type)
 {
-    uint32_t offset = i9250_radio_parts[type].offset;
-    uint32_t length = i9250_radio_parts[type].length;
+    uint32_t offset = maguro_radio_parts[type].offset;
+    uint32_t length = maguro_radio_parts[type].length;
     char *start = io_data->radio_data + offset;
     int ret = 0;
 
-    ret = i9250_send_image_data(client, io_data, addr, start, length);
+    ret = maguro_send_image_data(client, io_data, addr, start, length);
 
     return ret;
 }
 
-static int i9250_send_mps_data(struct ipc_client *client,
+static int maguro_send_mps_data(struct ipc_client *client,
     struct modemctl_io_data *io_data)
 {
     int ret = 0;
@@ -462,7 +486,7 @@ static int i9250_send_mps_data(struct ipc_client *client,
         read(mps_fd, mps_data, I9250_MPS_LENGTH);
     }
 
-    if ((ret = i9250_boot_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
+    if ((ret = maguro_boot_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
         ipc_client_log(client, "Error: failed to send ReqFlashSetAddress");
         goto fail;
     }
@@ -470,7 +494,7 @@ static int i9250_send_mps_data(struct ipc_client *client,
         ipc_client_log(client, "sent ReqFlashSetAddress");
     }
 
-    if ((ret = i9250_boot_cmd(client, io_data, ReqFlashWriteBlock,
+    if ((ret = maguro_boot_cmd(client, io_data, ReqFlashWriteBlock,
         mps_data, I9250_MPS_LENGTH)) < 0) {
         ipc_client_log(client, "Error: failed to write MPS data to modem");
         goto fail;
@@ -485,17 +509,17 @@ fail:
     return ret;
 }
 
-static int i9250_send_image_addrs(struct ipc_client *client,
+static int maguro_send_image_addrs(struct ipc_client *client,
     struct modemctl_io_data *io_data)
 {
     int ret = 0;
 
-    uint32_t sec_off = i9250_radio_parts[SECURE_IMAGE].offset;
-    uint32_t sec_len = i9250_radio_parts[SECURE_IMAGE].length;
+    uint32_t sec_off = maguro_radio_parts[SECURE_IMAGE].offset;
+    uint32_t sec_len = maguro_radio_parts[SECURE_IMAGE].length;
     void *sec_img = io_data->radio_data + sec_off;
     void *nv_data = NULL;
 
-    if ((ret = i9250_boot_cmd(client, io_data, ReqSecStart, sec_img, sec_len)) < 0) {
+    if ((ret = maguro_boot_cmd(client, io_data, ReqSecStart, sec_img, sec_len)) < 0) {
         ipc_client_log(client, "Error: failed to write ReqSecStart");
         goto fail;
     }
@@ -503,7 +527,7 @@ static int i9250_send_image_addrs(struct ipc_client *client,
         ipc_client_log(client, "sent ReqSecStart");
     }
 
-    if ((ret = i9250_send_image_addr(client, io_data, FW_LOAD_ADDR, FIRMWARE)) < 0) {
+    if ((ret = maguro_send_image_addr(client, io_data, FW_LOAD_ADDR, FIRMWARE)) < 0) {
         ipc_client_log(client, "Error: failed to send FIRMWARE image");
         goto fail;
     }
@@ -520,7 +544,7 @@ static int i9250_send_image_addrs(struct ipc_client *client,
         goto fail;
     }
 
-    if ((ret = i9250_send_image_data(client, io_data, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
+    if ((ret = maguro_send_image_data(client, io_data, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
         ipc_client_log(client, "Error: failed to send NVDATA image");
         goto fail;
     }
@@ -530,7 +554,7 @@ static int i9250_send_image_addrs(struct ipc_client *client,
 
     free(nv_data);
 
-    if ((ret = i9250_send_mps_data(client, io_data)) < 0) {
+    if ((ret = maguro_send_mps_data(client, io_data)) < 0) {
         ipc_client_log(client, "Error: failed to send MPS data");
         goto fail;
     }
@@ -538,7 +562,7 @@ static int i9250_send_image_addrs(struct ipc_client *client,
         ipc_client_log(client, "sent MPS data");
     }
 
-    if ((ret = i9250_boot_cmd(client, io_data, ReqSecEnd,
+    if ((ret = maguro_boot_cmd(client, io_data, ReqSecEnd,
         BL_END_MAGIC, BL_END_MAGIC_LEN)) < 0)
     {
         ipc_client_log(client, "Error: failed to write ReqSecEnd");
@@ -548,7 +572,7 @@ static int i9250_send_image_addrs(struct ipc_client *client,
         ipc_client_log(client, "sent ReqSecEnd");
     }
 
-    ret = i9250_boot_cmd(client, io_data, ReqForceHwReset,
+    ret = maguro_boot_cmd(client, io_data, ReqForceHwReset,
         BL_RESET_MAGIC, BL_RESET_MAGIC_LEN);
     if (ret < 0) {
         ipc_client_log(client, "Error: failed to write ReqForceHwReset");
@@ -562,7 +586,7 @@ fail:
     return ret;
 }
 
-static int i9250_reboot_modem(struct ipc_client *client,
+static int maguro_modem_reboot(struct ipc_client *client,
     struct modemctl_io_data *io_data, bool hard)
 {
     int ret;
@@ -613,7 +637,7 @@ fail:
     return ret;
 }
 
-int i9250_boot_modem(struct ipc_client *client)
+int maguro_modem_bootstrap(struct ipc_client *client)
 {
     int ret = -1;
     struct modemctl_io_data io_data;
@@ -649,7 +673,7 @@ int i9250_boot_modem(struct ipc_client *client)
         ipc_client_log(client, "opened boot device %s, fd=%d", BOOT_DEV, io_data.boot_fd);
     }
 
-    if (i9250_reboot_modem(client, &io_data, true) < 0) {
+    if (maguro_modem_reboot(client, &io_data, true) < 0) {
         ipc_client_log(client, "Error: failed to hard reset modem");
         goto fail;
     }
@@ -707,7 +731,7 @@ int i9250_boot_modem(struct ipc_client *client)
         ipc_client_log(client, "got bootloader id marker");
     }
 
-    if ((ret = i9250_send_psi(client, &io_data)) < 0) {
+    if ((ret = maguro_send_psi(client, &io_data)) < 0) {
         ipc_client_log(client, "Error: failed to upload PSI");
         goto fail;
     }
@@ -745,7 +769,7 @@ int i9250_boot_modem(struct ipc_client *client)
         goto fail;
     }
 
-    if ((ret = i9250_send_ebl(client, &io_data)) < 0) {
+    if ((ret = maguro_send_ebl(client, &io_data)) < 0) {
         ipc_client_log(client, "Error: failed to upload EBL");
         goto fail;
     }
@@ -753,7 +777,7 @@ int i9250_boot_modem(struct ipc_client *client)
         ipc_client_log(client, "EBL download complete");
     }
 
-    if ((ret = i9250_boot_info_ack(client, &io_data)) < 0) {
+    if ((ret = maguro_boot_info_ack(client, &io_data)) < 0) {
         ipc_client_log(client, "Error: failed to receive Boot Info");
         goto fail;
     }
@@ -761,7 +785,7 @@ int i9250_boot_modem(struct ipc_client *client)
         ipc_client_log(client, "Boot Info ACK done");
     }
 
-    if ((ret = i9250_send_image_addrs(client, &io_data)) < 0) {
+    if ((ret = maguro_send_image_addrs(client, &io_data)) < 0) {
         ipc_client_log(client, "Error: failed to upload Secure Image");
         goto fail;
     }

@@ -57,16 +57,21 @@ extern struct ipc_ops aries_rfs_ops;
 extern struct ipc_handlers aries_default_handlers;
 extern struct ipc_gprs_specs aries_gprs_specs;
 
-// xmm6260
-// Galaxy S2 (I9100)
-// Galaxy Nexus (I9250)
+// galaxys2
 
-extern struct ipc_handlers xmm6260_default_handlers;
-extern struct ipc_ops xmm6260_rfs_ops;
-extern struct ipc_ops xmm6260_i9100_fmt_ops;
-extern struct ipc_ops xmm6260_i9250_fmt_ops;
-extern struct ipc_gprs_specs xmm6260_gprs_specs;
-extern struct ipc_gprs_specs xmm6260_nv_data_specs;
+extern struct ipc_ops galaxys2_fmt_ops;
+extern struct ipc_ops galaxys2_fmt_ops;
+extern struct ipc_ops galaxys2_rfs_ops;
+extern struct ipc_handlers galaxys2_default_handlers;
+extern struct ipc_gprs_specs galaxys2_gprs_specs;
+
+// maguro
+
+extern struct ipc_ops maguro_fmt_ops;
+extern struct ipc_ops maguro_rfs_ops;
+extern struct ipc_handlers maguro_default_handlers;
+extern struct ipc_gprs_specs maguro_gprs_specs;
+extern struct ipc_nv_data_specs maguro_nv_data_specs;
 
 #endif
 

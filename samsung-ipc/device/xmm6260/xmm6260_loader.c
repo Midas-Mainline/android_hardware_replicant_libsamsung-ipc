@@ -1,9 +1,7 @@
 /*
- * io_helpers.c - I/O helper functions for the firmware loader
- * This file is part of:
- *
- * Firmware loader for Samsung I9100 and I9250
+ * XMM6260 Firmware loader functions
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
+ * Copyright (C) 2012 Paul Kocialkowski <contact@paulk.fr>
  *
  * based on the incomplete C++ implementation which is
  * Copyright (C) 2012 Sergey Gridasov <grindars@gmail.com>
@@ -22,9 +20,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "io_helpers.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 
-#define DEFAULT_TIMEOUT 50
+#include <getopt.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+
+//for timeval
+#include <sys/time.h>
+
+//for mmap
+#include <sys/mman.h>
+#include <sys/stat.h>
+
+#include "ipc_private.h"
+
+#include "xmm6260_loader.h"
+#include "xmm6260_modemctl.h"
+#include "modem_prj.h"
+
+unsigned char xmm6260_crc_calculate(void* data, size_t offset, size_t length)
+{
+    unsigned char crc = 0;
+    unsigned char *ptr = (unsigned char*)(data + offset);
+
+    while (length--) {
+        crc ^= *ptr++;
+    }
+
+    return crc;
+}
+
+/*
+ * io helper functions
+ */
 
 int expect(int fd, unsigned timeout) {
     int ret = 0;
@@ -76,5 +110,3 @@ int expect_data(int fd, void *data, size_t size) {
 
     return ret;
 }
-
-// vim:ts=4:sw=4:expandtab

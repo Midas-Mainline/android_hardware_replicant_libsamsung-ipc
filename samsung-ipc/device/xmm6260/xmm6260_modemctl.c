@@ -1,6 +1,7 @@
 /*
- * Firmware loader for Samsung I9100 and I9250
+ * XMM6260 Modem Control functions
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
+ * Copyright (C) 2012 Paul Kocialkowski <contact@paulk.fr>
  *
  * based on the incomplete C++ implementation which is
  * Copyright (C) 2012 Sergey Gridasov <grindars@gmail.com>
@@ -19,12 +20,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//modemctl shared code
-#include "modemctl_common.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
+#include <getopt.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+
+//for timeval
+#include <sys/time.h>
+
+//for mmap
+#include <sys/mman.h>
+#include <sys/stat.h>
+
+#include "ipc_private.h"
+
+#include "xmm6260_loader.h"
+#include "xmm6260_modemctl.h"
+#include "modem_prj.h"
 
 /*
  * modemctl generic functions
  */
+
 int modemctl_link_set_active(struct ipc_client *client,
     struct modemctl_io_data *io_data, bool enabled) {
     unsigned status = enabled;
@@ -153,18 +176,6 @@ int modemctl_modem_boot_power(struct ipc_client *client,
         return ioctl(io_data->boot_fd, IOCTL_MODEM_BOOT_OFF, 0);
     }
     return -1;
-}
-
-unsigned char calculateCRC(void* data, size_t offset, size_t length)
-{
-    unsigned char crc = 0;
-    unsigned char *ptr = (unsigned char*)(data + offset);
-
-    while (length--) {
-        crc ^= *ptr++;
-    }
-
-    return crc;
 }
 
 // vim:ts=4:sw=4:expandtab

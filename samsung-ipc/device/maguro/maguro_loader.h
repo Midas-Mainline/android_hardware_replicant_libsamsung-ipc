@@ -1,6 +1,7 @@
 /*
- * Firmware loader for Samsung I9100 and I9250
+ * Firmware loader for Samsung I9250 (maguro)
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
+ * Copyright (C) 2012 Paul Kocialkowski <contact@paulk.fr>
  *
  * based on the incomplete C++ implementation which is
  * Copyright (C) 2012 Sergey Gridasov <grindars@gmail.com>
@@ -19,8 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __FWLOADER_I9250_IPC_H__
-#define __FWLOADER_I9250_IPC_H__
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+#ifndef __MAGURO_LOADER_H__
+#define __MAGURO_LOADER_H__
 
 #define I9250_RADIO_IMAGE "/dev/block/platform/omap/omap_hsmmc.0/by-name/radio"
 #define I9250_SECOND_BOOT_DEV "/dev/umts_boot1"
@@ -58,13 +63,13 @@
  * on I9250, all commands need ACK and we do not need to
  * allocate a fixed size buffer
  */
-struct i9250_boot_cmd_desc {
+struct maguro_boot_cmd_desc {
     unsigned code;
     bool long_tail;
     bool no_ack;
 };
 
-struct i9250_boot_cmd_header {
+struct maguro_boot_cmd_header {
     uint32_t total_size;
     uint16_t hdr_magic;
     uint16_t cmd;
@@ -72,25 +77,27 @@ struct i9250_boot_cmd_header {
 } __attribute__((packed));
 
 #define DECLARE_BOOT_CMD_HEADER(name, code, size) \
-struct i9250_boot_cmd_header name = {\
+struct maguro_boot_cmd_header name = {\
     .total_size = size + 10,\
     .hdr_magic = 2,\
     .cmd = code,\
     .data_size = size,\
 }
 
-struct i9250_boot_tail_header {
+struct maguro_boot_tail_header {
     uint16_t checksum;
     uint16_t tail_magic;
     uint8_t unknown[2];
 } __attribute__((packed));
 
 #define DECLARE_BOOT_TAIL_HEADER(name, checksum) \
-struct i9250_boot_tail_header name = {\
+struct maguro_boot_tail_header name = {\
     .checksum = checksum,\
     .tail_magic = 3,\
     .unknown = "\xea\xea",\
 }
+
+int maguro_modem_bootstrap(struct ipc_client *client);
 
 #endif
 

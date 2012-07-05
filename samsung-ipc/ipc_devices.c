@@ -18,12 +18,11 @@
  *
  */
 
+#include <stdlib.h>
+
 #include <radio.h>
 
 #include "ipc_devices.h"
-
-    struct ipc_gprs_specs *gprs_specs;
-    struct ipc_nv_data_specs *nv_data_specs;
 
 struct ipc_device_desc ipc_devices[] = {
     {
@@ -56,29 +55,29 @@ struct ipc_device_desc ipc_devices[] = {
     {   
         .name = "galaxys2",
         .board_name = "i9100",
-        .fmt_ops = &xmm6260_i9100_fmt_ops,
-        .rfs_ops = &xmm6260_rfs_ops,
-        .handlers = &xmm6260_default_handlers,
-        .gprs_specs = &xmm6260_gprs_specs,
+        .fmt_ops = &galaxys2_fmt_ops,
+        .rfs_ops = &galaxys2_rfs_ops,
+        .handlers = &galaxys2_default_handlers,
+        .gprs_specs = &galaxys2_gprs_specs,
         .nv_data_specs = NULL,
     },
     {   
         .name = "galaxys2",
         .board_name = "smdk4210",
-        .fmt_ops = &xmm6260_i9100_fmt_ops,
-        .rfs_ops = &xmm6260_rfs_ops,
-        .handlers = &xmm6260_default_handlers,
-        .gprs_specs = &xmm6260_gprs_specs,
+        .fmt_ops = &galaxys2_fmt_ops,
+        .rfs_ops = &galaxys2_rfs_ops,
+        .handlers = &galaxys2_default_handlers,
+        .gprs_specs = &galaxys2_gprs_specs,
         .nv_data_specs = NULL,
     },
     {
         .name = "maguro",
         .board_name = "tuna",
-        .fmt_ops = &xmm6260_i9250_fmt_ops,
-        .rfs_ops = &xmm6260_rfs_ops,
-        .handlers = &xmm6260_default_handlers,
-        .gprs_specs = &xmm6260_gprs_specs,
-        .nv_data_specs = &xmm6260_nv_data_specs,
+        .fmt_ops = &maguro_fmt_ops,
+        .rfs_ops = &maguro_rfs_ops,
+        .handlers = &maguro_default_handlers,
+        .gprs_specs = &maguro_gprs_specs,
+        .nv_data_specs = &maguro_nv_data_specs,
     }
 };
 

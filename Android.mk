@@ -7,7 +7,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libsamsung-ipc
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_CFLAGS += -Iexternal/openssl/include
+LOCAL_C_INCLUDES := external/openssl/include
 LOCAL_LDFLAGS += -lcrypto
 
 ifeq ($(TARGET_DEVICE),crespo)
@@ -16,6 +16,7 @@ ifeq ($(TARGET_DEVICE),crespo)
 endif
 
 ifeq ($(TARGET_DEVICE),galaxys2)
+	LOCAL_C_INCLUDES += $(LOCAL_PATH)/samsung-ipc/device/xmm6260/
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	samsung-ipc_device := galaxys2
 endif
@@ -35,6 +36,7 @@ ifeq ($(TARGET_DEVICE),h1)
 endif
 
 ifeq ($(TARGET_DEVICE),maguro)
+	LOCAL_C_INCLUDES += $(LOCAL_PATH)/samsung-ipc/device/xmm6260/
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	samsung-ipc_device := maguro
 endif
@@ -58,17 +60,19 @@ samsung-ipc_files := \
 	samsung-ipc/device/h1/h1_ipc.c \
 	samsung-ipc/device/crespo/crespo_ipc.c \
 	samsung-ipc/device/aries/aries_ipc.c \
-	samsung-ipc/device/xmm6260/fwloader_i9100.c \
-	samsung-ipc/device/xmm6260/fwloader_i9250.c \
-	samsung-ipc/device/xmm6260/io_helpers.c \
-	samsung-ipc/device/xmm6260/modemctl_common.c \
-	samsung-ipc/device/xmm6260/xmm6260_ipc.c
+	samsung-ipc/device/xmm6260/xmm6260_loader.c \
+	samsung-ipc/device/xmm6260/xmm6260_modemctl.c \
+	samsung-ipc/device/xmm6260/xmm6260_ipc.c \
+	samsung-ipc/device/galaxys2/galaxys2_loader.c \
+	samsung-ipc/device/galaxys2/galaxys2_ipc.c \
+	samsung-ipc/device/maguro/maguro_loader.c \
+	samsung-ipc/device/maguro/maguro_ipc.c
 
 LOCAL_SRC_FILES := $(samsung-ipc_files)
 LOCAL_CFLAGS += -DIPC_DEVICE_EXPLICIT=\"$(samsung-ipc_device)\"
 
 LOCAL_SHARED_LIBRARIES := libutils
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/include \
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/include \
 	$(LOCAL_PATH)/samsung-ipc
 
 include $(BUILD_STATIC_LIBRARY)
@@ -120,7 +124,7 @@ LOCAL_SRC_FILES := $(modemctrl_files)
 
 LOCAL_STATIC_LIBRARIES := libsamsung-ipc
 LOCAL_SHARED_LIBRARIES := libutils
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
 
 include $(BUILD_EXECUTABLE)
 

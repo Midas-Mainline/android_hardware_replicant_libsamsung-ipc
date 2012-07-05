@@ -1,6 +1,7 @@
 /*
- * Firmware loader for Samsung I9100 and I9250
+ * XMM6260 Modem Control functions
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
+ * Copyright (C) 2012 Paul Kocialkowski <contact@paulk.fr>
  *
  * based on the incomplete C++ implementation which is
  * Copyright (C) 2012 Sergey Gridasov <grindars@gmail.com>
@@ -19,16 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __MODEMCTL_COMMON_H__
-#define __MODEMCTL_COMMON_H__
+#ifndef __XMM6260_MODEMCTL_H__
+#define __XMM6260_MODEMCTL_H__
 
 #include <radio.h>
-
-#include "common.h"
-#include "io_helpers.h"
-
-//Samsung IOCTLs
-#include "modem_prj.h"
 
 #define MODEM_DEVICE(x) ("/dev/" #x)
 #define LINK_PM MODEM_DEVICE(link_pm)
@@ -40,39 +35,6 @@
 #define LINK_POLL_DELAY_US (50 * 1000)
 #define LINK_TIMEOUT_MS 2000
 
-#define RADIO_MAP_SIZE (16 << 20)
-
-struct xmm6260_radio_part {
-    size_t offset;
-    size_t length;
-};
-
-/*
- * Components of the Samsung XMM6260 firmware
- */
-enum xmm6260_image {
-    PSI,
-    EBL,
-    SECURE_IMAGE,
-    FIRMWARE,
-    NVDATA,
-};
-
-/*
- * Bootloader control interface definitions
- */
-
-enum xmm6260_boot_cmd {
-    SetPortConf,
-
-    ReqSecStart,
-    ReqSecEnd,
-    ReqForceHwReset,
-
-    ReqFlashSetAddress,
-    ReqFlashWriteBlock,
-};
-
 struct modemctl_io_data {
     int link_fd;
     int boot_fd;
@@ -80,9 +42,6 @@ struct modemctl_io_data {
     int radio_fd;
     char *radio_data;
     struct stat radio_stat;
-
-    struct xmm6260_radio_part *radio_parts;
-    int radio_parts_count;
 };
 
 /*
@@ -159,16 +118,6 @@ int modemctl_modem_power(struct ipc_client *client,
 int modemctl_modem_boot_power(struct ipc_client *client,
     struct modemctl_io_data *io_data, bool enabled);
 
-/*
- * @brief Calculate the checksum for the XMM6260 bootloader protocol
- *
- * @param data [in] the data to calculate the checksum for
- * @param offset [in] number of bytes to skip
- * @param length [in] length of data in bytes
- * @return checksum value
- */
-unsigned char calculateCRC(void* data, size_t offset, size_t length);
-
-#endif //__MODEMCTL_COMMON_H__
+#endif
 
 // vim:ts=4:sw=4:expandtab

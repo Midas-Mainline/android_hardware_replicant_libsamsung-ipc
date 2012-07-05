@@ -1,6 +1,7 @@
 /*
- * Firmware loader for Samsung I9100 and I9250
+ * XMM6260 Firmware loader functions
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
+ * Copyright (C) 2012 Paul Kocialkowski <contact@paulk.fr>
  *
  * based on the incomplete C++ implementation which is
  * Copyright (C) 2012 Sergey Gridasov <grindars@gmail.com>
@@ -19,10 +20,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __IO_HELPERS_H__
-#define __IO_HELPERS_H__
+#ifndef __XMM6260_LOADER_H__
+#define __XMM6260_LOADER_H__
 
-#include "common.h"
+#define RADIO_MAP_SIZE (16 << 20)
+#define DEFAULT_TIMEOUT 50
+
+/*
+ * Offset and length to describe a part of XMM6260 firmware
+ */
+struct xmm6260_radio_part {
+    size_t offset;
+    size_t length;
+};
+
+/*
+ * Components of the Samsung XMM6260 firmware
+ */
+enum xmm6260_image {
+    PSI,
+    EBL,
+    SECURE_IMAGE,
+    FIRMWARE,
+    NVDATA,
+};
+
+/*
+ * Bootloader control interface definitions
+ */
+enum xmm6260_boot_cmd {
+    SetPortConf,
+
+    ReqSecStart,
+    ReqSecEnd,
+    ReqForceHwReset,
+
+    ReqFlashSetAddress,
+    ReqFlashWriteBlock,
+};
+
+/*
+ * @brief Calculate the checksum for the XMM6260 bootloader protocol
+ *
+ * @param data [in] the data to calculate the checksum for
+ * @param offset [in] number of bytes to skip
+ * @param length [in] length of data in bytes
+ * @return checksum value
+ */
+unsigned char xmm6260_crc_calculate(void* data, size_t offset, size_t length);
 
 /* 
  * @brief Waits for fd to become available for reading
@@ -56,6 +101,4 @@ int expect_read(int fd, void *buf, size_t size);
  */
 int expect_data(int fd, void *data, size_t size);
 
-#endif //__IO_HELPERS_H__
-
-// vim:ts=4:sw=4:expandtab
+#endif
