@@ -28,20 +28,20 @@
 #include "common.h"
 
 #ifndef SILENT
-	#define LOG_TAG "xmm6260-sec"
-	#define _p(fmt, x...) \
-		do {\
-			printf("[" LOG_TAG "]: " fmt " at %s:%s:%d\n", \
-				##x, __FILE__, __func__, __LINE__); \
-		} while (0)
+    #define LOG_TAG "xmm6260-sec"
+    #define _p(fmt, x...) \
+        do {\
+            printf("[" LOG_TAG "]: " fmt " at %s:%s:%d\n", \
+                ##x, __FILE__, __func__, __LINE__); \
+        } while (0)
 #else
-	#define _p(fmt, x...) do {} while (0)
+    #define _p(fmt, x...) do {} while (0)
 #endif
 
 #ifdef DEBUG
-	#define _d(fmt, x...) _p("D/" fmt, ##x)
+    #define _d(fmt, x...) _p("D/" fmt, ##x)
 #else
-	#define _d(fmt, x...) do {} while (0)
+    #define _d(fmt, x...) do {} while (0)
 #endif
 
 #define _e(fmt, x...) _p("E/" fmt, ##x)
@@ -52,3 +52,5 @@
 void hexdump(void* data, size_t size);
 
 #endif //__LOG_H__
+
+// vim:ts=4:sw=4:expandtab

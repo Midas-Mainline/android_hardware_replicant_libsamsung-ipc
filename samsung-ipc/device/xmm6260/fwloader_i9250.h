@@ -55,3 +55,5 @@
 #define BL_RESET_MAGIC_LEN 4
 
 #endif
+
+// vim:ts=4:sw=4:expandtab

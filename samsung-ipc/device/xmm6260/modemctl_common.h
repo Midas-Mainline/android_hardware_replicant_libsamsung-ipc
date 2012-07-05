@@ -44,25 +44,25 @@
 #define RADIO_MAP_SIZE (16 << 20)
 
 typedef struct {
-	int link_fd;
-	int boot_fd;
+    int link_fd;
+    int boot_fd;
 
-	int radio_fd;
-	char *radio_data;
-	struct stat radio_stat;
+    int radio_fd;
+    char *radio_data;
+    struct stat radio_stat;
 
-	struct ipc_client *client;
+    struct ipc_client *client;
 } fwloader_context;
 
 /*
  * Components of the Samsung XMM6260 firmware
  */
 enum xmm6260_image {
-	PSI,
-	EBL,
-	SECURE_IMAGE,
-	FIRMWARE,
-	NVDATA,
+    PSI,
+    EBL,
+    SECURE_IMAGE,
+    FIRMWARE,
+    NVDATA,
 };
 
 /*
@@ -70,14 +70,14 @@ enum xmm6260_image {
  */
 
 enum xmm6260_boot_cmd {
-	SetPortConf,
+    SetPortConf,
 
-	ReqSecStart,
-	ReqSecEnd,
-	ReqForceHwReset,
+    ReqSecStart,
+    ReqSecEnd,
+    ReqForceHwReset,
 
-	ReqFlashSetAddress,
-	ReqFlashWriteBlock,
+    ReqFlashSetAddress,
+    ReqFlashWriteBlock,
 };
 
 /*
@@ -169,3 +169,5 @@ int boot_modem_i9250(struct ipc_client *client);
 unsigned char calculateCRC(void* data, size_t offset, size_t length);
 
 #endif //__MODEMCTL_COMMON_H__
+
+// vim:ts=4:sw=4:expandtab

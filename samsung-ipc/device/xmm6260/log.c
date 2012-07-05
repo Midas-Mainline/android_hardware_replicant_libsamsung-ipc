@@ -25,19 +25,21 @@
 #include "log.h"
 
 void hexdump(void* data, size_t size) {
-	if (size < 1) {
-		return;
-	}
-	char *_data = (char*)data;
-	char __hd_buf[DUMP_SIZE * 3 + 1];
+    if (size < 1) {
+        return;
+    }
+    char *_data = (char*)data;
+    char __hd_buf[DUMP_SIZE * 3 + 1];
 
-	size_t len = size < DUMP_SIZE ? size : DUMP_SIZE;
-	memset(__hd_buf, 0, sizeof(__hd_buf));
-	int i;
-	for (i = 0; i < len; i++) {
-		snprintf(__hd_buf + i * 3, 4, "%02x ", _data[i]);	
-	}
+    size_t len = size < DUMP_SIZE ? size : DUMP_SIZE;
+    memset(__hd_buf, 0, sizeof(__hd_buf));
+    int i;
+    for (i = 0; i < len; i++) {
+        snprintf(__hd_buf + i * 3, 4, "%02x ", _data[i]);    
+    }
 
-	__hd_buf[sizeof(__hd_buf) - 1] = '\0';
-	_d("%s", __hd_buf);
+    __hd_buf[sizeof(__hd_buf) - 1] = '\0';
+    _d("%s", __hd_buf);
 }
+
+// vim:ts=4:sw=4:expandtab

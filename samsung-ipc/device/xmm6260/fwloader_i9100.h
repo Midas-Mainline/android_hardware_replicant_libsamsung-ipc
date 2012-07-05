@@ -49,3 +49,5 @@
 #define NVDATA_LOAD_ADDR 0x60e80000
 
 #endif
+
+// vim:ts=4:sw=4:expandtab

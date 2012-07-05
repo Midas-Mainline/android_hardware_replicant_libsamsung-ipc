@@ -68,3 +68,5 @@ int receive(int fd, void *buf, size_t size);
 int expect_data(int fd, void *data, size_t size);
 
 #endif //__IO_HELPERS_H__
+
+// vim:ts=4:sw=4:expandtab

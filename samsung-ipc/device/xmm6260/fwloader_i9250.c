@@ -24,60 +24,60 @@
 #include "fwloader_i9250.h"
 
 typedef struct {
-	uint32_t total_size;
-	uint16_t hdr_magic;
-	uint16_t cmd;
-	uint16_t data_size;
+    uint32_t total_size;
+    uint16_t hdr_magic;
+    uint16_t cmd;
+    uint16_t data_size;
 } __attribute__((packed)) bootloader_cmd_hdr_t;
 
 #define DECLARE_BOOT_CMD_HEADER(name, code, size) \
 bootloader_cmd_hdr_t name = {\
-	.total_size = size + 10,\
-	.hdr_magic = 2,\
-	.cmd = code,\
-	.data_size = size,\
+    .total_size = size + 10,\
+    .hdr_magic = 2,\
+    .cmd = code,\
+    .data_size = size,\
 }
 
 typedef struct {
-	uint16_t checksum;
-	uint16_t tail_magic;
-	uint8_t unknown[2];
+    uint16_t checksum;
+    uint16_t tail_magic;
+    uint8_t unknown[2];
 } __attribute__((packed)) bootloader_cmd_tail_t;
 
 #define DECLARE_BOOT_TAIL_HEADER(name, checksum) \
 bootloader_cmd_tail_t name = {\
-	.checksum = checksum,\
-	.tail_magic = 3,\
-	.unknown = "\xea\xea",\
+    .checksum = checksum,\
+    .tail_magic = 3,\
+    .unknown = "\xea\xea",\
 }
 
 /*
  * Locations of the firmware components in the Samsung firmware
  */
 static struct xmm6260_offset {
-	size_t offset;
-	size_t length;
+    size_t offset;
+    size_t length;
 } i9250_radio_parts[] = {
-	[PSI] = {
-		.offset = 0,
-		.length = 0xf000,
-	},
-	[EBL] = {
-		.offset = 0xf000,
-		.length = 0x19000,
-	},
-	[SECURE_IMAGE] = {
-		.offset = 0x9ff800,
-		.length = 0x800,
-	},
-	[FIRMWARE] = {
-		.offset = 0x28000,
-		.length = 0x9d8000,
-	},
-	[NVDATA] = {
-		.offset = 0xa00000,
-		.length = 2 << 20,
-	}
+    [PSI] = {
+        .offset = 0,
+        .length = 0xf000,
+    },
+    [EBL] = {
+        .offset = 0xf000,
+        .length = 0x19000,
+    },
+    [SECURE_IMAGE] = {
+        .offset = 0x9ff800,
+        .length = 0x800,
+    },
+    [FIRMWARE] = {
+        .offset = 0x28000,
+        .length = 0x9d8000,
+    },
+    [NVDATA] = {
+        .offset = 0xa00000,
+        .length = 2 << 20,
+    }
 };
 
 /*
@@ -86,741 +86,743 @@ static struct xmm6260_offset {
  */
 
 struct {
-	unsigned code;
-	bool long_tail;
-	bool no_ack;
+    unsigned code;
+    bool long_tail;
+    bool no_ack;
 } i9250_boot_cmd_desc[] = {
-	[SetPortConf] = {
-		.code = 0x86,
-		.long_tail = 1,
-	},
-	[ReqSecStart] = {
-		.code = 0x204,
-		.long_tail = 1,
-	},
-	[ReqSecEnd] = {
-		.code = 0x205,
-	},
-	[ReqForceHwReset] = {
-		.code = 0x208,
-		.long_tail = 1,
-		.no_ack = 1,
-	},
-	[ReqFlashSetAddress] = {
-		.code = 0x802,
-		.long_tail = 1,
-	},
-	[ReqFlashWriteBlock] = {
-		.code = 0x804,
-	},
+    [SetPortConf] = {
+        .code = 0x86,
+        .long_tail = 1,
+    },
+    [ReqSecStart] = {
+        .code = 0x204,
+        .long_tail = 1,
+    },
+    [ReqSecEnd] = {
+        .code = 0x205,
+    },
+    [ReqForceHwReset] = {
+        .code = 0x208,
+        .long_tail = 1,
+        .no_ack = 1,
+    },
+    [ReqFlashSetAddress] = {
+        .code = 0x802,
+        .long_tail = 1,
+    },
+    [ReqFlashWriteBlock] = {
+        .code = 0x804,
+    },
 };
 
 static int reboot_modem_i9250(fwloader_context *ctx, bool hard) {
-	int ret;
+    int ret;
 
-	if (!hard) {
-		return 0;
-	}
+    if (!hard) {
+        return 0;
+    }
 
-	/*
-	 * Disable the hardware to ensure consistent state
-	 */
-	if ((ret = modemctl_modem_power(ctx, false)) < 0) {
-		_e("failed to disable modem power");
-		goto fail;
-	}
-	else {
-		_d("disabled modem power");
-	}
-	
-	if ((ret = modemctl_modem_boot_power(ctx, false)) < 0) {
-		_e("failed to disable modem boot power");
-		goto fail;
-	}
-	else {
-		_d("disabled modem boot power");
-	}
-	
-	/*
-	 * Now, initialize the hardware
-	 */
-	if ((ret = modemctl_modem_boot_power(ctx, true)) < 0) {
-		_e("failed to enable modem boot power");
-		goto fail;
-	}
-	else {
-		_d("enabled modem boot power");
-	}
-	
-	if ((ret = modemctl_modem_power(ctx, true)) < 0) {
-		_e("failed to enable modem power");
-		goto fail;
-	}
-	else {
-		_d("enabled modem power");
-	}
+    /*
+     * Disable the hardware to ensure consistent state
+     */
+    if ((ret = modemctl_modem_power(ctx, false)) < 0) {
+        _e("failed to disable modem power");
+        goto fail;
+    }
+    else {
+        _d("disabled modem power");
+    }
+    
+    if ((ret = modemctl_modem_boot_power(ctx, false)) < 0) {
+        _e("failed to disable modem boot power");
+        goto fail;
+    }
+    else {
+        _d("disabled modem boot power");
+    }
+    
+    /*
+     * Now, initialize the hardware
+     */
+    if ((ret = modemctl_modem_boot_power(ctx, true)) < 0) {
+        _e("failed to enable modem boot power");
+        goto fail;
+    }
+    else {
+        _d("enabled modem boot power");
+    }
+    
+    if ((ret = modemctl_modem_power(ctx, true)) < 0) {
+        _e("failed to enable modem power");
+        goto fail;
+    }
+    else {
+        _d("enabled modem power");
+    }
 
 fail:
-	return ret;
+    return ret;
 }
 
 static int send_image_i9250(fwloader_context *ctx, enum xmm6260_image type) {
-	int ret = -1;
-	
-	if (type >= ARRAY_SIZE(i9250_radio_parts)) {
-		_e("bad image type %x", type);
-		goto fail;
-	}
+    int ret = -1;
+    
+    if (type >= ARRAY_SIZE(i9250_radio_parts)) {
+        _e("bad image type %x", type);
+        goto fail;
+    }
 
-	size_t length = i9250_radio_parts[type].length;
-	size_t offset = i9250_radio_parts[type].offset;
+    size_t length = i9250_radio_parts[type].length;
+    size_t offset = i9250_radio_parts[type].offset;
 
-	size_t start = offset;
-	size_t end = length + start;
-	
-	unsigned char crc = calculateCRC(ctx->radio_data, offset, length);
+    size_t start = offset;
+    size_t end = length + start;
+    
+    unsigned char crc = calculateCRC(ctx->radio_data, offset, length);
 
-	//dump some image bytes
-	_d("image start");
-	hexdump(ctx->radio_data + start, length);
+    //dump some image bytes
+    _d("image start");
+    hexdump(ctx->radio_data + start, length);
 
-	size_t chunk_size = 0xdfc;
+    size_t chunk_size = 0xdfc;
 
-	while (start < end) {
-		size_t remaining = end - start;
-		size_t curr_chunk = chunk_size < remaining ? chunk_size : remaining;
-		ret = write(ctx->boot_fd, ctx->radio_data + start, curr_chunk);
-		if (ret < 0) {
-			_e("failed to write image chunk");
-			goto fail;
-		}
-		start += ret;
-	}
-	_d("sent image type=%d", type);
+    while (start < end) {
+        size_t remaining = end - start;
+        size_t curr_chunk = chunk_size < remaining ? chunk_size : remaining;
+        ret = write(ctx->boot_fd, ctx->radio_data + start, curr_chunk);
+        if (ret < 0) {
+            _e("failed to write image chunk");
+            goto fail;
+        }
+        start += ret;
+    }
+    _d("sent image type=%d", type);
 
-	if (type == EBL) {
-		if ((ret = write(ctx->boot_fd, &crc, 1)) < 1) {
-			_e("failed to write EBL CRC");
-			goto fail;
-		}
-		else {
-			_d("wrote EBL CRC %02x", crc);
-		}
-		goto done;
-	}
+    if (type == EBL) {
+        if ((ret = write(ctx->boot_fd, &crc, 1)) < 1) {
+            _e("failed to write EBL CRC");
+            goto fail;
+        }
+        else {
+            _d("wrote EBL CRC %02x", crc);
+        }
+        goto done;
+    }
 
-	uint32_t crc32 = (crc << 24) | 0xffffff;
-	if ((ret = write(ctx->boot_fd, &crc32, 4)) != 4) {
-		_e("failed to write CRC");
-		goto fail;
-	}
-	else {
-		_d("wrote CRC %x", crc);
-	}
+    uint32_t crc32 = (crc << 24) | 0xffffff;
+    if ((ret = write(ctx->boot_fd, &crc32, 4)) != 4) {
+        _e("failed to write CRC");
+        goto fail;
+    }
+    else {
+        _d("wrote CRC %x", crc);
+    }
 
 done:
-	ret = 0;
+    ret = 0;
 
 fail:
-	return ret;
+    return ret;
 }
 
 static int send_PSI_i9250(fwloader_context *ctx) {
-	int ret = -1;
+    int ret = -1;
 
-	if ((ret = write(ctx->boot_fd, I9250_PSI_START_MAGIC, 4)) < 0) {
-		_d("%s: failed to write header, ret %d", __func__, ret);
-		goto fail;
-	}
+    if ((ret = write(ctx->boot_fd, I9250_PSI_START_MAGIC, 4)) < 0) {
+        _d("%s: failed to write header, ret %d", __func__, ret);
+        goto fail;
+    }
 
-	if ((ret = send_image_i9250(ctx, PSI)) < 0) {
-		_e("failed to send PSI image");
-		goto fail;
-	}
+    if ((ret = send_image_i9250(ctx, PSI)) < 0) {
+        _e("failed to send PSI image");
+        goto fail;
+    }
 
-	char expected_acks[4][4] = {
-		"\xff\xff\xff\x01",
-		"\xff\xff\xff\x01",
-		"\x02\x00\x00\x00",
-		"\x01\xdd\x00\x00",
-	};
-	
-	unsigned i;
-	for (i = 0; i < ARRAY_SIZE(expected_acks); i++) {
-		ret = expect_data(ctx->boot_fd, expected_acks[i], 4);
-		if (ret < 0) {
-			_d("failed to wait for ack %d", i);
-			goto fail;
-		}
-	}
-	_d("received PSI ACK");
+    char expected_acks[4][4] = {
+        "\xff\xff\xff\x01",
+        "\xff\xff\xff\x01",
+        "\x02\x00\x00\x00",
+        "\x01\xdd\x00\x00",
+    };
+    
+    unsigned i;
+    for (i = 0; i < ARRAY_SIZE(expected_acks); i++) {
+        ret = expect_data(ctx->boot_fd, expected_acks[i], 4);
+        if (ret < 0) {
+            _d("failed to wait for ack %d", i);
+            goto fail;
+        }
+    }
+    _d("received PSI ACK");
 
-	return 0;
+    return 0;
 
 fail:
-	return ret;
+    return ret;
 }
 
 static int send_EBL_i9250(fwloader_context *ctx) {
-	int ret;
-	int fd = ctx->boot_fd;
-	unsigned length = i9250_radio_parts[EBL].length;
-	
-	if ((ret = write(fd, "\x04\x00\x00\x00", 4)) != 4) {
-		_e("failed to write length of EBL length ('4') ");
-		goto fail;
-	}
+    int ret;
+    int fd = ctx->boot_fd;
+    unsigned length = i9250_radio_parts[EBL].length;
+    
+    if ((ret = write(fd, "\x04\x00\x00\x00", 4)) != 4) {
+        _e("failed to write length of EBL length ('4') ");
+        goto fail;
+    }
 
-	if ((ret = write(fd, &length, sizeof(length))) != sizeof(length)) {
-		_e("failed to write EBL length");
-		goto fail;
-	}
+    if ((ret = write(fd, &length, sizeof(length))) != sizeof(length)) {
+        _e("failed to write EBL length");
+        goto fail;
+    }
 
-	if ((ret = expect_data(fd, I9250_GENERAL_ACK, 4)) < 0) {
-		_e("failed to wait for EBL length ACK");
-		goto fail;
-	}
+    if ((ret = expect_data(fd, I9250_GENERAL_ACK, 4)) < 0) {
+        _e("failed to wait for EBL length ACK");
+        goto fail;
+    }
 
-	if ((ret = expect_data(fd, I9250_EBL_HDR_ACK_MAGIC, 4)) < 0) {
-		_e("failed to wait for EBL header ACK");
-		goto fail;
-	}
-	
-	length++;
-	if ((ret = write(fd, &length, sizeof(length))) != sizeof(length)) {
-		_e("failed to write EBL length + 1");
-		goto fail;
-	}
-	
-	if ((ret = send_image_i9250(ctx, EBL)) < 0) {
-		_e("failed to send EBL image");
-		goto fail;
-	}
-	else {
-		_d("sent EBL image, waiting for ACK");
-	}
+    if ((ret = expect_data(fd, I9250_EBL_HDR_ACK_MAGIC, 4)) < 0) {
+        _e("failed to wait for EBL header ACK");
+        goto fail;
+    }
+    
+    length++;
+    if ((ret = write(fd, &length, sizeof(length))) != sizeof(length)) {
+        _e("failed to write EBL length + 1");
+        goto fail;
+    }
+    
+    if ((ret = send_image_i9250(ctx, EBL)) < 0) {
+        _e("failed to send EBL image");
+        goto fail;
+    }
+    else {
+        _d("sent EBL image, waiting for ACK");
+    }
 
-	if ((ret = expect_data(fd, I9250_GENERAL_ACK, 4)) < 0) {
-		_e("failed to wait for EBL image general ACK");
-		goto fail;
-	}
+    if ((ret = expect_data(fd, I9250_GENERAL_ACK, 4)) < 0) {
+        _e("failed to wait for EBL image general ACK");
+        goto fail;
+    }
 
-	if ((ret = expect_data(fd, I9250_EBL_IMG_ACK_MAGIC, 4)) < 0) {
-		_e("failed to wait for EBL image ACK");
-		goto fail;
-	}
-	else {
-		_d("got EBL ACK");
-	}
+    if ((ret = expect_data(fd, I9250_EBL_IMG_ACK_MAGIC, 4)) < 0) {
+        _e("failed to wait for EBL image ACK");
+        goto fail;
+    }
+    else {
+        _d("got EBL ACK");
+    }
 
-	return 0;
+    return 0;
 
 fail:
-	return ret;
+    return ret;
 }
 
 static int bootloader_cmd(fwloader_context *ctx,
-	enum xmm6260_boot_cmd cmd, void *data, size_t data_size)
+    enum xmm6260_boot_cmd cmd, void *data, size_t data_size)
 {
-	int ret = 0;
-	char *cmd_data = 0;
-	if (cmd >= ARRAY_SIZE(i9250_boot_cmd_desc)) {
-		_e("bad command %x\n", cmd);
-		goto done_or_fail;
-	}
+    int ret = 0;
+    char *cmd_data = 0;
+    if (cmd >= ARRAY_SIZE(i9250_boot_cmd_desc)) {
+        _e("bad command %x\n", cmd);
+        goto done_or_fail;
+    }
 
-	unsigned cmd_code = i9250_boot_cmd_desc[cmd].code;
+    unsigned cmd_code = i9250_boot_cmd_desc[cmd].code;
 
-	uint16_t checksum = (data_size & 0xffff) + cmd_code;
-	unsigned char *ptr = (unsigned char*)data;
-	size_t i;
-	for (i = 0; i < data_size; i++) {
-		checksum += ptr[i];
-	}
+    uint16_t checksum = (data_size & 0xffff) + cmd_code;
+    unsigned char *ptr = (unsigned char*)data;
+    size_t i;
+    for (i = 0; i < data_size; i++) {
+        checksum += ptr[i];
+    }
 
-	DECLARE_BOOT_CMD_HEADER(header, cmd_code, data_size);
-	DECLARE_BOOT_TAIL_HEADER(tail, checksum);
+    DECLARE_BOOT_CMD_HEADER(header, cmd_code, data_size);
+    DECLARE_BOOT_TAIL_HEADER(tail, checksum);
 
-	size_t tail_size = sizeof(tail);
-	if (!i9250_boot_cmd_desc[cmd].long_tail) {
-		tail_size -= 2;
-	}
+    size_t tail_size = sizeof(tail);
+    if (!i9250_boot_cmd_desc[cmd].long_tail) {
+        tail_size -= 2;
+    }
 
-	size_t cmd_buffer_size = data_size + sizeof(header) + tail_size;
-	_d("data_size %d [%d] checksum 0x%x", data_size, cmd_buffer_size, checksum);
+    size_t cmd_buffer_size = data_size + sizeof(header) + tail_size;
+    _d("data_size %d [%d] checksum 0x%x", data_size, cmd_buffer_size, checksum);
 
-	cmd_data = (char*)malloc(cmd_buffer_size);
-	if (!cmd_data) {
-		_e("failed to allocate command buffer");
-		ret = -ENOMEM;
-		goto done_or_fail;
-	}
-	memset(cmd_data, 0, cmd_buffer_size);
-	memcpy(cmd_data, &header, sizeof(header));
-	memcpy(cmd_data + sizeof(header), data, data_size);
-	memcpy(cmd_data + sizeof(header) + data_size, &tail, tail_size);
+    cmd_data = (char*)malloc(cmd_buffer_size);
+    if (!cmd_data) {
+        _e("failed to allocate command buffer");
+        ret = -ENOMEM;
+        goto done_or_fail;
+    }
+    memset(cmd_data, 0, cmd_buffer_size);
+    memcpy(cmd_data, &header, sizeof(header));
+    memcpy(cmd_data + sizeof(header), data, data_size);
+    memcpy(cmd_data + sizeof(header) + data_size, &tail, tail_size);
 
-	_d("bootloader cmd packet");
-	hexdump(cmd_data, cmd_buffer_size);
-	hexdump(cmd_data + cmd_buffer_size - 16, 16);
+    _d("bootloader cmd packet");
+    hexdump(cmd_data, cmd_buffer_size);
+    hexdump(cmd_data + cmd_buffer_size - 16, 16);
 
-	if ((ret = write(ctx->boot_fd, cmd_data, cmd_buffer_size)) < 0) {
-		_e("failed to write command to socket");
-		goto done_or_fail;
-	}
+    if ((ret = write(ctx->boot_fd, cmd_data, cmd_buffer_size)) < 0) {
+        _e("failed to write command to socket");
+        goto done_or_fail;
+    }
 
-	if ((unsigned)ret < cmd_buffer_size) {
-		_e("written %d bytes of %d", ret, cmd_buffer_size);
-		ret = -EINVAL;
-		goto done_or_fail;
-	}
+    if ((unsigned)ret < cmd_buffer_size) {
+        _e("written %d bytes of %d", ret, cmd_buffer_size);
+        ret = -EINVAL;
+        goto done_or_fail;
+    }
 
-	_d("sent command %x", header.cmd);
-	if (i9250_boot_cmd_desc[cmd].no_ack) {
-		_i("not waiting for ACK");
-		goto done_or_fail;
-	}
+    _d("sent command %x", header.cmd);
+    if (i9250_boot_cmd_desc[cmd].no_ack) {
+        _i("not waiting for ACK");
+        goto done_or_fail;
+    }
 
-	uint32_t ack_length;
-	if ((ret = receive(ctx->boot_fd, &ack_length, 4)) < 0) {
-		_e("failed to receive ack header length");
-		goto done_or_fail;
-	}
+    uint32_t ack_length;
+    if ((ret = receive(ctx->boot_fd, &ack_length, 4)) < 0) {
+        _e("failed to receive ack header length");
+        goto done_or_fail;
+    }
 
-	if (ack_length + 4 > cmd_buffer_size) {
-		free(cmd_data);
-		cmd_data = NULL;
-		cmd_data = malloc(ack_length + 4);
-		if (!cmd_data) {
-			_e("failed to allocate the buffer for ack data");
-			goto done_or_fail;
-		}
-	}
-	memset(cmd_data, 0, ack_length);
-	memcpy(cmd_data, &ack_length, 4);
-	for (i = 0; i < (ack_length + 3) / 4; i++) {
-		if ((ret = receive(ctx->boot_fd, cmd_data + ((i + 1) << 2), 4)) < 0) {
-			_e("failed to receive ack chunk");
-			goto done_or_fail;
-		}
-	}
+    if (ack_length + 4 > cmd_buffer_size) {
+        free(cmd_data);
+        cmd_data = NULL;
+        cmd_data = malloc(ack_length + 4);
+        if (!cmd_data) {
+            _e("failed to allocate the buffer for ack data");
+            goto done_or_fail;
+        }
+    }
+    memset(cmd_data, 0, ack_length);
+    memcpy(cmd_data, &ack_length, 4);
+    for (i = 0; i < (ack_length + 3) / 4; i++) {
+        if ((ret = receive(ctx->boot_fd, cmd_data + ((i + 1) << 2), 4)) < 0) {
+            _e("failed to receive ack chunk");
+            goto done_or_fail;
+        }
+    }
 
-	_d("received ack");
-	hexdump(cmd_data, ack_length + 4);
+    _d("received ack");
+    hexdump(cmd_data, ack_length + 4);
 
-	bootloader_cmd_hdr_t *ack_hdr = (bootloader_cmd_hdr_t*)cmd_data;
-	bootloader_cmd_tail_t *ack_tail = (bootloader_cmd_tail_t*)
-		(cmd_data + ack_length + 4 - sizeof(bootloader_cmd_tail_t));
-	
-	_d("ack code 0x%x checksum 0x%x", ack_hdr->cmd, ack_tail->checksum);
-	if (ack_hdr->cmd != header.cmd) {
-		_e("request and ack command codes do not match");
-		ret = -1;
-		goto done_or_fail;
-	}
+    bootloader_cmd_hdr_t *ack_hdr = (bootloader_cmd_hdr_t*)cmd_data;
+    bootloader_cmd_tail_t *ack_tail = (bootloader_cmd_tail_t*)
+        (cmd_data + ack_length + 4 - sizeof(bootloader_cmd_tail_t));
+    
+    _d("ack code 0x%x checksum 0x%x", ack_hdr->cmd, ack_tail->checksum);
+    if (ack_hdr->cmd != header.cmd) {
+        _e("request and ack command codes do not match");
+        ret = -1;
+        goto done_or_fail;
+    }
 
-	ret = 0;
+    ret = 0;
 
 done_or_fail:
 
-	if (cmd_data) {
-		free(cmd_data);
-	}
+    if (cmd_data) {
+        free(cmd_data);
+    }
 
-	return ret;
+    return ret;
 }
 
 static int ack_BootInfo_i9250(fwloader_context *ctx) {
-	int ret = -1;
-	uint32_t boot_info_length;
-	char *boot_info = 0;
+    int ret = -1;
+    uint32_t boot_info_length;
+    char *boot_info = 0;
 
 
-	if ((ret = receive(ctx->boot_fd, &boot_info_length, 4)) < 0) {
-		_e("failed to receive boot info length");
-		goto fail;
-	}
+    if ((ret = receive(ctx->boot_fd, &boot_info_length, 4)) < 0) {
+        _e("failed to receive boot info length");
+        goto fail;
+    }
 
-	_d("Boot Info length=0x%x", boot_info_length);
+    _d("Boot Info length=0x%x", boot_info_length);
 
-	boot_info = (char*)malloc(boot_info_length);
-	if (!boot_info) {
-		_e("failed to allocate memory for boot info");
-		goto fail;
-	}
-	
-	memset(boot_info, 0, boot_info_length);
+    boot_info = (char*)malloc(boot_info_length);
+    if (!boot_info) {
+        _e("failed to allocate memory for boot info");
+        goto fail;
+    }
+    
+    memset(boot_info, 0, boot_info_length);
 
-	size_t boot_chunk = 4;
-	size_t boot_chunk_count = (boot_info_length + boot_chunk - 1) / boot_chunk;
-	unsigned i;
-	for (i = 0; i < boot_chunk_count; i++) {
-		ret = receive(ctx->boot_fd, boot_info + (i * boot_chunk), boot_chunk);
-		if (ret < 0) {
-			_e("failed to receive Boot Info chunk %i ret=%d", i, ret);
-			goto fail;
-		}
-	}
-	
-	_d("received Boot Info");
-	hexdump(boot_info, boot_info_length);
+    size_t boot_chunk = 4;
+    size_t boot_chunk_count = (boot_info_length + boot_chunk - 1) / boot_chunk;
+    unsigned i;
+    for (i = 0; i < boot_chunk_count; i++) {
+        ret = receive(ctx->boot_fd, boot_info + (i * boot_chunk), boot_chunk);
+        if (ret < 0) {
+            _e("failed to receive Boot Info chunk %i ret=%d", i, ret);
+            goto fail;
+        }
+    }
+    
+    _d("received Boot Info");
+    hexdump(boot_info, boot_info_length);
 
-	ret = bootloader_cmd(ctx, SetPortConf, boot_info, boot_info_length);
-	if (ret < 0) {
-		_e("failed to send SetPortConf command");
-		goto fail;
-	}
-	else {
-		_d("sent SetPortConf command");
-	}
+    ret = bootloader_cmd(ctx, SetPortConf, boot_info, boot_info_length);
+    if (ret < 0) {
+        _e("failed to send SetPortConf command");
+        goto fail;
+    }
+    else {
+        _d("sent SetPortConf command");
+    }
 
-	ret = 0;
+    ret = 0;
 
 fail:
-	if (boot_info) {
-		free(boot_info);
-	}
+    if (boot_info) {
+        free(boot_info);
+    }
 
-	return ret;
+    return ret;
 }
 
 static int send_secure_data(fwloader_context *ctx, uint32_t addr,
-	void *data, int data_len)
+    void *data, int data_len)
 {
-	int ret = 0;
-	int count = 0;
-	char *data_p = (char *) data;
+    int ret = 0;
+    int count = 0;
+    char *data_p = (char *) data;
 
-	if ((ret = bootloader_cmd(ctx, ReqFlashSetAddress, &addr, 4)) < 0) {
-		_e("failed to send ReqFlashSetAddress");
-		goto fail;
-	}
-	else {
-		_d("sent ReqFlashSetAddress");
-	}
+    if ((ret = bootloader_cmd(ctx, ReqFlashSetAddress, &addr, 4)) < 0) {
+        _e("failed to send ReqFlashSetAddress");
+        goto fail;
+    }
+    else {
+        _d("sent ReqFlashSetAddress");
+    }
 
-	while (count < data_len) {
-		int rest = data_len - count;
-		int chunk = rest < SEC_DOWNLOAD_CHUNK ? rest : SEC_DOWNLOAD_CHUNK;
+    while (count < data_len) {
+        int rest = data_len - count;
+        int chunk = rest < SEC_DOWNLOAD_CHUNK ? rest : SEC_DOWNLOAD_CHUNK;
 
-		ret = bootloader_cmd(ctx, ReqFlashWriteBlock, data_p, chunk);
-		if (ret < 0) {
-			_e("failed to send data chunk");
-			goto fail;
-		}
+        ret = bootloader_cmd(ctx, ReqFlashWriteBlock, data_p, chunk);
+        if (ret < 0) {
+            _e("failed to send data chunk");
+            goto fail;
+        }
 
-		data_p += chunk;
-		count += chunk;
-	}
+        data_p += chunk;
+        count += chunk;
+    }
 
-	usleep(SEC_DOWNLOAD_DELAY_US);
+    usleep(SEC_DOWNLOAD_DELAY_US);
 
 fail:
-	return ret;
+    return ret;
 }
 
 static int send_secure_image(fwloader_context *ctx, uint32_t addr,
-	enum xmm6260_image type)
+    enum xmm6260_image type)
 {
-	uint32_t offset = i9250_radio_parts[type].offset;
-	uint32_t length = i9250_radio_parts[type].length;
-	char *start = ctx->radio_data + offset;
-	int ret = 0;
+    uint32_t offset = i9250_radio_parts[type].offset;
+    uint32_t length = i9250_radio_parts[type].length;
+    char *start = ctx->radio_data + offset;
+    int ret = 0;
 
-	ret = send_secure_data(ctx, addr, start, length);
+    ret = send_secure_data(ctx, addr, start, length);
 
-	return ret;
+    return ret;
 }
 
 static int send_mps_data(fwloader_context *ctx) {
-	int ret = 0;
-	int mps_fd = -1;
-	char mps_data[I9250_MPS_LENGTH] = {};
-	uint32_t addr = I9250_MPS_LOAD_ADDR;
+    int ret = 0;
+    int mps_fd = -1;
+    char mps_data[I9250_MPS_LENGTH] = {};
+    uint32_t addr = I9250_MPS_LOAD_ADDR;
 
-	mps_fd = open(I9250_MPS_IMAGE_PATH, O_RDONLY);
-	if (mps_fd < 0) {
-		_e("failed to open MPS data");
-	}
-	else {
-		read(mps_fd, mps_data, I9250_MPS_LENGTH);
-	}
-	
-	if ((ret = bootloader_cmd(ctx, ReqFlashSetAddress, &addr, 4)) < 0) {
-		_e("failed to send ReqFlashSetAddress");
-		goto fail;
-	}
-	else {
-		_d("sent ReqFlashSetAddress");
-	}
+    mps_fd = open(I9250_MPS_IMAGE_PATH, O_RDONLY);
+    if (mps_fd < 0) {
+        _e("failed to open MPS data");
+    }
+    else {
+        read(mps_fd, mps_data, I9250_MPS_LENGTH);
+    }
+    
+    if ((ret = bootloader_cmd(ctx, ReqFlashSetAddress, &addr, 4)) < 0) {
+        _e("failed to send ReqFlashSetAddress");
+        goto fail;
+    }
+    else {
+        _d("sent ReqFlashSetAddress");
+    }
 
-	if ((ret = bootloader_cmd(ctx, ReqFlashWriteBlock,
-		mps_data, I9250_MPS_LENGTH)) < 0) {
-		_e("failed to write MPS data to modem");
-		goto fail;
-	}
+    if ((ret = bootloader_cmd(ctx, ReqFlashWriteBlock,
+        mps_data, I9250_MPS_LENGTH)) < 0) {
+        _e("failed to write MPS data to modem");
+        goto fail;
+    }
 
 
 fail:
-	if (mps_fd >= 0) {
-		close(mps_fd);
-	}
+    if (mps_fd >= 0) {
+        close(mps_fd);
+    }
 
-	return ret;
+    return ret;
 }
 
 static int send_SecureImage_i9250(fwloader_context *ctx) {
-	int ret = 0;
+    int ret = 0;
 
-	uint32_t sec_off = i9250_radio_parts[SECURE_IMAGE].offset;
-	uint32_t sec_len = i9250_radio_parts[SECURE_IMAGE].length;
-	void *sec_img = ctx->radio_data + sec_off;
-	void *nv_data = NULL;
+    uint32_t sec_off = i9250_radio_parts[SECURE_IMAGE].offset;
+    uint32_t sec_len = i9250_radio_parts[SECURE_IMAGE].length;
+    void *sec_img = ctx->radio_data + sec_off;
+    void *nv_data = NULL;
 
-	if ((ret = bootloader_cmd(ctx, ReqSecStart, sec_img, sec_len)) < 0) {
-		_e("failed to write ReqSecStart");
-		goto fail;
-	}
-	else {
-		_d("sent ReqSecStart");
-	}
+    if ((ret = bootloader_cmd(ctx, ReqSecStart, sec_img, sec_len)) < 0) {
+        _e("failed to write ReqSecStart");
+        goto fail;
+    }
+    else {
+        _d("sent ReqSecStart");
+    }
 
-	if ((ret = send_secure_image(ctx, FW_LOAD_ADDR, FIRMWARE)) < 0) {
-		_e("failed to send FIRMWARE image");
-		goto fail;
-	}
-	else {
-		_d("sent FIRMWARE image");
-	}
-	
-	nv_data_check(ctx->client);
-	nv_data_md5_check(ctx->client);
+    if ((ret = send_secure_image(ctx, FW_LOAD_ADDR, FIRMWARE)) < 0) {
+        _e("failed to send FIRMWARE image");
+        goto fail;
+    }
+    else {
+        _d("sent FIRMWARE image");
+    }
+    
+    nv_data_check(ctx->client);
+    nv_data_md5_check(ctx->client);
 
-	nv_data = ipc_file_read(ctx->client, nv_data_path(ctx->client), 2 << 20, 1024);
-	if (nv_data == NULL) {
-		_e("failed to read NVDATA image");
-		goto fail;
-	}
+    nv_data = ipc_file_read(ctx->client, nv_data_path(ctx->client), 2 << 20, 1024);
+    if (nv_data == NULL) {
+        _e("failed to read NVDATA image");
+        goto fail;
+    }
 
-	if ((ret = send_secure_data(ctx, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
-		_e("failed to send NVDATA image");
-		goto fail;
-	}
-	else {
-		_d("sent NVDATA image");
-	}
+    if ((ret = send_secure_data(ctx, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
+        _e("failed to send NVDATA image");
+        goto fail;
+    }
+    else {
+        _d("sent NVDATA image");
+    }
 
-	free(nv_data);
+    free(nv_data);
 
-	if ((ret = send_mps_data(ctx)) < 0) {
-		_e("failed to send MPS data");
-		goto fail;
-	}
-	else {
-		_d("sent MPS data");
-	}
+    if ((ret = send_mps_data(ctx)) < 0) {
+        _e("failed to send MPS data");
+        goto fail;
+    }
+    else {
+        _d("sent MPS data");
+    }
 
-	if ((ret = bootloader_cmd(ctx, ReqSecEnd,
-		BL_END_MAGIC, BL_END_MAGIC_LEN)) < 0)
-	{
-		_e("failed to write ReqSecEnd");
-		goto fail;
-	}
-	else {
-		_d("sent ReqSecEnd");
-	}
+    if ((ret = bootloader_cmd(ctx, ReqSecEnd,
+        BL_END_MAGIC, BL_END_MAGIC_LEN)) < 0)
+    {
+        _e("failed to write ReqSecEnd");
+        goto fail;
+    }
+    else {
+        _d("sent ReqSecEnd");
+    }
 
-	ret = bootloader_cmd(ctx, ReqForceHwReset,
-		BL_RESET_MAGIC, BL_RESET_MAGIC_LEN);
-	if (ret < 0) {
-		_e("failed to write ReqForceHwReset");
-		goto fail;
-	}
-	else {
-		_d("sent ReqForceHwReset");
-	}
+    ret = bootloader_cmd(ctx, ReqForceHwReset,
+        BL_RESET_MAGIC, BL_RESET_MAGIC_LEN);
+    if (ret < 0) {
+        _e("failed to write ReqForceHwReset");
+        goto fail;
+    }
+    else {
+        _d("sent ReqForceHwReset");
+    }
 
 fail:
-	return ret;
+    return ret;
 }
 
 int boot_modem_i9250(struct ipc_client *client) {
-	int ret = -1;
-	fwloader_context ctx;
-	memset(&ctx, 0, sizeof(ctx));
+    int ret = -1;
+    fwloader_context ctx;
+    memset(&ctx, 0, sizeof(ctx));
 
-	ctx.client = client;
+    ctx.client = client;
 
-	ctx.radio_fd = open(I9250_RADIO_IMAGE, O_RDONLY);
-	if (ctx.radio_fd < 0) {
-		_e("failed to open radio firmware");
-		goto fail;
-	}
-	else {
-		_d("opened radio image %s, fd=%d", I9250_RADIO_IMAGE, ctx.radio_fd);
-	}
+    ctx.radio_fd = open(I9250_RADIO_IMAGE, O_RDONLY);
+    if (ctx.radio_fd < 0) {
+        _e("failed to open radio firmware");
+        goto fail;
+    }
+    else {
+        _d("opened radio image %s, fd=%d", I9250_RADIO_IMAGE, ctx.radio_fd);
+    }
 
-	if (fstat(ctx.radio_fd, &ctx.radio_stat) < 0) {
-		_e("failed to stat radio image, error %s", strerror(errno));
-		goto fail;
-	}
+    if (fstat(ctx.radio_fd, &ctx.radio_stat) < 0) {
+        _e("failed to stat radio image, error %s", strerror(errno));
+        goto fail;
+    }
 
-	ctx.radio_data = mmap(0, RADIO_MAP_SIZE, PROT_READ, MAP_SHARED,
-		ctx.radio_fd, 0);
-	if (ctx.radio_data == MAP_FAILED) {
-		_e("failed to mmap radio image, error %s", strerror(errno));
-		goto fail;
-	}
+    ctx.radio_data = mmap(0, RADIO_MAP_SIZE, PROT_READ, MAP_SHARED,
+        ctx.radio_fd, 0);
+    if (ctx.radio_data == MAP_FAILED) {
+        _e("failed to mmap radio image, error %s", strerror(errno));
+        goto fail;
+    }
 
-	ctx.boot_fd = open(BOOT_DEV, O_RDWR | O_NOCTTY | O_NONBLOCK);
-	if (ctx.boot_fd < 0) {
-		_e("failed to open boot device");
-		goto fail;
-	}
-	else {
-		_d("opened boot device %s, fd=%d", BOOT_DEV, ctx.boot_fd);
-	}
+    ctx.boot_fd = open(BOOT_DEV, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    if (ctx.boot_fd < 0) {
+        _e("failed to open boot device");
+        goto fail;
+    }
+    else {
+        _d("opened boot device %s, fd=%d", BOOT_DEV, ctx.boot_fd);
+    }
 
-	if (reboot_modem_i9250(&ctx, true) < 0) {
-		_e("failed to hard reset modem");
-		goto fail;
-	}
-	else {
-		_d("modem hard reset done");
-	}
+    if (reboot_modem_i9250(&ctx, true) < 0) {
+        _e("failed to hard reset modem");
+        goto fail;
+    }
+    else {
+        _d("modem hard reset done");
+    }
 
-	/*
-	 * Now, actually load the firmware
-	 */
-	int i;
-	for (i = 0; i < 2; i++) {
-		if (write(ctx.boot_fd, "ATAT", 4) != 4) {
-			_e("failed to write ATAT to boot socket");
-			goto fail;
-		}
-		else {
-			_d("written ATAT to boot socket, waiting for ACK");
-		}
-		
-		if (read_select(ctx.boot_fd, 100) < 0) {
-			_d("failed to select before next ACK, ignoring");
-		}
-	}
+    /*
+     * Now, actually load the firmware
+     */
+    int i;
+    for (i = 0; i < 2; i++) {
+        if (write(ctx.boot_fd, "ATAT", 4) != 4) {
+            _e("failed to write ATAT to boot socket");
+            goto fail;
+        }
+        else {
+            _d("written ATAT to boot socket, waiting for ACK");
+        }
+        
+        if (read_select(ctx.boot_fd, 100) < 0) {
+            _d("failed to select before next ACK, ignoring");
+        }
+    }
 
-	//FIXME: make sure it does not timeout or add the retry in the ril library
-	
-	if ((ret = read_select(ctx.boot_fd, 100)) < 0) {
-		_e("failed to wait for bootloader ready state");
-		goto fail;
-	}
-	else {
-		_d("ready for PSI upload");
-	}
+    //FIXME: make sure it does not timeout or add the retry in the ril library
+    
+    if ((ret = read_select(ctx.boot_fd, 100)) < 0) {
+        _e("failed to wait for bootloader ready state");
+        goto fail;
+    }
+    else {
+        _d("ready for PSI upload");
+    }
 
-	ret = -ETIMEDOUT;
-	for (i = 0; i < I9250_BOOT_REPLY_MAX; i++) {
-		uint32_t id_buf;
-		if ((ret = receive(ctx.boot_fd, (void*)&id_buf, 4)) != 4) {
-			_e("failed receiving bootloader reply");
-			goto fail;
-		}
-		_d("got bootloader reply %08x", id_buf);
-		if (id_buf == I9250_BOOT_LAST_MARKER) {
-			ret = 0;
-			break;
-		}
-	}
+    ret = -ETIMEDOUT;
+    for (i = 0; i < I9250_BOOT_REPLY_MAX; i++) {
+        uint32_t id_buf;
+        if ((ret = receive(ctx.boot_fd, (void*)&id_buf, 4)) != 4) {
+            _e("failed receiving bootloader reply");
+            goto fail;
+        }
+        _d("got bootloader reply %08x", id_buf);
+        if (id_buf == I9250_BOOT_LAST_MARKER) {
+            ret = 0;
+            break;
+        }
+    }
 
-	if (ret < 0) {
-		_e("bootloader id marker not received");
-		goto fail;
-	}
-	else {
-		_d("got bootloader id marker");
-	}
+    if (ret < 0) {
+        _e("bootloader id marker not received");
+        goto fail;
+    }
+    else {
+        _d("got bootloader id marker");
+    }
 
-	if ((ret = send_PSI_i9250(&ctx)) < 0) {
-		_e("failed to upload PSI");
-		goto fail;
-	}
-	else {
-		_d("PSI download complete");
-	}
-	
-	close(ctx.boot_fd);
-	ctx.boot_fd = open(I9250_SECOND_BOOT_DEV, O_RDWR | O_NOCTTY | O_NONBLOCK);
-	if (ctx.boot_fd < 0) {
-		_e("failed to open " I9250_SECOND_BOOT_DEV " control device");
-		goto fail;
-	}
-	else {
-		_d("opened second boot device %s, fd=%d", I9250_SECOND_BOOT_DEV, ctx.boot_fd);
-	}
+    if ((ret = send_PSI_i9250(&ctx)) < 0) {
+        _e("failed to upload PSI");
+        goto fail;
+    }
+    else {
+        _d("PSI download complete");
+    }
+    
+    close(ctx.boot_fd);
+    ctx.boot_fd = open(I9250_SECOND_BOOT_DEV, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    if (ctx.boot_fd < 0) {
+        _e("failed to open " I9250_SECOND_BOOT_DEV " control device");
+        goto fail;
+    }
+    else {
+        _d("opened second boot device %s, fd=%d", I9250_SECOND_BOOT_DEV, ctx.boot_fd);
+    }
 
-	//RpsiCmdLoadAndExecute
-	if ((ret = write(ctx.boot_fd, I9250_PSI_CMD_EXEC, 4)) < 0) {
-		_e("failed writing cmd_load_exe_EBL");
-		goto fail;
-	}
-	if ((ret = write(ctx.boot_fd, I9250_PSI_EXEC_DATA, 8)) < 0) {
-		_e("failed writing 8 bytes to boot1");
-		goto fail;
-	}
+    //RpsiCmdLoadAndExecute
+    if ((ret = write(ctx.boot_fd, I9250_PSI_CMD_EXEC, 4)) < 0) {
+        _e("failed writing cmd_load_exe_EBL");
+        goto fail;
+    }
+    if ((ret = write(ctx.boot_fd, I9250_PSI_EXEC_DATA, 8)) < 0) {
+        _e("failed writing 8 bytes to boot1");
+        goto fail;
+    }
 
-	if ((ret = expect_data(ctx.boot_fd, I9250_GENERAL_ACK, 4)) < 0) {
-		_e("failed to receive cmd_load_exe_EBL ack");
-		goto fail;
-	}
+    if ((ret = expect_data(ctx.boot_fd, I9250_GENERAL_ACK, 4)) < 0) {
+        _e("failed to receive cmd_load_exe_EBL ack");
+        goto fail;
+    }
 
-	if ((ret = expect_data(ctx.boot_fd, I9250_PSI_READY_ACK, 4)) < 0) {
-		_e("failed to receive PSI ready ack");
-		goto fail;
-	}
+    if ((ret = expect_data(ctx.boot_fd, I9250_PSI_READY_ACK, 4)) < 0) {
+        _e("failed to receive PSI ready ack");
+        goto fail;
+    }
 
-	if ((ret = send_EBL_i9250(&ctx)) < 0) {
-		_e("failed to upload EBL");
-		goto fail;
-	}
-	else {
-		_d("EBL download complete");
-	}
+    if ((ret = send_EBL_i9250(&ctx)) < 0) {
+        _e("failed to upload EBL");
+        goto fail;
+    }
+    else {
+        _d("EBL download complete");
+    }
 
-	if ((ret = ack_BootInfo_i9250(&ctx)) < 0) {
-		_e("failed to receive Boot Info");
-		goto fail;
-	}
-	else {
-		_d("Boot Info ACK done");
-	}
+    if ((ret = ack_BootInfo_i9250(&ctx)) < 0) {
+        _e("failed to receive Boot Info");
+        goto fail;
+    }
+    else {
+        _d("Boot Info ACK done");
+    }
 
-	if ((ret = send_SecureImage_i9250(&ctx)) < 0) {
-		_e("failed to upload Secure Image");
-		goto fail;
-	}
-	else {
-		_d("Secure Image download complete");
-	}
+    if ((ret = send_SecureImage_i9250(&ctx)) < 0) {
+        _e("failed to upload Secure Image");
+        goto fail;
+    }
+    else {
+        _d("Secure Image download complete");
+    }
 
-	if ((ret = modemctl_wait_modem_online(&ctx))) {
-		_e("failed to wait for modem to become online");
-		goto fail;
-	}
+    if ((ret = modemctl_wait_modem_online(&ctx))) {
+        _e("failed to wait for modem to become online");
+        goto fail;
+    }
 
-	_i("modem online");
-	ret = 0;
+    _i("modem online");
+    ret = 0;
 
 fail:
-	if (ctx.radio_data != MAP_FAILED) {
-		munmap(ctx.radio_data, RADIO_MAP_SIZE);
-	}
+    if (ctx.radio_data != MAP_FAILED) {
+        munmap(ctx.radio_data, RADIO_MAP_SIZE);
+    }
 
-	if (ctx.radio_fd >= 0) {
-		close(ctx.radio_fd);
-	}
+    if (ctx.radio_fd >= 0) {
+        close(ctx.radio_fd);
+    }
 
-	if (ctx.boot_fd >= 0) {
-		close(ctx.boot_fd);
-	}
+    if (ctx.boot_fd >= 0) {
+        close(ctx.boot_fd);
+    }
 
-	return ret;
+    return ret;
 }
+
+// vim:ts=4:sw=4:expandtab
