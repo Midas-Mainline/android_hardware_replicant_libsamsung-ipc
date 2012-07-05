@@ -152,7 +152,7 @@ static int i9100_send_psi(struct ipc_client *client, struct modemctl_io_data *io
     int i;
     for (i = 0; i < 22; i++) {
         char ack;
-        if (receive(io_data->boot_fd, &ack, 1) < 1) {
+        if (expect_read(io_data->boot_fd, &ack, 1) < 1) {
             _d("failed to read ACK byte %d", i);
             goto fail;
         }
@@ -278,7 +278,7 @@ static int i9100_boot_cmd(struct ipc_client *client,
     struct i9100_boot_cmd ack = {
         .check = 0,
     };
-    if ((ret = receive(io_data->boot_fd, &ack, sizeof(ack))) < 0) {
+    if ((ret = expect_read(io_data->boot_fd, &ack, sizeof(ack))) < 0) {
         _e("failed to receive ack for cmd %x", header.cmd);
         goto done_or_fail;
     }
@@ -297,7 +297,7 @@ static int i9100_boot_cmd(struct ipc_client *client,
         goto done_or_fail;
     }
 
-    if ((ret = receive(io_data->boot_fd, cmd_data, cmd_size)) < 0) {
+    if ((ret = expect_read(io_data->boot_fd, cmd_data, cmd_size)) < 0) {
         _e("failed to receive reply data");
         goto done_or_fail;
     }
@@ -324,7 +324,7 @@ static int i9100_boot_info_ack(struct ipc_client *client,
     int ret;
     struct i9100_boot_info info;
 
-    if ((ret = receive(io_data->boot_fd, &info, sizeof(info))) != sizeof(info)) {
+    if ((ret = expect_read(io_data->boot_fd, &info, sizeof(info))) != sizeof(info)) {
         _e("failed to receive Boot Info ret=%d", ret);
         ret = -1;
         goto fail;
@@ -675,11 +675,11 @@ int i9100_boot_modem(struct ipc_client *client) {
     }
 
     char buf[2];
-    if (receive(io_data.boot_fd, buf, 1) < 0) {
+    if (expect_read(io_data.boot_fd, buf, 1) < 0) {
         _e("failed to receive bootloader ACK");
         goto fail;
     }
-    if (receive(io_data.boot_fd, buf + 1, 1) < 0) {
+    if (expect_read(io_data.boot_fd, buf + 1, 1) < 0) {
         _e("failed to receive chip IP ACK");
         goto fail;
     }

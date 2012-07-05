@@ -302,7 +302,7 @@ int xmm6260_ipc_read(void *data, unsigned int size, void *io_data)
     if(fd < 0)
         return -1;
 
-    rc = read_select(fd, 100);
+    rc = expect(fd, 100);
     if (rc < 0)
         return -1;
 

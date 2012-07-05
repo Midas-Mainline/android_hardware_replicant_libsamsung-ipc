@@ -301,7 +301,7 @@ static int i9250_boot_cmd(struct ipc_client *client,
     }
 
     uint32_t ack_length;
-    if ((ret = receive(io_data->boot_fd, &ack_length, 4)) < 0) {
+    if ((ret = expect_read(io_data->boot_fd, &ack_length, 4)) < 0) {
         _e("failed to receive ack header length");
         goto done_or_fail;
     }
@@ -318,7 +318,7 @@ static int i9250_boot_cmd(struct ipc_client *client,
     memset(cmd_data, 0, ack_length);
     memcpy(cmd_data, &ack_length, 4);
     for (i = 0; i < (ack_length + 3) / 4; i++) {
-        if ((ret = receive(io_data->boot_fd, cmd_data + ((i + 1) << 2), 4)) < 0) {
+        if ((ret = expect_read(io_data->boot_fd, cmd_data + ((i + 1) << 2), 4)) < 0) {
             _e("failed to receive ack chunk");
             goto done_or_fail;
         }
@@ -357,7 +357,7 @@ static int i9250_boot_info_ack(struct ipc_client *client,
     char *boot_info = 0;
 
 
-    if ((ret = receive(io_data->boot_fd, &boot_info_length, 4)) < 0) {
+    if ((ret = expect_read(io_data->boot_fd, &boot_info_length, 4)) < 0) {
         _e("failed to receive boot info length");
         goto fail;
     }
@@ -376,7 +376,7 @@ static int i9250_boot_info_ack(struct ipc_client *client,
     size_t boot_chunk_count = (boot_info_length + boot_chunk - 1) / boot_chunk;
     unsigned i;
     for (i = 0; i < boot_chunk_count; i++) {
-        ret = receive(io_data->boot_fd, boot_info + (i * boot_chunk), boot_chunk);
+        ret = expect_read(io_data->boot_fd, boot_info + (i * boot_chunk), boot_chunk);
         if (ret < 0) {
             _e("failed to receive Boot Info chunk %i ret=%d", i, ret);
             goto fail;
@@ -678,14 +678,14 @@ int i9250_boot_modem(struct ipc_client *client)
             _d("written ATAT to boot socket, waiting for ACK");
         }
 
-        if (read_select(io_data.boot_fd, 100) < 0) {
+        if (expect(io_data.boot_fd, 100) < 0) {
             _d("failed to select before next ACK, ignoring");
         }
     }
 
     //FIXME: make sure it does not timeout or add the retry in the ril library
 
-    if ((ret = read_select(io_data.boot_fd, 100)) < 0) {
+    if ((ret = expect(io_data.boot_fd, 100)) < 0) {
         _e("failed to wait for bootloader ready state");
         goto fail;
     }
@@ -696,7 +696,7 @@ int i9250_boot_modem(struct ipc_client *client)
     ret = -ETIMEDOUT;
     for (i = 0; i < I9250_BOOT_REPLY_MAX; i++) {
         uint32_t id_buf;
-        if ((ret = receive(io_data.boot_fd, (void*)&id_buf, 4)) != 4) {
+        if ((ret = expect_read(io_data.boot_fd, (void*)&id_buf, 4)) != 4) {
             _e("failed receiving bootloader reply");
             goto fail;
         }

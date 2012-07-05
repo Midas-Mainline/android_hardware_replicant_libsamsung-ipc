@@ -27,27 +27,7 @@
 
 #define DEFAULT_TIMEOUT 50
 
-int c_ioctl(int fd, unsigned long code, void* data) {
-    int ret;
-
-    if (!data) {
-        ret = ioctl(fd, code);
-    }
-    else {
-        ret = ioctl(fd, code, data);
-    }
-
-    if (ret < 0) {
-        _e("ioctl fd=%d code=%lx failed: %s", fd, code, strerror(errno));
-    }
-    else {
-        _d("ioctl fd=%d code=%lx OK", fd, code);
-    }
-
-    return ret;
-}
-
-int read_select(int fd, unsigned timeout) {
+int expect(int fd, unsigned timeout) {
     int ret = 0;
     
     struct timeval tv = {
@@ -75,9 +55,9 @@ fail:
     return ret;
 }
 
-int receive(int fd, void *buf, size_t size) {
+int expect_read(int fd, void *buf, size_t size) {
     int ret;
-    if ((ret = read_select(fd, DEFAULT_TIMEOUT)) < 1) {
+    if ((ret = expect(fd, DEFAULT_TIMEOUT)) < 1) {
         _e("failed to select the fd %d", fd);
         return ret;
     }
@@ -91,7 +71,7 @@ int receive(int fd, void *buf, size_t size) {
 int expect_data(int fd, void *data, size_t size) {
     int ret;
     char buf[size];
-    if ((ret = receive(fd, buf, size)) != size) {
+    if ((ret = expect_read(fd, buf, size)) != size) {
         ret = -1;
         _e("failed to receive data");
         return ret;

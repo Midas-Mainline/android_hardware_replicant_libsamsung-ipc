@@ -25,17 +25,6 @@
 #include "common.h"
 
 /* 
- * @brief A wrapper around ioctl that prints the error to the log
- *
- * @param fd [in] File descriptor of the socket
- * @param code [in] ioctl code
- * @param data argument to the ioctl
- * @return Negative value indicating error code
- * @return ioctl call result
- */
-int c_ioctl(int fd, unsigned long code, void* data);
-
-/* 
  * @brief Waits for fd to become available for reading
  *
  * @param fd [in] File descriptor of the socket
@@ -43,7 +32,7 @@ int c_ioctl(int fd, unsigned long code, void* data);
  * @return Negative value indicating error code
  * @return Available socket number - 1, as select()
  */
-int read_select(int fd, unsigned timeout);
+int expect(int fd, unsigned timeout);
 
 /* 
  * @brief Waits for data available and reads it to the buffer
@@ -54,7 +43,7 @@ int read_select(int fd, unsigned timeout);
  * @return Negative value indicating error code
  * @return The size of data received
  */
-int receive(int fd, void *buf, size_t size);
+int expect_read(int fd, void *buf, size_t size);
 
 /* 
  * @brief Receives data and compares with the pattern in memory
