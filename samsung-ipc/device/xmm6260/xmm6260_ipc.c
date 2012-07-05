@@ -46,12 +46,12 @@
 
 int i9100_modem_bootstrap(struct ipc_client *client)
 {
-    return boot_modem_i9100(client);
+    return i9100_boot_modem(client);
 }
 
 int i9250_modem_bootstrap(struct ipc_client *client)
 {
-    return boot_modem_i9250(client);
+    return i9250_boot_modem(client);
 }
 
 int xmm6260_ipc_send(struct ipc_client *client, struct ipc_message_info *request)

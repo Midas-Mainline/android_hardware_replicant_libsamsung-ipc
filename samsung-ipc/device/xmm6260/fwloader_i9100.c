@@ -83,8 +83,9 @@ struct i9100_boot_cmd_desc i9100_boot_cmd_desc[] = {
     }
 };
 
-static int send_image(struct ipc_client *client,
-    struct modemctl_io_data *io_data, enum xmm6260_image type) {
+static int i9100_send_image(struct ipc_client *client,
+    struct modemctl_io_data *io_data, enum xmm6260_image type)
+{
     int ret = -1;
 
     if (type >= io_data->radio_parts_count) {
@@ -127,7 +128,8 @@ fail:
     return ret;
 }
 
-static int send_PSI(struct ipc_client *client, struct modemctl_io_data *io_data) {
+static int i9100_send_psi(struct ipc_client *client, struct modemctl_io_data *io_data)
+{
     size_t length = i9100_radio_parts[PSI].length;
 
     struct i9100_psi_header hdr = {
@@ -142,7 +144,7 @@ static int send_PSI(struct ipc_client *client, struct modemctl_io_data *io_data)
         goto fail;
     }
 
-    if ((ret = send_image(client, io_data, PSI)) < 0) {
+    if ((ret = i9100_send_image(client, io_data, PSI)) < 0) {
         _e("failed to send PSI image");
         goto fail;
     }
@@ -181,7 +183,8 @@ fail:
     return ret;
 }
 
-static int send_EBL(struct ipc_client *client, struct modemctl_io_data *io_data) {
+static int i9100_send_ebl(struct ipc_client *client, struct modemctl_io_data *io_data)
+{
     int ret;
     int fd = io_data->boot_fd;
     unsigned length = i9100_radio_parts[EBL].length;
@@ -196,7 +199,7 @@ static int send_EBL(struct ipc_client *client, struct modemctl_io_data *io_data)
         goto fail;
     }
 
-    if ((ret = send_image(client, io_data, EBL)) < 0) {
+    if ((ret = i9100_send_image(client, io_data, EBL)) < 0) {
         _e("failed to send EBL image");
         goto fail;
     }
@@ -212,7 +215,7 @@ fail:
     return ret;
 }
 
-static int bootloader_cmd(struct ipc_client *client,
+static int i9100_boot_cmd(struct ipc_client *client,
     struct modemctl_io_data *io_data, enum xmm6260_boot_cmd cmd,
     void *data, size_t data_size)
 {
@@ -315,8 +318,9 @@ done_or_fail:
     return ret;
 }
 
-static int ack_BootInfo(struct ipc_client *client,
-    struct modemctl_io_data *io_data) {
+static int i9100_boot_info_ack(struct ipc_client *client,
+    struct modemctl_io_data *io_data)
+{
     int ret;
     struct i9100_boot_info info;
 
@@ -330,7 +334,7 @@ static int ack_BootInfo(struct ipc_client *client,
         hexdump(&info, sizeof(info));
     }
 
-    if ((ret = bootloader_cmd(client, io_data, SetPortConf, &info, sizeof(info))) < 0) {
+    if ((ret = i9100_boot_cmd(client, io_data, SetPortConf, &info, sizeof(info))) < 0) {
         _e("failed to send SetPortConf command");
         goto fail;
     }
@@ -344,7 +348,7 @@ fail:
     return ret;
 }
 
-static int send_image_data(struct ipc_client *client,
+static int i9100_send_image_data(struct ipc_client *client,
     struct modemctl_io_data *io_data, uint32_t addr,
     void *data, int data_len)
 {
@@ -352,7 +356,7 @@ static int send_image_data(struct ipc_client *client,
     int count = 0;
     char *data_p = (char *) data;
 
-    if ((ret = bootloader_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
+    if ((ret = i9100_boot_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
         _e("failed to send ReqFlashSetAddress");
         goto fail;
     }
@@ -364,7 +368,7 @@ static int send_image_data(struct ipc_client *client,
         int rest = data_len - count;
         int chunk = rest < SEC_DOWNLOAD_CHUNK ? rest : SEC_DOWNLOAD_CHUNK;
 
-        ret = bootloader_cmd(client, io_data, ReqFlashWriteBlock, data_p, chunk);
+        ret = i9100_boot_cmd(client, io_data, ReqFlashWriteBlock, data_p, chunk);
         if (ret < 0) {
             _e("failed to send data chunk");
             goto fail;
@@ -380,7 +384,7 @@ fail:
     return ret;
 }
 
-static int send_image_addr(struct ipc_client *client,
+static int i9100_send_image_addr(struct ipc_client *client,
     struct modemctl_io_data *io_data, uint32_t addr, enum xmm6260_image type)
 {
     uint32_t offset = i9100_radio_parts[type].offset;
@@ -388,13 +392,14 @@ static int send_image_addr(struct ipc_client *client,
     char *start = io_data->radio_data + offset;
     int ret = 0;
 
-    ret = send_image_data(client, io_data, addr, start, length);
+    ret = i9100_send_image_data(client, io_data, addr, start, length);
 
     return ret;
 }
 
-static int send_SecureImage(struct ipc_client *client,
-    struct modemctl_io_data *io_data) {
+static int i9100_send_secure_images(struct ipc_client *client,
+    struct modemctl_io_data *io_data)
+{
     int ret = 0;
 
     uint32_t sec_off = i9100_radio_parts[SECURE_IMAGE].offset;
@@ -402,7 +407,7 @@ static int send_SecureImage(struct ipc_client *client,
     void *sec_img = io_data->radio_data + sec_off;
     void *nv_data = NULL;
 
-    if ((ret = bootloader_cmd(client, io_data, ReqSecStart, sec_img, sec_len)) < 0) {
+    if ((ret = i9100_boot_cmd(client, io_data, ReqSecStart, sec_img, sec_len)) < 0) {
         _e("failed to write ReqSecStart");
         goto fail;
     }
@@ -410,7 +415,7 @@ static int send_SecureImage(struct ipc_client *client,
         _d("sent ReqSecStart");
     }
 
-    if ((ret = send_image_addr(client, io_data, FW_LOAD_ADDR, FIRMWARE)) < 0) {
+    if ((ret = i9100_send_image_addr(client, io_data, FW_LOAD_ADDR, FIRMWARE)) < 0) {
         _e("failed to send FIRMWARE image");
         goto fail;
     }
@@ -427,7 +432,7 @@ static int send_SecureImage(struct ipc_client *client,
         goto fail;
     }
 
-    if ((ret = send_image_data(client, io_data, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
+    if ((ret = i9100_send_image_data(client, io_data, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
         _e("failed to send NVDATA image");
         goto fail;
     }
@@ -437,7 +442,7 @@ static int send_SecureImage(struct ipc_client *client,
 
     free(nv_data);
 
-    if ((ret = bootloader_cmd(client, io_data, ReqSecEnd,
+    if ((ret = i9100_boot_cmd(client, io_data, ReqSecEnd,
         BL_END_MAGIC, BL_END_MAGIC_LEN)) < 0)
     {
         _e("failed to write ReqSecEnd");
@@ -447,7 +452,7 @@ static int send_SecureImage(struct ipc_client *client,
         _d("sent ReqSecEnd");
     }
 
-    ret = bootloader_cmd(client, io_data, ReqForceHwReset,
+    ret = i9100_boot_cmd(client, io_data, ReqForceHwReset,
         BL_RESET_MAGIC, BL_RESET_MAGIC_LEN);
     if (ret < 0) {
         _e("failed to write ReqForceHwReset");
@@ -501,7 +506,7 @@ fail:
     return ret;
 }
 
-static int reboot_modem_i9100(struct ipc_client *client,
+static int i9100_reboot_modem(struct ipc_client *client,
     struct modemctl_io_data *io_data, bool hard) {
     int ret;
 
@@ -603,7 +608,7 @@ fail:
     return ret;
 }
 
-int boot_modem_i9100(struct ipc_client *client) {
+int i9100_boot_modem(struct ipc_client *client) {
     int ret = 0;
     struct modemctl_io_data io_data;
     memset(&io_data, 0, sizeof(client, io_data));
@@ -650,7 +655,7 @@ int boot_modem_i9100(struct ipc_client *client) {
         _d("opened link device %s, fd=%d", LINK_PM, io_data.link_fd);
     }
 
-    if (reboot_modem_i9100(client, &io_data, true)) {
+    if (i9100_reboot_modem(client, &io_data, true)) {
         _e("failed to hard reset modem");
         goto fail;
     }
@@ -680,7 +685,7 @@ int boot_modem_i9100(struct ipc_client *client) {
     }
     _i("receive ID: [%02x %02x]", buf[0], buf[1]);
 
-    if ((ret = send_PSI(client, &io_data)) < 0) {
+    if ((ret = i9100_send_psi(client, &io_data)) < 0) {
         _e("failed to upload PSI");
         goto fail;
     }
@@ -688,7 +693,7 @@ int boot_modem_i9100(struct ipc_client *client) {
         _d("PSI download complete");
     }
 
-    if ((ret = send_EBL(client, &io_data)) < 0) {
+    if ((ret = i9100_send_ebl(client, &io_data)) < 0) {
         _e("failed to upload EBL");
         goto fail;
     }
@@ -696,7 +701,7 @@ int boot_modem_i9100(struct ipc_client *client) {
         _d("EBL download complete");
     }
 
-    if ((ret = ack_BootInfo(client, &io_data)) < 0) {
+    if ((ret = i9100_boot_info_ack(client, &io_data)) < 0) {
         _e("failed to receive Boot Info");
         goto fail;
     }
@@ -704,7 +709,7 @@ int boot_modem_i9100(struct ipc_client *client) {
         _d("Boot Info ACK done");
     }
 
-    if ((ret = send_SecureImage(client, &io_data)) < 0) {
+    if ((ret = i9100_send_secure_images(client, &io_data)) < 0) {
         _e("failed to upload Secure Image");
         goto fail;
     }
@@ -714,7 +719,7 @@ int boot_modem_i9100(struct ipc_client *client) {
 
     usleep(POST_BOOT_TIMEOUT_US);
 
-    if ((ret = reboot_modem_i9100(client, &io_data, false))) {
+    if ((ret = i9100_reboot_modem(client, &io_data, false))) {
         _e("failed to soft reset modem");
         goto fail;
     }

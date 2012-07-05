@@ -76,58 +76,9 @@ struct i9250_boot_cmd_desc i9250_boot_cmd_desc[] = {
     },
 };
 
-static int reboot_modem_i9250(struct ipc_client *client,
-    struct modemctl_io_data *io_data, bool hard) {
-    int ret;
-
-    if (!hard) {
-        return 0;
-    }
-
-    /*
-     * Disable the hardware to ensure consistent state
-     */
-    if ((ret = modemctl_modem_power(client, io_data, false)) < 0) {
-        _e("failed to disable modem power");
-        goto fail;
-    }
-    else {
-        _d("disabled modem power");
-    }
-
-    if ((ret = modemctl_modem_boot_power(client, io_data, false)) < 0) {
-        _e("failed to disable modem boot power");
-        goto fail;
-    }
-    else {
-        _d("disabled modem boot power");
-    }
-
-    /*
-     * Now, initialize the hardware
-     */
-    if ((ret = modemctl_modem_boot_power(client, io_data, true)) < 0) {
-        _e("failed to enable modem boot power");
-        goto fail;
-    }
-    else {
-        _d("enabled modem boot power");
-    }
-
-    if ((ret = modemctl_modem_power(client, io_data, true)) < 0) {
-        _e("failed to enable modem power");
-        goto fail;
-    }
-    else {
-        _d("enabled modem power");
-    }
-
-fail:
-    return ret;
-}
-
-static int send_image_i9250(struct ipc_client *client,
-    struct modemctl_io_data *io_data, enum xmm6260_image type) {
+static int i9250_send_image(struct ipc_client *client,
+    struct modemctl_io_data *io_data, enum xmm6260_image type)
+{
     int ret = -1;
 
     if (type >= ARRAY_SIZE(i9250_radio_parts)) {
@@ -188,8 +139,9 @@ fail:
     return ret;
 }
 
-static int send_PSI_i9250(struct ipc_client *client,
-    struct modemctl_io_data *io_data) {
+static int i9250_send_psi(struct ipc_client *client,
+    struct modemctl_io_data *io_data)
+{
     int ret = -1;
 
     if ((ret = write(io_data->boot_fd, I9250_PSI_START_MAGIC, 4)) < 0) {
@@ -197,7 +149,7 @@ static int send_PSI_i9250(struct ipc_client *client,
         goto fail;
     }
 
-    if ((ret = send_image_i9250(client, io_data, PSI)) < 0) {
+    if ((ret = i9250_send_image(client, io_data, PSI)) < 0) {
         _e("failed to send PSI image");
         goto fail;
     }
@@ -225,8 +177,9 @@ fail:
     return ret;
 }
 
-static int send_EBL_i9250(struct ipc_client *client,
-    struct modemctl_io_data *io_data) {
+static int i9250_send_ebl(struct ipc_client *client,
+    struct modemctl_io_data *io_data)
+{
     int ret;
     int fd = io_data->boot_fd;
     unsigned length = i9250_radio_parts[EBL].length;
@@ -257,7 +210,7 @@ static int send_EBL_i9250(struct ipc_client *client,
         goto fail;
     }
 
-    if ((ret = send_image_i9250(client, io_data, EBL)) < 0) {
+    if ((ret = i9250_send_image(client, io_data, EBL)) < 0) {
         _e("failed to send EBL image");
         goto fail;
     }
@@ -284,7 +237,7 @@ fail:
     return ret;
 }
 
-static int bootloader_cmd(struct ipc_client *client,
+static int i9250_boot_cmd(struct ipc_client *client,
     struct modemctl_io_data *io_data, enum xmm6260_boot_cmd cmd,
     void *data, size_t data_size)
 {
@@ -396,8 +349,9 @@ done_or_fail:
     return ret;
 }
 
-static int ack_BootInfo_i9250(struct ipc_client *client,
-    struct modemctl_io_data *io_data) {
+static int i9250_boot_info_ack(struct ipc_client *client,
+    struct modemctl_io_data *io_data)
+{
     int ret = -1;
     uint32_t boot_info_length;
     char *boot_info = 0;
@@ -432,7 +386,7 @@ static int ack_BootInfo_i9250(struct ipc_client *client,
     _d("received Boot Info");
     hexdump(boot_info, boot_info_length);
 
-    ret = bootloader_cmd(client, io_data, SetPortConf, boot_info, boot_info_length);
+    ret = i9250_boot_cmd(client, io_data, SetPortConf, boot_info, boot_info_length);
     if (ret < 0) {
         _e("failed to send SetPortConf command");
         goto fail;
@@ -451,7 +405,7 @@ fail:
     return ret;
 }
 
-static int send_secure_data(struct ipc_client *client,
+static int i9250_send_image_data(struct ipc_client *client,
     struct modemctl_io_data *io_data, uint32_t addr,
     void *data, int data_len)
 {
@@ -459,7 +413,7 @@ static int send_secure_data(struct ipc_client *client,
     int count = 0;
     char *data_p = (char *) data;
 
-    if ((ret = bootloader_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
+    if ((ret = i9250_boot_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
         _e("failed to send ReqFlashSetAddress");
         goto fail;
     }
@@ -471,7 +425,7 @@ static int send_secure_data(struct ipc_client *client,
         int rest = data_len - count;
         int chunk = rest < SEC_DOWNLOAD_CHUNK ? rest : SEC_DOWNLOAD_CHUNK;
 
-        ret = bootloader_cmd(client, io_data, ReqFlashWriteBlock, data_p, chunk);
+        ret = i9250_boot_cmd(client, io_data, ReqFlashWriteBlock, data_p, chunk);
         if (ret < 0) {
             _e("failed to send data chunk");
             goto fail;
@@ -487,7 +441,7 @@ fail:
     return ret;
 }
 
-static int send_secure_image(struct ipc_client *client,
+static int i9250_send_image_addr(struct ipc_client *client,
     struct modemctl_io_data *io_data, uint32_t addr, enum xmm6260_image type)
 {
     uint32_t offset = i9250_radio_parts[type].offset;
@@ -495,13 +449,14 @@ static int send_secure_image(struct ipc_client *client,
     char *start = io_data->radio_data + offset;
     int ret = 0;
 
-    ret = send_secure_data(client, io_data, addr, start, length);
+    ret = i9250_send_image_data(client, io_data, addr, start, length);
 
     return ret;
 }
 
-static int send_mps_data(struct ipc_client *client,
-    struct modemctl_io_data *io_data) {
+static int i9250_send_mps_data(struct ipc_client *client,
+    struct modemctl_io_data *io_data)
+{
     int ret = 0;
     int mps_fd = -1;
     char mps_data[I9250_MPS_LENGTH] = {};
@@ -515,7 +470,7 @@ static int send_mps_data(struct ipc_client *client,
         read(mps_fd, mps_data, I9250_MPS_LENGTH);
     }
 
-    if ((ret = bootloader_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
+    if ((ret = i9250_boot_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
         _e("failed to send ReqFlashSetAddress");
         goto fail;
     }
@@ -523,7 +478,7 @@ static int send_mps_data(struct ipc_client *client,
         _d("sent ReqFlashSetAddress");
     }
 
-    if ((ret = bootloader_cmd(client, io_data, ReqFlashWriteBlock,
+    if ((ret = i9250_boot_cmd(client, io_data, ReqFlashWriteBlock,
         mps_data, I9250_MPS_LENGTH)) < 0) {
         _e("failed to write MPS data to modem");
         goto fail;
@@ -538,8 +493,9 @@ fail:
     return ret;
 }
 
-static int send_SecureImage_i9250(struct ipc_client *client,
-    struct modemctl_io_data *io_data) {
+static int i9250_send_image_addrs(struct ipc_client *client,
+    struct modemctl_io_data *io_data)
+{
     int ret = 0;
 
     uint32_t sec_off = i9250_radio_parts[SECURE_IMAGE].offset;
@@ -547,7 +503,7 @@ static int send_SecureImage_i9250(struct ipc_client *client,
     void *sec_img = io_data->radio_data + sec_off;
     void *nv_data = NULL;
 
-    if ((ret = bootloader_cmd(client, io_data, ReqSecStart, sec_img, sec_len)) < 0) {
+    if ((ret = i9250_boot_cmd(client, io_data, ReqSecStart, sec_img, sec_len)) < 0) {
         _e("failed to write ReqSecStart");
         goto fail;
     }
@@ -555,7 +511,7 @@ static int send_SecureImage_i9250(struct ipc_client *client,
         _d("sent ReqSecStart");
     }
 
-    if ((ret = send_secure_image(client, io_data, FW_LOAD_ADDR, FIRMWARE)) < 0) {
+    if ((ret = i9250_send_image_addr(client, io_data, FW_LOAD_ADDR, FIRMWARE)) < 0) {
         _e("failed to send FIRMWARE image");
         goto fail;
     }
@@ -572,7 +528,7 @@ static int send_SecureImage_i9250(struct ipc_client *client,
         goto fail;
     }
 
-    if ((ret = send_secure_data(client, io_data, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
+    if ((ret = i9250_send_image_data(client, io_data, NVDATA_LOAD_ADDR, nv_data, 2 << 20)) < 0) {
         _e("failed to send NVDATA image");
         goto fail;
     }
@@ -582,7 +538,7 @@ static int send_SecureImage_i9250(struct ipc_client *client,
 
     free(nv_data);
 
-    if ((ret = send_mps_data(client, io_data)) < 0) {
+    if ((ret = i9250_send_mps_data(client, io_data)) < 0) {
         _e("failed to send MPS data");
         goto fail;
     }
@@ -590,7 +546,7 @@ static int send_SecureImage_i9250(struct ipc_client *client,
         _d("sent MPS data");
     }
 
-    if ((ret = bootloader_cmd(client, io_data, ReqSecEnd,
+    if ((ret = i9250_boot_cmd(client, io_data, ReqSecEnd,
         BL_END_MAGIC, BL_END_MAGIC_LEN)) < 0)
     {
         _e("failed to write ReqSecEnd");
@@ -600,7 +556,7 @@ static int send_SecureImage_i9250(struct ipc_client *client,
         _d("sent ReqSecEnd");
     }
 
-    ret = bootloader_cmd(client, io_data, ReqForceHwReset,
+    ret = i9250_boot_cmd(client, io_data, ReqForceHwReset,
         BL_RESET_MAGIC, BL_RESET_MAGIC_LEN);
     if (ret < 0) {
         _e("failed to write ReqForceHwReset");
@@ -614,7 +570,59 @@ fail:
     return ret;
 }
 
-int boot_modem_i9250(struct ipc_client *client) {
+static int i9250_reboot_modem(struct ipc_client *client,
+    struct modemctl_io_data *io_data, bool hard)
+{
+    int ret;
+
+    if (!hard) {
+        return 0;
+    }
+
+    /*
+     * Disable the hardware to ensure consistent state
+     */
+    if ((ret = modemctl_modem_power(client, io_data, false)) < 0) {
+        _e("failed to disable modem power");
+        goto fail;
+    }
+    else {
+        _d("disabled modem power");
+    }
+
+    if ((ret = modemctl_modem_boot_power(client, io_data, false)) < 0) {
+        _e("failed to disable modem boot power");
+        goto fail;
+    }
+    else {
+        _d("disabled modem boot power");
+    }
+
+    /*
+     * Now, initialize the hardware
+     */
+    if ((ret = modemctl_modem_boot_power(client, io_data, true)) < 0) {
+        _e("failed to enable modem boot power");
+        goto fail;
+    }
+    else {
+        _d("enabled modem boot power");
+    }
+
+    if ((ret = modemctl_modem_power(client, io_data, true)) < 0) {
+        _e("failed to enable modem power");
+        goto fail;
+    }
+    else {
+        _d("enabled modem power");
+    }
+
+fail:
+    return ret;
+}
+
+int i9250_boot_modem(struct ipc_client *client)
+{
     int ret = -1;
     struct modemctl_io_data io_data;
     memset(&io_data, 0, sizeof(client, io_data));
@@ -649,7 +657,7 @@ int boot_modem_i9250(struct ipc_client *client) {
         _d("opened boot device %s, fd=%d", BOOT_DEV, io_data.boot_fd);
     }
 
-    if (reboot_modem_i9250(client, &io_data, true) < 0) {
+    if (i9250_reboot_modem(client, &io_data, true) < 0) {
         _e("failed to hard reset modem");
         goto fail;
     }
@@ -707,7 +715,7 @@ int boot_modem_i9250(struct ipc_client *client) {
         _d("got bootloader id marker");
     }
 
-    if ((ret = send_PSI_i9250(client, &io_data)) < 0) {
+    if ((ret = i9250_send_psi(client, &io_data)) < 0) {
         _e("failed to upload PSI");
         goto fail;
     }
@@ -745,7 +753,7 @@ int boot_modem_i9250(struct ipc_client *client) {
         goto fail;
     }
 
-    if ((ret = send_EBL_i9250(client, &io_data)) < 0) {
+    if ((ret = i9250_send_ebl(client, &io_data)) < 0) {
         _e("failed to upload EBL");
         goto fail;
     }
@@ -753,7 +761,7 @@ int boot_modem_i9250(struct ipc_client *client) {
         _d("EBL download complete");
     }
 
-    if ((ret = ack_BootInfo_i9250(client, &io_data)) < 0) {
+    if ((ret = i9250_boot_info_ack(client, &io_data)) < 0) {
         _e("failed to receive Boot Info");
         goto fail;
     }
@@ -761,7 +769,7 @@ int boot_modem_i9250(struct ipc_client *client) {
         _d("Boot Info ACK done");
     }
 
-    if ((ret = send_SecureImage_i9250(client, &io_data)) < 0) {
+    if ((ret = i9250_send_image_addrs(client, &io_data)) < 0) {
         _e("failed to upload Secure Image");
         goto fail;
     }
