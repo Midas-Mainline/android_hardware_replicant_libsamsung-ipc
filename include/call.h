@@ -64,6 +64,10 @@
 #define IPC_CALL_LIST_ENTRY_STATE_INCOMING          0x05
 #define IPC_CALL_LIST_ENTRY_STATE_WAITING           0x06
 
+#define IPC_CALL_END_CAUSE_NORMAL       0x05
+#define IPC_CALL_END_CAUSE_REJECTED     0x2F
+#define IPC_CALL_END_CAUSE_UNSPECIFIED  0x10
+
 #define IPC_CALL_TERM_MO                0x01
 #define IPC_CALL_TERM_MT                0x02
 
