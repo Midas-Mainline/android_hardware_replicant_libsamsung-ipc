@@ -28,7 +28,7 @@
 
 #define MAX_MODEM_DATA_SIZE     0x50000
 
-#define GPRS_IFACE              "rmnet0"
+#define GPRS_IFACE_PREFIX       "rmnet"
 
 int wake_lock(char *lock_name, int len);
 int wake_unlock(char *lock_name, int len);

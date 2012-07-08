@@ -62,7 +62,7 @@ struct ipc_handlers {
 };
 
 struct ipc_gprs_specs {
-    int (*gprs_get_iface)(char **iface);
+    int (*gprs_get_iface)(char **iface, int cid);
     int (*gprs_get_capabilities)(struct ipc_client_gprs_capabilities *cap);
 };
 

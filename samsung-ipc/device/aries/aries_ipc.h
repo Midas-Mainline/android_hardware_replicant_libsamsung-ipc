@@ -41,6 +41,9 @@
 
 #define MAX_MODEM_DATA_SIZE     0x1000
 
+#define GPRS_IFACE_PREFIX       "pdp"
+#define GPRS_IFACE_COUNT        3
+
 int phonet_iface_ifdown(void);
 int phonet_iface_ifup(void);
 

@@ -397,14 +397,14 @@ int ipc_client_gprs_deactivate(struct ipc_client *client)
     return client->handlers->gprs_deactivate(client->handlers->gprs_deactivate_data);
 }
 
-int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface)
+int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface, int cid)
 {
     if (client == NULL ||
         client->gprs_specs == NULL ||
         client->gprs_specs->gprs_get_iface == NULL)
         return -1;
 
-    return client->gprs_specs->gprs_get_iface(iface);
+    return client->gprs_specs->gprs_get_iface(iface, cid);
 }
 
 int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_client_gprs_capabilities *cap)

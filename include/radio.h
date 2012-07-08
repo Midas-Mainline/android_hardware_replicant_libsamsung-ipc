@@ -86,7 +86,7 @@ int ipc_client_power_off(struct ipc_client *client);
 int ipc_client_gprs_handlers_available(struct ipc_client *client);
 int ipc_client_gprs_activate(struct ipc_client *client);
 int ipc_client_gprs_deactivate(struct ipc_client *client);
-int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface);
+int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface, int cid);
 int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_client_gprs_capabilities *cap);
 
 int ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response);
