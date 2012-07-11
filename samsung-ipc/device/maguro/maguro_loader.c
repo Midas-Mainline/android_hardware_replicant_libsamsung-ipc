@@ -605,26 +605,9 @@ static int maguro_modem_reboot(struct ipc_client *client,
     else {
         ipc_client_log(client, "disabled modem power");
     }
-
-    if ((ret = modemctl_modem_boot_power(client, io_data, false)) < 0) {
-        ipc_client_log(client, "Error: failed to disable modem boot power");
-        goto fail;
-    }
-    else {
-        ipc_client_log(client, "disabled modem boot power");
-    }
-
     /*
      * Now, initialize the hardware
      */
-    if ((ret = modemctl_modem_boot_power(client, io_data, true)) < 0) {
-        ipc_client_log(client, "Error: failed to enable modem boot power");
-        goto fail;
-    }
-    else {
-        ipc_client_log(client, "enabled modem boot power");
-    }
-
     if ((ret = modemctl_modem_power(client, io_data, true)) < 0) {
         ipc_client_log(client, "Error: failed to enable modem power");
         goto fail;
@@ -797,6 +780,11 @@ int maguro_modem_bootstrap(struct ipc_client *client)
         ipc_client_log(client, "Error: failed to wait for modem to become online");
         goto fail;
     }
+    
+    /*
+     * This restores UART MUX to GPS
+     */
+    modemctl_modem_boot_power(client, &io_data, false);
 
     ipc_client_log(client, "Modem is online!");
     ret = 0;
