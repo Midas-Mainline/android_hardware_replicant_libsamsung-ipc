@@ -113,7 +113,7 @@ int nv_data_size(struct ipc_client *client)
 {
     if (client == NULL ||
         client->nv_data_specs == NULL ||
-        client->nv_data_specs->nv_data_size == NULL)
+        client->nv_data_specs->nv_data_size == 0)
         return NV_DATA_SIZE_DEFAULT;
 
     return client->nv_data_specs->nv_data_size;
@@ -123,7 +123,7 @@ int nv_data_chunk_size(struct ipc_client *client)
 {
     if (client == NULL ||
         client->nv_data_specs == NULL ||
-        client->nv_data_specs->nv_data_chunk_size == NULL)
+        client->nv_data_specs->nv_data_chunk_size == 0)
         return NV_DATA_CHUNK_SIZE_DEFAULT;
 
     return client->nv_data_specs->nv_data_chunk_size;
@@ -714,7 +714,7 @@ void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client, struct 
     if (rfs_io == NULL)
     {
         ipc_client_log(client, "ERROR: Request message is invalid: aseq = %i", info->aseq);
-        return NULL;
+        return;
     }
 
     rfs_io_conf = malloc(rfs_io->length + sizeof(struct ipc_rfs_io_confirm));
