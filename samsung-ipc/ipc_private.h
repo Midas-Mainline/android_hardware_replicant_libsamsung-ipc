@@ -35,9 +35,10 @@ struct ipc_handlers {
     void *read_data;
     ipc_io_handler_cb write;
     void *write_data;
-    ipc_io_handler_cb open;
+
+    int (*open)(int type, void *io_data);
+    int (*close)(void *io_data);
     void *open_data;
-    ipc_io_handler_cb close;
     void *close_data;
 
     /* Power handlers */

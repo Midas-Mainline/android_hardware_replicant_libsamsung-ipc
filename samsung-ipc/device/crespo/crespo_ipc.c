@@ -451,9 +451,8 @@ int crespo_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_inf
     return 0;
 }
 
-int crespo_ipc_open(void *data, unsigned int size, void *io_data)
+int crespo_ipc_open(int type, void *io_data)
 {
-    int type = *((int *) data);
     int fd = -1;
 
     switch(type)
@@ -479,7 +478,7 @@ int crespo_ipc_open(void *data, unsigned int size, void *io_data)
     return 0;
 }
 
-int crespo_ipc_close(void *data, unsigned int size, void *io_data)
+int crespo_ipc_close(void *io_data)
 {
     int fd = -1;
 

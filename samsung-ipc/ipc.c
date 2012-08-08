@@ -331,7 +331,7 @@ int ipc_client_open(struct ipc_client *client)
 
     type = client->type;
 
-    return client->handlers->open(&type, 0, client->handlers->open_data);
+    return client->handlers->open(type, client->handlers->open_data);
 }
 
 int ipc_client_close(struct ipc_client *client)
@@ -341,7 +341,7 @@ int ipc_client_close(struct ipc_client *client)
         client->handlers->close == NULL)
         return -1;
 
-    return client->handlers->close(NULL, 0, client->handlers->close_data);
+    return client->handlers->close(client->handlers->close_data);
 }
 
 int ipc_client_power_on(struct ipc_client *client)

@@ -211,9 +211,8 @@ int xmm6260_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_in
     return rc;
 }
 
-int xmm6260_ipc_open(void *data, unsigned int size, void *io_data)
+int xmm6260_ipc_open(int type, void *io_data)
 {
-    int type = *((int *) data);
     int fd = -1;
 
     switch(type)
@@ -239,7 +238,7 @@ int xmm6260_ipc_open(void *data, unsigned int size, void *io_data)
     return 0;
 }
 
-int xmm6260_ipc_close(void *data, unsigned int size, void *io_data)
+int xmm6260_ipc_close(void *io_data)
 {
     int fd = -1;
 

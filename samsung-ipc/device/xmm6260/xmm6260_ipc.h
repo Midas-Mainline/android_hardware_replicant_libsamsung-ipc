@@ -40,8 +40,8 @@ int xmm6260_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_in
 int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_info *response);
 int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_info *response);
 int xmm6260_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_info *request);
-int xmm6260_ipc_open(void *data, unsigned int size, void *io_data);
-int xmm6260_ipc_close(void *data, unsigned int size, void *io_data);
+int xmm6260_ipc_open(int type, void *io_data);
+int xmm6260_ipc_close(void *io_data);
 int xmm6260_ipc_read(void *data, unsigned int size, void *io_data);
 int xmm6260_ipc_write(void *data, unsigned int size, void *io_data);
 int xmm6260_ipc_power_on(void *io_data);
