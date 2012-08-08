@@ -158,7 +158,7 @@ void nv_data_md5_generate(struct ipc_client *client)
     ipc_client_log(client, "nv_data_md5_generate: enter\n");
 
     ipc_client_log(client, "nv_data_md5_generate: generating MD5 hash\n");
-    nv_data_p=ipc_file_read(client, nv_data_path(client),
+    nv_data_p=ipc_client_file_read(client, nv_data_path(client),
         nv_data_size(client), nv_data_chunk_size(client));
     nv_data_md5_compute(nv_data_p, nv_data_size(client), nv_data_secret(client), nv_data_md5_hash);
     free(nv_data_p);
@@ -236,7 +236,7 @@ void nv_data_backup_create(struct ipc_client *client)
     memset(nv_data_md5_hash_string, 0, MD5_STRING_SIZE);
 
     /* Read the content of the backup file. */
-    nv_data_p=ipc_file_read(client, nv_data_path(client),
+    nv_data_p=ipc_client_file_read(client, nv_data_path(client),
         nv_data_size(client), nv_data_chunk_size(client));
 
     /* Compute the backup file MD5 hash. */
@@ -308,7 +308,7 @@ nv_data_backup_create_write:
     }
 
     /* Read the newly-written .nv_data.bak. */
-    nv_data_bak_p=ipc_file_read(client, nv_data_bak_path(client), 
+    nv_data_bak_p=ipc_client_file_read(client, nv_data_bak_path(client), 
         nv_data_size(client), nv_data_chunk_size(client));
 
     /* Compute the MD5 hash for nv_data.bin. */
@@ -398,7 +398,7 @@ void nv_data_backup_restore(struct ipc_client *client)
     memset(nv_data_md5_hash_string, 0, MD5_STRING_SIZE);
 
     /* Read the content of the backup file. */
-    nv_data_bak_p=ipc_file_read(client, nv_data_bak_path(client),
+    nv_data_bak_p=ipc_client_file_read(client, nv_data_bak_path(client),
         nv_data_size(client), nv_data_chunk_size(client));
 
     /* Compute the backup file MD5 hash. */
@@ -471,7 +471,7 @@ nv_data_backup_restore_write:
     }
 
     /* Read the newly-written nv_data.bin. */
-    nv_data_p=ipc_file_read(client, nv_data_path(client),
+    nv_data_p=ipc_client_file_read(client, nv_data_path(client),
         nv_data_size(client), nv_data_chunk_size(client));
 
     /* Compute the MD5 hash for nv_data.bin. */
@@ -585,7 +585,7 @@ void nv_data_md5_check(struct ipc_client *client)
     memset(nv_data_md5_hash_read, 0, MD5_STRING_SIZE);
     memset(nv_data_md5_hash_string, 0, MD5_STRING_SIZE);
 
-    nv_data_p=ipc_file_read(client, nv_data_path(client),
+    nv_data_p=ipc_client_file_read(client, nv_data_path(client),
         nv_data_size(client), nv_data_chunk_size(client));
     data_p=nv_data_p;
 
@@ -726,7 +726,7 @@ void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client, struct 
 
 #ifdef DEBUG
     ipc_client_log(client, "Read rfs_data dump:");
-    ipc_hex_dump(client, rfs_data, rfs_io->length);
+    ipc_client_hex_dump(client, rfs_data, rfs_io->length);
 #endif
 
     ipc_client_log(client, "Preparing RFS IO Confirm message (rc is %d)", rc);
@@ -755,7 +755,7 @@ void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client, struct
 
 #ifdef DEBUG
     ipc_client_log(client, "Write rfs_data dump:");
-    ipc_hex_dump(client, rfs_data, rfs_io->length);
+    ipc_client_hex_dump(client, rfs_data, rfs_io->length);
 #endif
 
     ipc_client_log(client, "Asked to write 0x%x bytes at offset 0x%x", rfs_io->length, rfs_io->offset);

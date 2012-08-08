@@ -438,7 +438,7 @@ static int galaxys2_send_secure_images(struct ipc_client *client,
     nv_data_check(client);
     nv_data_md5_check(client);
 
-    nv_data = ipc_file_read(client, nv_data_path(client), 2 << 20, 1024);
+    nv_data = ipc_client_file_read(client, nv_data_path(client), 2 << 20, 1024);
     if (nv_data == NULL) {
         ipc_client_log(client, "Error: failed to read NVDATA image");
         goto fail;

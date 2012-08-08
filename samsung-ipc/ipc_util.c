@@ -45,7 +45,7 @@ void ipc_client_log_recv(struct ipc_client *client,
 #ifdef DEBUG
             if (response->length > 0) {
                 ipc_client_log(client, "==== FMT DATA DUMP ====");
-                ipc_hex_dump(client, (void *) response->data, 
+                ipc_client_hex_dump(client, (void *) response->data, 
                     response->length > 0x100 ? 0x100 : response->length);
             }
 #endif
@@ -57,7 +57,7 @@ void ipc_client_log_recv(struct ipc_client *client,
 #ifdef DEBUG
             if (response->length > 0) {
                 ipc_client_log(client, "==== RFS DATA DUMP ====");
-                ipc_hex_dump(client, (void *) response->data, 
+                ipc_client_hex_dump(client, (void *) response->data, 
                     response->length > 0x100 ? 0x100 : response->length);
             }
 #endif
@@ -78,7 +78,7 @@ void ipc_client_log_send(struct ipc_client *client,
 #ifdef DEBUG
             if (request->length > 0) {
                 ipc_client_log(client, "==== FMT DATA DUMP ====");
-                ipc_hex_dump(client, (void *) request->data,
+                ipc_client_hex_dump(client, (void *) request->data,
                     request->length > 0x100 ? 0x100 : request->length);
             }
 #endif
@@ -90,7 +90,7 @@ void ipc_client_log_send(struct ipc_client *client,
 #ifdef DEBUG
             if (request->length > 0) {
                 ipc_client_log(client, "==== RFS DATA DUMP ====");
-                ipc_hex_dump(client, (void *) request->data,
+                ipc_client_hex_dump(client, (void *) request->data,
                     request->length > 0x100 ? 0x100 : request->length);
             }
 #endif
@@ -253,7 +253,7 @@ const char *ipc_command_to_str(int command) {
 	}
 }
 
-void ipc_hex_dump(struct ipc_client *client, void *data, int size)
+void ipc_client_hex_dump(struct ipc_client *client, void *data, int size)
 {
     /* dumps size bytes of *data to stdout. Looks like:
      * [0000] 75 6E 6B 6E 6F 77 6E 20
@@ -307,7 +307,7 @@ void ipc_hex_dump(struct ipc_client *client, void *data, int size)
     }
 }
 
-void *ipc_mtd_read(struct ipc_client *client, char *mtd_name, int size, int block_size)
+void *ipc_client_mtd_read(struct ipc_client *client, char *mtd_name, int size, int block_size)
 {
     void *mtd_p=NULL;
     uint8_t *data_p=NULL;
@@ -319,7 +319,7 @@ void *ipc_mtd_read(struct ipc_client *client, char *mtd_name, int size, int bloc
     if (mtd_name == NULL || size <= 0 || block_size <= 0)
         goto error;
 
-    ipc_client_log(client, "ipc_mtd_read: reading 0x%x bytes from %s with 0x%x bytes block size\n", size, mtd_name, block_size);
+    ipc_client_log(client, "ipc_client_mtd_read: reading 0x%x bytes from %s with 0x%x bytes block size\n", size, mtd_name, block_size);
 
     fd=open(mtd_name, O_RDONLY);
     if (fd < 0)
@@ -338,7 +338,7 @@ void *ipc_mtd_read(struct ipc_client *client, char *mtd_name, int size, int bloc
         offs = i * block_size;
         if (ioctl(fd, MEMGETBADBLOCK, &offs) == 1)
         {
-            ipc_client_log(client, "ipc_mtd_read: warning: bad block at offset %lld\n", (long long int) offs);
+            ipc_client_log(client, "ipc_client_mtd_read: warning: bad block at offset %lld\n", (long long int) offs);
             data_p+=block_size;
             continue;
         }
@@ -352,11 +352,11 @@ void *ipc_mtd_read(struct ipc_client *client, char *mtd_name, int size, int bloc
     return mtd_p;
 
 error:
-    ipc_client_log(client, "ipc_mtd_read: something went wrong\n");
+    ipc_client_log(client, "ipc_client_mtd_read: something went wrong\n");
     return NULL;
 }
 
-void *ipc_file_read(struct ipc_client *client, char *file_name, int size, int block_size)
+void *ipc_client_file_read(struct ipc_client *client, char *file_name, int size, int block_size)
 {
     void *file_p=NULL;
     uint8_t *data_p=NULL;
@@ -367,7 +367,7 @@ void *ipc_file_read(struct ipc_client *client, char *file_name, int size, int bl
     if (file_name == NULL || size <= 0 || block_size <= 0)
         goto error;
 
-    ipc_client_log(client, "ipc_file_read: reading 0x%x bytes from %s with 0x%x bytes block size\n", size, file_name, block_size);
+    ipc_client_log(client, "ipc_client_file_read: reading 0x%x bytes from %s with 0x%x bytes block size\n", size, file_name, block_size);
 
     fd=open(file_name, O_RDONLY);
     if (fd < 0)
@@ -392,7 +392,7 @@ void *ipc_file_read(struct ipc_client *client, char *file_name, int size, int bl
     return file_p;
 
 error:
-    ipc_client_log(client, "ipc_file_read: something went wrong\n");
+    ipc_client_log(client, "ipc_client_file_read: something went wrong\n");
     return NULL;
 }
 

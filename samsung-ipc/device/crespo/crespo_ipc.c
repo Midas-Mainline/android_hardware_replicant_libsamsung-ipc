@@ -102,9 +102,9 @@ int crespo_modem_bootstrap(struct ipc_client *client)
 
     /* Read the radio.img image. */
     ipc_client_log(client, "crespo_ipc_bootstrap: reading radio image");
-    radio_img_p = ipc_mtd_read(client, "/dev/mtd/mtd5ro", RADIO_IMG_SIZE, 0x1000);
+    radio_img_p = ipc_client_mtd_read(client, "/dev/mtd/mtd5ro", RADIO_IMG_SIZE, 0x1000);
     if (radio_img_p == NULL) {
-        radio_img_p = ipc_mtd_read(client, "/dev/mtd5ro", RADIO_IMG_SIZE, 0x1000);
+        radio_img_p = ipc_client_mtd_read(client, "/dev/mtd5ro", RADIO_IMG_SIZE, 0x1000);
         if (radio_img_p == NULL)
             goto error;
     }
@@ -267,7 +267,7 @@ int crespo_modem_bootstrap(struct ipc_client *client)
     /* Write nv_data.bin to modem_ctl. */
     ipc_client_log(client, "crespo_ipc_bootstrap: write nv_data to modem_ctl");
 
-    nv_data_p = ipc_file_read(client, nv_data_path(client), nv_data_size(client), nv_data_chunk_size(client));
+    nv_data_p = ipc_client_file_read(client, nv_data_path(client), nv_data_size(client), nv_data_chunk_size(client));
     if (nv_data_p == NULL)
         goto error;
     data_p = nv_data_p;

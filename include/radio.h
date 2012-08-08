@@ -71,6 +71,7 @@ int ipc_client_set_handlers(struct ipc_client *client, struct ipc_handlers *hand
 int ipc_client_set_io_handlers(struct ipc_client *client,
                                ipc_io_handler_cb read, void *read_data,
                                ipc_io_handler_cb write, void *write_data);
+
 int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data);
 void *ipc_client_get_handlers_common_data(struct ipc_client *client);
 int ipc_client_create_handlers_common_data(struct ipc_client *client);
@@ -105,9 +106,10 @@ void ipc_client_log_send(struct ipc_client *client,
 const char *ipc_response_type_to_str(int type);
 const char *ipc_request_type_to_str(int type);
 const char *ipc_command_to_str(int command);
-void ipc_hex_dump(struct ipc_client *client, void *data, int size);
-void *ipc_mtd_read(struct ipc_client *client, char *mtd_name, int size, int block_size);
-void *ipc_file_read(struct ipc_client *client, char *file_name, int size, int block_size);
+
+void ipc_client_hex_dump(struct ipc_client *client, void *data, int size);
+void *ipc_client_mtd_read(struct ipc_client *client, char *mtd_name, int size, int block_size);
+void *ipc_client_file_read(struct ipc_client *client, char *file_name, int size, int block_size);
 
 #endif
 
