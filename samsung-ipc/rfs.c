@@ -113,7 +113,7 @@ int nv_data_size(struct ipc_client *client)
 {
     if (client == NULL ||
         client->nv_data_specs == NULL ||
-        client->nv_data_specs->nv_data_size == NULL)
+        client->nv_data_specs->nv_data_size == 0)
         return NV_DATA_SIZE_DEFAULT;
 
     return client->nv_data_specs->nv_data_size;
@@ -123,7 +123,7 @@ int nv_data_chunk_size(struct ipc_client *client)
 {
     if (client == NULL ||
         client->nv_data_specs == NULL ||
-        client->nv_data_specs->nv_data_chunk_size == NULL)
+        client->nv_data_specs->nv_data_chunk_size == 0)
         return NV_DATA_CHUNK_SIZE_DEFAULT;
 
     return client->nv_data_specs->nv_data_chunk_size;
@@ -714,7 +714,7 @@ void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client, struct 
     if (rfs_io == NULL)
     {
         ipc_client_log(client, "ERROR: Request message is invalid: aseq = %i", info->aseq);
-        return NULL;
+        return;
     }
 
     rfs_io_conf = malloc(rfs_io->length + sizeof(struct ipc_rfs_io_confirm));
@@ -734,7 +734,8 @@ void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client, struct 
     rfs_io_conf->offset = rfs_io->offset;
     rfs_io_conf->length = rfs_io->length;
 
-    ipc_client_send(client, IPC_RFS_NV_READ_ITEM, 0, rfs_io_conf, rfs_io->length + sizeof(struct ipc_rfs_io_confirm), info->aseq);
+    ipc_client_send(client, IPC_RFS_NV_READ_ITEM, 0, (unsigned char*) rfs_io_conf,
+                    rfs_io->length + sizeof(struct ipc_rfs_io_confirm), info->aseq);
     free(rfs_io_conf);
 }
 
@@ -767,7 +768,8 @@ void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client, struct
     rfs_io_conf->offset = rfs_io->offset;
     rfs_io_conf->length = rfs_io->length;
 
-    ipc_client_send(client, IPC_RFS_NV_WRITE_ITEM, 0, rfs_io_conf, sizeof(struct ipc_rfs_io_confirm), info->aseq);
+    ipc_client_send(client, IPC_RFS_NV_WRITE_ITEM, 0, (unsigned char*) rfs_io_conf,
+                    sizeof(struct ipc_rfs_io_confirm), info->aseq);
     free(rfs_io_conf);
 }
 

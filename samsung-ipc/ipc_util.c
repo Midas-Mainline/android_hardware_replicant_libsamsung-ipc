@@ -35,7 +35,7 @@
 #define IPC_STR(f)	case f: return strdup(#f);
 
 void ipc_client_log_recv(struct ipc_client *client,
-    struct ipc_message_info *response, char *prefix)
+    struct ipc_message_info *response, const char *prefix)
 {
     switch (client->type) {
         case IPC_CLIENT_TYPE_FMT:
@@ -68,7 +68,7 @@ void ipc_client_log_recv(struct ipc_client *client,
 }
 
 void ipc_client_log_send(struct ipc_client *client,
-    struct ipc_message_info *request, char *prefix)
+    struct ipc_message_info *request, const char *prefix)
 {
     switch (client->type) {
         case IPC_CLIENT_TYPE_FMT:
@@ -271,8 +271,10 @@ void ipc_client_hex_dump(struct ipc_client *client, void *data, int size)
     for (n=1;n<=size;n++) {
         if (n%16 == 1) {
             /* store address for this line */
-            snprintf(addrstr, sizeof(addrstr), "%.4x",
-               ((unsigned int)p-(unsigned int)data) );
+            unsigned int end = 0, start = 0;
+            end = *((unsigned int*) p);
+            start = *((unsigned int*) data);
+            snprintf(addrstr, sizeof(addrstr), "%.4x", end - start);
         }
 
         c = *p;

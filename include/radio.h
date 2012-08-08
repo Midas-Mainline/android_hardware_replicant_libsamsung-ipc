@@ -100,9 +100,9 @@ void ipc_client_send_exec(struct ipc_client *client, const unsigned short comman
 
 /* Utility functions */
 void ipc_client_log_recv(struct ipc_client *client,
-    struct ipc_message_info *response, char *prefix);
+    struct ipc_message_info *response, const char *prefix);
 void ipc_client_log_send(struct ipc_client *client,
-    struct ipc_message_info *request, char *prefix);
+    struct ipc_message_info *request, const char *prefix);
 const char *ipc_response_type_to_str(int type);
 const char *ipc_request_type_to_str(int type);
 const char *ipc_command_to_str(int command);
