@@ -435,8 +435,11 @@ static int galaxys2_send_secure_images(struct ipc_client *client,
         ipc_client_log(client, "sent FIRMWARE image");
     }
 
-    nv_data_check(client);
-    nv_data_md5_check(client);
+    if (nv_data_check(client) < 0)
+        goto fail;
+
+    if (nv_data_md5_check(client) < 0)
+        goto fail;
 
     nv_data = ipc_client_file_read(client, nv_data_path(client), 2 << 20, 1024);
     if (nv_data == NULL) {

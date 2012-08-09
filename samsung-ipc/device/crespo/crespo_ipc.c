@@ -283,10 +283,12 @@ int crespo_modem_bootstrap(struct ipc_client *client)
     /* nv_data part. */
 
     /* Check if all the nv_data files are ok. */
-    nv_data_check(client);
+    if (nv_data_check(client) < 0)
+        goto error;
 
     /* Check if the MD5 is ok. */
-    nv_data_md5_check(client);
+    if (nv_data_md5_check(client) < 0)
+        goto error;
 
     /* Write nv_data.bin to modem_ctl. */
     ipc_client_log(client, "crespo_ipc_bootstrap: write nv_data to modem_ctl");
