@@ -811,6 +811,8 @@ int maguro_modem_bootstrap(struct ipc_client *client)
     ipc_client_log(client, "Modem is online!");
     ret = 0;
 
+    usleep(500 * 1000);
+
 fail:
     if (io_data.radio_data != MAP_FAILED) {
         munmap(io_data.radio_data, RADIO_MAP_SIZE);
