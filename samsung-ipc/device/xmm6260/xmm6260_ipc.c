@@ -57,7 +57,7 @@ int xmm6260_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_in
     unsigned char *payload;
     size_t frame_length;
     
-    //wake_lock(FMT_LOCK_NAME);
+    wake_lock(FMT_LOCK_NAME);
 
     /* Frame IPC header + payload length */
     frame_length = (sizeof(*hdr) + request->length);
@@ -83,7 +83,7 @@ int xmm6260_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_in
 
     free(frame);
 
-    //wake_unlock(FMT_LOCK_NAME);
+    wake_unlock(FMT_LOCK_NAME);
 
     return 0;
 }
@@ -100,7 +100,7 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
     int num_read = 0;
     int left = 0;
 
-    //wake_lock(FMT_LOCK_NAME);
+    wake_lock(FMT_LOCK_NAME);
 
     num_read = client->handlers->read(buf, IPC_MAX_XFER,
         client->handlers->read_data);
@@ -135,7 +135,7 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
     ipc_client_log_recv(client, response, __func__);
 
 done:
-    //wake_unlock(FMT_LOCK_NAME);
+    wake_unlock(FMT_LOCK_NAME);
     return 0;
 }
 
@@ -149,7 +149,7 @@ int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_in
 
     int ret = 0;
 
-    //wake_lock(RFS_LOCK_NAME);
+    wake_lock(RFS_LOCK_NAME);
 
     do {
         rc = client->handlers->read(buf, IPC_MAX_XFER, client->handlers->read_data);
@@ -205,7 +205,7 @@ int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_in
 
 done:
 
-    //wake_unlock(RFS_LOCK_NAME);
+    wake_unlock(RFS_LOCK_NAME);
     return ret;
 }
 
@@ -216,7 +216,7 @@ int xmm6260_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_in
     int data_length;
     int rc;
 
-    //wake_lock(RFS_LOCK_NAME);
+    wake_lock(RFS_LOCK_NAME);
 
     data_length = sizeof(struct rfs_hdr) + request->length;
     data = malloc(data_length);
@@ -233,7 +233,7 @@ int xmm6260_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_in
 
     rc = client->handlers->write(data, data_length, client->handlers->write_data);
     
-    //wake_unlock(RFS_LOCK_NAME);
+    wake_unlock(RFS_LOCK_NAME);
     return rc;
 }
 
