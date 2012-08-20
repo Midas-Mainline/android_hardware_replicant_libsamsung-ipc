@@ -1370,8 +1370,10 @@ namespace SamsungIpc
         public int set_log_handler(LogHandlerCb log_cb);
         public int set_io_handlers(TransportCb write_cb, TransportCb read_cb);
         public int bootstrap_modem();
-        public void open();
-        public void close();
+        public int open();
+        public int close();
+        public int power_on();
+        public int power_off();
         public int recv(out Response response);
         public void send(MessageType command, RequestType type, uint8[] data, uint8 mseq);
         public void send_get(MessageType command, uint8 aseq);
