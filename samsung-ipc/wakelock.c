@@ -22,17 +22,22 @@
 #include <fcntl.h>
 #include <wakelock.h>
 
+static int wake_lock_fd = -1;
+static int wake_unlock_fd = -1;
+
 int wake_lock(char *lock_name) {
 	int rc;
 	assert(lock_name != NULL);
 	
-	int fd = open("/sys/power/wake_lock", O_RDWR);
-	if (fd < 0) {
-		return fd;
+	if (wake_lock_fd < 0) {
+		wake_lock_fd = open("/sys/power/wake_lock", O_RDWR);
 	}
 
-	rc = write(fd, lock_name, strlen(lock_name));
-	close(fd);
+	if (wake_lock_fd < 0) {
+		return wake_lock_fd;
+	}
+
+	rc = write(wake_lock_fd, lock_name, strlen(lock_name));
 
 	return rc;
 }
@@ -41,13 +46,15 @@ int wake_unlock(char *lock_name) {
 	int rc;
 	assert(lock_name != NULL);
 	
-	int fd = open("/sys/power/wake_unlock", O_RDWR);
-	if (fd < 0) {
-		return fd;
+	if (wake_unlock_fd < 0) {
+		wake_unlock_fd = open("/sys/power/wake_unlock", O_RDWR);
 	}
 
-	rc = write(fd, lock_name, strlen(lock_name));
-	close(fd);
+	if (wake_unlock_fd < 0) {
+		return wake_lock_fd;
+	}
+
+	rc = write(wake_unlock_fd, lock_name, strlen(lock_name));
 
 	return rc;
 }
