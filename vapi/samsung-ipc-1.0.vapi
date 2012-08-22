@@ -1378,5 +1378,7 @@ namespace SamsungIpc
         public void send(MessageType command, RequestType type, uint8[] data, uint8 mseq);
         public void send_get(MessageType command, uint8 aseq);
         public void send_exec(MessageType command, uint8 aseq);
+        public void set_handlers_common_data_fd(int fd);
+        public int get_handlers_common_data_fd();
     }
 }
