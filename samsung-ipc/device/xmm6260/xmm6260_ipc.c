@@ -100,12 +100,15 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
     int num_read = 0;
     int left = 0;
 
+    if (!client || !response)
+        return -1;
+
     wake_lock(FMT_LOCK_NAME);
 
     num_read = client->handlers->read(buf, IPC_MAX_XFER,
         client->handlers->read_data);
 
-    if (num_read < 0) {
+    if (num_read <= 0) {
         ipc_client_log(client, "read failed to read ipc length: %d", num_read);
         response->data = 0;
         response->length = 0;
@@ -128,9 +131,11 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
     response->index = ipc.index;
     response->type = ipc.type;
     response->length = ipc.length - sizeof(ipc);
-    
-    response->data = (unsigned char*)malloc(response->length);
-    memcpy(response->data, buf + sizeof(ipc), response->length);
+   
+    if (response->length > 0) {
+        response->data = (unsigned char*)malloc(response->length);
+        memcpy(response->data, buf + sizeof(ipc), response->length);
+    }
 
     ipc_client_log_recv(client, response, __func__);
 
