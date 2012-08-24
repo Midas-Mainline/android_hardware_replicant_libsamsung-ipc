@@ -137,7 +137,7 @@ int aries_modem_bootstrap(struct ipc_client *client)
 
     /* Read the radio.img image. */
     ipc_client_log(client, "aries_ipc_bootstrap: reading radio image");
-    radio_img_p = ipc_mtd_read(client, "/dev/block/bml12", RADIO_IMG_READ_SIZE, RADIO_IMG_READ_SIZE);
+    radio_img_p = ipc_client_mtd_read(client, "/dev/block/bml12", RADIO_IMG_READ_SIZE, RADIO_IMG_READ_SIZE);
     ipc_client_log(client, "aries_ipc_bootstrap: radio image read");
 
     ipc_client_log(client, "aries_ipc_bootstrap: open onedram");
@@ -348,15 +348,17 @@ int aries_modem_bootstrap(struct ipc_client *client)
     /* nv_data part. */
 
     /* Check if all the nv_data files are ok. */
-    nv_data_check(client);
+    if (nv_data_check(client) < 0)
+        goto error;
 
     /* Check if the MD5 is ok. */
-    nv_data_md5_check(client);
+    if (nv_data_md5_check(client) < 0)
+        goto error;
 
     /* Write nv_data.bin to modem_ctl. */
     ipc_client_log(client, "aries_ipc_bootstrap: write nv_data to onedram");
 
-    nv_data_p = ipc_file_read(client, nv_data_path(client), nv_data_size(client), nv_data_chunk_size(client));
+    nv_data_p = ipc_client_file_read(client, nv_data_path(client), nv_data_size(client), nv_data_chunk_size(client));
     if (nv_data_p == NULL)
         goto error;
     data_p = nv_data_p;
@@ -831,7 +833,7 @@ int aries_ipc_gprs_deactivate(void *data)
     return 0;
 }
 
-int aries_ipc_gprs_get_iface(char **iface)
+int aries_ipc_gprs_get_iface(char **iface, int cid)
 {
     struct ifreq ifr;
     int fd;
@@ -842,17 +844,19 @@ int aries_ipc_gprs_get_iface(char **iface)
 
     fd = socket(AF_PHONET, SOCK_DGRAM, 0);
 
-    for(i=0 ; i < 3 ; i++) {
-        sprintf(ifr.ifr_name, "pdp%d", i);
 
+    for(i=GPRS_IFACE_COUNT-1 ; i >= 0 ; i--) {
+        sprintf(ifr.ifr_name, "%s%d", GPRS_IFACE_PREFIX, i);
         rc = ioctl(fd, SIOCGIFFLAGS, &ifr);
-        if(rc >= 0) {
-            *iface=malloc(strlen(ifr.ifr_name) + 1);
-            memcpy((void *) *iface, ifr.ifr_name, strlen(ifr.ifr_name) + 1);
+        if(rc < 0 || ifr.ifr_flags & IFF_UP) {
+            continue;
+        } else {
+            asprintf(iface, "%s%d", GPRS_IFACE_PREFIX, i);
             return 0;
         }
-
     }
+
+    *iface = NULL;
 
     return -1;
 }
@@ -863,7 +867,7 @@ int aries_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap)
         return -1;
 
     cap->port_list = 1;
-    cap->cid_max = 3;
+    cap->cid_max = GPRS_IFACE_COUNT;
 
     return 0;
 }

@@ -63,8 +63,8 @@ void nv_data_md5_compute(void *data_p, int size, char *secret, void *hash);
 void nv_data_md5_generate(struct ipc_client *client);
 void nv_data_backup_create(struct ipc_client *client);
 void nv_data_backup_restore(struct ipc_client *client);
-void nv_data_check(struct ipc_client *client);
-void nv_data_md5_check(struct ipc_client *client);
+int nv_data_check(struct ipc_client *client);
+int nv_data_md5_check(struct ipc_client *client);
 int nv_data_read(struct ipc_client *client, int offset, int length, char *buf);
 int nv_data_write(struct ipc_client *client, int offset, int length, char *buf);
 

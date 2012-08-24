@@ -115,6 +115,7 @@ namespace SamsungIpc
         GPRS_DATA_DORMANT,
         GPRS_DUN_PIN_CTRL,
         GPRS_CALL_STATUS,
+        GPRS_PORT_LIST,
         SAT_PROFILE_DOWNLOAD,
         SAT_ENVELOPE_CMD,
         SAT_PROACTIVE_CMD,
@@ -941,27 +942,42 @@ namespace SamsungIpc
 
     namespace Gprs
     {
-        [CCode (cname = "gint8", cprefix = "IPC_GPRS_CALL_STATUS_TYPE_", has_type_id = false)]
-        public enum CallStatusType
+        [CCode (cname = "IPC_GPRS_PDP_CONTEXT_GET_DESC_COUNT")]
+        public uint MAX_PDP_CONTEXT_COUNT;
+
+        [CCode (cname = "gint8", cprefix = "IPC_GPRS_STATE_", has_type_id = false)]
+        public enum State
         {
-            ON,
-            OFF,
+            NOT_ENABLED,
+            ENABLED,
+            DISABLED
         }
 
-        [CCode (cname = "gint8", cprefix = "IPC_GPRS_ERROR_", has_type_id = false)]
-        public enum ErrorType
+        [CCode (cname = "gint8", cprefix = "IPC_GPRS_FAIL_", has_type_id = false)]
+        public enum Error
         {
-            UNAVAILABLE,
+            INSUFFICIENT_RESOURCES,
+            MISSING_UNKNOWN_APN,
+            UNKNOWN_PDP_ADDRESS_TYPE,
+            USER_AUTHENTICATION,
+            ACTIVATION_REJECT_CGSN,
+            ACTIVATION_REJECT_UNSPECIFIED,
+            SERVICE_OPTION_NOT_SUPPORTED,
+            SERVICE_OPTION_NOT_SUBSCRIBED,
+            SERVICE_OPTION_OUT_OF_ORDER,
+            NSAPI_IN_USE
         }
 
         [CCode (cname = "struct ipc_gprs_define_pdp_context", destroy_function = "")]
         public struct DefinePdpContextMessage
         {
-            public uint8[] unk0;
+            public uint8 enable;
+            public uint8 cid;
+            public uint8 unk;
             public uint8[] apn;
 
             [CCode (cname = "ipc_gprs_define_pdp_context_setup")]
-            public void setup(string apn);
+            public void setup(uint8 cid, bool enable, string apn);
 
             public unowned uint8[] data
             {
@@ -977,7 +993,7 @@ namespace SamsungIpc
         [CCode (cname = "struct ipc_gprs_ip_configuration", destroy_function = "")]
         public struct IpConfigurationMessage
         {
-            public uint8 unk0;
+            public uint8 cid;
             public uint8 field_flag;
             public uint8 unk1;
             [CCode (array_length = false)]
@@ -1004,12 +1020,47 @@ namespace SamsungIpc
             }
         }
 
+        [CCode (name = "struct ipc_gprs_pdp_context_get_desc", destroy_function = "")]
+        public struct PdpContextGetDescMessage
+        {
+            public uint8 cid;
+            public uint8 state;
+
+            public unowned uint8[] data
+            {
+                get
+                {
+                    unowned uint8[] res = (uint8[])(&this);
+                    res.length = (int) sizeof( PdpContextGetDescMessage );
+                    return res;
+                }
+            }
+        }
+
+        [CCode (name = "struct ipc_gprs_pdp_context_get", destroy_function = "")]
+        public struct PdpContextGetMessage
+        {
+            public uint8 unk;
+            public PdpContextGetDescMessage[] desc;
+
+            public unowned uint8[] data
+            {
+                get
+                {
+                    unowned uint8[] res = (uint8[])(&this);
+                    res.length = (int) sizeof( PdpContextGetMessage );
+                    return res;
+                }
+            }
+        }
+
+
         [CCode (name = "struct ipc_gprs_call_status", destroy_function = "")]
         public struct CallStatusMessage
         {
             public uint8 cid;
-            public CallStatusType status;
-            public uint16 reason;
+            public State status;
+            public uint16 fail_status;
 
             public unowned uint8[] data
             {
@@ -1038,23 +1089,26 @@ namespace SamsungIpc
             }
         }
 
-        [CCode (cname = "struct ipc_gprs_pdp_context", destroy_function = "")]
-        public struct PdpContextMessage
+        [CCode (cname = "struct ipc_gprs_pdp_context_set", destroy_function = "")]
+        public struct PdpContextSetMessage
         {
+            public uint8 enable;
+            public uint8 cid;
             public uint8[] unk0;
             public uint8[] username;
             public uint8[] password;
             public uint8[] unk1;
+            public uint8 unk2;
 
             [CCode (cname = "ipc_gprs_pdp_context_setup")]
-            public void setup(bool activate, string? username, string? password);
+            public void setup(int cid, bool activate, string? username, string? password);
 
             public unowned uint8[] data
             {
                 get
                 {
                     unowned uint8[] res = (uint8[])(&this);
-                    res.length = (int) sizeof( PdpContextMessage );
+                    res.length = (int) sizeof( PdpContextSetMessage );
                     return res;
                 }
             }
@@ -1079,7 +1133,9 @@ namespace SamsungIpc
         [CCode (cname = "struct ipc_gprs_current_session_data_counter", destroy_function = "")]
         public struct CurrentSessionDataCounterMessage
         {
-            public uint8[] unk;
+            public uint8[] cid;
+            public uint8[] rx_count;
+            public uint8[] tx_count;
 
             public unowned uint8[] data
             {
@@ -1087,6 +1143,25 @@ namespace SamsungIpc
                 {
                     unowned uint8[] res = (uint8[])(&this);
                     res.length = (int) sizeof( CurrentSessionDataCounterMessage );
+                    return res;
+                }
+            }
+        }
+
+        [CCode (cname = "struct ipc_gprs_port_list")]
+        public struct PortListMessage
+        {
+            public uint8[] unk;
+
+            [CCode (cname = "ipc_gprs_port_list_setup")]
+            public void setup();
+
+            public unowned uint8[] data
+            {
+                get
+                {
+                    unowned uint8[] res = (uint8[])(&this);
+                    res.length = (int) sizeof( PortListMessage );
                     return res;
                 }
             }
@@ -1295,11 +1370,15 @@ namespace SamsungIpc
         public int set_log_handler(LogHandlerCb log_cb);
         public int set_io_handlers(TransportCb write_cb, TransportCb read_cb);
         public int bootstrap_modem();
-        public void open();
-        public void close();
+        public int open();
+        public int close();
+        public int power_on();
+        public int power_off();
         public int recv(out Response response);
         public void send(MessageType command, RequestType type, uint8[] data, uint8 mseq);
         public void send_get(MessageType command, uint8 aseq);
         public void send_exec(MessageType command, uint8 aseq);
+        public void set_handlers_common_data_fd(int fd);
+        public int get_handlers_common_data_fd();
     }
 }

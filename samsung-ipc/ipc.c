@@ -333,7 +333,7 @@ int ipc_client_open(struct ipc_client *client)
 
     type = client->type;
 
-    return client->handlers->open(&type, 0, client->handlers->open_data);
+    return client->handlers->open(type, client->handlers->open_data);
 }
 
 int ipc_client_close(struct ipc_client *client)
@@ -343,7 +343,7 @@ int ipc_client_close(struct ipc_client *client)
         client->handlers->close == NULL)
         return -1;
 
-    return client->handlers->close(NULL, 0, client->handlers->close_data);
+    return client->handlers->close(client->handlers->close_data);
 }
 
 int ipc_client_power_on(struct ipc_client *client)
@@ -399,14 +399,14 @@ int ipc_client_gprs_deactivate(struct ipc_client *client)
     return client->handlers->gprs_deactivate(client->handlers->gprs_deactivate_data);
 }
 
-int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface)
+int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface, int cid)
 {
     if (client == NULL ||
         client->gprs_specs == NULL ||
         client->gprs_specs->gprs_get_iface == NULL)
         return -1;
 
-    return client->gprs_specs->gprs_get_iface(iface);
+    return client->gprs_specs->gprs_get_iface(iface, cid);
 }
 
 int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_client_gprs_capabilities *cap)

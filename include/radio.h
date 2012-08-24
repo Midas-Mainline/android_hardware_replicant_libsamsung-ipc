@@ -71,6 +71,7 @@ int ipc_client_set_handlers(struct ipc_client *client, struct ipc_handlers *hand
 int ipc_client_set_io_handlers(struct ipc_client *client,
                                ipc_io_handler_cb read, void *read_data,
                                ipc_io_handler_cb write, void *write_data);
+
 int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data);
 void *ipc_client_get_handlers_common_data(struct ipc_client *client);
 int ipc_client_create_handlers_common_data(struct ipc_client *client);
@@ -86,7 +87,7 @@ int ipc_client_power_off(struct ipc_client *client);
 int ipc_client_gprs_handlers_available(struct ipc_client *client);
 int ipc_client_gprs_activate(struct ipc_client *client);
 int ipc_client_gprs_deactivate(struct ipc_client *client);
-int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface);
+int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface, int cid);
 int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_client_gprs_capabilities *cap);
 
 int ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response);
@@ -99,15 +100,16 @@ void ipc_client_send_exec(struct ipc_client *client, const unsigned short comman
 
 /* Utility functions */
 void ipc_client_log_recv(struct ipc_client *client,
-    struct ipc_message_info *response, char *prefix);
+    struct ipc_message_info *response, const char *prefix);
 void ipc_client_log_send(struct ipc_client *client,
-    struct ipc_message_info *request, char *prefix);
+    struct ipc_message_info *request, const char *prefix);
 const char *ipc_response_type_to_str(int type);
 const char *ipc_request_type_to_str(int type);
 const char *ipc_command_to_str(int command);
-void ipc_hex_dump(struct ipc_client *client, void *data, int size);
-void *ipc_mtd_read(struct ipc_client *client, char *mtd_name, int size, int block_size);
-void *ipc_file_read(struct ipc_client *client, char *file_name, int size, int block_size);
+
+void ipc_client_hex_dump(struct ipc_client *client, void *data, int size);
+void *ipc_client_mtd_read(struct ipc_client *client, char *mtd_name, int size, int block_size);
+void *ipc_client_file_read(struct ipc_client *client, char *file_name, int size, int block_size);
 
 #endif
 

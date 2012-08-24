@@ -481,9 +481,14 @@ static int maguro_send_mps_data(struct ipc_client *client,
     mps_fd = open(I9250_MPS_IMAGE_PATH, O_RDONLY);
     if (mps_fd < 0) {
         ipc_client_log(client, "Error: failed to open MPS data");
+        goto fail;
     }
     else {
-        read(mps_fd, mps_data, I9250_MPS_LENGTH);
+        ret = read(mps_fd, mps_data, I9250_MPS_LENGTH);
+        if (ret < 0) {
+            ipc_client_log(client, "Error: failed to read MPS data\n");
+            goto fail;
+        }
     }
 
     if ((ret = maguro_boot_cmd(client, io_data, ReqFlashSetAddress, &addr, 4)) < 0) {
@@ -535,10 +540,13 @@ static int maguro_send_image_addrs(struct ipc_client *client,
         ipc_client_log(client, "sent FIRMWARE image");
     }
 
-    nv_data_check(client);
-    nv_data_md5_check(client);
+    if (nv_data_check(client) < 0)
+        goto fail;
 
-    nv_data = ipc_file_read(client, nv_data_path(client), 2 << 20, 1024);
+    if (nv_data_md5_check(client) < 0)
+        goto fail;
+
+    nv_data = ipc_client_file_read(client, nv_data_path(client), 2 << 20, 1024);
     if (nv_data == NULL) {
         ipc_client_log(client, "Error: failed to read NVDATA image");
         goto fail;

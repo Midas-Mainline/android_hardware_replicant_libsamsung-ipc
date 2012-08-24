@@ -76,9 +76,9 @@ int crespo_modem_bootstrap(struct ipc_client *client)
 
     /* Read the radio.img image. */
     ipc_client_log(client, "crespo_ipc_bootstrap: reading radio image");
-    radio_img_p = ipc_mtd_read(client, "/dev/mtd/mtd5ro", RADIO_IMG_SIZE, 0x1000);
+    radio_img_p = ipc_client_mtd_read(client, "/dev/mtd/mtd5ro", RADIO_IMG_SIZE, 0x1000);
     if (radio_img_p == NULL) {
-        radio_img_p = ipc_mtd_read(client, "/dev/mtd5ro", RADIO_IMG_SIZE, 0x1000);
+        radio_img_p = ipc_client_mtd_read(client, "/dev/mtd5ro", RADIO_IMG_SIZE, 0x1000);
         if (radio_img_p == NULL)
             goto error;
     }
@@ -90,7 +90,10 @@ int crespo_modem_bootstrap(struct ipc_client *client)
         goto error;
 
     /* Reset the modem before init to send the first part of modem.img. */
-    ioctl(modem_ctl_fd, IOCTL_MODEM_RESET);
+    rc = ioctl(modem_ctl_fd, IOCTL_MODEM_RESET);
+    if (rc < 0)
+        goto error;
+
     usleep(400000);
 
     ipc_client_log(client, "crespo_ipc_bootstrap: open s3c2410_serial3");
@@ -120,28 +123,40 @@ int crespo_modem_bootstrap(struct ipc_client *client)
     usleep(50000); //FIXME
 
     /* Get and check bootcore version. */
-    read(s3c2410_serial3_fd, &bootcore_version, sizeof(bootcore_version));
+    rc = read(s3c2410_serial3_fd, &bootcore_version, sizeof(bootcore_version));
+    if (rc < 0)
+        goto error;
+
     ipc_client_log(client, "crespo_ipc_bootstrap: got bootcore version: 0x%x", bootcore_version);
 
     if(bootcore_version != BOOTCORE_VERSION)
         goto error;
 
     /* Get info_size. */
-    read(s3c2410_serial3_fd, &info_size, sizeof(info_size));
+    rc = read(s3c2410_serial3_fd, &info_size, sizeof(info_size));
+    if (rc < 0)
+        goto error;
+
     ipc_client_log(client, "crespo_ipc_bootstrap: got info_size: 0x%x", info_size);
 
     /* Send PSI magic. */
-    data=PSI_MAGIC;
-    write(s3c2410_serial3_fd, &data, sizeof(data));
+    data = PSI_MAGIC;
+    rc = write(s3c2410_serial3_fd, &data, sizeof(data));
+    if (rc < 0)
+        goto error;
+
     ipc_client_log(client, "crespo_ipc_bootstrap: sent PSI_MAGIC (0x%x)", PSI_MAGIC);
 
     /* Send PSI data len. */
-    data_16=PSI_DATA_LEN;
-    data_p=(uint8_t *)&data_16;
+    data_16 = PSI_DATA_LEN;
+    data_p = (uint8_t *)&data_16;
 
     for(i=0 ; i < 2 ; i++)
     {
-        write(s3c2410_serial3_fd, data_p, 1);
+        rc = write(s3c2410_serial3_fd, data_p, 1);
+        if (rc < 0)
+            goto error;
+
         data_p++;
     }
     ipc_client_log(client, "crespo_ipc_bootstrap: sent PSI_DATA_LEN (0x%x)", PSI_DATA_LEN);
@@ -150,49 +165,55 @@ int crespo_modem_bootstrap(struct ipc_client *client)
     FD_ZERO(&fds);
     FD_SET(s3c2410_serial3_fd, &fds);
 
-    timeout.tv_sec=4;
-    timeout.tv_usec=0;
+    timeout.tv_sec = 4;
+    timeout.tv_usec = 0;
 
-    data_p=radio_img_p;
+    data_p = radio_img_p;
 
     ipc_client_log(client, "crespo_ipc_bootstrap: sending the first part of radio.img");
 
-    for(i=0 ; i < PSI_DATA_LEN ; i++)
+    for (i=0 ; i < PSI_DATA_LEN ; i++)
     {
-        if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
+        if (select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
         {
             ipc_client_log(client, "crespo_ipc_bootstrap: select timeout passed");
             goto error;
         }
 
-        write(s3c2410_serial3_fd, data_p, 1);
-        crc_byte=crc_byte ^ *data_p;
+        rc = write(s3c2410_serial3_fd, data_p, 1);
+        if (rc < 0)
+            goto error;
 
+        crc_byte = crc_byte ^ *data_p;
         data_p++;
     }
 
     ipc_client_log(client, "crespo_ipc_bootstrap: first part of radio.img sent; crc_byte is 0x%x", crc_byte);
 
-    if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
+    if (select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
     {
         ipc_client_log(client, "crespo_ipc_bootstrap: select timeout passed");
         goto error;
     }
 
-    write(s3c2410_serial3_fd, &crc_byte, sizeof(crc_byte));
+    rc = write(s3c2410_serial3_fd, &crc_byte, sizeof(crc_byte));
+    if (rc < 0)
+        goto error;
 
     ipc_client_log(client, "crespo_ipc_bootstrap: crc_byte sent");
 
     data = 0;
-    for(i = 0 ; data != 0x01 ; i++)
+    for (i = 0 ; data != 0x01 ; i++)
     {
-        if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
+        if (select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
         {
             ipc_client_log(client, "crespo_ipc_bootstrap: select timeout passed");
             goto error;
         }
 
-        read(s3c2410_serial3_fd, &data, sizeof(data));
+        rc = read(s3c2410_serial3_fd, &data, sizeof(data));
+        if (rc < 0)
+            goto error;
 
         if(i > 50)
         {
@@ -209,22 +230,25 @@ int crespo_modem_bootstrap(struct ipc_client *client)
     lseek(modem_ctl_fd, 0, SEEK_SET);
 
     /* Pointer to the remaining part of radio.img. */
-    data_p=radio_img_p + PSI_DATA_LEN;
+    data_p = radio_img_p + PSI_DATA_LEN;
 
     FD_ZERO(&fds);
     FD_SET(modem_ctl_fd, &fds);
 
     block_size = 0x100000;
 
-    for(i=0 ; i < (RADIO_IMG_SIZE - PSI_DATA_LEN) / block_size ; i++)
+    for (i=0 ; i < (RADIO_IMG_SIZE - PSI_DATA_LEN) / block_size ; i++)
     {
-        if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
+        if (select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
         {
             ipc_client_log(client, "crespo_ipc_bootstrap: select timeout passed");
             goto error;
         }
 
-        write(modem_ctl_fd, data_p, block_size);
+        rc = write(modem_ctl_fd, data_p, block_size);
+        if (rc < 0)
+            goto error;
+
         data_p += block_size;
     }
 
@@ -233,29 +257,33 @@ int crespo_modem_bootstrap(struct ipc_client *client)
     /* nv_data part. */
 
     /* Check if all the nv_data files are ok. */
-    nv_data_check(client);
+    if (nv_data_check(client) < 0)
+        goto error;
 
     /* Check if the MD5 is ok. */
-    nv_data_md5_check(client);
+    if (nv_data_md5_check(client) < 0)
+        goto error;
 
     /* Write nv_data.bin to modem_ctl. */
     ipc_client_log(client, "crespo_ipc_bootstrap: write nv_data to modem_ctl");
 
-    nv_data_p = ipc_file_read(client, nv_data_path(client), nv_data_size(client), nv_data_chunk_size(client));
+    nv_data_p = ipc_client_file_read(client, nv_data_path(client), nv_data_size(client), nv_data_chunk_size(client));
     if (nv_data_p == NULL)
         goto error;
-    data_p = nv_data_p;
 
+    data_p = nv_data_p;
     lseek(modem_ctl_fd, RADIO_IMG_SIZE, SEEK_SET);
 
     for(i=0 ; i < 2 ; i++)
     {
-        write(modem_ctl_fd, data_p, nv_data_size(client) / 2);
+        rc = write(modem_ctl_fd, data_p, nv_data_size(client) / 2);
+        if (rc < 0)
+            goto error;
+
         data_p += nv_data_size(client) / 2;
     }
 
     free(nv_data_p);
-
     close(modem_ctl_fd);
 
     rc = 0;
@@ -425,9 +453,8 @@ int crespo_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_inf
     return 0;
 }
 
-int crespo_ipc_open(void *data, unsigned int size, void *io_data)
+int crespo_ipc_open(int type, void *io_data)
 {
-    int type = *((int *) data);
     int fd = -1;
 
     switch(type)
@@ -453,7 +480,7 @@ int crespo_ipc_open(void *data, unsigned int size, void *io_data)
     return 0;
 }
 
-int crespo_ipc_close(void *data, unsigned int size, void *io_data)
+int crespo_ipc_close(void *io_data)
 {
     int fd = -1;
 
@@ -559,9 +586,9 @@ int crespo_ipc_power_off(void *io_data)
     return 0;
 }
 
-int crespo_ipc_gprs_get_iface(char **iface)
+int crespo_ipc_gprs_get_iface(char **iface, int cid)
 {
-    asprintf(iface, GPRS_IFACE);
+    asprintf(iface, "%s%d", GPRS_IFACE_PREFIX, 0);
 
     return 0;
 }
