@@ -497,6 +497,7 @@ int aries_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_info
     response->group = resphdr->group;
     response->index = resphdr->index;
     response->type = resphdr->type;
+    response->cmd = IPC_COMMAND(response);
     response->length = resphdr->length - sizeof(struct ipc_header);
     response->data = NULL;
 

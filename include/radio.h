@@ -43,6 +43,7 @@ struct ipc_message_info {
     unsigned char aseq;
     unsigned char group;
     unsigned char index;
+    unsigned short cmd;
     unsigned char type;
     unsigned int length;
     unsigned char *data;

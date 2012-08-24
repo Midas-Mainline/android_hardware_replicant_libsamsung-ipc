@@ -163,6 +163,7 @@ int h1_ipc_recv(struct ipc_client *client, struct ipc_message_info *response)
             response->group = ipc->group;
             response->index = ipc->index;
             response->type = ipc->type;
+            response->type = IPC_COMMAND(response);
             response->length = (ipc->length - sizeof(*ipc));
 
             response->data = (unsigned char*)malloc(response->length);
