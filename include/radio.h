@@ -92,6 +92,7 @@ int ipc_client_gprs_get_iface(struct ipc_client *client, char **iface, int cid);
 int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_client_gprs_capabilities *cap);
 
 int ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response);
+void ipc_client_response_free(struct ipc_client *client, struct ipc_message_info *response);
 
 /* Convenience functions for ipc_send */
 void ipc_client_send(struct ipc_client *client, const unsigned short command, const char type, unsigned char *data,

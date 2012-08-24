@@ -464,4 +464,12 @@ int ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response
     return client->ops->recv(client, response);
 }
 
+void ipc_client_response_free(struct ipc_client *client, struct ipc_message_info *response)
+{
+    if (response->data != NULL) {
+        free(response->data);
+        response->data = NULL;
+    }
+}
+
 // vim:ts=4:sw=4:expandtab
