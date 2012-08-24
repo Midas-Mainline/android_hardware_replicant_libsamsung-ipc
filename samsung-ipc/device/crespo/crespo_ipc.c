@@ -34,37 +34,11 @@
 #include <assert.h>
 
 #include <radio.h>
+#include <wakelock.h>
 
 #include "crespo_modem_ctl.h"
 #include "crespo_ipc.h"
 #include "ipc_private.h"
-
-int wake_lock_fd =      -1;
-int wake_unlock_fd =    -1;
-
-int wake_lock(char *lock_name, int len)
-{
-    int rc = 0;
-
-    if(wake_lock_fd < 0)
-        wake_lock_fd = open("/sys/power/wake_lock", O_RDWR);
-
-    rc = write(wake_lock_fd, lock_name, len);
-
-    return rc;
-}
-
-int wake_unlock(char *lock_name, int len)
-{
-    int rc = 0;
-
-    if(wake_unlock_fd < 0)
-        wake_unlock_fd = open("/sys/power/wake_unlock", O_RDWR);
-
-    rc = write(wake_unlock_fd, lock_name, len);
-
-    return rc;
-}
 
 int crespo_modem_bootstrap(struct ipc_client *client)
 {
@@ -388,7 +362,7 @@ int crespo_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_inf
 
     memset(response, 0, sizeof(struct ipc_message_info));
 
-    wake_lock("secril_fmt-interface", 20);
+    wake_lock("secril_fmt-interface");
 
     assert(client->handlers->read != NULL);
     bread = client->handlers->read((uint8_t*) &modem_data, sizeof(struct modem_io) + MAX_MODEM_DATA_SIZE, client->handlers->read_data);
@@ -424,7 +398,7 @@ int crespo_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_inf
 
     ipc_client_log_recv(client, response, __func__);
 
-    wake_unlock("secril_fmt-interface", 20);
+    wake_unlock("secril_fmt-interface");
 
     return 0;
 }
@@ -440,7 +414,7 @@ int crespo_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_inf
 
     memset(response, 0, sizeof(struct ipc_message_info));
 
-    wake_lock("secril_rfs-interface", 20);
+    wake_lock("secril_rfs-interface");
 
     assert(client->handlers->read != NULL);
     bread = client->handlers->read((uint8_t*) &modem_data, sizeof(struct modem_io) + MAX_MODEM_DATA_SIZE, client->handlers->read_data);
@@ -474,7 +448,7 @@ int crespo_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_inf
 
     ipc_client_log_recv(client, response, __func__);
 
-    wake_unlock("secril_rfs-interface", 20);
+    wake_unlock("secril_rfs-interface");
 
     return 0;
 }

@@ -98,6 +98,7 @@ struct maguro_boot_tail_header name = {\
 }
 
 int maguro_modem_bootstrap(struct ipc_client *client);
+int maguro_power_off(void *io_data);
 
 #endif
 

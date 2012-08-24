@@ -1,7 +1,7 @@
 /**
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,20 +18,36 @@
  *
  */
 
-#ifndef __CRESPO_IPC_H__
-#define __CRESPO_IPC_H__
+#include <assert.h>
+#include <fcntl.h>
+#include <wakelock.h>
 
-#define BOOTCORE_VERSION        0xf0
-#define PSI_MAGIC               0x30
-#define PSI_DATA_LEN            0x5000
-#define RADIO_IMG_SIZE          0xd80000
+int wake_lock(char *lock_name) {
+	int rc;
+	assert(lock_name != NULL);
+	
+	int fd = open("/sys/power/wake_lock", O_RDWR);
+	if (fd < 0) {
+		return fd;
+	}
 
-#define MAX_MODEM_DATA_SIZE     0x50000
+	rc = write(fd, lock_name, strlen(lock_name));
+	close(fd);
 
-#define GPRS_IFACE_PREFIX       "rmnet"
+	return rc;
+}
 
-extern struct ipc_handlers crespo_ipc_default_handlers;
+int wake_unlock(char *lock_name) {
+	int rc;
+	assert(lock_name != NULL);
+	
+	int fd = open("/sys/power/wake_unlock", O_RDWR);
+	if (fd < 0) {
+		return fd;
+	}
 
-#endif
+	rc = write(fd, lock_name, strlen(lock_name));
+	close(fd);
 
-// vim:ts=4:sw=4:expandtab
+	return rc;
+}
