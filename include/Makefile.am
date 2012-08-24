@@ -16,6 +16,7 @@ samsung_ipcinclude_HEADERS = \
 	gprs.h \
 	snd.h \
 	rfs.h \
+	samsung-ipc.h \
 	$(NULL)
 
 samsung_ipc_v4includedir = $(includedir)/samsung-ipc-1.0/device/ipc-v4/
