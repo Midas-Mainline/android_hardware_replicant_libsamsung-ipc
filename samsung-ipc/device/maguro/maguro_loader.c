@@ -730,7 +730,7 @@ int maguro_modem_bootstrap(struct ipc_client *client)
             goto fail;
         }
         ipc_client_log(client, "got bootloader reply %08x", id_buf);
-        if (id_buf == I9250_BOOT_LAST_MARKER) {
+        if ((id_buf & I9250_BOOT_LAST_MASK) == I9250_BOOT_LAST_MASK) {
             ret = 0;
             break;
         }
