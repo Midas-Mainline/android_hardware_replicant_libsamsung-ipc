@@ -1380,5 +1380,6 @@ namespace SamsungIpc
         public void send_exec(MessageType command, uint8 aseq);
         public void set_handlers_common_data_fd(int fd);
         public int get_handlers_common_data_fd();
+        public int create_handlers_common_data();
     }
 }
