@@ -100,6 +100,12 @@ struct maguro_boot_cmd_desc maguro_boot_cmd_desc[] = {
     },
 };
 
+#define I9250_RADIO_IMAGE_PATHS_NUM 2
+const char *i9250_radio_image_paths[] = {
+    "/dev/block/platform/omap/omap_hsmmc.0/by-name/radio",
+    "/dev/mmcblk0p9"
+};
+
 static int maguro_send_image(struct ipc_client *client,
     struct modemctl_io_data *io_data, enum xmm6260_image type)
 {
@@ -652,17 +658,23 @@ fail:
 
 int maguro_modem_bootstrap(struct ipc_client *client)
 {
-    int ret = -1;
+    int ret = -1, n = 0, fd = -1;
     struct modemctl_io_data io_data;
     memset(&io_data, 0, sizeof(client, io_data));
 
-    io_data.radio_fd = open(I9250_RADIO_IMAGE, O_RDONLY);
+    io_data.radio_fd = -1;
+    for (n = 0; n < I9250_RADIO_IMAGE_PATHS_NUM; n++) {
+        fd = open(i9250_radio_image_paths[n], O_RDONLY);
+        if (fd > 0) {
+            io_data.radio_fd = fd;
+            ipc_client_log(client, "opened radio image %s, fd=%d", i9250_radio_image_paths[n], io_data.radio_fd);
+            break;
+        }
+    }
+
     if (io_data.radio_fd < 0) {
         ipc_client_log(client, "Error: failed to open radio firmware");
         goto fail;
-    }
-    else {
-        ipc_client_log(client, "opened radio image %s, fd=%d", I9250_RADIO_IMAGE, io_data.radio_fd);
     }
 
     if (fstat(io_data.radio_fd, &io_data.radio_stat) < 0) {

@@ -27,7 +27,6 @@
 #ifndef __MAGURO_LOADER_H__
 #define __MAGURO_LOADER_H__
 
-#define I9250_RADIO_IMAGE "/dev/block/platform/omap/omap_hsmmc.0/by-name/radio"
 #define I9250_SECOND_BOOT_DEV "/dev/umts_boot1"
 
 #define I9250_BOOT_LAST_MASK 0x0000ffff
