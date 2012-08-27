@@ -38,6 +38,7 @@
 #include <assert.h>
 
 #include <radio.h>
+#include <wakelock.h>
 
 #include "ipc_private.h"
 
@@ -46,12 +47,17 @@
 #include "xmm6260_modemctl.h"
 #include "modem_prj.h"
 
+#define FMT_LOCK_NAME "xmm6260-fmt-lock"
+#define RFS_LOCK_NAME "xmm6260-rfs-lock"
+
 int xmm6260_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_info *request)
 {
     struct ipc_header *hdr;
     unsigned char *frame;
     unsigned char *payload;
     size_t frame_length;
+    
+    wake_lock(FMT_LOCK_NAME);
 
     /* Frame IPC header + payload length */
     frame_length = (sizeof(*hdr) + request->length);
@@ -77,6 +83,8 @@ int xmm6260_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_in
 
     free(frame);
 
+    wake_unlock(FMT_LOCK_NAME);
+
     return 0;
 }
 
@@ -92,14 +100,19 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
     int num_read = 0;
     int left = 0;
 
+    if (!client || !response)
+        return -1;
+
+    wake_lock(FMT_LOCK_NAME);
+
     num_read = client->handlers->read(buf, IPC_MAX_XFER,
         client->handlers->read_data);
 
-    if (num_read < 0) {
+    if (num_read <= 0) {
         ipc_client_log(client, "read failed to read ipc length: %d", num_read);
         response->data = 0;
         response->length = 0;
-        return 0;
+        goto done;
     }
 
     memcpy(&ipc, buf, sizeof(ipc));
@@ -119,12 +132,16 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
     response->type = ipc.type;
     response->cmd = IPC_COMMAND(response);
     response->length = ipc.length - sizeof(ipc);
-    
-    response->data = (unsigned char*)malloc(response->length);
-    memcpy(response->data, buf + sizeof(ipc), response->length);
+   
+    if (response->length > 0) {
+        response->data = (unsigned char*)malloc(response->length);
+        memcpy(response->data, buf + sizeof(ipc), response->length);
+    }
 
     ipc_client_log_recv(client, response, __func__);
 
+done:
+    wake_unlock(FMT_LOCK_NAME);
     return 0;
 }
 
@@ -136,12 +153,17 @@ int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_in
     unsigned count=0;
     int rc;
 
+    int ret = 0;
+
+    wake_lock(RFS_LOCK_NAME);
+
     do {
         rc = client->handlers->read(buf, IPC_MAX_XFER, client->handlers->read_data);
 
         if (rc < 0) {
             ipc_client_log(client, "Failed to read RFS data.");
-            return -1;
+            ret = -1;
+            goto done;
         }
         ipc_client_log(client, "received %d bytes", rc);
 
@@ -149,14 +171,16 @@ int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_in
         if (!header_recv) {
             if ((unsigned)rc < sizeof(struct rfs_hdr)) {
                 ipc_client_log(client, "Failed to read RFS data.");
-                return -1;
+                ret = -1;
+                goto done;
             }
 
             memcpy((void *) &header, (void *) buf, sizeof(struct rfs_hdr));
 
             if (header.size < sizeof(struct rfs_hdr)) {
                 ipc_client_log(client, "Invalid size in header");
-                return -1;
+                ret = -1;
+                goto done;
             }
 
             response->mseq = 0;
@@ -185,7 +209,10 @@ int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_in
 
     ipc_client_log_recv(client, response, __func__);
 
-    return 0;
+done:
+
+    wake_unlock(RFS_LOCK_NAME);
+    return ret;
 }
 
 int xmm6260_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_info *request)
@@ -194,6 +221,8 @@ int xmm6260_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_in
     char *data = NULL;
     int data_length;
     int rc;
+
+    wake_lock(RFS_LOCK_NAME);
 
     data_length = sizeof(struct rfs_hdr) + request->length;
     data = malloc(data_length);
@@ -209,6 +238,8 @@ int xmm6260_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_in
     ipc_client_log_send(client, request, __func__);
 
     rc = client->handlers->write(data, data_length, client->handlers->write_data);
+    
+    wake_unlock(RFS_LOCK_NAME);
     return rc;
 }
 

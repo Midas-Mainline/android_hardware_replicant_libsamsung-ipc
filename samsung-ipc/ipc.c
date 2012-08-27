@@ -48,7 +48,9 @@ void log_handler_default(const char *message, void *user_data)
 
 void ipc_client_log(struct ipc_client *client, const char *message, ...)
 {
-    assert(client->log_handler != NULL);
+    if (!message || !client || !client->log_handler) {
+        return;
+    }
 
     va_list args;
     char buffer[4096];

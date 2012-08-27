@@ -30,7 +30,7 @@
 #define I9250_RADIO_IMAGE "/dev/block/platform/omap/omap_hsmmc.0/by-name/radio"
 #define I9250_SECOND_BOOT_DEV "/dev/umts_boot1"
 
-#define I9250_BOOT_LAST_MARKER 0x0030ffff
+#define I9250_BOOT_LAST_MASK 0x0000ffff
 #define I9250_BOOT_REPLY_MAX 20
 
 #define I9250_GENERAL_ACK "\x02\x00\x00\x00"
@@ -98,6 +98,7 @@ struct maguro_boot_tail_header name = {\
 }
 
 int maguro_modem_bootstrap(struct ipc_client *client);
+int maguro_power_off(void *io_data);
 
 #endif
 

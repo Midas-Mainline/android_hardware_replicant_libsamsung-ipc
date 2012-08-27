@@ -628,6 +628,28 @@ fail:
     return ret;
 }
 
+int maguro_power_off(void *io_data_unused) {
+    int ret = -1;
+    struct modemctl_io_data io_data;
+    
+    io_data.boot_fd = open(BOOT_DEV, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    if (io_data.boot_fd < 0) {
+        ret = io_data.boot_fd;
+        goto fail;
+    }
+    
+    if ((ret = modemctl_modem_power(NULL, &io_data, false)) < 0) {
+        goto fail_pwr;
+    }
+
+    ret = 0;
+
+fail_pwr:
+    close(io_data.boot_fd);
+fail:
+    return ret;
+}
+
 int maguro_modem_bootstrap(struct ipc_client *client)
 {
     int ret = -1;
@@ -708,7 +730,7 @@ int maguro_modem_bootstrap(struct ipc_client *client)
             goto fail;
         }
         ipc_client_log(client, "got bootloader reply %08x", id_buf);
-        if (id_buf == I9250_BOOT_LAST_MARKER) {
+        if ((id_buf & I9250_BOOT_LAST_MASK) == I9250_BOOT_LAST_MASK) {
             ret = 0;
             break;
         }

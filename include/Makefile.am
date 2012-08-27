@@ -16,6 +16,7 @@ samsung_ipcinclude_HEADERS = \
 	gprs.h \
 	snd.h \
 	rfs.h \
+	wakelock.h \
 	samsung-ipc.h \
 	$(NULL)
 
