@@ -74,7 +74,7 @@ void ipc_client_log_send(struct ipc_client *client,
         case IPC_CLIENT_TYPE_FMT:
             ipc_client_log(client, "%s: SEND FMT!", prefix);
             ipc_client_log(client, "%s: Request: mseq=0x%02x command=%s (0x%04x) type=%s",
-                prefix, request->mseq, ipc_command_to_str(IPC_COMMAND(request)), IPC_COMMAND(request), ipc_response_type_to_str(request->type));
+                prefix, request->mseq, ipc_command_to_str(IPC_COMMAND(request)), IPC_COMMAND(request), ipc_request_type_to_str(request->type));
 #ifdef DEBUG
             if (request->length > 0) {
                 ipc_client_log(client, "==== FMT DATA DUMP ====");
