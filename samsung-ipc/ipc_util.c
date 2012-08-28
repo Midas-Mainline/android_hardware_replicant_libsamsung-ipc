@@ -47,6 +47,7 @@ void ipc_client_log_recv(struct ipc_client *client,
                 ipc_client_log(client, "==== FMT DATA DUMP ====");
                 ipc_client_hex_dump(client, (void *) response->data, 
                     response->length > 0x100 ? 0x100 : response->length);
+                ipc_client_log(client, "=======================");
             }
 #endif
             break;
@@ -59,12 +60,11 @@ void ipc_client_log_recv(struct ipc_client *client,
                 ipc_client_log(client, "==== RFS DATA DUMP ====");
                 ipc_client_hex_dump(client, (void *) response->data, 
                     response->length > 0x100 ? 0x100 : response->length);
+                ipc_client_log(client, "=======================");
             }
 #endif
             break;
     }
-
-    ipc_client_log(client, "");
 }
 
 void ipc_client_log_send(struct ipc_client *client,
@@ -80,6 +80,7 @@ void ipc_client_log_send(struct ipc_client *client,
                 ipc_client_log(client, "==== FMT DATA DUMP ====");
                 ipc_client_hex_dump(client, (void *) request->data,
                     request->length > 0x100 ? 0x100 : request->length);
+                ipc_client_log(client, "=======================");
             }
 #endif
             break;
@@ -92,12 +93,11 @@ void ipc_client_log_send(struct ipc_client *client,
                 ipc_client_log(client, "==== RFS DATA DUMP ====");
                 ipc_client_hex_dump(client, (void *) request->data,
                     request->length > 0x100 ? 0x100 : request->length);
+                ipc_client_log(client, "=======================");
             }
 #endif
             break;
     }
-
-    ipc_client_log(client, "");
 }
 
 const char *ipc_response_type_to_str(int type) {
