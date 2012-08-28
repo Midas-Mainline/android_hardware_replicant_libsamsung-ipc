@@ -165,7 +165,6 @@ int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_in
             ret = -1;
             goto done;
         }
-        ipc_client_log(client, "received %d bytes", rc);
 
         // We didn't recieve the header yet
         if (!header_recv) {
