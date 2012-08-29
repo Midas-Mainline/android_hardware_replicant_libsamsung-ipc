@@ -244,6 +244,7 @@ namespace SamsungIpc
         [CCode (cname = "gint8", cprefix = "IPC_SEC_FACILITY_LOCK_TYPE_", has_type_id = false)]
         public enum FacilityLockType
         {
+            SC_UNLOCKED,
             SC_PIN1_REQ,
             SC_PUK_REQ,
             SC_CARD_BLOCKED,

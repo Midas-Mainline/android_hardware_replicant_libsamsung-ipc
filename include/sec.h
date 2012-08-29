@@ -59,6 +59,7 @@ struct ipc_message_info;
 #define IPC_SEC_FACILITY_TYPE_PC                        0x08
 
 /* SIM card (SC) facility lock types */
+#define IPC_SEC_FACILITY_LOCK_TYPE_SC_UNLOCKED          0x00
 #define IPC_SEC_FACILITY_LOCK_TYPE_SC_PIN1_REQ          0x01
 #define IPC_SEC_FACILITY_LOCK_TYPE_SC_PUK_REQ           0x02
 #define IPC_SEC_FACILITY_LOCK_TYPE_SC_CARD_BLOCKED      0x05
