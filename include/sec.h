@@ -78,7 +78,7 @@ struct ipc_message_info;
 #define IPC_SEC_RSIM_COMMAND_UPDATE_BINARY              0xd6
 #define IPC_SEC_RSIM_COMMAND_STATUS                     0xf2
 
-struct ipc_sec_pin_status_response {
+struct ipc_sec_sim_status_response {
     /* IPC_SEC_SIM_STATUS_... */
     unsigned char status;
     /* IPC_SEC_FACILITY_LOCK_TYPE_... */

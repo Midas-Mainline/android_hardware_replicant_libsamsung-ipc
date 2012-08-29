@@ -149,7 +149,7 @@ void modem_set_sec_pin_status(struct ipc_client *client, char *pin1, char *pin2)
 
 void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp)
 {
-    struct ipc_sec_pin_status_response *pin_status;
+    struct ipc_sec_sim_status_response *sim_status;
     unsigned char type;
     int status;
     char *data;
@@ -157,9 +157,9 @@ void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp
     switch(IPC_COMMAND(resp))
     {
         case IPC_SEC_SIM_STATUS :
-            pin_status = (struct ipc_sec_pin_status_response *)resp->data;
+            sim_status = (struct ipc_sec_sim_status_response *)resp->data;
 
-            switch(pin_status->status)
+            switch(sim_status->status)
             {
                 case IPC_SEC_SIM_STATUS_INITIALIZING:
                     printf("[I] SIM is initializing\n");
@@ -168,7 +168,7 @@ void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp
                     printf("[I] SIM card is definitely absent\n");
                 break;
                 case IPC_SEC_SIM_STATUS_LOCK_SC:
-                    switch(pin_status->facility_lock)
+                    switch(sim_status->facility_lock)
                     {
                         case IPC_SEC_FACILITY_LOCK_TYPE_SC_PIN1_REQ:
                             printf("[I] We need the PIN1 to unlock the card!\n");
