@@ -25,7 +25,7 @@
 struct ipc_message_info;
 
 /* Possible SEC related IPC message types */
-#define IPC_SEC_PIN_STATUS                              0x0501
+#define IPC_SEC_SIM_STATUS                              0x0501
 #define IPC_SEC_PHONE_LOCK                              0x0502
 #define IPC_SEC_CHANGE_LOCKING_PW                       0x0503
 #define IPC_SEC_SIM_LANG                                0x0504

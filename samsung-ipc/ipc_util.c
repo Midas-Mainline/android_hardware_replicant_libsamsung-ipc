@@ -188,7 +188,7 @@ const char *ipc_command_to_str(int command) {
         IPC_STR(IPC_PWR_PHONE_STATE)
         IPC_STR(IPC_RFS_NV_READ_ITEM)
         IPC_STR(IPC_RFS_NV_WRITE_ITEM)
-        IPC_STR(IPC_SEC_PIN_STATUS)
+        IPC_STR(IPC_SEC_SIM_STATUS)
         IPC_STR(IPC_SEC_PHONE_LOCK)
         IPC_STR(IPC_SEC_CHANGE_LOCKING_PW)
         IPC_STR(IPC_SEC_SIM_LANG)

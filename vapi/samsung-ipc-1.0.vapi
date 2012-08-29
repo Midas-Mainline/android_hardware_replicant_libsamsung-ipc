@@ -143,7 +143,7 @@ namespace SamsungIpc
         DISP_ICON_INFO,
         DISP_HOMEZONE_INFO,
         DISP_RSSI_INFO,
-        SEC_PIN_STATUS,
+        SEC_SIM_STATUS,
         SEC_PHONE_LOCK,
         SEC_CHANGE_LOCKING_PW,
         SEC_SIM_LANG,

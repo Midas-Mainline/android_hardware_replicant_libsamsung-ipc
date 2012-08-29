@@ -144,7 +144,7 @@ void modem_set_sec_pin_status(struct ipc_client *client, char *pin1, char *pin2)
     printf("[I] Sending PIN1 unlock request\n");
 
     ipc_sec_pin_status_set_setup(&pin_status, IPC_SEC_PIN_TYPE_PIN1, pin1, pin2);
-    ipc_client_send(client, IPC_SEC_PIN_STATUS, IPC_TYPE_SET, (void *) &pin_status, sizeof(pin_status), seq_get());
+    ipc_client_send(client, IPC_SEC_SIM_STATUS, IPC_TYPE_SET, (void *) &pin_status, sizeof(pin_status), seq_get());
 }
 
 void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp)
@@ -156,7 +156,7 @@ void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp
 
     switch(IPC_COMMAND(resp))
     {
-        case IPC_SEC_PIN_STATUS :
+        case IPC_SEC_SIM_STATUS :
             pin_status = (struct ipc_sec_pin_status_response *)resp->data;
 
             switch(pin_status->status)
