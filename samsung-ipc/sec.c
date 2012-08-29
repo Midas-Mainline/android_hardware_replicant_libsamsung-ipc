@@ -46,6 +46,16 @@ void ipc_sec_pin_status_set_setup(struct ipc_sec_pin_status_set *message,
     }
 }
 
+void ipc_sec_lock_info_get_setup(struct ipc_sec_lock_info_get *message,
+                                 unsigned char pin_type)
+{
+    if (message == NULL)
+        return;
+
+    message->unk0 = 1;
+    message->pin_type = pin_type;
+}
+
 char* ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *response)
 {
     int n = 0;

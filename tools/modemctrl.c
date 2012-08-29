@@ -139,7 +139,7 @@ void modem_set_sms_device_ready(struct ipc_client *client)
 void modem_set_sec_pin_status(struct ipc_client *client, char *pin1, char *pin2)
 {
     struct ipc_sec_pin_status_set pin_status;
-    struct ipc_sec_lock_info_request lock_info_req;
+    struct ipc_sec_lock_info_get lock_info_req;
 
     printf("[I] Sending PIN1 unlock request\n");
 
@@ -159,18 +159,18 @@ void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp
         case IPC_SEC_PIN_STATUS :
             pin_status = (struct ipc_sec_pin_status_response *)resp->data;
 
-            switch(pin_status->type)
+            switch(pin_status->status)
             {
-                case IPC_SEC_PIN_SIM_INITIALIZING:
+                case IPC_SEC_SIM_STATUS_INITIALIZING:
                     printf("[I] SIM is initializing\n");
                 break;
-                case IPC_SEC_PIN_SIM_CARD_NOT_PRESENT:
+                case IPC_SEC_SIM_STATUS_CARD_NOT_PRESENT:
                     printf("[I] SIM card is definitely absent\n");
                 break;
-                case IPC_SEC_PIN_SIM_LOCK_SC:
-                    switch(pin_status->key)
+                case IPC_SEC_SIM_STATUS_LOCK_SC:
+                    switch(pin_status->facility_lock)
                     {
-                        case IPC_SEC_PIN_SIM_LOCK_SC_PIN1_REQ:
+                        case IPC_SEC_FACILITY_LOCK_TYPE_SC_PIN1_REQ:
                             printf("[I] We need the PIN1 to unlock the card!\n");
                             if(strlen(sim_pin) > 0) {
                                 modem_set_sec_pin_status(client, sim_pin, NULL);
@@ -178,21 +178,21 @@ void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp
                                 printf("[E] No SIM Pin, use --pin\n");
                             }
                         break;
-                        case IPC_SEC_PIN_SIM_LOCK_SC_PUK_REQ:
+                        case IPC_SEC_FACILITY_LOCK_TYPE_SC_PUK_REQ:
                             printf("[I] Please provide the SIM card PUK!\n");
                         break;
-                        case IPC_SEC_PIN_SIM_LOCK_SC_CARD_BLOCKED:
+                        case IPC_SEC_FACILITY_LOCK_TYPE_SC_CARD_BLOCKED:
                             printf("[I] Ouch, the SIM Card is blocked.\n");
                         break;
                     }
                 break;
-                case IPC_SEC_PIN_SIM_INIT_COMPLETE:
+                case IPC_SEC_SIM_STATUS_INIT_COMPLETE:
                     printf("[3] SIM init complete\n");
                     if(state == MODEM_STATE_NORMAL)
                         state = MODEM_STATE_SIM_OK;
 
                 break;
-                case IPC_SEC_PIN_SIM_PB_INIT_COMPLETE:
+                case IPC_SEC_SIM_STATUS_PB_INIT_COMPLETE:
                     printf("[I] SIM Phone Book init complete\n");
                 break;
             }

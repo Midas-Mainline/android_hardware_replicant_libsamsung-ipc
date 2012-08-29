@@ -212,7 +212,7 @@ namespace SamsungIpc
 
     namespace Security
     {
-        [CCode (cname = "gint8", cprefix = "IPC_SEC_PIN_SIM_", has_type_id = false)]
+        [CCode (cname = "gint8", cprefix = "IPC_SEC_SIM_STATUS_", has_type_id = false)]
         public enum SimStatus
         {
             INITIALIZING,
@@ -230,12 +230,23 @@ namespace SamsungIpc
             PB_INIT_COMPLETE,
         }
 
-        [CCode (cname = "gint8", cprefix = "IPC_SEC_PIN_SIM_LOCK_SC_", has_type_id = false)]
-        public enum SimLockStatus
+        [CCode (cname = "gint8", cprefix = "IPC_SEC_FACILITY_TYPE_", has_type_id = false)]
+        public enum FacilityType
         {
-            PIN1_REQ,
-            PUK_REQ,
-            CARD_BLOCKED,
+            SC,
+            FD,
+            PN,
+            PU,
+            PP,
+            PC,
+        }
+
+        [CCode (cname = "gint8", cprefix = "IPC_SEC_FACILITY_LOCK_TYPE_", has_type_id = false)]
+        public enum FacilityLockType
+        {
+            SC_PIN1_REQ,
+            SC_PUK_REQ,
+            SC_CARD_BLOCKED,
         }
 
         [CCode (cname = "gint8", cprefix = "IPC_SEC_PIN_TYPE_", has_type_id = false)]
@@ -265,10 +276,8 @@ namespace SamsungIpc
         [CCode (cname = "struct ipc_sec_pin_status_response", destroy_function = "")]
         public struct SimStatusMessage
         {
-            [CCode (cname = "type")]
             public SimStatus status;
-            [CCode (cname = "key")]
-            public SimLockStatus lock_status;
+            public FacilityLockType facility_lock;
 
             public unowned uint8[] data
             {
@@ -309,7 +318,7 @@ namespace SamsungIpc
         [CCode (cname = "struct ipc_sec_phone_lock_get", destroy_function = "")]
         public struct PhoneLockGetMessage
         {
-            public SimStatus lock_type; // FIXME refactor log type from SimStatus in own enum
+            public FacilityType facility;
 
             public unowned uint8[] data
             {
@@ -325,8 +334,8 @@ namespace SamsungIpc
         [CCode (cname = "struct ipc_sec_phone_lock_response", destroy_function = "")]
         public struct PhoneLockGetResponseMessage
         {
-            public uint8 type;
-            public SimLockStatus status;
+            public FacilityType facility;
+            public bool status;
 
             public unowned uint8[] data
             {
@@ -339,7 +348,7 @@ namespace SamsungIpc
             }
         }
 
-        [CCode (cname = "struct ipc_sec_rsim_access_request", destroy_function = "")]
+        [CCode (cname = "struct ipc_sec_rsim_access_get", destroy_function = "")]
         public struct RSimAccessRequestMessage
         {
             public RSimCommandType command;
@@ -380,11 +389,14 @@ namespace SamsungIpc
             public static string get_file_data( Response response );
         }
 
-        [CCode (cname = "struct ipc_sec_lock_info_request", destroy_function = "")]
+        [CCode (cname = "struct ipc_sec_lock_info_get", destroy_function = "")]
         public struct LockInfoRequestMessage
         {
             public uint8 unk0;
             public PinType pin_type;
+
+            [CCode (cname = "ipc_sec_lock_info_get_setup")]
+            public void setup(PinType pin_type);
 
             public unowned uint8[] data
             {
@@ -401,7 +413,7 @@ namespace SamsungIpc
         public struct LockInfoResponseMessage
         {
             public uint8 num;
-            public uint8 type;
+            public PinType type;
             public uint8 key;
             public uint8 attempts;
 
