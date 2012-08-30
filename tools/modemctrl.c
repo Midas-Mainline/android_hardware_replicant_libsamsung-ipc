@@ -314,14 +314,14 @@ void modem_response_pwr(struct ipc_client *client, struct ipc_message_info *resp
 
 void modem_response_net(struct ipc_client *client, struct ipc_message_info *resp)
 {
-    struct ipc_net_regist *regi;
+    struct ipc_net_regist_response *regi;
     struct ipc_net_plmn_entry *plmn;
     char mnc[6];
 
     switch(IPC_COMMAND(resp))
     {
         case IPC_NET_REGIST:
-            regi = (struct ipc_net_regist *)resp->data;
+            regi = (struct ipc_net_regist_response*) resp->data;
             if(regi->reg_state == IPC_NET_REGISTRATION_STATE_HOME)
             {
                 printf("[I] Registered with network successfully!\n");

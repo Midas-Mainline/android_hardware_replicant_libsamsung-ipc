@@ -63,14 +63,19 @@
 #define IPC_NET_MODE_SEL_UMTS_ONLY                                  0x03
 
 struct ipc_net_regist_get {
+    /* ignore, ipc_net_regist_get_setup will do for you */
     unsigned char net;
+    /* IPC_NET_SERVICE_DOMAIN_.. */
     unsigned char domain;
 } __attribute__((__packed__));
 
-struct ipc_net_regist {
-    unsigned char act; // IPC_NET_ACCESS_TECHNOLOGY_...
-    unsigned char domain; // IPC_NET_SERVICE_DOMAIN_...
-    unsigned char reg_state; // IPC_NET_REGISTRATION_STATE_...
+struct ipc_net_regist_response {
+    /* IPC_NET_ACCESS_TECHNOLOGY_... */
+    unsigned char act;
+    /* IPC_NET_SERVICE_DOMAIN_... */
+    unsigned char domain;
+    /* IPC_NET_REGISTRATION_STATE_... */
+    unsigned char reg_state;
     unsigned char edge;
     unsigned short lac;
     unsigned int cid;
@@ -102,8 +107,8 @@ struct ipc_net_plmn_sel_set {
     unsigned char act; // IPC_NET_ACCESS_TECHNOLOGY_...
 } __attribute__((__packed__));
 
-void ipc_net_regist_setup(struct ipc_net_regist_get *message, unsigned char domain);
-void ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel_set *message, unsigned char mode, char *plmn, unsigned char act);
+void ipc_net_regist_get_setup(struct ipc_net_regist_get *message, unsigned char domain);
+void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_set *message, unsigned char mode, char *plmn, unsigned char act);
 
 #endif
 

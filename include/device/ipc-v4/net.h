@@ -29,7 +29,7 @@
 #define IPC_NET_ACCESS_TECHNOLOGY_EDGE                              0x03
 #define IPC_NET_ACCESS_TECHNOLOGY_UMTS                              0x04
 
-struct ipc_net_current_plmn {
+struct ipc_net_current_plmn_response {
     char unk0;
     unsigned char slevel;
     char unk1;
