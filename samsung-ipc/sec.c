@@ -86,4 +86,17 @@ char* ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *respon
     return file_data;
 }
 
+void ipc_sec_phone_lock_set_setup(struct ipc_sec_phone_lock_set *message,
+                                  int pin_type, int enable, char *passwd)
+{
+    message->type = pin_type;
+    message->lock = enable ? 1 : 0;
+
+    if (passwd != NULL)
+    {
+        strncpy((char*) message->password, passwd, 39);
+        message->length = strlen(passwd);
+    }
+}
+
 // vim:ts=4:sw=4:expandtab
