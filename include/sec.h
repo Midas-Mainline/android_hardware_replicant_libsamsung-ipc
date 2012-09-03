@@ -165,6 +165,9 @@ void ipc_sec_phone_lock_set_setup(struct ipc_sec_phone_lock_set *message,
 
 char* ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *response);
 
+void ipc_sec_change_locking_pw_set_setup(struct ipc_sec_change_locking_pw_set *message,
+                                         int type, char *passwd_old, char *passwd_new);
+
 #endif
 
 // vim:ts=4:sw=4:expandtab

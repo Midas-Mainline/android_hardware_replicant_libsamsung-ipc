@@ -99,4 +99,22 @@ void ipc_sec_phone_lock_set_setup(struct ipc_sec_phone_lock_set *message,
     }
 }
 
+void ipc_sec_change_locking_pw_set_setup(struct ipc_sec_change_locking_pw_set *message,
+                                         int type, char *passwd_old, char *passwd_new)
+{
+    message->facility = type;
+
+    if (passwd_old != NULL)
+    {
+        strncpy((char*) message->password_old, passwd_old, 39);
+        message->length_old = strlen(passwd_old);
+    }
+
+    if (passwd_new != NULL)
+    {
+        strncpy((char*) message->password_new, passwd_new, 39);
+        message->length_new = strlen(passwd_new);
+    }
+}
+
 // vim:ts=4:sw=4:expandtab
