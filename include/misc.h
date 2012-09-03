@@ -33,6 +33,7 @@ struct ipc_message_info;
 #define IPC_MISC_ME_IMSI                0x0A02
 #define IPC_MISC_ME_SN                  0x0A03
 #define IPC_MISC_TIME_INFO              0x0A07
+#define IPC_MISC_DEBUG_LEVEL            0x0A0C
 
 #define IPC_MISC_ME_SN_SERIAL_NUM                   0x01
 #define IPC_MISC_ME_SN_SERIAL_NUM_SERIAL            0x04
