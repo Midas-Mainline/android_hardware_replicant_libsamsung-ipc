@@ -46,7 +46,7 @@ int xmm6260_ipc_read(void *data, unsigned int size, void *io_data);
 int xmm6260_ipc_write(void *data, unsigned int size, void *io_data);
 int xmm6260_ipc_power_on(void *io_data);
 int xmm6260_ipc_power_off(void *io_data);
-int xmm6260_ipc_gprs_get_iface(char **iface, int cid);
+char* xmm6260_ipc_gprs_get_iface(int cid);
 int xmm6260_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap);
 void *xmm6260_ipc_common_data_create(void);
 int xmm6260_ipc_common_data_destroy(void *io_data);

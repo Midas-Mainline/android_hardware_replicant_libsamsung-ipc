@@ -587,11 +587,11 @@ int crespo_ipc_power_off(void *io_data)
     return 0;
 }
 
-int crespo_ipc_gprs_get_iface(char **iface, int cid)
+char* crespo_ipc_gprs_get_iface(int cid)
 {
+    char *iface;
     asprintf(iface, "%s%d", GPRS_IFACE_PREFIX, 0);
-
-    return 0;
+    return iface;
 }
 
 int crespo_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap)

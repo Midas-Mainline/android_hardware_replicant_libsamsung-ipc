@@ -344,16 +344,16 @@ int xmm6260_ipc_power_off(void *io_data)
     return 0;
 }
 
-int xmm6260_ipc_gprs_get_iface(char **iface, int cid)
+char* xmm6260_ipc_gprs_get_iface(int cid)
 {
-    if(cid > GPRS_IFACE_COUNT) {
-        *iface = NULL;
-        return -1;
-    }
+    char *iface;
+
+    if(cid > GPRS_IFACE_COUNT)
+        return NULL;
 
     asprintf(iface, "%s%d", GPRS_IFACE_PREFIX, cid - 1);
 
-    return 0;
+    return iface;
 }
 
 int xmm6260_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap)
