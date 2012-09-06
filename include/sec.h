@@ -87,7 +87,7 @@ struct ipc_sec_sim_status_response {
 } __attribute__((__packed__));
 
 struct ipc_sec_pin_status_set {
-    /* IPC_SEC_PIN_TYPE_... */
+    /* IPC_SEC_SIM_STATUS_... */
     unsigned char type;
     unsigned char length1;
     unsigned char length2;
@@ -96,7 +96,7 @@ struct ipc_sec_pin_status_set {
 } __attribute__((__packed__));
 
 struct ipc_sec_phone_lock_set {
-    /* IPC_SEC_PIN_... */
+    /* IPC_SEC_SIM_STATUS_... */
     unsigned char type;
     unsigned char lock; /* 1: lock, 0: unlock */
     unsigned char length;
