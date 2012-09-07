@@ -562,13 +562,11 @@ int aries_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_info
     return 0;
 }
 
-int aries_ipc_open(void *data, unsigned int size, void *io_data)
+int aries_ipc_open(int type, void *io_data)
 {
     struct aries_ipc_handlers_common_data *common_data;
     struct sockaddr_pn *spn;
     struct ifreq ifr;
-
-    int type = *((int *) data);
 
     int reuse;
     int socket_rfs_magic;
@@ -581,6 +579,9 @@ int aries_ipc_open(void *data, unsigned int size, void *io_data)
 
     common_data = (struct aries_ipc_handlers_common_data *) io_data;
     spn = common_data->spn;
+
+    if(spn == NULL)
+        goto error;
 
     memset(&ifr, 0, sizeof(ifr));
     memset(ifr.ifr_name, 0, IFNAMSIZ);
@@ -647,7 +648,7 @@ end:
     return 0;
 }
 
-int aries_ipc_close(void *data, unsigned int size, void *io_data)
+int aries_ipc_close(void *io_data)
 {
     struct aries_ipc_handlers_common_data *common_data;
     int fd = -1;
