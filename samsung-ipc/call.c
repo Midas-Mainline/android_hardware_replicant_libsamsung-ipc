@@ -96,15 +96,16 @@ char* ipc_call_list_response_get_entry_number(struct ipc_message_info *response,
     if (num > count)
         return NULL;
 
-    for (n = 0; n < num; n++)
+    for (n = 0; n < num + 1; n++)
     {
+        if (entry != NULL)
+            pos += entry->number_len;
+
         entry = (struct ipc_call_list_entry*) (response->data + pos);
-        pos += (unsigned int) (sizeof(struct ipc_call_list_entry) + entry->number_len);
+        pos += (unsigned int) sizeof(struct ipc_call_list_entry);
     }
 
-    if (entry == NULL ||
-        (unsigned char*) (response->data + pos) == NULL ||
-        (unsigned char*) (response->data + pos + entry->number_len) == NULL)
+    if (entry == NULL || (unsigned char*) (response->data + pos) == NULL)
         return NULL;
 
     number = (char*) malloc(sizeof(char) * entry->number_len);
