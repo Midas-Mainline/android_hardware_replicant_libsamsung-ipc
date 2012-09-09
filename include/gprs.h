@@ -102,7 +102,7 @@ struct ipc_gprs_call_status {
 };
 
 struct ipc_gprs_hsdpa_status {
-    unsigned char unk;
+    unsigned char reg_state;
 };
 
 struct ipc_gprs_ps {
