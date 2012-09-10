@@ -146,8 +146,6 @@ struct ipc_client* ipc_client_new(int client_type)
     client->gprs_specs = ipc_devices[device_index].gprs_specs;
     client->nv_data_specs = ipc_devices[device_index].nv_data_specs;
 
-    client->log_handler = log_handler_default;
-
     if (ipc_devices[device_index].handlers != 0)
         memcpy(client->handlers, ipc_devices[device_index].handlers, sizeof(struct ipc_handlers));
 
