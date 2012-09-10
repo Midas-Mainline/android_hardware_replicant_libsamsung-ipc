@@ -835,10 +835,10 @@ int aries_ipc_gprs_deactivate(void *data)
     return 0;
 }
 
-char* aries_ipc_gprs_get_iface(int cid)
+char *aries_ipc_gprs_get_iface(int cid)
 {
     struct ifreq ifr;
-    char *iface;
+    char *iface = NULL;
     int fd;
     int rc;
     int i;
@@ -854,7 +854,7 @@ char* aries_ipc_gprs_get_iface(int cid)
         if(rc < 0 || ifr.ifr_flags & IFF_UP) {
             continue;
         } else {
-            asprintf(iface, "%s%d", GPRS_IFACE_PREFIX, i);
+            asprintf(&iface, "%s%d", GPRS_IFACE_PREFIX, i);
             return iface;
         }
     }

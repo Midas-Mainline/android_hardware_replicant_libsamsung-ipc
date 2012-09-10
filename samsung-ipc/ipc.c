@@ -399,7 +399,7 @@ int ipc_client_gprs_deactivate(struct ipc_client *client)
     return client->handlers->gprs_deactivate(client->handlers->gprs_deactivate_data);
 }
 
-char* ipc_client_gprs_get_iface(struct ipc_client *client, int cid)
+char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid)
 {
     if (client == NULL ||
         client->gprs_specs == NULL ||

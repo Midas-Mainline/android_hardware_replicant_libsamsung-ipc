@@ -344,14 +344,14 @@ int xmm6260_ipc_power_off(void *io_data)
     return 0;
 }
 
-char* xmm6260_ipc_gprs_get_iface(int cid)
+char *xmm6260_ipc_gprs_get_iface(int cid)
 {
-    char *iface;
+    char *iface = NULL;
 
     if(cid > GPRS_IFACE_COUNT)
         return NULL;
 
-    asprintf(iface, "%s%d", GPRS_IFACE_PREFIX, cid - 1);
+    asprintf(&iface, "%s%d", GPRS_IFACE_PREFIX, cid - 1);
 
     return iface;
 }
