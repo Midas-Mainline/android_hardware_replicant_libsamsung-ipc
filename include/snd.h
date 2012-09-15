@@ -26,8 +26,13 @@ struct ipc_message_info;
 #define IPC_SND_SPKR_VOLUME_CTRL                    0x0901
 #define IPC_SND_MIC_MUTE_CTRL                       0x0902
 #define IPC_SND_AUDIO_PATH_CTRL                     0x0903
+#define IPC_SND_AUDIO_SOURCE_CTRL                   0x0904
+#define IPC_SND_LOOPBACK_CTRL                       0x0905
+#define IPC_SND_VOICE_RECORDING_CTRL                0x0906
+#define IPC_SND_VIDEO_CALL_CTRL                     0x0907
 #define IPC_SND_RINGBACK_TONE_CTRL                  0x0908
 #define IPC_SND_CLOCK_CTRL                          0x0909
+#define IPC_SND_WB_AMR_STATUS                       0x090A
 
 #define IPC_SND_VOLUME_TYPE_VOICE                   0x01
 #define IPC_SND_VOLUME_TYPE_SPEAKER                 0x11
