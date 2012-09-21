@@ -46,4 +46,4 @@ unsigned char* ipc_sms_send_msg_pack(struct ipc_sms_send_msg *msg, char *smsc,
     return data;
 }
 
-
+// vim:ts=4:sw=4:expandtab

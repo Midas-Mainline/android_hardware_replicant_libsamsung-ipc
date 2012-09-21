@@ -37,36 +37,31 @@ struct ipc_device_desc {
 extern struct ipc_device_desc ipc_devices[];
 extern int ipc_devices_count;
 
-// h1
-
+/* h1 */
 extern struct ipc_ops h1_fmt_ops;
 extern struct ipc_ops h1_rfs_ops;
 extern struct ipc_handlers h1_default_handlers;
 
-// crespo
-
+/* crespo */
 extern struct ipc_ops crespo_fmt_ops;
 extern struct ipc_ops crespo_rfs_ops;
 extern struct ipc_handlers crespo_default_handlers;
 extern struct ipc_gprs_specs crespo_gprs_specs;
 
-// aries
-
+/* aries */
 extern struct ipc_ops aries_fmt_ops;
 extern struct ipc_ops aries_rfs_ops;
 extern struct ipc_handlers aries_default_handlers;
 extern struct ipc_gprs_specs aries_gprs_specs;
 
-// galaxys2
-
+/* galaxys2 */
 extern struct ipc_ops galaxys2_fmt_ops;
 extern struct ipc_ops galaxys2_fmt_ops;
 extern struct ipc_ops galaxys2_rfs_ops;
 extern struct ipc_handlers galaxys2_default_handlers;
 extern struct ipc_gprs_specs galaxys2_gprs_specs;
 
-// maguro
-
+/* maguro */
 extern struct ipc_ops maguro_fmt_ops;
 extern struct ipc_ops maguro_rfs_ops;
 extern struct ipc_handlers maguro_default_handlers;

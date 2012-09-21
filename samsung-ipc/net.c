@@ -23,7 +23,7 @@
 
 void ipc_net_regist_get_setup(struct ipc_net_regist_get *message, unsigned char domain)
 {
-    //FIXME: could that be IPC_NET_ACCESS_TECHNOLOGY_... (act) ?
+    /* FIXME: could that be IPC_NET_ACCESS_TECHNOLOGY_... (act) ? */
     message->net = 0xff;
     message->domain = domain;
 }

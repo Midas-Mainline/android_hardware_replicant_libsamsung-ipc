@@ -32,7 +32,7 @@
 #include <radio.h>
 #include "ipc_private.h"
 
-#define IPC_STR(f)	case f: return strdup(#f);
+#define IPC_STR(f)  case f: return strdup(#f);
 
 void ipc_client_log_recv(struct ipc_client *client,
     struct ipc_message_info *response, const char *prefix)
@@ -100,20 +100,22 @@ void ipc_client_log_send(struct ipc_client *client,
     }
 }
 
-const char *ipc_response_type_to_str(int type) {
-	switch(type) {
-		case IPC_TYPE_INDI:
-			return "INDI";
-		case IPC_TYPE_RESP:
-			return "RESP";
-		case IPC_TYPE_NOTI:
-			return "NOTI";
-		default:
-			return "UNKNOWN";
-	}
+const char *ipc_response_type_to_str(int type)
+{
+    switch(type) {
+        case IPC_TYPE_INDI:
+            return "INDI";
+        case IPC_TYPE_RESP:
+            return "RESP";
+        case IPC_TYPE_NOTI:
+            return "NOTI";
+        default:
+            return "UNKNOWN";
+    }
 }
 
-const char *ipc_request_type_to_str(int type) {
+const char *ipc_request_type_to_str(int type)
+{
     switch(type) {
         case IPC_TYPE_EXEC:
             return "EXEC";
@@ -125,13 +127,14 @@ const char *ipc_request_type_to_str(int type) {
             return "CFRM";
         case IPC_TYPE_EVENT:
             return "EVENT";
-		default:
-			return "UNKNOWN";
+        default:
+            return "UNKNOWN";
     }
 }
 
-const char *ipc_command_to_str(int command) {
-	switch(command) {
+const char *ipc_command_to_str(int command)
+{
+    switch(command) {
         IPC_STR(IPC_CALL_OUTGOING)
         IPC_STR(IPC_CALL_INCOMING)
         IPC_STR(IPC_CALL_RELEASE)
@@ -250,7 +253,7 @@ const char *ipc_command_to_str(int command) {
         IPC_STR(IPC_IMEI_CHECK_DEVICE_INFO)
         default:
             return "IPC_UNKNOWN";
-	}
+    }
 }
 
 void ipc_client_hex_dump(struct ipc_client *client, void *data, int size)
