@@ -31,9 +31,9 @@
 #define GPRS_IFACE_COUNT    3
 
 struct rfs_hdr {
-        uint32_t size;
-        uint8_t cmd;
-        uint8_t id;
+    uint32_t size;
+    uint8_t cmd;
+    uint8_t id;
 } __attribute__ ((packed));
 
 int xmm6260_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_info *request);

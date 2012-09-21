@@ -31,10 +31,8 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 
-//for timeval
 #include <sys/time.h>
 
-//for mmap
 #include <sys/mman.h>
 #include <sys/stat.h>
 
@@ -47,22 +45,18 @@
 unsigned char xmm6260_crc_calculate(void* data, size_t offset, size_t length)
 {
     unsigned char crc = 0;
-    unsigned char *ptr = (unsigned char*)(data + offset);
+    unsigned char *ptr = (unsigned char*) (data + offset);
 
-    while (length--) {
+    while (length--)
         crc ^= *ptr++;
-    }
 
     return crc;
 }
 
-/*
- * io helper functions
- */
-
-int expect(int fd, unsigned timeout) {
+int expect(int fd, unsigned timeout)
+{
     int ret = 0;
-    
+
     struct timeval tv = {
         tv.tv_sec = timeout / 1000,
         tv.tv_usec = 1000 * (timeout % 1000),
@@ -74,38 +68,36 @@ int expect(int fd, unsigned timeout) {
 
     ret = select(fd + 1, &read_set, 0, 0, &tv);
 
-    if (ret < 0) {
-        // _e("failed to select the fd %d ret=%d: %s", fd, ret, strerror(errno));
+    if (ret < 0)
         goto fail;
-    }
 
-    if (ret < 1 || !FD_ISSET(fd, &read_set)) {
-        // _d("fd %d not in fd set", fd);
+    if (ret < 1 || !FD_ISSET(fd, &read_set))
         goto fail;
-    }
 
 fail:
     return ret;
 }
 
-int expect_read(int fd, void *buf, size_t size) {
+int expect_read(int fd, void *buf, size_t size)
+{
     int ret;
-    if ((ret = expect(fd, DEFAULT_TIMEOUT)) < 1) {
-        // _e("failed to select the fd %d", fd);
+
+    if ((ret = expect(fd, DEFAULT_TIMEOUT)) < 1)
         return ret;
-    }
 
     return read(fd, buf, size);
 }
 
-int expect_data(int fd, void *data, size_t size) {
+int expect_data(int fd, void *data, size_t size)
+{
     int ret;
     char buf[size];
+
     if ((ret = expect_read(fd, buf, size)) != size) {
         ret = -1;
-        // _e("failed to receive data");
         return ret;
     }
+
     ret = memcmp(buf, data, size);
 
     return ret;

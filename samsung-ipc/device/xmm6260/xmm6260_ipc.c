@@ -56,12 +56,12 @@ int xmm6260_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_in
     unsigned char *frame;
     unsigned char *payload;
     size_t frame_length;
-    
+
     wake_lock(FMT_LOCK_NAME);
 
     /* Frame IPC header + payload length */
     frame_length = (sizeof(*hdr) + request->length);
-    
+
     frame = (unsigned char*)malloc(frame_length);
     hdr = (struct ipc_header*)frame;
 
@@ -97,6 +97,7 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
     struct ipc_header ipc = {
         .length = 0,
     };
+
     int num_read = 0;
     int left = 0;
 
@@ -117,11 +118,9 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
 
     memcpy(&ipc, buf, sizeof(ipc));
     left = ipc.length - num_read;
-   
-    if (left > 0) {
-        num_read = client->handlers->read(buf + num_read, left,
-            client->handlers->read_data);
-    }
+
+    if (left > 0)
+        num_read = client->handlers->read(buf + num_read, left, client->handlers->read_data);
 
     memcpy(&ipc, buf, sizeof(ipc));
 
@@ -132,7 +131,7 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
     response->type = ipc.type;
     response->cmd = IPC_COMMAND(response);
     response->length = ipc.length - sizeof(ipc);
-   
+
     if (response->length > 0) {
         response->data = (unsigned char*)malloc(response->length);
         memcpy(response->data, buf + sizeof(ipc), response->length);
@@ -152,7 +151,6 @@ int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_in
     int header_recv = 0;
     unsigned count=0;
     int rc;
-
     int ret = 0;
 
     wake_lock(RFS_LOCK_NAME);
@@ -168,7 +166,7 @@ int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_in
 
         // We didn't recieve the header yet
         if (!header_recv) {
-            if ((unsigned)rc < sizeof(struct rfs_hdr)) {
+            if ((unsigned) rc < sizeof(struct rfs_hdr)) {
                 ipc_client_log(client, "Failed to read RFS data.");
                 ret = -1;
                 goto done;
@@ -237,7 +235,7 @@ int xmm6260_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_in
     ipc_client_log_send(client, request, __func__);
 
     rc = client->handlers->write(data, data_length, client->handlers->write_data);
-    
+
     wake_unlock(RFS_LOCK_NAME);
     return rc;
 }

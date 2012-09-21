@@ -31,10 +31,8 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 
-//for timeval
 #include <sys/time.h>
 
-//for mmap
 #include <sys/mman.h>
 #include <sys/stat.h>
 
@@ -49,7 +47,8 @@
  */
 
 int modemctl_link_set_active(struct ipc_client *client,
-    struct modemctl_io_data *io_data, bool enabled) {
+    struct modemctl_io_data *io_data, bool enabled)
+{
     unsigned status = enabled;
     int ret;
     unsigned long ioctl_code;
@@ -63,12 +62,14 @@ int modemctl_link_set_active(struct ipc_client *client,
     }
 
     return 0;
+
 fail:
     return ret;
 }
 
 int modemctl_link_set_enabled(struct ipc_client *client,
-    struct modemctl_io_data *io_data, bool enabled) {
+    struct modemctl_io_data *io_data, bool enabled)
+{
     unsigned status = enabled;
     int ret;
     unsigned long ioctl_code;
@@ -87,7 +88,8 @@ fail:
 }
 
 int modemctl_wait_link_ready(struct ipc_client *client,
-    struct modemctl_io_data *io_data) {
+    struct modemctl_io_data *io_data)
+{
     int ret;
 
     struct timeval tv_start = {};
@@ -95,18 +97,17 @@ int modemctl_wait_link_ready(struct ipc_client *client,
 
     gettimeofday(&tv_start, 0);;
 
-    //link wakeup timeout in milliseconds
+    /* link wakeup timeout in milliseconds */
     long diff = 0;
 
     do {
         ret = ioctl(io_data->link_fd, IOCTL_LINK_CONNECTED, 0);
-        if (ret < 0) {
-            goto fail;
-        }
 
-        if (ret == 1) {
+        if (ret < 0)
+            goto fail;
+
+        if (ret == 1)
             return 0;
-        }
 
         usleep(LINK_POLL_DELAY_US);
         gettimeofday(&tv_end, 0);;
@@ -122,7 +123,8 @@ fail:
 }
 
 int modemctl_wait_modem_online(struct ipc_client *client,
-    struct modemctl_io_data *io_data) {
+    struct modemctl_io_data *io_data)
+{
     int ret;
 
     struct timeval tv_start = {};
@@ -130,18 +132,16 @@ int modemctl_wait_modem_online(struct ipc_client *client,
 
     gettimeofday(&tv_start, 0);;
 
-    //link wakeup timeout in milliseconds
+    /* link wakeup timeout in milliseconds */
     long diff = 0;
 
     do {
         ret = ioctl(io_data->boot_fd, IOCTL_MODEM_STATUS, 0);
-        if (ret < 0) {
+        if (ret < 0)
             goto fail;
-        }
 
-        if (ret == STATE_ONLINE) {
+        if (ret == STATE_ONLINE)
             return 0;
-        }
 
         usleep(LINK_POLL_DELAY_US);
         gettimeofday(&tv_end, 0);;
@@ -157,24 +157,24 @@ fail:
 }
 
 int modemctl_modem_power(struct ipc_client *client,
-    struct modemctl_io_data *io_data, bool enabled) {
-    if (enabled) {
+    struct modemctl_io_data *io_data, bool enabled)
+{
+    if (enabled)
         return ioctl(io_data->boot_fd, IOCTL_MODEM_ON, 0);
-    }
-    else {
+    else
         return ioctl(io_data->boot_fd, IOCTL_MODEM_OFF, 0);
-    }
+
     return -1;
 }
 
 int modemctl_modem_boot_power(struct ipc_client *client,
-    struct modemctl_io_data *io_data, bool enabled) {
-    if (enabled) {
+    struct modemctl_io_data *io_data, bool enabled)
+{
+    if (enabled)
         return ioctl(io_data->boot_fd, IOCTL_MODEM_BOOT_ON, 0);
-    }
-    else {
+    else
         return ioctl(io_data->boot_fd, IOCTL_MODEM_BOOT_OFF, 0);
-    }
+
     return -1;
 }
 
