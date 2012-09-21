@@ -31,10 +31,8 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 
-//for timeval
 #include <sys/time.h>
 
-//for mmap
 #include <sys/mman.h>
 #include <sys/stat.h>
 
@@ -101,6 +99,7 @@ struct maguro_boot_cmd_desc maguro_boot_cmd_desc[] = {
 };
 
 #define I9250_RADIO_IMAGE_PATHS_NUM 2
+
 const char *i9250_radio_image_paths[] = {
     "/dev/block/platform/omap/omap_hsmmc.0/by-name/radio",
     "/dev/mmcblk0p9"
@@ -132,13 +131,17 @@ static int maguro_send_image(struct ipc_client *client,
     while (start < end) {
         size_t remaining = end - start;
         size_t curr_chunk = chunk_size < remaining ? chunk_size : remaining;
+
         ret = write(io_data->boot_fd, io_data->radio_data + start, curr_chunk);
+
         if (ret < 0) {
             ipc_client_log(client, "Error: failed to write image chunk");
             goto fail;
         }
+
         start += ret;
     }
+
     ipc_client_log(client, "sent image type=%d", type);
 
     if (type == EBL) {
@@ -149,10 +152,12 @@ static int maguro_send_image(struct ipc_client *client,
         else {
             ipc_client_log(client, "wrote EBL CRC %02x", crc);
         }
+
         goto done;
     }
 
     uint32_t crc32 = (crc << 24) | 0xffffff;
+
     if ((ret = write(io_data->boot_fd, &crc32, 4)) != 4) {
         ipc_client_log(client, "Error: failed to write CRC");
         goto fail;
@@ -272,16 +277,18 @@ static int maguro_boot_cmd(struct ipc_client *client,
 {
     int ret = 0;
     char *cmd_data = 0;
+    uint32_t ack_length;
+
     if (cmd >= ARRAY_SIZE(maguro_boot_cmd_desc)) {
         ipc_client_log(client, "Error: bad command %x\n", cmd);
         goto done_or_fail;
     }
 
     unsigned cmd_code = maguro_boot_cmd_desc[cmd].code;
-
     uint16_t checksum = (data_size & 0xffff) + cmd_code;
     unsigned char *ptr = (unsigned char*)data;
     size_t i;
+
     for (i = 0; i < data_size; i++) {
         checksum += ptr[i];
     }
@@ -298,11 +305,13 @@ static int maguro_boot_cmd(struct ipc_client *client,
     ipc_client_log(client, "data_size %d [%d] checksum 0x%x", data_size, cmd_buffer_size, checksum);
 
     cmd_data = (char*)malloc(cmd_buffer_size);
+
     if (!cmd_data) {
         ipc_client_log(client, "Error: failed to allocate command buffer");
         ret = -ENOMEM;
         goto done_or_fail;
     }
+
     memset(cmd_data, 0, cmd_buffer_size);
     memcpy(cmd_data, &header, sizeof(header));
     memcpy(cmd_data + sizeof(header), data, data_size);
@@ -324,7 +333,6 @@ static int maguro_boot_cmd(struct ipc_client *client,
         goto done_or_fail;
     }
 
-    uint32_t ack_length;
     if ((ret = expect_read(io_data->boot_fd, &ack_length, 4)) < 0) {
         ipc_client_log(client, "Error: failed to receive ack header length");
         goto done_or_fail;
@@ -332,15 +340,19 @@ static int maguro_boot_cmd(struct ipc_client *client,
 
     if (ack_length + 4 > cmd_buffer_size) {
         free(cmd_data);
+
         cmd_data = NULL;
         cmd_data = malloc(ack_length + 4);
+
         if (!cmd_data) {
             ipc_client_log(client, "Error: failed to allocate the buffer for ack data");
             goto done_or_fail;
         }
     }
+
     memset(cmd_data, 0, ack_length);
     memcpy(cmd_data, &ack_length, 4);
+
     for (i = 0; i < (ack_length + 3) / 4; i++) {
         if ((ret = expect_read(io_data->boot_fd, cmd_data + ((i + 1) << 2), 4)) < 0) {
             ipc_client_log(client, "Error: failed to receive ack chunk");
@@ -364,10 +376,8 @@ static int maguro_boot_cmd(struct ipc_client *client,
     ret = 0;
 
 done_or_fail:
-
-    if (cmd_data) {
+    if (cmd_data)
         free(cmd_data);
-    }
 
     return ret;
 }
@@ -420,9 +430,8 @@ static int maguro_boot_info_ack(struct ipc_client *client,
     ret = 0;
 
 fail:
-    if (boot_info) {
+    if (boot_info)
         free(boot_info);
-    }
 
     return ret;
 }
@@ -513,9 +522,8 @@ static int maguro_send_mps_data(struct ipc_client *client,
 
 
 fail:
-    if (mps_fd >= 0) {
+    if (mps_fd >= 0)
         close(mps_fd);
-    }
 
     return ret;
 }
@@ -605,13 +613,10 @@ static int maguro_modem_reboot(struct ipc_client *client,
 {
     int ret;
 
-    if (!hard) {
+    if (!hard)
         return 0;
-    }
 
-    /*
-     * Disable the hardware to ensure consistent state
-     */
+    /* Disable the hardware to ensure consistent state */
     if ((ret = modemctl_modem_power(client, io_data, false)) < 0) {
         ipc_client_log(client, "Error: failed to disable modem power");
         goto fail;
@@ -619,9 +624,8 @@ static int maguro_modem_reboot(struct ipc_client *client,
     else {
         ipc_client_log(client, "disabled modem power");
     }
-    /*
-     * Now, initialize the hardware
-     */
+
+    /* Now, initialize the hardware */
     if ((ret = modemctl_modem_power(client, io_data, true)) < 0) {
         ipc_client_log(client, "Error: failed to enable modem power");
         goto fail;
@@ -637,16 +641,15 @@ fail:
 int maguro_power_off(void *io_data_unused) {
     int ret = -1;
     struct modemctl_io_data io_data;
-    
+
     io_data.boot_fd = open(BOOT_DEV, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (io_data.boot_fd < 0) {
         ret = io_data.boot_fd;
         goto fail;
     }
-    
-    if ((ret = modemctl_modem_power(NULL, &io_data, false)) < 0) {
+
+    if ((ret = modemctl_modem_power(NULL, &io_data, false)) < 0)
         goto fail_pwr;
-    }
 
     ret = 0;
 
@@ -658,7 +661,7 @@ fail:
 
 int maguro_modem_bootstrap(struct ipc_client *client)
 {
-    int ret = -1, n = 0, fd = -1;
+    int ret = -1, n = 0, fd = -1, i;
     struct modemctl_io_data io_data;
     memset(&io_data, 0, sizeof(client, io_data));
 
@@ -706,10 +709,7 @@ int maguro_modem_bootstrap(struct ipc_client *client)
         ipc_client_log(client, "modem hard reset done");
     }
 
-    /*
-     * Now, actually load the firmware
-     */
-    int i;
+    /* Now, actually load the firmware */
     for (i = 0; i < 2; i++) {
         if (write(io_data.boot_fd, "ATAT", 4) != 4) {
             ipc_client_log(client, "Error: failed to write ATAT to boot socket");
@@ -724,8 +724,7 @@ int maguro_modem_bootstrap(struct ipc_client *client)
         }
     }
 
-    //FIXME: make sure it does not timeout or add the retry in the ril library
-
+    /* FIXME: make sure it does not timeout or add the retry in the ril library */
     if ((ret = expect(io_data.boot_fd, 100)) < 0) {
         ipc_client_log(client, "Error: failed to wait for bootloader ready state");
         goto fail;
@@ -774,11 +773,11 @@ int maguro_modem_bootstrap(struct ipc_client *client)
         ipc_client_log(client, "opened second boot device %s, fd=%d", I9250_SECOND_BOOT_DEV, io_data.boot_fd);
     }
 
-    //RpsiCmdLoadAndExecute
     if ((ret = write(io_data.boot_fd, I9250_PSI_CMD_EXEC, 4)) < 0) {
         ipc_client_log(client, "Error: failed writing cmd_load_exe_EBL");
         goto fail;
     }
+
     if ((ret = write(io_data.boot_fd, I9250_PSI_EXEC_DATA, 8)) < 0) {
         ipc_client_log(client, "Error: failed writing 8 bytes to boot1");
         goto fail;
@@ -822,27 +821,22 @@ int maguro_modem_bootstrap(struct ipc_client *client)
         ipc_client_log(client, "Error: failed to wait for modem to become online");
         goto fail;
     }
-    
-    /*
-     * This restores UART MUX to GPS
-     */
+
+    /* This restores UART MUX to GPS */
     modemctl_modem_boot_power(client, &io_data, false);
 
     ipc_client_log(client, "Modem is online!");
     ret = 0;
 
 fail:
-    if (io_data.radio_data != MAP_FAILED) {
+    if (io_data.radio_data != MAP_FAILED)
         munmap(io_data.radio_data, RADIO_MAP_SIZE);
-    }
 
-    if (io_data.radio_fd >= 0) {
+    if (io_data.radio_fd >= 0)
         close(io_data.radio_fd);
-    }
 
-    if (io_data.boot_fd >= 0) {
+    if (io_data.boot_fd >= 0)
         close(io_data.boot_fd);
-    }
 
     return ret;
 }

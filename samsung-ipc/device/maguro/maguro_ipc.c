@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
  * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
+ *
  * based on crespo IPC code which is:
  *
  * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
