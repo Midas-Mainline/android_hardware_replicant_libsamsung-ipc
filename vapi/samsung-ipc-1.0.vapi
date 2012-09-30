@@ -555,7 +555,7 @@ namespace SamsungIpc
             public uint8 net;
             public ServiceDomain domain;
 
-            [CCode (cname = "ipc_net_regist_setup")]
+            [CCode (cname = "ipc_net_regist_get_setup")]
             public void setup( ServiceDomain domain );
 
             public unowned uint8[] data
@@ -664,7 +664,7 @@ namespace SamsungIpc
             public uint8[] plmn;
             public AccessTechnology act;
 
-            [CCode (cname = "ipc_net_plmn_sel_setup")]
+            [CCode (cname = "ipc_net_plmn_sel_set_setup")]
             public void setup(uint8 mode, string plmn, AccessTechnology act);
 
             public unowned uint8[] data
