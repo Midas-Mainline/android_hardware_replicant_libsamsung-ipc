@@ -527,7 +527,7 @@ namespace SamsungIpc
             GPRS,
         }
 
-        [CCode (cname = "struct ipc_net_regist", destroy_function = "")]
+        [CCode (cname = "struct ipc_net_regist_response", destroy_function = "")]
         public struct RegistrationMessage
         {
             public AccessTechnology act;
