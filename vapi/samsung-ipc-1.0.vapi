@@ -569,7 +569,7 @@ namespace SamsungIpc
             }
         }
 
-        [CCode (cname = "struct ipc_net_current_plmn", destroy_function = "")]
+        [CCode (cname = "struct ipc_net_current_plmn_response", destroy_function = "")]
         public struct CurrentPlmnMessage
         {
             public uint8 unk0;
