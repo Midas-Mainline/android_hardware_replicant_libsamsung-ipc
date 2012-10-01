@@ -29,6 +29,7 @@
 #define MAX_MODEM_DATA_SIZE     0x50000
 
 #define GPRS_IFACE_PREFIX       "rmnet"
+#define GPRS_IFACE_COUNT        3
 
 extern struct ipc_handlers crespo_ipc_default_handlers;
 

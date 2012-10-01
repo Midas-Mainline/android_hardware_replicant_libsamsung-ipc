@@ -587,7 +587,7 @@ int crespo_ipc_power_off(void *io_data)
     return 0;
 }
 
-char *crespo_ipc_gprs_get_iface(int cid)
+char *crespo_2_6_35_ipc_gprs_get_iface(int cid)
 {
     char *iface = NULL;
 
@@ -596,13 +596,36 @@ char *crespo_ipc_gprs_get_iface(int cid)
     return iface;
 }
 
-int crespo_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap)
+char *crespo_3_0_ipc_gprs_get_iface(int cid)
+{
+    char *iface = NULL;
+
+    if(cid > GPRS_IFACE_COUNT)
+        return NULL;
+
+    asprintf(&iface, "%s%d", GPRS_IFACE_PREFIX, cid - 1);
+
+    return iface;
+}
+
+int crespo_2_6_35_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap)
 {
     if (cap == NULL)
         return -1;
 
     cap->port_list = 0;
     cap->cid_max = 1;
+
+    return 0;
+}
+
+int crespo_3_0_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap)
+{
+    if (cap == NULL)
+        return -1;
+
+    cap->port_list = 0;
+    cap->cid_max = GPRS_IFACE_COUNT;
 
     return 0;
 }
@@ -685,9 +708,14 @@ struct ipc_handlers crespo_default_handlers = {
     .common_data_get_fd = crespo_ipc_common_data_get_fd,
 };
 
-struct ipc_gprs_specs crespo_gprs_specs = {
-    .gprs_get_iface = crespo_ipc_gprs_get_iface,
-    .gprs_get_capabilities = crespo_ipc_gprs_get_capabilities,
+struct ipc_gprs_specs crespo_2_6_35_gprs_specs = {
+    .gprs_get_iface = crespo_2_6_35_ipc_gprs_get_iface,
+    .gprs_get_capabilities = crespo_2_6_35_ipc_gprs_get_capabilities,
+};
+
+struct ipc_gprs_specs crespo_3_0_gprs_specs = {
+    .gprs_get_iface = crespo_3_0_ipc_gprs_get_iface,
+    .gprs_get_capabilities = crespo_3_0_ipc_gprs_get_capabilities,
 };
 
 // vim:ts=4:sw=4:expandtab

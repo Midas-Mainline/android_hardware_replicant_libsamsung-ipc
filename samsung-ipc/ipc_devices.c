@@ -28,11 +28,21 @@ struct ipc_device_desc ipc_devices[] = {
     {
         .name = "crespo",
         .board_name = "herring",
-        .kernel_version = NULL,
+        .kernel_version = "2.6.35",
         .fmt_ops = &crespo_fmt_ops,
         .rfs_ops = &crespo_rfs_ops,
         .handlers = &crespo_default_handlers,
-        .gprs_specs = &crespo_gprs_specs,
+        .gprs_specs = &crespo_2_6_35_gprs_specs,
+        .nv_data_specs = NULL,
+    },
+    {
+        .name = "crespo",
+        .board_name = "herring",
+        .kernel_version = "3.0",
+        .fmt_ops = &crespo_fmt_ops,
+        .rfs_ops = &crespo_rfs_ops,
+        .handlers = &crespo_default_handlers,
+        .gprs_specs = &crespo_3_0_gprs_specs,
         .nv_data_specs = NULL,
     },
     {

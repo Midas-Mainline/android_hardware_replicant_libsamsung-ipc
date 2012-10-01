@@ -47,7 +47,8 @@ extern struct ipc_handlers h1_default_handlers;
 extern struct ipc_ops crespo_fmt_ops;
 extern struct ipc_ops crespo_rfs_ops;
 extern struct ipc_handlers crespo_default_handlers;
-extern struct ipc_gprs_specs crespo_gprs_specs;
+extern struct ipc_gprs_specs crespo_2_6_35_gprs_specs;
+extern struct ipc_gprs_specs crespo_3_0_gprs_specs;
 
 /* aries */
 extern struct ipc_ops aries_fmt_ops;
