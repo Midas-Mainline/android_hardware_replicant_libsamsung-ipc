@@ -26,6 +26,7 @@
 struct ipc_device_desc {
     char *name;
     char *board_name;
+    char *kernel_version;
 
     struct ipc_ops *fmt_ops;
     struct ipc_ops *rfs_ops;

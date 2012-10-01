@@ -35,6 +35,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <asm/types.h>
+#include <sys/utsname.h>
 
 #include <radio.h>
 
@@ -63,18 +64,13 @@ void ipc_client_log(struct ipc_client *client, const char *message, ...)
 
 int ipc_device_detect(void)
 {
+    char *device = NULL;
+    char *kernel_version = NULL;
     int index = -1;
     int i;
 
 #ifdef IPC_DEVICE_EXPLICIT
-    for (i=0 ; i < ipc_devices_count ; i++)
-    {
-        if (strcmp(IPC_DEVICE_EXPLICIT, ipc_devices[i].name) == 0)
-        {
-            index = i;
-            break;
-        }
-    }
+    device = strdup(IPC_DEVICE_EXPLICIT);
 #else
     char buf[4096];
 
@@ -100,18 +96,49 @@ int ipc_device_detect(void)
                 str[i] = tmp;
             }
 
-            for (i=0 ; i < ipc_devices_count ; i++)
-            {
-                if (strstr(pch, ipc_devices[i].board_name) != NULL)
-                {
-                    index = i;
-                    break;
-                }
-            }
+            device = strdup(pch);
         }
         pch = strtok(NULL, "\n");
     }
 #endif
+
+#ifdef IPC_KERNEL_VERSION_EXPLICIT
+    kernel_version = strdup(IPC_KERNEL_VERSION_EXPLICIT);
+#else
+    struct utsname utsname;
+    memset(&utsname, 0, sizeof(utsname));
+
+    uname(&utsname);
+
+    kernel_version = strdup(utsname.release);
+#endif
+
+    for (i=0 ; i < ipc_devices_count ; i++)
+    {
+        if (strcmp(device, ipc_devices[i].name) == 0)
+        {
+            if (ipc_devices[i].kernel_version != NULL)
+            {
+                if (strncmp(kernel_version, ipc_devices[i].kernel_version, strlen(ipc_devices[i].kernel_version)) == 0)
+                {
+                    index = i;
+                    break;
+                } else {
+                    // Kernel version didn't match but it may still work
+                    index = i;
+                }
+            } else {
+                index = i;
+                break;
+            }
+        }
+    }
+
+    if (device != NULL)
+        free(device);
+
+    if (kernel_version != NULL)
+        free(kernel_version);
 
     return index;
 }

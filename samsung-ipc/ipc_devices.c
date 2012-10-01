@@ -28,6 +28,7 @@ struct ipc_device_desc ipc_devices[] = {
     {
         .name = "crespo",
         .board_name = "herring",
+        .kernel_version = NULL,
         .fmt_ops = &crespo_fmt_ops,
         .rfs_ops = &crespo_rfs_ops,
         .handlers = &crespo_default_handlers,
@@ -37,6 +38,7 @@ struct ipc_device_desc ipc_devices[] = {
     {
         .name = "aries",
         .board_name = "aries",
+        .kernel_version = NULL,
         .fmt_ops = &aries_fmt_ops,
         .rfs_ops = &aries_rfs_ops,
         .handlers = &aries_default_handlers,
@@ -46,6 +48,7 @@ struct ipc_device_desc ipc_devices[] = {
     {
         .name = "aries",
         .board_name = "gt-p1000",
+        .kernel_version = NULL,
         .fmt_ops = &aries_fmt_ops,
         .rfs_ops = &aries_rfs_ops,
         .handlers = &aries_default_handlers,
@@ -55,6 +58,7 @@ struct ipc_device_desc ipc_devices[] = {
     {   
         .name = "galaxys2",
         .board_name = "i9100",
+        .kernel_version = NULL,
         .fmt_ops = &galaxys2_fmt_ops,
         .rfs_ops = &galaxys2_rfs_ops,
         .handlers = &galaxys2_default_handlers,
@@ -64,6 +68,7 @@ struct ipc_device_desc ipc_devices[] = {
     {   
         .name = "galaxys2",
         .board_name = "smdk4210",
+        .kernel_version = NULL,
         .fmt_ops = &galaxys2_fmt_ops,
         .rfs_ops = &galaxys2_rfs_ops,
         .handlers = &galaxys2_default_handlers,
@@ -73,6 +78,7 @@ struct ipc_device_desc ipc_devices[] = {
     {
         .name = "maguro",
         .board_name = "tuna",
+        .kernel_version = NULL,
         .fmt_ops = &maguro_fmt_ops,
         .rfs_ops = &maguro_rfs_ops,
         .handlers = &maguro_default_handlers,
