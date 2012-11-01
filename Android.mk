@@ -55,6 +55,7 @@ samsung-ipc_files := \
 	samsung-ipc/misc.c \
 	samsung-ipc/net.c \
 	samsung-ipc/sec.c \
+	samsung-ipc/sms.c \
 	samsung-ipc/wakelock.c \
 	samsung-ipc/device/h1/h1_ipc.c \
 	samsung-ipc/device/crespo/crespo_ipc.c \

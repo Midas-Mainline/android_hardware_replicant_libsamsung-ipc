@@ -26,6 +26,26 @@
 #define IPC_SMS_ACK_MALFORMED_REQ_ERROR 0x8061
 #define IPC_SMS_ACK_UNSPEC_ERROR        0x806F
 
+/*
+ * This is followed by:
+ * smsc_string (variable length, 1st byte is length)
+ * pdu (variable length)
+ */
+struct ipc_sms_send_msg_request {
+    unsigned char type;
+    unsigned char msg_type;
+    unsigned char unk;
+    unsigned char length;
+    unsigned char smsc_len;
+} __attribute__((__packed__));
+
+struct ipc_sms_send_msg_response {
+    unsigned char type;
+    unsigned short error;
+    unsigned char msg_tpid;
+    unsigned char unk;
+} __attribute__((__packed__));
+
 struct ipc_sms_incoming_msg {
     unsigned char msg_type;
     unsigned char type;
@@ -34,24 +54,15 @@ struct ipc_sms_incoming_msg {
     unsigned char length;
 } __attribute__((__packed__));
 
-/*
- * This is followed by:
- * smsc_string (variable length, 1st byte is length)
- * pdu (variable length)
- */
-struct ipc_sms_send_msg {
-    unsigned char type;
-    unsigned char msg_type;
-    unsigned char unk;
-    unsigned char length;
-    unsigned char smsc_len;
-} __attribute__((__packed__));
-
-struct ipc_sms_deliv_report_msg {
+struct ipc_sms_deliver_report_request {
     unsigned char type;
     unsigned short error;
     unsigned char msg_tpid;
     unsigned char unk;
+} __attribute__((__packed__));
+
+struct ipc_sms_deliver_report_response {
+    unsigned short error;
 } __attribute__((__packed__));
 
 #endif

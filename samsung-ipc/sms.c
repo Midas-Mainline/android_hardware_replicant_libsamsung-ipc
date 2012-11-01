@@ -22,7 +22,7 @@
 #include <string.h>
 #include <assert.h>
 
-unsigned char* ipc_sms_send_msg_pack(struct ipc_sms_send_msg *msg, char *smsc,
+unsigned char* ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request *msg, char *smsc,
                                      unsigned char *pdu, int pdu_length)
 {
     unsigned char *data = NULL, *p = NULL;
@@ -32,13 +32,13 @@ unsigned char* ipc_sms_send_msg_pack(struct ipc_sms_send_msg *msg, char *smsc,
     assert(pdu != NULL);
 
     smsc_len = strlen(smsc);
-    data_length = smsc_len + pdu_length + sizeof(struct ipc_sms_send_msg);
+    data_length = smsc_len + pdu_length + sizeof(struct ipc_sms_send_msg_request);
     data = (unsigned char*) malloc(sizeof(unsigned char) * data_length);
     memset(data, 0, data_length);
 
     p = data;
-    memcpy(p, &msg, sizeof(struct ipc_sms_send_msg));
-    p += sizeof(struct ipc_sms_send_msg);
+    memcpy(p, &msg, sizeof(struct ipc_sms_send_msg_request));
+    p += sizeof(struct ipc_sms_send_msg_request);
     memcpy(p, (char*) (smsc + 1), smsc_len);
     p += smsc_len;
     memcpy(p, pdu, pdu_length);

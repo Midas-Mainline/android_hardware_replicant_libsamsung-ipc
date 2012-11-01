@@ -52,7 +52,7 @@
 #define IPC_SMS_TYPE_STATUS_REPORT  2
 #define IPC_SMS_TYPE_OUTGOING       2
 
-unsigned char* ipc_sms_send_msg_pack(struct ipc_sms_send_msg *msg, char *smsc, unsigned char *pdu, int length);
+unsigned char* ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request *msg, char *smsc, unsigned char *pdu, int length);
 
 #endif
 
