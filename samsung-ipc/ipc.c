@@ -404,24 +404,24 @@ int ipc_client_gprs_handlers_available(struct ipc_client *client)
         return 0;
 }
 
-int ipc_client_gprs_activate(struct ipc_client *client)
+int ipc_client_gprs_activate(struct ipc_client *client, int cid)
 {
     if (client == NULL ||
         client->handlers == NULL ||
         client->handlers->gprs_activate == NULL)
         return -1;
 
-    return client->handlers->gprs_activate(client->handlers->gprs_activate_data);
+    return client->handlers->gprs_activate(client->handlers->gprs_activate_data, cid);
 }
 
-int ipc_client_gprs_deactivate(struct ipc_client *client)
+int ipc_client_gprs_deactivate(struct ipc_client *client, int cid)
 {
     if (client == NULL ||
         client->handlers == NULL ||
         client->handlers->gprs_deactivate == NULL)
         return -1;
 
-    return client->handlers->gprs_deactivate(client->handlers->gprs_deactivate_data);
+    return client->handlers->gprs_deactivate(client->handlers->gprs_deactivate_data, cid);
 }
 
 char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid)

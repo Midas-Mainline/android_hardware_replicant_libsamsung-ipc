@@ -38,6 +38,7 @@
 #include <asm/types.h>
 #include <mtd/mtd-abi.h>
 #include <assert.h>
+#include <string.h>
 
 #include <radio.h>
 
@@ -796,17 +797,22 @@ int aries_ipc_power_off(void *data)
 
 //TODO: there are also suspend/resume nodes
 
-int aries_ipc_gprs_activate(void *data)
+int aries_ipc_gprs_activate(void *data, int cid)
 {
     int fd = open("/sys/class/net/svnet0/pdp/activate", O_RDWR);
-    char activate_data[] = "1\n";
+    char *activate_data = NULL;
     int rc;
 
     if(fd < 0)
         return -1;
 
-    rc = write(fd, activate_data, sizeof(activate_data) - 1);
+    asprintf(&activate_data, "%d\n", cid);
+    if(activate_data == NULL)
+        return -1;
 
+    rc = write(fd, activate_data, strlen(activate_data));
+
+    free(activate_data);
     close(fd);
 
     if(rc < 0)
@@ -816,17 +822,22 @@ int aries_ipc_gprs_activate(void *data)
 
 }
 
-int aries_ipc_gprs_deactivate(void *data)
+int aries_ipc_gprs_deactivate(void *data, int cid)
 {
     int fd = open("/sys/class/net/svnet0/pdp/deactivate", O_RDWR);
-    char deactivate_data[] = "1\n";
+    char *deactivate_data = NULL;
     int rc;
 
     if(fd < 0)
         return -1;
 
-    rc = write(fd, deactivate_data, sizeof(deactivate_data) - 1);
+    asprintf(&deactivate_data, "%d\n", cid);
+    if(deactivate_data == NULL)
+        return -1;
 
+    rc = write(fd, deactivate_data, strlen(deactivate_data));
+
+    free(deactivate_data);
     close(fd);
 
     if(rc < 0)
