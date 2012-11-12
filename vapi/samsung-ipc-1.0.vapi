@@ -1237,7 +1237,7 @@ namespace SamsungIpc
             }
         }
 
-        [CCode (cname = "struct ipc_sms_send_msg")]
+        [CCode (cname = "struct ipc_sms_send_msg_request")]
         public struct SendMessage
         {
             public MessageType type;
@@ -1258,7 +1258,7 @@ namespace SamsungIpc
             }
         }
 
-        [CCode (cname = "struct ipc_sms_deliv_report_msg")]
+        [CCode (cname = "struct ipc_sms_send_msg_response")]
         public struct DeliverReportMessage
         {
             public MessageType type;
