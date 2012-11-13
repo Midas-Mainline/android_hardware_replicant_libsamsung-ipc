@@ -157,6 +157,8 @@ struct ipc_client* ipc_client_new(int client_type)
         return NULL;
 
     client = (struct ipc_client*) malloc(sizeof(struct ipc_client));
+    memset(client, 0, sizeof(struct ipc_client));
+
     client->type = client_type;
 
     switch (client_type)
