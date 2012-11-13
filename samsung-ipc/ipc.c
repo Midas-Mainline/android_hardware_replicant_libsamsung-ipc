@@ -115,7 +115,7 @@ int ipc_device_detect(void)
 
     for (i=0 ; i < ipc_devices_count ; i++)
     {
-        if (strcmp(device, ipc_devices[i].name) == 0)
+        if (strstr(device, ipc_devices[i].board_name) != NULL)
         {
             if (ipc_devices[i].kernel_version != NULL)
             {
