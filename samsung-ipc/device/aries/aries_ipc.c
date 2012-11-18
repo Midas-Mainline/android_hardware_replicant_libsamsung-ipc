@@ -184,8 +184,6 @@ int aries_modem_bootstrap(struct ipc_client *client)
     }
     ipc_client_log(client, "aries_ipc_bootstrap: sending AT in ASCII done");
 
-    usleep(50000); //FIXME
-
     /* Write the first part of modem.img. */
     FD_ZERO(&fds);
     FD_SET(s3c2410_serial3_fd, &fds);
@@ -193,7 +191,7 @@ int aries_modem_bootstrap(struct ipc_client *client)
     timeout.tv_sec=5;
     timeout.tv_usec=0;
 
-    if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
+    if(select(s3c2410_serial3_fd + 1, &fds, NULL, NULL, &timeout) == 0)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
         goto error;
@@ -206,10 +204,13 @@ int aries_modem_bootstrap(struct ipc_client *client)
     if(bootcore_version != BOOTCORE_VERSION)
         goto error;
 
+    FD_ZERO(&fds);
+    FD_SET(s3c2410_serial3_fd, &fds);
+
     timeout.tv_sec=5;
     timeout.tv_usec=0;
 
-    if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
+    if(select(s3c2410_serial3_fd + 1, &fds, NULL, NULL, &timeout) == 0)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
         goto error;
@@ -219,18 +220,9 @@ int aries_modem_bootstrap(struct ipc_client *client)
     read(s3c2410_serial3_fd, &info_size, sizeof(info_size));
     ipc_client_log(client, "aries_ipc_bootstrap: got info_size: 0x%x", info_size);
 
-    timeout.tv_sec=5;
-    timeout.tv_usec=0;
-
-    if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
-    {
-        ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-        goto error;
-    }
-
     /* Send PSI magic. */
     data=PSI_MAGIC;
-    write(s3c2410_serial3_fd, &data, sizeof(data));
+    write(s3c2410_serial3_fd, &data, sizeof(uint8_t));
     ipc_client_log(client, "aries_ipc_bootstrap: sent PSI_MAGIC (0x%x)", PSI_MAGIC);
 
     /* Send PSI data len. */
@@ -239,7 +231,7 @@ int aries_modem_bootstrap(struct ipc_client *client)
 
     for(i=0 ; i < 2 ; i++)
     {
-        write(s3c2410_serial3_fd, data_p, 1);
+        write(s3c2410_serial3_fd, data_p, sizeof(uint8_t));
         data_p++;
     }
     ipc_client_log(client, "aries_ipc_bootstrap: sent PSI_DATA_LEN (0x%x)", PSI_DATA_LEN);
@@ -253,7 +245,10 @@ int aries_modem_bootstrap(struct ipc_client *client)
 
     for(i=0 ; i < PSI_DATA_LEN ; i++)
     {
-        if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
+        FD_ZERO(&fds);
+        FD_SET(s3c2410_serial3_fd, &fds);
+
+        if(select(s3c2410_serial3_fd + 1, NULL, &fds, NULL, &timeout) == 0)
         {
             ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
             goto error;
@@ -267,10 +262,10 @@ int aries_modem_bootstrap(struct ipc_client *client)
 
     ipc_client_log(client, "aries_ipc_bootstrap: first part of radio.img sent; crc_byte is 0x%x", crc_byte);
 
-    timeout.tv_sec=5;
-    timeout.tv_usec=0;
+    FD_ZERO(&fds);
+    FD_SET(s3c2410_serial3_fd, &fds);
 
-    if(select(FD_SETSIZE, NULL, &fds, NULL, &timeout) == 0)
+    if(select(s3c2410_serial3_fd + 1, NULL, &fds, NULL, &timeout) == 0)
     {
         ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
         goto error;
@@ -280,13 +275,16 @@ int aries_modem_bootstrap(struct ipc_client *client)
 
     ipc_client_log(client, "aries_ipc_bootstrap: crc_byte sent");
 
+    timeout.tv_sec=5;
+    timeout.tv_usec=0;
+
     data = 0;
     for(i = 0 ; data != 0x01 ; i++)
     {
-        timeout.tv_sec=5;
-        timeout.tv_usec=0;
+        FD_ZERO(&fds);
+        FD_SET(s3c2410_serial3_fd, &fds);
 
-        if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
+        if(select(s3c2410_serial3_fd + 1, &fds, NULL, NULL, &timeout) == 0)
         {
             ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
             goto error;
@@ -304,28 +302,26 @@ int aries_modem_bootstrap(struct ipc_client *client)
     ipc_client_log(client, "aries_ipc_bootstrap: close s3c2410_serial3");
     close(s3c2410_serial3_fd);
 
-    FD_ZERO(&fds);
-    FD_SET(onedram_fd, &fds);
-
-    timeout.tv_sec=5;
+    timeout.tv_sec=3;
     timeout.tv_usec=0;
 
-    ipc_client_log(client, "aries_ipc_bootstrap: wait for 0x12341234 from onedram");
-    if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
-    {
-        ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-        goto error;
+    ipc_client_log(client, "aries_ipc_bootstrap: wait for 0x%04x from onedram", ONEDRAM_INIT_READ);
+
+    onedram_data = 0;
+    while(onedram_data != ONEDRAM_INIT_READ) {
+        FD_ZERO(&fds);
+        FD_SET(onedram_fd, &fds);
+
+        if(select(onedram_fd + 1, &fds, NULL, NULL, &timeout) == 0)
+        {
+            ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
+            goto error;
+        }
+
+        read(onedram_fd, &onedram_data, sizeof(onedram_data));
+
+        ipc_client_log(client, "aries_ipc_bootstrap: read 0x%04x from onedram", onedram_data);
     }
-
-    read(onedram_fd, &onedram_data, sizeof(onedram_data));
-
-    if(onedram_data != ONEDRAM_INIT_READ)
-    {
-        ipc_client_log(client, "aries_ipc_bootstrap: wrong onedram init magic (got 0x%04x)", onedram_data);
-        goto error;
-    }
-
-    ipc_client_log(client, "aries_ipc_bootstrap: got 0x%04x", onedram_data);
 
     ipc_client_log(client, "aries_ipc_bootstrap: writing the rest of modem.img to onedram.");
 
@@ -339,8 +335,8 @@ int aries_modem_bootstrap(struct ipc_client *client)
         ipc_client_log(client, "aries_ipc_bootstrap: could not map onedram to memory");
         goto error;
     }
- 
-    // it sometimes hangs here
+
+    ipc_client_log(client, "aries_ipc_bootstrap: mapped onedram to 0x%x", onedram_p);
 
     memcpy(onedram_p, data_p, RADIO_IMG_READ_SIZE - PSI_DATA_LEN);
 
@@ -378,27 +374,29 @@ int aries_modem_bootstrap(struct ipc_client *client)
 
     onedram_data = ONEDRAM_DEINIT_CMD;
 
-    timeout.tv_sec=5;
-    timeout.tv_usec=0;
-
     ipc_client_log(client, "aries_ipc_bootstrap: send 0x%04x", onedram_data);
     write(onedram_fd, &onedram_data, sizeof(onedram_data));
 
-    if(select(FD_SETSIZE, &fds, NULL, NULL, &timeout) == 0)
-    {
-        ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-        goto error;
+    timeout.tv_sec=3;
+    timeout.tv_usec=0;
+
+    ipc_client_log(client, "aries_ipc_bootstrap: wait for 0x%04x from onedram", ONEDRAM_DEINIT_READ);
+
+    onedram_data = 0;
+    while(onedram_data != ONEDRAM_DEINIT_READ) {
+        FD_ZERO(&fds);
+        FD_SET(onedram_fd, &fds);
+
+        if(select(onedram_fd + 1, &fds, NULL, NULL, &timeout) == 0)
+        {
+            ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
+            goto error;
+        }
+
+        read(onedram_fd, &onedram_data, sizeof(onedram_data));
+
+        ipc_client_log(client, "aries_ipc_bootstrap: read 0x%04x from onedram", onedram_data);
     }
-
-    read(onedram_fd, &onedram_data, sizeof(onedram_data));
-
-    if(onedram_data != ONEDRAM_DEINIT_READ)
-    {
-        ipc_client_log(client, "aries_ipc_bootstrap: wrong onedram deinit magic (got 0x%04x)", onedram_data);
-        goto error;
-    }
-
-    ipc_client_log(client, "aries_ipc_bootstrap: got 0x%04x", onedram_data);
 
     close(onedram_fd);
 
