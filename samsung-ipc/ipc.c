@@ -64,17 +64,17 @@ void ipc_client_log(struct ipc_client *client, const char *message, ...)
 
 int ipc_device_detect(void)
 {
-    char *device = NULL;
+    char *board_name = NULL;
     char *kernel_version = NULL;
     int index = -1;
     int i;
 
-#ifdef IPC_DEVICE_EXPLICIT
-    device = strdup(IPC_DEVICE_EXPLICIT);
+#ifdef IPC_BOARD_NAME_EXPLICIT
+    board_name = strdup(IPC_BOARD_NAME_EXPLICIT);
 #else
     char buf[4096];
 
-    // gather device type from /proc/cpuinfo
+    // gather board name type from /proc/cpuinfo
     int fd = open("/proc/cpuinfo", O_RDONLY);
     int bytesread = read(fd, buf, 4096);
     close(fd);
@@ -96,7 +96,7 @@ int ipc_device_detect(void)
                 str[i] = tmp;
             }
 
-            device = strdup(pch);
+            board_name = strdup(pch);
         }
         pch = strtok(NULL, "\n");
     }
@@ -115,7 +115,7 @@ int ipc_device_detect(void)
 
     for (i=0 ; i < ipc_devices_count ; i++)
     {
-        if (strstr(device, ipc_devices[i].board_name) != NULL)
+        if (strstr(board_name, ipc_devices[i].board_name) != NULL)
         {
             if (ipc_devices[i].kernel_version != NULL)
             {
@@ -134,8 +134,8 @@ int ipc_device_detect(void)
         }
     }
 
-    if (device != NULL)
-        free(device);
+    if (board_name != NULL)
+        free(board_name);
 
     if (kernel_version != NULL)
         free(kernel_version);
@@ -143,7 +143,7 @@ int ipc_device_detect(void)
     return index;
 }
 
-struct ipc_client* ipc_client_new(int client_type)
+struct ipc_client *ipc_client_new(int client_type)
 {
     struct ipc_client *client;
     int device_index = -1;
@@ -156,7 +156,7 @@ struct ipc_client* ipc_client_new(int client_type)
     if (client_type < 0 || client_type > IPC_CLIENT_TYPE_RFS)
         return NULL;
 
-    client = (struct ipc_client*) malloc(sizeof(struct ipc_client));
+    client = (struct ipc_client *) malloc(sizeof(struct ipc_client));
     memset(client, 0, sizeof(struct ipc_client));
 
     client->type = client_type;

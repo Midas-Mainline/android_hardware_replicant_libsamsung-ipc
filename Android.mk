@@ -13,22 +13,22 @@ LOCAL_LDFLAGS += -lcrypto
 
 ifeq ($(TARGET_DEVICE),crespo)
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := crespo
+	board_name := herring
 endif
 
 ifeq ($(TARGET_DEVICE),galaxys2)
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := galaxys2
+	board_name := smdk4210
 endif
 
 ifeq ($(TARGET_DEVICE),galaxysmtd)
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := aries
+	board_name := aries
 endif
 
 ifeq ($(TARGET_DEVICE),galaxytab)
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := aries
+	board_name := gt-p1000
 endif
 
 ifeq ($(TARGET_DEVICE),h1)
@@ -37,7 +37,7 @@ endif
 
 ifeq ($(TARGET_DEVICE),maguro)
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := maguro
+	board_name := tuna
 endif
 
 ifeq ($(DEBUG),true)
@@ -69,7 +69,7 @@ samsung-ipc_files := \
 	samsung-ipc/device/maguro/maguro_ipc.c
 
 LOCAL_SRC_FILES := $(samsung-ipc_files)
-LOCAL_CFLAGS += -DIPC_DEVICE_EXPLICIT=\"$(samsung-ipc_device)\"
+LOCAL_CFLAGS += -DIPC_BOARD_NAME_EXPLICIT=\"$(board_name)\"
 
 LOCAL_SHARED_LIBRARIES := libutils
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include \
