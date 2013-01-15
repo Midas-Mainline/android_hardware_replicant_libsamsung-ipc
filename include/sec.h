@@ -73,11 +73,15 @@ struct ipc_message_info;
 #define IPC_SEC_SIM_CARD_TYPE_SIM                       0x01
 #define IPC_SEC_SIM_CARD_TYPE_USIM                      0x02
 
-/* Possible RSIM commads */
+/* Possible RSIM commads (see TS 27.00.1 8.18) */
 #define IPC_SEC_RSIM_COMMAND_READ_BINARY                0xb0
-#define IPC_SEC_RSIM_COMMAND_READ_RECORD                0xc0
+#define IPC_SEC_RSIM_COMMAND_READ_RECORD                0xb2
+#define IPC_SEC_RSIM_COMMAND_GET_RESPONSE               0xc0
 #define IPC_SEC_RSIM_COMMAND_UPDATE_BINARY              0xd6
+#define IPC_SEC_RSIM_COMMAND_UPDATE_RECORD              0xdc
 #define IPC_SEC_RSIM_COMMAND_STATUS                     0xf2
+#define IPC_SEC_RSIM_COMMAND_RETRIEVE_DATA              0xcb
+#define IPC_SEC_RSIM_COMMAND_SET_DATA                   0xdb
 
 struct ipc_sec_sim_status_response {
     /* IPC_SEC_SIM_STATUS_... */
