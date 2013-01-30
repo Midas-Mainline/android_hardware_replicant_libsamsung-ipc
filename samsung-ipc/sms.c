@@ -37,7 +37,7 @@ unsigned char* ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request *msg, char 
     memset(data, 0, data_length);
 
     p = data;
-    memcpy(p, &msg, sizeof(struct ipc_sms_send_msg_request));
+    memcpy(p, msg, sizeof(struct ipc_sms_send_msg_request));
     p += sizeof(struct ipc_sms_send_msg_request);
     memcpy(p, (char*) (smsc + 1), smsc_len);
     p += smsc_len;
