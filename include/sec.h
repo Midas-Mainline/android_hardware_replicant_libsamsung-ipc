@@ -83,6 +83,9 @@ struct ipc_message_info;
 #define IPC_SEC_RSIM_COMMAND_RETRIEVE_DATA              0xcb
 #define IPC_SEC_RSIM_COMMAND_SET_DATA                   0xdb
 
+#define IPC_SEC_RSIM_FILE_STRUCTURE_TRANSPARENT         0x83
+#define IPC_SEC_RSIM_FILE_STRUCTURE_LINEAR_FIXED        0x00
+
 struct ipc_sec_sim_status_response {
     /* IPC_SEC_SIM_STATUS_... */
     unsigned char status;
@@ -139,6 +142,15 @@ struct ipc_sec_rsim_access_response {
     unsigned char len;
 } __attribute__((__packed__));
 
+// This is the data structure for SIM ICC type != 1
+struct ipc_sec_rsim_access_response_data {
+	unsigned char unk1[3];
+    unsigned char offset;
+    unsigned char unk2[2];
+	unsigned char file_structure;
+	unsigned char record_length;
+} __attribute__((__packed__));
+
 struct ipc_sec_lock_info_get {
     unsigned char unk0; /* needs to be "1" */
     /* IPC_SEC_PIN_TYPE_... */
@@ -154,7 +166,6 @@ struct ipc_sec_lock_info_response {
 } __attribute__((__packed__));
 
 struct ipc_sec_sim_icc_type {
-    /* unknown */
     unsigned char type;
 } __attribute__((__packed__));
 
