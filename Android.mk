@@ -31,6 +31,11 @@ ifeq ($(TARGET_DEVICE),galaxytab)
 	board_name := gt-p1000
 endif
 
+ifeq ($(TARGET_DEVICE),spica)
+	LOCAL_CFLAGS += -DDEVICE_IPC_V4
+	board_name := i5700
+endif
+
 ifeq ($(TARGET_DEVICE),h1)
 	LOCAL_CFLAGS += -DDEVICE_H1
 endif
@@ -102,6 +107,11 @@ endif
 ifeq ($(TARGET_DEVICE),galaxytab)
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	samsung-ipc_device := aries
+endif
+
+ifeq ($(TARGET_DEVICE),spica)
+	LOCAL_CFLAGS += -DDEVICE_IPC_V4
+	samsung-ipc_device := i5700
 endif
 
 ifeq ($(TARGET_DEVICE),h1)
