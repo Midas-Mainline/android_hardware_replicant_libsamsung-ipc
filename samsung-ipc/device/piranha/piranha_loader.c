@@ -44,8 +44,6 @@
 
 #include "piranha_loader.h"
 
-// TODO: redo log messages
-
 struct piranha_radio_part piranha_radio_parts[] = {
     {
         .id = PSI,
