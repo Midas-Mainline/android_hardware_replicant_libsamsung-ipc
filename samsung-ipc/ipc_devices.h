@@ -70,6 +70,13 @@ extern struct ipc_handlers maguro_default_handlers;
 extern struct ipc_gprs_specs maguro_gprs_specs;
 extern struct ipc_nv_data_specs maguro_nv_data_specs;
 
+/* piranha */
+extern struct ipc_ops piranha_fmt_ops;
+extern struct ipc_ops piranha_rfs_ops;
+extern struct ipc_handlers piranha_default_handlers;
+extern struct ipc_gprs_specs piranha_gprs_specs;
+extern struct ipc_nv_data_specs piranha_nv_data_specs;
+
 #endif
 
 // vim:ts=4:sw=4:expandtab

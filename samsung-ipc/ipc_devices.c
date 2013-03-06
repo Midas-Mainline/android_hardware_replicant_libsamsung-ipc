@@ -94,6 +94,26 @@ struct ipc_device_desc ipc_devices[] = {
         .handlers = &maguro_default_handlers,
         .gprs_specs = &maguro_gprs_specs,
         .nv_data_specs = &maguro_nv_data_specs,
+    },
+    {
+        .name = "piranha",
+        .board_name = "espresso10",
+        .kernel_version = NULL,
+        .fmt_ops = &piranha_fmt_ops,
+        .rfs_ops = &piranha_rfs_ops,
+        .handlers = &piranha_default_handlers,
+        .gprs_specs = &piranha_gprs_specs,
+        .nv_data_specs = NULL,
+    },
+    {
+        .name = "piranha",
+        .board_name = "espresso",
+        .kernel_version = NULL,
+        .fmt_ops = &piranha_fmt_ops,
+        .rfs_ops = &piranha_rfs_ops,
+        .handlers = &piranha_default_handlers,
+        .gprs_specs = &piranha_gprs_specs,
+        .nv_data_specs = NULL,
     }
 };
 

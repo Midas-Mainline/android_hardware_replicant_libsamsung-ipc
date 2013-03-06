@@ -45,6 +45,16 @@ ifeq ($(TARGET_DEVICE),maguro)
 	board_name := tuna
 endif
 
+ifeq ($(TARGET_DEVICE),p5100)
+	LOCAL_CFLAGS += -DDEVICE_IPC_V4
+	board_name := espresso10
+endif
+
+ifeq ($(TARGET_DEVICE),p3100)
+	LOCAL_CFLAGS += -DDEVICE_IPC_V4
+	board_name := espresso
+endif
+
 ifeq ($(DEBUG),true)
 	LOCAL_CFLAGS += -DDEBUG
 	LOCAL_CFLAGS += -DLOG_STDOUT
@@ -71,7 +81,9 @@ samsung-ipc_files := \
 	samsung-ipc/device/galaxys2/galaxys2_loader.c \
 	samsung-ipc/device/galaxys2/galaxys2_ipc.c \
 	samsung-ipc/device/maguro/maguro_loader.c \
-	samsung-ipc/device/maguro/maguro_ipc.c
+	samsung-ipc/device/maguro/maguro_ipc.c \
+	samsung-ipc/device/piranha/piranha_loader.c \
+	samsung-ipc/device/piranha/piranha_ipc.c
 
 LOCAL_SRC_FILES := $(samsung-ipc_files)
 LOCAL_CFLAGS += -DIPC_BOARD_NAME_EXPLICIT=\"$(board_name)\"
@@ -121,6 +133,16 @@ endif
 ifeq ($(TARGET_DEVICE),maguro)
 	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	samsung-ipc_device := maguro
+endif
+
+ifeq ($(TARGET_DEVICE),p5100)
+	LOCAL_CFLAGS += -DDEVICE_IPC_V4
+	samsung-ipc_device := espresso10
+endif
+
+ifeq ($(TARGET_DEVICE),p3100)
+	LOCAL_CFLAGS += -DDEVICE_IPC_V4
+	samsung-ipc_device := espresso
 endif
 
 ifeq ($(DEBUG),true)
