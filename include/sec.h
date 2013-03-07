@@ -36,7 +36,7 @@ struct ipc_message_info;
 #define IPC_SEC_ISIM_AUTH                               0x0509
 
 /* SIM status */
-#define IPC_SEC_SIM_STATUS_INITIALIZING                 0x00
+#define IPC_SEC_SIM_STATUS_READY                        0x00
 #define IPC_SEC_SIM_STATUS_SIM_LOCK_REQUIRED            0x01
 #define IPC_SEC_SIM_STATUS_INSIDE_PF_ERROR              0x02
 #define IPC_SEC_SIM_STATUS_LOCK_SC                      0x03
