@@ -161,9 +161,6 @@ void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp
 
             switch(sim_status->status)
             {
-                case IPC_SEC_SIM_STATUS_INITIALIZING:
-                    printf("[I] SIM is initializing\n");
-                break;
                 case IPC_SEC_SIM_STATUS_CARD_NOT_PRESENT:
                     printf("[I] SIM card is definitely absent\n");
                 break;
