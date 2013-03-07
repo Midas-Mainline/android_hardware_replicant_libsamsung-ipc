@@ -23,7 +23,7 @@
 #define __DEVICE_IPC_V4_DISP_H__
 
 struct ipc_disp_icon_info {
-    unsigned char rssi, battery, act, reg;
+    unsigned char rssi, bars, act, reg;
 } __attribute__((__packed__));
 
 #endif
