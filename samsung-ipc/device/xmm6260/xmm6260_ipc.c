@@ -131,6 +131,7 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
     response->type = ipc.type;
     response->cmd = IPC_COMMAND(response);
     response->length = ipc.length - sizeof(ipc);
+    response->data = NULL;
 
     if (response->length > 0) {
         response->data = (unsigned char*)malloc(response->length);
