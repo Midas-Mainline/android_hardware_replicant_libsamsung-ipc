@@ -50,6 +50,9 @@ libsamsung_ipc_la_SOURCES = \
 	device/maguro/maguro_loader.c \
 	device/maguro/maguro_loader.h \
 	device/maguro/maguro_ipc.c \
+	device/piranha/piranha_loader.c \
+	device/piranha/piranha_loader.h \
+	device/piranha/piranha_ipc.c \
 	$(NULL)
 
 AM_CFLAGS += -DDEVICE_IPC_V4
