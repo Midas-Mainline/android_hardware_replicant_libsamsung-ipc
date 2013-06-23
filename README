@@ -1,0 +1,21 @@
+libsamsung-ipc
+==============
+
+This is an implementation of the modem protocol found in a lot of Samsung devices
+mostly smartphones.
+
+Compilation and installation
+============================
+
+In orderto compile the source code you need the following software packages
+- GCC compiler
+- GNC C library
+- OpenSSL >= 1.0.0e
+
+To configure run
+    ./configure --prefix=/usr
+
+Configure automatically searches for all required components and packages.
+
+To compile and install run:
+    make && make install
