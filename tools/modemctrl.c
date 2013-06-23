@@ -408,9 +408,12 @@ int modem_read_loop(struct ipc_client *client)
     return 0;
 }
 
-void modem_log_handler(char *message, void *user_data)
+void modem_log_handler(const char *msg, void *user_data)
 {
     int i, l;
+    char *message;
+
+    message = strdup(msg);
     l = strlen(message);
 
     if(l > 1) {
@@ -425,6 +428,8 @@ void modem_log_handler(char *message, void *user_data)
 
         printf("[D] %s\n", message);
     }
+
+    free(message);
 }
 
 void modem_log_handler_quiet(const char *message, void *user_data)

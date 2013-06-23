@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <wakelock.h>
 #include <stdlib.h>
+#include <string.h>
 
 static int wake_lock_fd = -1;
 static int wake_unlock_fd = -1;
