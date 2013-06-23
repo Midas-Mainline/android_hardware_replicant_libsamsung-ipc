@@ -44,6 +44,7 @@ libsamsung_ipc_la_SOURCES = \
 	device/xmm6260/xmm6260_modemctl.h \
 	device/xmm6260/xmm6260_ipc.c \
 	device/xmm6260/xmm6260_ipc.h \
+	device/xmm6260/modem_prj.h \
 	device/galaxys2/galaxys2_loader.c \
 	device/galaxys2/galaxys2_loader.h \
 	device/galaxys2/galaxys2_ipc.c \
