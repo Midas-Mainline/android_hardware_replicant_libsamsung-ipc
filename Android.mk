@@ -31,10 +31,6 @@ ifeq ($(TARGET_DEVICE),spica)
 	board_name := i5700
 endif
 
-ifeq ($(TARGET_DEVICE),h1)
-	LOCAL_CFLAGS += -DDEVICE_H1
-endif
-
 ifeq ($(TARGET_DEVICE),maguro)
 	board_name := tuna
 endif
@@ -64,7 +60,6 @@ samsung-ipc_files := \
 	samsung-ipc/sec.c \
 	samsung-ipc/sms.c \
 	samsung-ipc/wakelock.c \
-	samsung-ipc/device/h1/h1_ipc.c \
 	samsung-ipc/device/crespo/crespo_ipc.c \
 	samsung-ipc/device/aries/aries_ipc.c \
 	samsung-ipc/device/xmm6260/xmm6260_loader.c \

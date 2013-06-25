@@ -38,11 +38,6 @@ struct ipc_device_desc {
 extern struct ipc_device_desc ipc_devices[];
 extern int ipc_devices_count;
 
-/* h1 */
-extern struct ipc_ops h1_fmt_ops;
-extern struct ipc_ops h1_rfs_ops;
-extern struct ipc_handlers h1_default_handlers;
-
 /* crespo */
 extern struct ipc_ops crespo_fmt_ops;
 extern struct ipc_ops crespo_rfs_ops;

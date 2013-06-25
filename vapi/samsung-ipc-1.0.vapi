@@ -32,7 +32,6 @@ namespace SamsungIpc
     public enum DeviceType
     {
         CRESPO,
-        H1,
     }
 
     [CCode (cname = "int", cprefix = "IPC_TYPE_", has_type_id = false)]
