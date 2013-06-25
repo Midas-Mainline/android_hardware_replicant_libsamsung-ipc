@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Paul Kocialkowsk <contact@paulk.fr>
@@ -18,7 +18,8 @@
  *
  */
 
-#include <stdio.h>
+#include <stdlib.h>
+
 #include <samsung-ipc.h>
 
 int ipc_gen_phone_res_check(struct ipc_gen_phone_res *res)

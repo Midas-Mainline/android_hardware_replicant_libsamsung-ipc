@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
@@ -19,29 +19,30 @@
  *
  */
 
-#include <samsung-ipc.h>
-#include <string.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <string.h>
+
+#include <samsung-ipc.h>
 
 void ipc_sec_pin_status_set_setup(struct ipc_sec_pin_status_set *message,
                                   unsigned char pin_type, char *pin1, char *pin2)
 {
-    assert(message != NULL);
+    if (message == NULL)
+        return;
 
-     memset(message, 0, sizeof(struct ipc_sec_pin_status_set));
+    memset(message, 0, sizeof(struct ipc_sec_pin_status_set));
 
     message->type = pin_type;
 
     if (pin1 != NULL)
     {
-        strncpy((char*)message->pin1, pin1, 8);
+        strncpy((char *) message->pin1, pin1, 8);
         message->length1 = strlen(pin1);
     }
 
     if (pin2 != NULL)
     {
-        strncpy((char*)message->pin2, pin2, 8);
+        strncpy((char *) message->pin2, pin2, 8);
         message->length2 = strlen(pin2);
     }
 }
@@ -56,7 +57,7 @@ void ipc_sec_lock_info_get_setup(struct ipc_sec_lock_info_get *message,
     message->pin_type = pin_type;
 }
 
-char* ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *response)
+char *ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *response)
 {
     int n = 0;
     int offset = (int) sizeof(struct ipc_sec_rsim_access_response);
@@ -66,7 +67,7 @@ char* ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *respon
         return NULL;
 
     struct ipc_sec_rsim_access_response *rsimresp = (struct ipc_sec_rsim_access_response*) response->data;
-    char *file_data = (char*) malloc(sizeof(char) * rsimresp->len);
+    char *file_data = (char *) malloc(sizeof(char) * rsimresp->len);
 
     for (n = 0; n < rsimresp->len; n++)
     {
@@ -81,7 +82,7 @@ char* ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *respon
     }
 
     if (size < rsimresp->len)
-        file_data = (char*) realloc(file_data, sizeof(char) * size);
+        file_data = (char *) realloc(file_data, sizeof(char) * size);
 
     return file_data;
 }
@@ -94,7 +95,7 @@ void ipc_sec_phone_lock_set_setup(struct ipc_sec_phone_lock_set *message,
 
     if (passwd != NULL)
     {
-        strncpy((char*) message->password, passwd, 39);
+        strncpy((char *) message->password, passwd, 39);
         message->length = strlen(passwd);
     }
 }
@@ -106,13 +107,13 @@ void ipc_sec_change_locking_pw_set_setup(struct ipc_sec_change_locking_pw_set *m
 
     if (passwd_old != NULL)
     {
-        strncpy((char*) message->password_old, passwd_old, 39);
+        strncpy((char *) message->password_old, passwd_old, 39);
         message->length_old = strlen(passwd_old);
     }
 
     if (passwd_new != NULL)
     {
-        strncpy((char*) message->password_new, passwd_new, 39);
+        strncpy((char *) message->password_new, passwd_new, 39);
         message->length_new = strlen(passwd_new);
     }
 }

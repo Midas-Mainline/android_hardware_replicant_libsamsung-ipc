@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
@@ -867,7 +867,7 @@ void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client, struct 
     rfs_io_conf->offset = rfs_io->offset;
     rfs_io_conf->length = rfs_io->length;
 
-    ipc_client_send(client, IPC_RFS_NV_READ_ITEM, 0, (unsigned char*) rfs_io_conf,
+    ipc_client_send(client, IPC_RFS_NV_READ_ITEM, 0, (unsigned char *) rfs_io_conf,
                     rfs_io->length + sizeof(struct ipc_rfs_io_confirm), info->aseq);
     free(rfs_io_conf);
 }
@@ -901,7 +901,7 @@ void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client, struct
     rfs_io_conf->offset = rfs_io->offset;
     rfs_io_conf->length = rfs_io->length;
 
-    ipc_client_send(client, IPC_RFS_NV_WRITE_ITEM, 0, (unsigned char*) rfs_io_conf,
+    ipc_client_send(client, IPC_RFS_NV_WRITE_ITEM, 0, (unsigned char *) rfs_io_conf,
                     sizeof(struct ipc_rfs_io_confirm), info->aseq);
     free(rfs_io_conf);
 }

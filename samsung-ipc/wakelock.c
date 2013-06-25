@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
@@ -18,11 +18,11 @@
  *
  */
 
-#include <assert.h>
-#include <fcntl.h>
-#include <wakelock.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
+
+#include <wakelock.h>
 
 static int wake_lock_fd = -1;
 static int wake_unlock_fd = -1;
@@ -30,7 +30,9 @@ static int wake_unlock_fd = -1;
 int wake_lock(char *lock_name)
 {
     int rc;
-    assert(lock_name != NULL);
+
+    if (lock_name == NULL)
+        return -1;
 
     if (wake_lock_fd < 0)
         wake_lock_fd = open("/sys/power/wake_lock", O_RDWR);
@@ -46,7 +48,9 @@ int wake_lock(char *lock_name)
 int wake_unlock(char *lock_name)
 {
     int rc;
-    assert(lock_name != NULL);
+
+    if (lock_name == NULL)
+        return -1;
 
     if (wake_unlock_fd < 0)
         wake_unlock_fd = open("/sys/power/wake_unlock", O_RDWR);
@@ -58,3 +62,5 @@ int wake_unlock(char *lock_name)
 
     return rc;
 }
+
+// vim:ts=4:sw=4:expandtab

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
@@ -18,10 +18,10 @@
  *
  */
 
-#include <samsung-ipc.h>
-#include <string.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <string.h>
+
+#include <samsung-ipc.h>
 
 void ipc_gprs_port_list_setup(struct ipc_gprs_port_list *message)
 {
@@ -30,7 +30,8 @@ void ipc_gprs_port_list_setup(struct ipc_gprs_port_list *message)
         0x02, 0x04, 0x16, 0x00, 0x17, 0x00, 0x87, 0x00, 0xBD, 0x01
     };
 
-    assert(message != NULL);
+    if (message == NULL)
+        return;
 
     memset(message, 0, sizeof(struct ipc_gprs_port_list));
 
@@ -40,7 +41,8 @@ void ipc_gprs_port_list_setup(struct ipc_gprs_port_list *message)
 void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context *message,
     unsigned char cid, int enable, char *apn)
 {
-    assert(message != NULL);
+    if (message == NULL)
+        return;
 
     memset(message, 0, sizeof(struct ipc_gprs_define_pdp_context));
 
@@ -54,7 +56,8 @@ void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context *messa
 void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context_set *message,
     unsigned char cid, int enable, char *username, char *password)
 {
-    assert(message != NULL);
+    if (message == NULL)
+        return;
 
     memset(message, 0, sizeof(struct ipc_gprs_pdp_context_set));
 
@@ -65,8 +68,8 @@ void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context_set *message,
     {
         message->unk0[2] = 0x13;
         message->unk2 = 0x1;
-        strncpy((char*)message->username, username, 32);
-        strncpy((char*)message->password, password, 32);
+        strncpy((char *) message->username, username, 32);
+        strncpy((char *) message->password, password, 32);
     }
 }
 

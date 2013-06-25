@@ -1,6 +1,7 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
+ * Copyright (C) 2013 Paul Kocialkowsk <contact@paulk.fr>
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
@@ -18,112 +19,102 @@
  *
  */
 
-#include <samsung-ipc.h>
-#include <string.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <string.h>
 
-#define OUTGOING_NUMBER_MAX_LENGTH      86
+#include <samsung-ipc.h>
 
-void ipc_call_outgoing_setup(struct ipc_call_outgoing *message, unsigned char type,
-                             unsigned char identity, unsigned char prefix, char *number)
+#define OUTGOING_NUMBER_MAX_LENGTH 86
+
+void ipc_call_outgoing_setup(struct ipc_call_outgoing *message, unsigned char type, unsigned char identity, unsigned char prefix, char *number)
 {
-    assert(message != NULL);
+    int length;
+
+    if (message == NULL || number == NULL)
+        return;
+
+    length = strlen(number);
+    if (length > OUTGOING_NUMBER_MAX_LENGTH)
+        length = OUTGOING_NUMBER_MAX_LENGTH;
 
     memset(message, 0, sizeof(struct ipc_call_outgoing));
 
     message->type = type;
     message->identity = identity;
     message->prefix = prefix;
-    message->length = strlen(number);
+    message->length = length;
 
-    assert(message->length <= OUTGOING_NUMBER_MAX_LENGTH);
-
-    strncpy(message->number, number, message->length);
+    strncpy((char *) message->number, number, length);
 }
 
-/**
- * Retrieve number of calls in list of calls.
- **/
+/* Retrieve number of calls in list of calls */
 unsigned int ipc_call_list_response_get_num_entries(struct ipc_message_info *response)
 {
-    unsigned int count = 0, n = 0;
+    if (response == NULL || response->data == NULL || response->length < sizeof(unsigned int))
+        return 0;
 
-    assert(response != NULL);
-    assert(response->data != NULL);
-
-    count = (unsigned int) *((unsigned char*) response->data);
-    return count;
+    return *((unsigned int *) response->data);
 }
 
-/**
- * Retrieve one specific entry from a list of calls.
- **/
+/* Retrieve one specific entry from a list of calls */
 struct ipc_call_list_entry* ipc_call_list_response_get_entry(struct ipc_message_info *response, unsigned int num)
 {
-    unsigned int count = 0, pos = 1, n = 0;
+    unsigned int count, pos, n;
     struct ipc_call_list_entry *entry = NULL;
 
-    assert(response != NULL);
-    assert(response->data != NULL);
-
     count = ipc_call_list_response_get_num_entries(response);
-    if (num > count)
+    if (num > count || count == 0)
         return NULL;
 
+    pos = 1;
     for (n = 0; n < num + 1; n++)
     {
-        entry = (struct ipc_call_list_entry*) (response->data + pos);
+        entry = (struct ipc_call_list_entry *) (response->data + pos);
         pos += (unsigned int) (sizeof(struct ipc_call_list_entry) + entry->number_len);
     }
 
     return entry;
 }
 
-/**
- * Retrieve the number of a call entry in the list of calls
- **/
-char* ipc_call_list_response_get_entry_number(struct ipc_message_info *response, unsigned int num)
+/* Retrieve the number of a call entry in the list of calls */
+char *ipc_call_list_response_get_entry_number(struct ipc_message_info *response, unsigned int num)
 {
-    unsigned int count = 0, pos = 1, n = 0;
+    unsigned int count, pos, n;
     struct ipc_call_list_entry *entry = NULL;
-    char *number = NULL;
-
-    assert(response != NULL);
-    assert(response->data != NULL);
+    char *number;
 
     count = ipc_call_list_response_get_num_entries(response);
-    if (num > count)
+    if (num > count || count == 0)
         return NULL;
 
+    pos = 1;
     for (n = 0; n < num + 1; n++)
     {
         if (entry != NULL)
             pos += entry->number_len;
 
-        entry = (struct ipc_call_list_entry*) (response->data + pos);
+        entry = (struct ipc_call_list_entry *) (response->data + pos);
         pos += (unsigned int) sizeof(struct ipc_call_list_entry);
     }
 
-    if (entry == NULL || (unsigned char*) (response->data + pos) == NULL)
+    if (entry == NULL || (unsigned char *) (response->data + pos) == NULL)
         return NULL;
 
-    number = (char*) malloc(sizeof(char) * entry->number_len);
-    strncpy(number, response->data + pos, entry->number_len);
+    number = (char *) malloc(sizeof(char) * entry->number_len);
+    strncpy(number, (char *) (response->data + pos), entry->number_len);
 
     return number;
 }
 
-unsigned char* ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf *message, unsigned char *burst, int burst_len)
+unsigned char *ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf *message, unsigned char *burst, int burst_len)
 {
     unsigned char *data = NULL;
     int data_len = sizeof(struct ipc_call_cont_dtmf) + burst_len;
 
-    assert(message != 0);
-    assert(burst != 0);
-    assert(burst_len != 0);
+    if (message == NULL || burst == NULL || burst_len <= 0)
+        return NULL;
 
-    data = (unsigned char*) malloc(sizeof(unsigned char) * data_len);
+    data = (unsigned char *) malloc(sizeof(unsigned char) * data_len);
     memset(data, 0, data_len);
 
     memcpy(data, message, sizeof(struct ipc_call_cont_dtmf));

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
@@ -18,28 +18,29 @@
  *
  */
 
-#include <samsung-ipc.h>
+#include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
-unsigned char* ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request *msg, char *smsc,
+#include <samsung-ipc.h>
+
+unsigned char *ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request *msg, char *smsc,
                                      unsigned char *pdu, int pdu_length)
 {
     unsigned char *data = NULL, *p = NULL;
     unsigned int data_length = 0, smsc_len = 0;
 
-    assert(smsc != NULL);
-    assert(pdu != NULL);
+    if (msg == NULL || smsc == NULL || pdu == NULL)
+        return NULL;
 
     smsc_len = strlen(smsc);
     data_length = smsc_len + pdu_length + sizeof(struct ipc_sms_send_msg_request);
-    data = (unsigned char*) malloc(sizeof(unsigned char) * data_length);
+    data = (unsigned char *) malloc(sizeof(unsigned char) * data_length);
     memset(data, 0, data_length);
 
     p = data;
     memcpy(p, msg, sizeof(struct ipc_sms_send_msg_request));
     p += sizeof(struct ipc_sms_send_msg_request);
-    memcpy(p, (char*) (smsc + 1), smsc_len);
+    memcpy(p, (char *) (smsc + 1), smsc_len);
     p += smsc_len;
     memcpy(p, pdu, pdu_length);
 

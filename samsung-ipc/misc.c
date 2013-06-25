@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
@@ -17,19 +17,21 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-#include <samsung-ipc.h>
+#include <stdlib.h>
 #include <string.h>
 
-#define DEFAULT_IMSI_LENGTH         15
+#include <samsung-ipc.h>
 
-char* ipc_misc_me_imsi_response_get_imsi(struct ipc_message_info *response)
+#define DEFAULT_IMSI_LENGTH 15
+
+char *ipc_misc_me_imsi_response_get_imsi(struct ipc_message_info *response)
 {
     if (response == NULL || response->data[0] != DEFAULT_IMSI_LENGTH)
         return NULL;
 
-    char *buffer = (char*) malloc(sizeof(char) * DEFAULT_IMSI_LENGTH);
+    char *buffer = (char *) malloc(sizeof(char) * DEFAULT_IMSI_LENGTH);
     memcpy(buffer, &response->data[1], DEFAULT_IMSI_LENGTH);
+
     return buffer;
 }
 

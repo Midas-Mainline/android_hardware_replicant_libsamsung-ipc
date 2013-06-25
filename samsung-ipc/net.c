@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com
@@ -18,7 +18,9 @@
  *
  */
 
+#include <stdlib.h>
 #include <string.h>
+
 #include <samsung-ipc.h>
 
 void ipc_net_regist_get_setup(struct ipc_net_regist_get *message, unsigned char domain)
@@ -30,9 +32,14 @@ void ipc_net_regist_get_setup(struct ipc_net_regist_get *message, unsigned char 
 
 void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_set *message, unsigned char mode, char *plmn, unsigned char act)
 {
-    int message_plmn_len = sizeof(message->plmn) / sizeof(char);
+    int message_plmn_len;
     int plmn_len;
     int i;
+
+    if (message == NULL)
+        return;
+
+    message_plmn_len = sizeof(message->plmn);
 
     memset(message, 0, sizeof(struct ipc_net_plmn_sel_set));
 
@@ -53,7 +60,7 @@ void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_set *message, unsigned c
 
         // If there are less (5 is the usual case) PLMN bytes, fill the rest with '#'
         if (plmn_len < message_plmn_len)
-            memset((void*) (message->plmn + plmn_len), '#', message_plmn_len - plmn_len);
+            memset((void *) (message->plmn + plmn_len), '#', message_plmn_len - plmn_len);
 
         message->mode = IPC_NET_PLMN_SEL_MANUAL;
         message->act = act;
