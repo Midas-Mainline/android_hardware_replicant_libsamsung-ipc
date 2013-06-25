@@ -1,8 +1,9 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
+ * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
- *               2011 Simon Busch <morphis@gravedo.de>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,21 +20,35 @@
  *
  */
 
-#ifndef __PWR_H__
-#define __PWR_H__
+#include <samsung-ipc.h>
+
+#ifndef __SAMSUNG_IPC_PWR_H__
+#define __SAMSUNG_IPC_PWR_H__
+
+/*
+ * Types
+ */
+
+#define IPC_PWR_PHONE_PWR_UP                                    0x0101
+#define IPC_PWR_PHONE_PWR_OFF                                   0x0102
+#define IPC_PWR_PHONE_RESET                                     0x0103
+#define IPC_PWR_BATT_STATUS                                     0x0104
+#define IPC_PWR_BATT_TYPE                                       0x0105
+#define IPC_PWR_BATT_COMP                                       0x0106
+#define IPC_PWR_PHONE_STATE                                     0x0107
+
+/*
+ * Values
+ */
+
+#define IPC_PWR_PHONE_STATE_LPM                                 0x0001
+#define IPC_PWR_PHONE_STATE_NORMAL                              0x0202
+
+/*
+ * Macros
+ */
 
 #define IPC_PWR_R(f)    (f & 0xff)
-
-#define IPC_PWR_PHONE_PWR_UP                0x0101
-#define IPC_PWR_PHONE_PWR_OFF               0x0102
-#define IPC_PWR_PHONE_RESET                 0x0103
-#define IPC_PWR_BATT_STATUS                 0x0104
-#define IPC_PWR_BATT_TYPE                   0x0105
-#define IPC_PWR_BATT_COMP                   0x0106
-#define IPC_PWR_PHONE_STATE                 0x0107
-
-#define IPC_PWR_PHONE_STATE_LPM             0x0001
-#define IPC_PWR_PHONE_STATE_NORMAL          0x0202
 
 #endif
 

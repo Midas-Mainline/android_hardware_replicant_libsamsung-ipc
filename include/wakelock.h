@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
@@ -18,10 +18,10 @@
  *
  */
 
-#ifndef __WAKELOCK_H__
-#define __WAKELOCK_H__
+#ifndef __SAMSUNG_IPC_WAKELOCK_H__
+#define __SAMSUNG_IPC_WAKELOCK_H__
 
 extern int wake_lock(char *lock_name);
 extern int wake_unlock(char *lock_name);
 
-#endif //__WAKELOCK_H__
+#endif

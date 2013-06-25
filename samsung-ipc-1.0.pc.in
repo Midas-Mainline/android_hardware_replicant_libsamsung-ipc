@@ -10,4 +10,4 @@ Description: A implemenation of the protocol to speak with modems found in most 
 Version: @VERSION@
 Requires:
 Libs: -L${libdir} -lsamsung-ipc
-Cflags: -I${includedir}/samsung-ipc-1.0 -DDEVICE_IPC_V4
+Cflags: -I${includedir}/samsung-ipc-1.0

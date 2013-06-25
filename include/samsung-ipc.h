@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2012 Simon Busch <morphis@gravedo.de>
@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef SAMSUNGIPC_H_
-#define SAMSUNGIPC_H_
+#ifndef __SAMSUNG_IPC_H__
+#define __SAMSUNG_IPC_H__
 
 #include <radio.h>
 

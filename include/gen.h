@@ -1,6 +1,7 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
+ * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
@@ -18,16 +19,31 @@
  *
  */
 
-#ifndef __GEN_H__
-#define __GEN_H__
+#include <samsung-ipc.h>
 
-#if defined(DEVICE_IPC_V4)
-#include "device/ipc-v4/gen.h"
-#elif defined(DEVICE_H1)
-#include "device/h1/gen.h"
-#endif
+#ifndef __SAMSUNG_IPC_GEN_H__
+#define __SAMSUNG_IPC_GEN_H__
 
-#define IPC_GEN_PHONE_RES               0x8001
+/*
+ * Types
+ */
+
+#define IPC_GEN_PHONE_RES                                       0x8001
+
+/*
+ * Structures
+ */
+
+struct ipc_gen_phone_res {
+    unsigned char group;
+    unsigned char index;
+    unsigned char type;
+    unsigned short code;
+} __attribute__((__packed__));
+
+/*
+ * Helpers
+ */
 
 int ipc_gen_phone_res_check(struct ipc_gen_phone_res *res);
 

@@ -1,8 +1,8 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
+ * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
- * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,72 +19,84 @@
  *
  */
 
-#ifndef __SEC_H__
-#define __SEC_H__
+#include <samsung-ipc.h>
 
-struct ipc_message_info;
+#ifndef __SAMSUNG_IPC_SEC_H__
+#define __SAMSUNG_IPC_SEC_H__
+
+/*
+ * Types
+ */
 
 /* Possible SEC related IPC message types */
-#define IPC_SEC_SIM_STATUS                              0x0501
-#define IPC_SEC_PHONE_LOCK                              0x0502
-#define IPC_SEC_CHANGE_LOCKING_PW                       0x0503
-#define IPC_SEC_SIM_LANG                                0x0504
-#define IPC_SEC_RSIM_ACCESS                             0x0505
-#define IPC_SEC_GSIM_ACCESS                             0x0506
-#define IPC_SEC_SIM_ICC_TYPE                            0x0507
-#define IPC_SEC_LOCK_INFO                               0x0508
-#define IPC_SEC_ISIM_AUTH                               0x0509
+#define IPC_SEC_SIM_STATUS                                      0x0501
+#define IPC_SEC_PHONE_LOCK                                      0x0502
+#define IPC_SEC_CHANGE_LOCKING_PW                               0x0503
+#define IPC_SEC_SIM_LANG                                        0x0504
+#define IPC_SEC_RSIM_ACCESS                                     0x0505
+#define IPC_SEC_GSIM_ACCESS                                     0x0506
+#define IPC_SEC_SIM_ICC_TYPE                                    0x0507
+#define IPC_SEC_LOCK_INFO                                       0x0508
+#define IPC_SEC_ISIM_AUTH                                       0x0509
+
+/*
+ * Values
+ */
 
 /* SIM status */
-#define IPC_SEC_SIM_STATUS_READY                        0x00
-#define IPC_SEC_SIM_STATUS_SIM_LOCK_REQUIRED            0x01
-#define IPC_SEC_SIM_STATUS_INSIDE_PF_ERROR              0x02
-#define IPC_SEC_SIM_STATUS_LOCK_SC                      0x03
-#define IPC_SEC_SIM_STATUS_LOCK_FD                      0x04
-#define IPC_SEC_SIM_STATUS_LOCK_PN                      0x05
-#define IPC_SEC_SIM_STATUS_LOCK_PU                      0x06
-#define IPC_SEC_SIM_STATUS_LOCK_PP                      0x07
-#define IPC_SEC_SIM_STATUS_LOCK_PC                      0x08
-#define IPC_SEC_SIM_STATUS_CARD_NOT_PRESENT             0x80
-#define IPC_SEC_SIM_STATUS_CARD_ERROR                   0x81
-#define IPC_SEC_SIM_STATUS_INIT_COMPLETE                0x82
-#define IPC_SEC_SIM_STATUS_PB_INIT_COMPLETE             0x83
+#define IPC_SEC_SIM_STATUS_READY                                0x00
+#define IPC_SEC_SIM_STATUS_SIM_LOCK_REQUIRED                    0x01
+#define IPC_SEC_SIM_STATUS_INSIDE_PF_ERROR                      0x02
+#define IPC_SEC_SIM_STATUS_LOCK_SC                              0x03
+#define IPC_SEC_SIM_STATUS_LOCK_FD                              0x04
+#define IPC_SEC_SIM_STATUS_LOCK_PN                              0x05
+#define IPC_SEC_SIM_STATUS_LOCK_PU                              0x06
+#define IPC_SEC_SIM_STATUS_LOCK_PP                              0x07
+#define IPC_SEC_SIM_STATUS_LOCK_PC                              0x08
+#define IPC_SEC_SIM_STATUS_CARD_NOT_PRESENT                     0x80
+#define IPC_SEC_SIM_STATUS_CARD_ERROR                           0x81
+#define IPC_SEC_SIM_STATUS_INIT_COMPLETE                        0x82
+#define IPC_SEC_SIM_STATUS_PB_INIT_COMPLETE                     0x83
 
 /* SIM/Network facility types */
-#define IPC_SEC_FACILITY_TYPE_SC                        0x03
-#define IPC_SEC_FACILITY_TYPE_FD                        0x04
-#define IPC_SEC_FACILITY_TYPE_PN                        0x05
-#define IPC_SEC_FACILITY_TYPE_PU                        0x06
-#define IPC_SEC_FACILITY_TYPE_PP                        0x07
-#define IPC_SEC_FACILITY_TYPE_PC                        0x08
+#define IPC_SEC_FACILITY_TYPE_SC                                0x03
+#define IPC_SEC_FACILITY_TYPE_FD                                0x04
+#define IPC_SEC_FACILITY_TYPE_PN                                0x05
+#define IPC_SEC_FACILITY_TYPE_PU                                0x06
+#define IPC_SEC_FACILITY_TYPE_PP                                0x07
+#define IPC_SEC_FACILITY_TYPE_PC                                0x08
 
 /* SIM card (SC) facility lock types */
-#define IPC_SEC_FACILITY_LOCK_TYPE_SC_UNLOCKED          0x00
-#define IPC_SEC_FACILITY_LOCK_TYPE_SC_PIN1_REQ          0x01
-#define IPC_SEC_FACILITY_LOCK_TYPE_SC_PUK_REQ           0x02
-#define IPC_SEC_FACILITY_LOCK_TYPE_SC_CARD_BLOCKED      0x05
+#define IPC_SEC_FACILITY_LOCK_TYPE_SC_UNLOCKED                  0x00
+#define IPC_SEC_FACILITY_LOCK_TYPE_SC_PIN1_REQ                  0x01
+#define IPC_SEC_FACILITY_LOCK_TYPE_SC_PUK_REQ                   0x02
+#define IPC_SEC_FACILITY_LOCK_TYPE_SC_CARD_BLOCKED              0x05
 
 /* PIN type */
-#define IPC_SEC_PIN_TYPE_PIN1                           0x03
-#define IPC_SEC_PIN_TYPE_PIN2                           0x09
+#define IPC_SEC_PIN_TYPE_PIN1                                   0x03
+#define IPC_SEC_PIN_TYPE_PIN2                                   0x09
 
 /* Type of the used SIM card */
-#define IPC_SEC_SIM_CARD_TYPE_UNKNOWN                   0x00
-#define IPC_SEC_SIM_CARD_TYPE_SIM                       0x01
-#define IPC_SEC_SIM_CARD_TYPE_USIM                      0x02
+#define IPC_SEC_SIM_CARD_TYPE_UNKNOWN                           0x00
+#define IPC_SEC_SIM_CARD_TYPE_SIM                               0x01
+#define IPC_SEC_SIM_CARD_TYPE_USIM                              0x02
 
 /* Possible RSIM commads (see TS 27.00.1 8.18) */
-#define IPC_SEC_RSIM_COMMAND_READ_BINARY                0xb0
-#define IPC_SEC_RSIM_COMMAND_READ_RECORD                0xb2
-#define IPC_SEC_RSIM_COMMAND_GET_RESPONSE               0xc0
-#define IPC_SEC_RSIM_COMMAND_UPDATE_BINARY              0xd6
-#define IPC_SEC_RSIM_COMMAND_UPDATE_RECORD              0xdc
-#define IPC_SEC_RSIM_COMMAND_STATUS                     0xf2
-#define IPC_SEC_RSIM_COMMAND_RETRIEVE_DATA              0xcb
-#define IPC_SEC_RSIM_COMMAND_SET_DATA                   0xdb
+#define IPC_SEC_RSIM_COMMAND_READ_BINARY                        0xb0
+#define IPC_SEC_RSIM_COMMAND_READ_RECORD                        0xb2
+#define IPC_SEC_RSIM_COMMAND_GET_RESPONSE                       0xc0
+#define IPC_SEC_RSIM_COMMAND_UPDATE_BINARY                      0xd6
+#define IPC_SEC_RSIM_COMMAND_UPDATE_RECORD                      0xdc
+#define IPC_SEC_RSIM_COMMAND_STATUS                             0xf2
+#define IPC_SEC_RSIM_COMMAND_RETRIEVE_DATA                      0xcb
+#define IPC_SEC_RSIM_COMMAND_SET_DATA                           0xdb
 
-#define IPC_SEC_RSIM_FILE_STRUCTURE_TRANSPARENT         0x83
-#define IPC_SEC_RSIM_FILE_STRUCTURE_LINEAR_FIXED        0x00
+#define IPC_SEC_RSIM_FILE_STRUCTURE_TRANSPARENT                 0x83
+#define IPC_SEC_RSIM_FILE_STRUCTURE_LINEAR_FIXED                0x00
+
+/*
+ * Structures
+ */
 
 struct ipc_sec_sim_status_response {
     /* IPC_SEC_SIM_STATUS_... */
@@ -169,19 +181,15 @@ struct ipc_sec_sim_icc_type {
     unsigned char type;
 } __attribute__((__packed__));
 
-void ipc_sec_pin_status_set_setup(struct ipc_sec_pin_status_set *message,
-                                  unsigned char pin_type, char *pin1, char *pin2);
+/*
+ * Helpers
+ */
 
-void ipc_sec_lock_info_get_setup(struct ipc_sec_lock_info_get *message,
-                                 unsigned char pin_type);
-
-void ipc_sec_phone_lock_set_setup(struct ipc_sec_phone_lock_set *message,
-                                  int pin_type, int enable, char *passwd);
-
-char* ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *response);
-
-void ipc_sec_change_locking_pw_set_setup(struct ipc_sec_change_locking_pw_set *message,
-                                         int type, char *passwd_old, char *passwd_new);
+void ipc_sec_pin_status_set_setup(struct ipc_sec_pin_status_set *message, unsigned char pin_type, char *pin1, char *pin2);
+void ipc_sec_lock_info_get_setup(struct ipc_sec_lock_info_get *message, unsigned char pin_type);
+void ipc_sec_phone_lock_set_setup(struct ipc_sec_phone_lock_set *message, int pin_type, int enable, char *passwd);
+char *ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *response);
+void ipc_sec_change_locking_pw_set_setup(struct ipc_sec_change_locking_pw_set *message, int type, char *passwd_old, char *passwd_new);
 
 #endif
 

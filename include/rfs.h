@@ -1,7 +1,7 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,25 +18,36 @@
  *
  */
 
-#ifndef __RFS_H__
-#define __RFS_H__
+#include <samsung-ipc.h>
 
-struct ipc_client;
-struct ipc_message_info;
+#ifndef __SAMSUNG_IPC_RFS_H__
+#define __SAMSUNG_IPC_RFS_H__
 
-#define IPC_RFS_NV_READ_ITEM                        0x4201
-#define IPC_RFS_NV_WRITE_ITEM                       0x4202
+/*
+ * Types
+ */
 
-#define NV_DATA_PATH_DEFAULT            "/efs/nv_data.bin"
-#define NV_DATA_MD5_PATH_DEFAULT        "/efs/nv_data.bin.md5"
-#define NV_DATA_BAK_PATH_DEFAULT        "/efs/.nv_data.bak"
-#define NV_DATA_MD5_BAK_PATH_DEFAULT    "/efs/.nv_data.bak.md5"
-#define NV_STATE_PATH_DEFAULT           "/efs/.nv_state"
-#define NV_DATA_SECRET_DEFAULT          "Samsung_Android_RIL"
-#define NV_DATA_SIZE_DEFAULT            0x200000
-#define NV_DATA_CHUNK_SIZE_DEFAULT      0x1000
+#define IPC_RFS_NV_READ_ITEM                                    0x4201
+#define IPC_RFS_NV_WRITE_ITEM                                   0x4202
 
-#define MD5_STRING_SIZE         MD5_DIGEST_LENGTH * 2 + 1
+/*
+ * Values
+ */
+
+#define NV_DATA_PATH_DEFAULT                                    "/efs/nv_data.bin"
+#define NV_DATA_MD5_PATH_DEFAULT                                "/efs/nv_data.bin.md5"
+#define NV_DATA_BAK_PATH_DEFAULT                                "/efs/.nv_data.bak"
+#define NV_DATA_MD5_BAK_PATH_DEFAULT                            "/efs/.nv_data.bak.md5"
+#define NV_STATE_PATH_DEFAULT                                   "/efs/.nv_state"
+#define NV_DATA_SECRET_DEFAULT                                  "Samsung_Android_RIL"
+#define NV_DATA_SIZE_DEFAULT                                    0x200000
+#define NV_DATA_CHUNK_SIZE_DEFAULT                              0x1000
+
+#define MD5_STRING_SIZE                                         MD5_DIGEST_LENGTH * 2 + 1
+
+/*
+ * Structures
+ */
 
 struct ipc_rfs_io {
     unsigned int offset;
@@ -48,6 +59,10 @@ struct ipc_rfs_io_confirm {
     unsigned int offset;
     unsigned int length;
 } __attribute__((__packed__));
+
+/*
+ * Helpers
+ */
 
 void md5hash2string(char *out, uint8_t *in);
 char *nv_data_path(struct ipc_client *client);

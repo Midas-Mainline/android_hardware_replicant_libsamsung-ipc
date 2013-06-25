@@ -22,13 +22,6 @@ OPENSSL_REQUIRED=1.0.0e
 PKG_PROG_PKG_CONFIG
 
 #------------------------------------------------------------------------------
-# protocol version we're building for
-
-AC_ARG_WITH(protocol-version, [  --with-protocol-version=NAME     Version of the IPC protocol we're building libsamsung-ipc for],
-            [v=$withval;protocol_version=$v], [protocol_version=4])
-AM_CONDITIONAL([WANT_PROTOCOL_VERISON_4], [test x"$protocol_version" = x"4"])
-
-#------------------------------------------------------------------------------
 # openssl
 
 PKG_CHECK_MODULES(OPENSSL, openssl >= $OPENSSL_REQUIRED)
@@ -62,8 +55,6 @@ echo "$PACKAGE_NAME $PACKAGE_VERSION"
 echo "------------------------------------------------------------------------"
 echo
 echo "Configuration Options:"
-echo
-echo "  protocol version........: $protocol_version"
 echo
 echo "  debug build.............: $debug"
 echo

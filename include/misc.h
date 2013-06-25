@@ -1,6 +1,8 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
+ * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
@@ -18,27 +20,47 @@
  *
  */
 
-#ifndef __MISC_H__
-#define __MISC_H__
+#include <samsung-ipc.h>
 
-#if defined(DEVICE_IPC_V4)
-#include "device/ipc-v4/misc.h"
-#elif defined(DEVICE_H1)
-#include "device/h1/misc.h"
-#endif
+#ifndef __SAMSUNG_IPC_MISC_H__
+#define __SAMSUNG_IPC_MISC_H__
 
-struct ipc_message_info;
+/*
+ * Types
+ */
 
-#define IPC_MISC_ME_VERSION             0x0A01
-#define IPC_MISC_ME_IMSI                0x0A02
-#define IPC_MISC_ME_SN                  0x0A03
-#define IPC_MISC_TIME_INFO              0x0A05
-#define IPC_MISC_DEBUG_LEVEL            0x0A0C
+#define IPC_MISC_ME_VERSION                                     0x0A01
+#define IPC_MISC_ME_IMSI                                        0x0A02
+#define IPC_MISC_ME_SN                                          0x0A03
+#define IPC_MISC_TIME_INFO                                      0x0A05
+#define IPC_MISC_DEBUG_LEVEL                                    0x0A0C
 
-#define IPC_MISC_ME_SN_SERIAL_NUM                   0x01
-#define IPC_MISC_ME_SN_SERIAL_NUM_SERIAL            0x04
-#define IPC_MISC_ME_SN_SERIAL_NUM_MANUFACTURE_DATE  0x05
-#define IPC_MISC_ME_SN_SERIAL_NUM_BARCODE           0x06
+/*
+ * Values
+ */
+
+#define IPC_MISC_ME_SN_SERIAL_NUM                               0x01
+#define IPC_MISC_ME_SN_SERIAL_NUM_SERIAL                        0x04
+#define IPC_MISC_ME_SN_SERIAL_NUM_MANUFACTURE_DATE              0x05
+#define IPC_MISC_ME_SN_SERIAL_NUM_BARCODE                       0x06
+
+/*
+ * Structures
+ */
+
+struct ipc_misc_me_version {
+    unsigned char unk;
+    char sw_version[32];
+    char hw_version[32];
+    char cal_date[32];
+    char misc[32];
+} __attribute__((__packed__));
+
+struct ipc_misc_me_sn {
+    unsigned char type; // IPC_MISC_ME_SN_SERIAL_NUM*
+    unsigned char length;
+    char data[32];
+} __attribute__((__packed__));
 
 struct ipc_misc_time_info {
     unsigned char tz_valid, daylight_valid;
@@ -48,7 +70,11 @@ struct ipc_misc_time_info {
     char plmn[6];
 } __attribute__((__packed__));
 
-char* ipc_misc_me_imsi_response_get_imsi(struct ipc_message_info *response);
+/*
+ * Helpers
+ */
+
+char *ipc_misc_me_imsi_response_get_imsi(struct ipc_message_info *response);
 
 #endif
 

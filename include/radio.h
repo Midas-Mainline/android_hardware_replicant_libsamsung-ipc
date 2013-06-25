@@ -23,8 +23,6 @@
 
 #include <stdint.h>
 
-#include "types.h"
-
 #define IPC_CLIENT_TYPE_FMT     0
 #define IPC_CLIENT_TYPE_RFS     1
 
@@ -56,6 +54,8 @@ struct ipc_client_gprs_capabilities {
     int port_list;
     int cid_max;
 };
+
+#include "types.h"
 
 typedef void (*ipc_client_log_handler_cb)(const char *message, void *user_data);
 

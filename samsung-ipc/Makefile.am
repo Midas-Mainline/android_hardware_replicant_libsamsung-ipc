@@ -56,8 +56,6 @@ libsamsung_ipc_la_SOURCES = \
 	device/piranha/piranha_ipc.c \
 	$(NULL)
 
-AM_CFLAGS += -DDEVICE_IPC_V4
-
 libsamsung_ipc_la_LIBADD = \
 	$(OPENSSL_LIBS) \
 	$(NULL)

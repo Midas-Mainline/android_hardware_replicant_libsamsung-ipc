@@ -4,8 +4,6 @@ AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	$(NULL)
 
-AM_CFLAGS += -DDEVICE_IPC_V4
-
 bin_PROGRAMS = \
 	modemctrl \
 	$(NULL)

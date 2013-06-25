@@ -1,8 +1,8 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
  * Copyright (C) 2012 Paul Kocialkowski <contact@oaulk.fr>
+ * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,14 @@
  *
  */
 
-#ifndef __SS_H__
-#define __SS_H__
+#include <samsung-ipc.h>
+
+#ifndef __SAMSUNG_IPC_SS_H__
+#define __SAMSUNG_IPC_SS_H__
+
+/*
+ * Types
+ */
 
 #define IPC_SS_WAITING                              0x0C01
 #define IPC_SS_CLI                                  0x0C02
@@ -33,6 +39,10 @@
 #define IPC_SS_AOC                                  0x0C09
 #define IPC_SS_RELEASE_COMPLETE                     0x0C0A
 
+/*
+ * Values
+ */
+
 #define IPC_SS_USSD_NO_ACTION_REQUIRE               0x01
 #define IPC_SS_USSD_ACTION_REQUIRE                  0x02
 #define IPC_SS_USSD_TERMINATED_BY_NET               0x03
@@ -41,8 +51,10 @@
 #define IPC_SS_USSD_TIME_OUT                        0x06 //guess
 
 /*
- * This is followed by the encoded (according to the dcs) bytes of the USSD message.
+ * Structures
  */
+
+/* This is followed by the encoded (according to the dcs) bytes of the USSD message */
 struct ipc_ss_ussd {
     unsigned char state;
     unsigned char dcs;

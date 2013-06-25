@@ -12,27 +12,22 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)/samsung-ipc/device/xmm6260/
 LOCAL_LDFLAGS += -lcrypto
 
 ifeq ($(TARGET_DEVICE),crespo)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	board_name := herring
 endif
 
 ifeq ($(TARGET_DEVICE),galaxys2)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	board_name := smdk4210
 endif
 
 ifeq ($(TARGET_DEVICE),galaxysmtd)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	board_name := aries
 endif
 
 ifeq ($(TARGET_DEVICE),galaxytab)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	board_name := gt-p1000
 endif
 
 ifeq ($(TARGET_DEVICE),spica)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	board_name := i5700
 endif
 
@@ -41,17 +36,14 @@ ifeq ($(TARGET_DEVICE),h1)
 endif
 
 ifeq ($(TARGET_DEVICE),maguro)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	board_name := tuna
 endif
 
 ifeq ($(TARGET_DEVICE),p5100)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	board_name := espresso10
 endif
 
 ifeq ($(TARGET_DEVICE),p3100)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
 	board_name := espresso
 endif
 
@@ -100,50 +92,6 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := ipc-modemctrl
 LOCAL_MODULE_TAGS := optional
-
-ifeq ($(TARGET_DEVICE),crespo)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := crespo
-endif
-
-ifeq ($(TARGET_DEVICE),galaxys2)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := galaxys2
-endif
-
-ifeq ($(TARGET_DEVICE),galaxysmtd)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := aries
-endif
-
-ifeq ($(TARGET_DEVICE),galaxytab)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := aries
-endif
-
-ifeq ($(TARGET_DEVICE),spica)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := i5700
-endif
-
-ifeq ($(TARGET_DEVICE),h1)
-	LOCAL_CFLAGS += -DDEVICE_H1
-endif
-
-ifeq ($(TARGET_DEVICE),maguro)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := maguro
-endif
-
-ifeq ($(TARGET_DEVICE),p5100)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := espresso10
-endif
-
-ifeq ($(TARGET_DEVICE),p3100)
-	LOCAL_CFLAGS += -DDEVICE_IPC_V4
-	samsung-ipc_device := espresso
-endif
 
 ifeq ($(DEBUG),true)
 	LOCAL_CFLAGS += -DDEBUG
