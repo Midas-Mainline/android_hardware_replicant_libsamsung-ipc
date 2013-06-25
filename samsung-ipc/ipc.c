@@ -89,7 +89,7 @@ int ipc_device_detect(void)
             int len = strlen(str);
             char tmp;
 
-            for (i=0 ; i < len ; i++)
+            for (i=0; i < len; i++)
             {
                 tmp = (char) tolower(str[i]);
                 str[i] = tmp;
@@ -112,7 +112,7 @@ int ipc_device_detect(void)
     kernel_version = strdup(utsname.release);
 #endif
 
-    for (i=0 ; i < ipc_devices_count ; i++)
+    for (i=0; i < ipc_devices_count; i++)
     {
         if (strstr(board_name, ipc_devices[i].board_name) != NULL)
         {

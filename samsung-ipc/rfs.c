@@ -37,7 +37,7 @@ void md5hash2string(char *out, unsigned char *in)
 {
     int i;
 
-    for (i=0 ; i < MD5_DIGEST_LENGTH ; i++)
+    for (i=0; i < MD5_DIGEST_LENGTH; i++)
     {
         /* After the first iteration, we override \0. */
         if (*in < 0x10)

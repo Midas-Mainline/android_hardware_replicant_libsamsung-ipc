@@ -340,7 +340,7 @@ void *ipc_client_mtd_read(struct ipc_client *client, char *mtd_name, int size,
 
     data_p=(uint8_t *) mtd_p;
 
-    for (i=0 ; i < size / block_size ; i++)
+    for (i=0; i < size / block_size; i++)
     {
         offs = i * block_size;
         if (ioctl(fd, MEMGETBADBLOCK, &offs) == 1)
@@ -389,7 +389,7 @@ void *ipc_client_file_read(struct ipc_client *client, char *file_name, int size,
 
     data_p=(uint8_t *) file_p;
 
-    for (i=0 ; i < size / block_size ; i++)
+    for (i=0; i < size / block_size; i++)
     {
         read(fd, data_p, block_size);
         data_p+=block_size;
