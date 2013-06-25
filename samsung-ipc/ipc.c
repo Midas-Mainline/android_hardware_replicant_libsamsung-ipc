@@ -39,7 +39,7 @@
 
 #include <samsung-ipc.h>
 
-#include "ipc_private.h"
+#include "ipc.h"
 #include "ipc_devices.h"
 
 void log_handler_default(const char *message, void *user_data)

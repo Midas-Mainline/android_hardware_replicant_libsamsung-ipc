@@ -26,7 +26,7 @@
 
 #include <stdlib.h>
 
-#include "ipc_private.h"
+#include "ipc.h"
 
 #include "xmm6260_ipc.h"
 #include "maguro_loader.h"

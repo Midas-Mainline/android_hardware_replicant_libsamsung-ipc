@@ -28,7 +28,7 @@ libsamsung_ipc_la_SOURCES = \
 	call.c \
 	net.c \
 	wakelock.c \
-	ipc_private.h \
+	ipc.h \
 	ipc_devices.h \
 	device/crespo/crespo_ipc.c \
 	device/aries/aries_ipc.c \

@@ -36,7 +36,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 
-#include "ipc_private.h"
+#include "ipc.h"
 
 #include "xmm6260_loader.h"
 #include "xmm6260_modemctl.h"

@@ -38,7 +38,7 @@
 
 #include "crespo_modem_ctl.h"
 #include "crespo_ipc.h"
-#include "ipc_private.h"
+#include "ipc.h"
 
 int crespo_modem_bootstrap(struct ipc_client *client)
 {

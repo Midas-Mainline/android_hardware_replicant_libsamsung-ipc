@@ -31,7 +31,7 @@
 
 #include <samsung-ipc.h>
 
-#include "ipc_private.h"
+#include "ipc.h"
 
 void md5hash2string(char *out, unsigned char *in)
 {

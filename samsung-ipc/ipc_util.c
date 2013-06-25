@@ -30,7 +30,8 @@
 #include <mtd/mtd-abi.h>
 
 #include <samsung-ipc.h>
-#include "ipc_private.h"
+
+#include "ipc.h"
 
 #define IPC_STR(f)  case f: return strdup(#f);
 

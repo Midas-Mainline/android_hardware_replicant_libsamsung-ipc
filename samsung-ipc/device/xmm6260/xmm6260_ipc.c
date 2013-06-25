@@ -40,7 +40,7 @@
 #include <samsung-ipc.h>
 #include <wakelock.h>
 
-#include "ipc_private.h"
+#include "ipc.h"
 
 #include "xmm6260_ipc.h"
 #include "xmm6260_loader.h"

@@ -25,7 +25,7 @@
 
 #include <stdlib.h>
 
-#include "ipc_private.h"
+#include "ipc.h"
 
 #include "xmm6260_ipc.h"
 #include "galaxys2_loader.h"

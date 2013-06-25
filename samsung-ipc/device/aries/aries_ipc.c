@@ -43,7 +43,7 @@
 #include <samsung-ipc.h>
 
 #include "aries_ipc.h"
-#include "ipc_private.h"
+#include "ipc.h"
 #include "sipc4.h"
 #include "onedram.h"
 #include "phonet.h"

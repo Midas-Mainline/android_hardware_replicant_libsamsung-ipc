@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
@@ -18,10 +18,14 @@
  *
  */
 
-#ifndef __IPC_PRIVATE_H__
-#define __IPC_PRIVATE_H__
-
 #include <samsung-ipc.h>
+
+#ifndef __IPC_H__
+#define __IPC_H__
+
+/*
+ * Structures
+ */
 
 struct ipc_ops {
     int (*bootstrap)(struct ipc_client *client);
@@ -89,6 +93,10 @@ struct ipc_client {
     struct ipc_gprs_specs *gprs_specs;
     struct ipc_nv_data_specs *nv_data_specs;
 };
+
+/*
+ * Helpers
+ */
 
 void ipc_client_log(struct ipc_client *client, const char *message, ...);
 
