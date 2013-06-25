@@ -139,8 +139,10 @@ struct ipc_gprs_port_list {
  */
 
 void ipc_gprs_port_list_setup(struct ipc_gprs_port_list *message);
-void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context_set *message, unsigned char cid, int enable, char *username, char *password);
-void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context *message, unsigned char cid, int enable, char *apn);
+void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context_set *message,
+    unsigned char cid, int enable, char *username, char *password);
+void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context *message,
+    unsigned char cid, int enable, char *apn);
 
 #endif
 

@@ -23,14 +23,16 @@
 
 #include <samsung-ipc.h>
 
-void ipc_net_regist_get_setup(struct ipc_net_regist_get *message, unsigned char domain)
+void ipc_net_regist_get_setup(struct ipc_net_regist_get *message,
+    unsigned char domain)
 {
     /* FIXME: could that be IPC_NET_ACCESS_TECHNOLOGY_... (act) ? */
     message->net = 0xff;
     message->domain = domain;
 }
 
-void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_set *message, unsigned char mode, char *plmn, unsigned char act)
+void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_set *message,
+    unsigned char mode, char *plmn, unsigned char act)
 {
     int message_plmn_len;
     int plmn_len;

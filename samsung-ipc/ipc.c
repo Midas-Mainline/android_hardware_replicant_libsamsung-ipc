@@ -188,7 +188,8 @@ int ipc_client_free(struct ipc_client *client)
     return 0;
 }
 
-int ipc_client_set_log_handler(struct ipc_client *client, ipc_client_log_handler_cb log_handler_cb, void *user_data)
+int ipc_client_set_log_handler(struct ipc_client *client,
+    ipc_client_log_handler_cb log_handler_cb, void *user_data)
 {
     if (client == NULL)
         return -1;
@@ -199,7 +200,8 @@ int ipc_client_set_log_handler(struct ipc_client *client, ipc_client_log_handler
     return 0;
 }
 
-int ipc_client_set_handlers(struct ipc_client *client, struct ipc_handlers *handlers)
+int ipc_client_set_handlers(struct ipc_client *client,
+    struct ipc_handlers *handlers)
 {
     if (client == NULL ||
        handlers == NULL)
@@ -211,8 +213,8 @@ int ipc_client_set_handlers(struct ipc_client *client, struct ipc_handlers *hand
 }
 
 int ipc_client_set_io_handlers(struct ipc_client *client,
-                               ipc_io_handler_cb read, void *read_data,
-                               ipc_io_handler_cb write, void *write_data)
+    ipc_io_handler_cb read, void *read_data,
+    ipc_io_handler_cb write,void *write_data)
 {
     if (client == NULL ||
        client->handlers == NULL)
@@ -455,17 +457,20 @@ int _ipc_client_send(struct ipc_client *client, struct ipc_message_info *request
     return client->ops->send(client, request);
 }
 
-inline void ipc_client_send_get(struct ipc_client *client, const unsigned short command, unsigned char mseq)
+inline void ipc_client_send_get(struct ipc_client *client,
+    const unsigned short command, unsigned char mseq)
 {
     ipc_client_send(client, command, IPC_TYPE_GET, 0, 0, mseq);
 }
 
-inline void ipc_client_send_exec(struct ipc_client *client, const unsigned short command, unsigned char mseq)
+inline void ipc_client_send_exec(struct ipc_client *client,
+    const unsigned short command, unsigned char mseq)
 {
     ipc_client_send(client, command, IPC_TYPE_EXEC, 0, 0, mseq);
 }
 
-void ipc_client_send(struct ipc_client *client, const unsigned short command, const char type, unsigned char *data, const int length, unsigned char mseq)
+void ipc_client_send(struct ipc_client *client, const unsigned short command,
+    const char type, unsigned char *data, const int length, unsigned char mseq)
 {
     struct ipc_message_info request;
 
@@ -480,7 +485,8 @@ void ipc_client_send(struct ipc_client *client, const unsigned short command, co
     _ipc_client_send(client, &request);
 }
 
-int ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response)
+int ipc_client_recv(struct ipc_client *client,
+    struct ipc_message_info *response)
 {
     if (client == NULL ||
         client->ops == NULL ||
@@ -490,7 +496,8 @@ int ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response
     return client->ops->recv(client, response);
 }
 
-void ipc_client_response_free(struct ipc_client *client, struct ipc_message_info *response)
+void ipc_client_response_free(struct ipc_client *client,
+    struct ipc_message_info *response)
 {
     if (response->data != NULL) {
         free(response->data);

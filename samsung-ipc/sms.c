@@ -24,7 +24,7 @@
 #include <samsung-ipc.h>
 
 unsigned char *ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request *msg, char *smsc,
-                                     unsigned char *pdu, int pdu_length)
+    unsigned char *pdu, int pdu_length)
 {
     unsigned char *data = NULL, *p = NULL;
     unsigned int data_length = 0, smsc_len = 0;

@@ -837,7 +837,8 @@ int nv_data_write(struct ipc_client *client, int offset, int length, char *buf)
     return 0;
 }
 
-void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client, struct ipc_message_info *info)
+void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client,
+    struct ipc_message_info *info)
 {
     struct ipc_rfs_io *rfs_io = (struct ipc_rfs_io *) info->data;
     struct ipc_rfs_io_confirm *rfs_io_conf;
@@ -872,7 +873,8 @@ void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client, struct 
     free(rfs_io_conf);
 }
 
-void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client, struct ipc_message_info *info)
+void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client,
+    struct ipc_message_info *info)
 {
     struct ipc_rfs_io *rfs_io = (struct ipc_rfs_io *) info->data;
     struct ipc_rfs_io_confirm *rfs_io_conf;

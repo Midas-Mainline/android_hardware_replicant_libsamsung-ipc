@@ -313,7 +313,8 @@ void ipc_client_hex_dump(struct ipc_client *client, void *data, int size)
     }
 }
 
-void *ipc_client_mtd_read(struct ipc_client *client, char *mtd_name, int size, int block_size)
+void *ipc_client_mtd_read(struct ipc_client *client, char *mtd_name, int size,
+    int block_size)
 {
     void *mtd_p=NULL;
     uint8_t *data_p=NULL;
@@ -362,7 +363,8 @@ error:
     return NULL;
 }
 
-void *ipc_client_file_read(struct ipc_client *client, char *file_name, int size, int block_size)
+void *ipc_client_file_read(struct ipc_client *client, char *file_name, int size,
+    int block_size)
 {
     void *file_p=NULL;
     uint8_t *data_p=NULL;

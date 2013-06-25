@@ -26,7 +26,8 @@
 
 #define OUTGOING_NUMBER_MAX_LENGTH 86
 
-void ipc_call_outgoing_setup(struct ipc_call_outgoing *message, unsigned char type, unsigned char identity, unsigned char prefix, char *number)
+void ipc_call_outgoing_setup(struct ipc_call_outgoing *message, unsigned char type,
+    unsigned char identity, unsigned char prefix, char *number)
 {
     int length;
 
@@ -57,7 +58,8 @@ unsigned int ipc_call_list_response_get_num_entries(struct ipc_message_info *res
 }
 
 /* Retrieve one specific entry from a list of calls */
-struct ipc_call_list_entry* ipc_call_list_response_get_entry(struct ipc_message_info *response, unsigned int num)
+struct ipc_call_list_entry* ipc_call_list_response_get_entry(struct ipc_message_info *response,
+    unsigned int num)
 {
     unsigned int count, pos, n;
     struct ipc_call_list_entry *entry = NULL;
@@ -77,7 +79,8 @@ struct ipc_call_list_entry* ipc_call_list_response_get_entry(struct ipc_message_
 }
 
 /* Retrieve the number of a call entry in the list of calls */
-char *ipc_call_list_response_get_entry_number(struct ipc_message_info *response, unsigned int num)
+char *ipc_call_list_response_get_entry_number(struct ipc_message_info *response,
+    unsigned int num)
 {
     unsigned int count, pos, n;
     struct ipc_call_list_entry *entry = NULL;
@@ -106,7 +109,8 @@ char *ipc_call_list_response_get_entry_number(struct ipc_message_info *response,
     return number;
 }
 
-unsigned char *ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf *message, unsigned char *burst, int burst_len)
+unsigned char *ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf *message,
+    unsigned char *burst, int burst_len)
 {
     unsigned char *data = NULL;
     int data_len = sizeof(struct ipc_call_cont_dtmf) + burst_len;

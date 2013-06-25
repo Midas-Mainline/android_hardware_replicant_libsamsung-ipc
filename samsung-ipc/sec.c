@@ -25,7 +25,7 @@
 #include <samsung-ipc.h>
 
 void ipc_sec_pin_status_set_setup(struct ipc_sec_pin_status_set *message,
-                                  unsigned char pin_type, char *pin1, char *pin2)
+    unsigned char pin_type, char *pin1, char *pin2)
 {
     if (message == NULL)
         return;
@@ -48,7 +48,7 @@ void ipc_sec_pin_status_set_setup(struct ipc_sec_pin_status_set *message,
 }
 
 void ipc_sec_lock_info_get_setup(struct ipc_sec_lock_info_get *message,
-                                 unsigned char pin_type)
+    unsigned char pin_type)
 {
     if (message == NULL)
         return;
@@ -88,7 +88,7 @@ char *ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *respon
 }
 
 void ipc_sec_phone_lock_set_setup(struct ipc_sec_phone_lock_set *message,
-                                  int pin_type, int enable, char *passwd)
+    int pin_type, int enable, char *passwd)
 {
     message->type = pin_type;
     message->lock = enable ? 1 : 0;
@@ -101,7 +101,7 @@ void ipc_sec_phone_lock_set_setup(struct ipc_sec_phone_lock_set *message,
 }
 
 void ipc_sec_change_locking_pw_set_setup(struct ipc_sec_change_locking_pw_set *message,
-                                         int type, char *passwd_old, char *passwd_new)
+    int type, char *passwd_old, char *passwd_new)
 {
     message->facility = type;
 

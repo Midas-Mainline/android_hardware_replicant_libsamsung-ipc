@@ -65,10 +65,14 @@ struct ipc_client* ipc_client_new(int client_type);
 struct ipc_client *ipc_client_new_for_device(int device_type, int client_type);
 int ipc_client_free(struct ipc_client *client);
 
-int ipc_client_set_log_handler(struct ipc_client *client, ipc_client_log_handler_cb log_handler_cb, void *user_data);
+int ipc_client_set_log_handler(struct ipc_client *client,
+    ipc_client_log_handler_cb log_handler_cb, void *user_data);
 
-int ipc_client_set_handlers(struct ipc_client *client, struct ipc_handlers *handlers);
-int ipc_client_set_io_handlers(struct ipc_client *client, ipc_io_handler_cb read, void *read_data, ipc_io_handler_cb write, void *write_data);
+int ipc_client_set_handlers(struct ipc_client *client,
+    struct ipc_handlers *handlers);
+int ipc_client_set_io_handlers(struct ipc_client *client,
+    ipc_io_handler_cb read, void *read_data,
+    ipc_io_handler_cb write, void *write_data);
 
 int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data);
 void *ipc_client_get_handlers_common_data(struct ipc_client *client);
@@ -86,26 +90,36 @@ int ipc_client_gprs_handlers_available(struct ipc_client *client);
 int ipc_client_gprs_activate(struct ipc_client *client, int cid);
 int ipc_client_gprs_deactivate(struct ipc_client *client, int cid);
 char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid);
-int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_client_gprs_capabilities *cap);
-
-int ipc_client_recv(struct ipc_client *client, struct ipc_message_info *response);
-void ipc_client_response_free(struct ipc_client *client, struct ipc_message_info *response);
+int ipc_client_gprs_get_capabilities(struct ipc_client *client,
+    struct ipc_client_gprs_capabilities *cap);
 
 /* Convenience functions for ipc_send */
-void ipc_client_send(struct ipc_client *client, const unsigned short command, const char type, unsigned char *data, const int length, unsigned char mseq);
-void ipc_client_send_get(struct ipc_client *client, const unsigned short command, unsigned char mseq);
-void ipc_client_send_exec(struct ipc_client *client, const unsigned short command, unsigned char mseq);
+void ipc_client_send(struct ipc_client *client, const unsigned short command,
+    const char type, unsigned char *data, const int length, unsigned char mseq);
+void ipc_client_send_get(struct ipc_client *client,
+    const unsigned short command,unsigned char mseq);
+void ipc_client_send_exec(struct ipc_client *client,
+    const unsigned short command, unsigned char mseq);
+
+int ipc_client_recv(struct ipc_client *client,
+    struct ipc_message_info *response);
+void ipc_client_response_free(struct ipc_client *client,
+    struct ipc_message_info *response);
 
 /* Utility functions */
-void ipc_client_log_recv(struct ipc_client *client, struct ipc_message_info *response, const char *prefix);
-void ipc_client_log_send(struct ipc_client *client, struct ipc_message_info *request, const char *prefix);
+void ipc_client_log_recv(struct ipc_client *client,
+    struct ipc_message_info *response, const char *prefix);
+void ipc_client_log_send(struct ipc_client *client,
+    struct ipc_message_info *request, const char *prefix);
 const char *ipc_response_type_to_str(int type);
 const char *ipc_request_type_to_str(int type);
 const char *ipc_command_to_str(int command);
 
 void ipc_client_hex_dump(struct ipc_client *client, void *data, int size);
-void *ipc_client_mtd_read(struct ipc_client *client, char *mtd_name, int size, int block_size);
-void *ipc_client_file_read(struct ipc_client *client, char *file_name, int size, int block_size);
+void *ipc_client_mtd_read(struct ipc_client *client, char *mtd_name, int size,
+    int block_size);
+void *ipc_client_file_read(struct ipc_client *client, char *file_name, int size,
+    int block_size);
 
 /*
  * Samsung-IPC protocol

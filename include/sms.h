@@ -105,7 +105,8 @@ struct ipc_sms_deliver_report_response {
     unsigned short error;
 } __attribute__((__packed__));
 
-unsigned char *ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request *msg, char *smsc, unsigned char *pdu, int length);
+unsigned char *ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request *msg,
+    char *smsc, unsigned char *pdu, int length);
 
 #endif
 

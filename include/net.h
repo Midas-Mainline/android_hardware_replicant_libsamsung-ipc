@@ -137,8 +137,10 @@ struct ipc_net_plmn_sel_set {
  * Helpers
  */
 
-void ipc_net_regist_get_setup(struct ipc_net_regist_get *message, unsigned char domain);
-void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_set *message, unsigned char mode, char *plmn, unsigned char act);
+void ipc_net_regist_get_setup(struct ipc_net_regist_get *message,
+    unsigned char domain);
+void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_set *message,
+    unsigned char mode, char *plmn, unsigned char act);
 
 #endif
 
