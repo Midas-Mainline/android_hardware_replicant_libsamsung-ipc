@@ -1,7 +1,7 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2011 Paul Kocialkowsk <contact@paulk.fr>
+ * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,21 @@
  *
  */
 
-#include <stdio.h>
 #include <samsung-ipc.h>
 
-int ipc_gen_phone_res_check(struct ipc_gen_phone_res *res)
-{
-    if (res == NULL)
-        return -1;
+#ifndef __SAMSUNG_IPC_PB_H__
+#define __SAMSUNG_IPC_PB_H__
 
-    switch(res->code)
-    {
-        case 0x8000:
-            return 0;
-        case 0x8001:
-            return 0;
-        default:
-            return -1;
-    }
-}
+/*
+ * Types
+ */
+
+#define IPC_PB_ACCESS                               	        0x0601
+#define IPC_PB_STORAGE                                          0x0602
+#define IPC_PB_STORAGE_LIST                                     0x0603
+#define IPC_PB_ENTRY_INFO                                       0x0604
+#define IPC_PB_CAPABILITY_INFO                                  0x0605
+
+#endif
 
 // vim:ts=4:sw=4:expandtab

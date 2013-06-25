@@ -19,7 +19,7 @@
  */
 
 #include <string.h>
-#include <radio.h>
+#include <samsung-ipc.h>
 
 void ipc_net_regist_get_setup(struct ipc_net_regist_get *message, unsigned char domain)
 {

@@ -19,7 +19,7 @@
  *
  */
 
-#include <radio.h>
+#include <samsung-ipc.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>

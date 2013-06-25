@@ -21,7 +21,7 @@
 #ifndef __IPC_DEVICES_H__
 #define __IPC_DEVICES_H__
 
-#include <radio.h>
+#include <samsung-ipc.h>
 
 struct ipc_device_desc {
     char *name;

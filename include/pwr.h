@@ -48,7 +48,7 @@
  * Macros
  */
 
-#define IPC_PWR_R(f)    (f & 0xff)
+#define IPC_PWR_R(f)                            (f & 0xff)
 
 #endif
 

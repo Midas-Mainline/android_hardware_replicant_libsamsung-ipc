@@ -18,7 +18,7 @@
  *
  */
 
-#include <radio.h>
+#include <samsung-ipc.h>
 #include <string.h>
 
 #define DEFAULT_IMSI_LENGTH         15

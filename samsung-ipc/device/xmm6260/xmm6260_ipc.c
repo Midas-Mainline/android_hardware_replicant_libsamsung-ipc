@@ -37,7 +37,7 @@
 #include <mtd/mtd-abi.h>
 #include <assert.h>
 
-#include <radio.h>
+#include <samsung-ipc.h>
 #include <wakelock.h>
 
 #include "ipc_private.h"

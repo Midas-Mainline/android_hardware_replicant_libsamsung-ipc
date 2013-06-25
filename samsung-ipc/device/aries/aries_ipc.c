@@ -40,7 +40,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include <radio.h>
+#include <samsung-ipc.h>
 
 #include "aries_ipc.h"
 #include "ipc_private.h"

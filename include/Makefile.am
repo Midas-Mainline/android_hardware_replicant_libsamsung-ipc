@@ -2,20 +2,22 @@ NULL =
 
 samsung_ipcincludedir = $(includedir)/samsung-ipc-1.0/
 samsung_ipcinclude_HEADERS = \
-	call.h \
-	disp.h \
-	gen.h \
-	misc.h \
-	net.h \
-	radio.h \
-	sec.h \
-	sms.h \
-	ss.h \
-	pwr.h \
-	types.h \
-	gprs.h \
-	snd.h \
-	rfs.h \
-	wakelock.h \
 	samsung-ipc.h \
+	protocol.h \
+	pwr.h \
+	call.h \
+	sms.h \
+	sec.h \
+	pb.h \
+	disp.h \
+	net.h \
+	snd.h \
+	misc.h \
+	ss.h \
+	gprs.h \
+	sat.h \
+	imei.h \
+	rfs.h \
+	gen.h \
+	wakelock.h \
 	$(NULL)

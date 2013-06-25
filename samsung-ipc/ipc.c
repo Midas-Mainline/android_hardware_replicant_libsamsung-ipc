@@ -37,7 +37,7 @@
 #include <asm/types.h>
 #include <sys/utsname.h>
 
-#include <radio.h>
+#include <samsung-ipc.h>
 
 #include "ipc_private.h"
 #include "ipc_devices.h"

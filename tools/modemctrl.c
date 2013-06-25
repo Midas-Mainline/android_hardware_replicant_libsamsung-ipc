@@ -32,7 +32,7 @@
 #include <pthread.h>
 #include <getopt.h>
 
-#include <radio.h>
+#include <samsung-ipc.h>
 
 #define MODEM_STATE_LPM     0
 #define MODEM_STATE_NORMAL  2

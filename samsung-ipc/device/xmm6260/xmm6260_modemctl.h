@@ -23,7 +23,7 @@
 #ifndef __XMM6260_MODEMCTL_H__
 #define __XMM6260_MODEMCTL_H__
 
-#include <radio.h>
+#include <samsung-ipc.h>
 
 #define MODEM_DEVICE(x) ("/dev/" #x)
 #define LINK_PM MODEM_DEVICE(link_pm)

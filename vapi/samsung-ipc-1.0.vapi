@@ -18,7 +18,7 @@
  *
  */
 
-[CCode (cheader_filename = "radio.h")]
+[CCode (cheader_filename = "samsung-ipc.h")]
 namespace SamsungIpc
 {
     [CCode (cname = "int", cprefix = "IPC_CLIENT_TYPE_", has_type_id = false)]

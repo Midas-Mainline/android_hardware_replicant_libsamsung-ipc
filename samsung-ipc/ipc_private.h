@@ -21,7 +21,7 @@
 #ifndef __IPC_PRIVATE_H__
 #define __IPC_PRIVATE_H__
 
-#include <radio.h>
+#include <samsung-ipc.h>
 
 struct ipc_ops {
     int (*bootstrap)(struct ipc_client *client);

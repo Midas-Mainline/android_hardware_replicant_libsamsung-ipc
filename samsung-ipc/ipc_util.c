@@ -29,7 +29,7 @@
 #include <asm/types.h>
 #include <mtd/mtd-abi.h>
 
-#include <radio.h>
+#include <samsung-ipc.h>
 #include "ipc_private.h"
 
 #define IPC_STR(f)  case f: return strdup(#f);

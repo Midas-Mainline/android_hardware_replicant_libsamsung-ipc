@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 
-#include <radio.h>
+#include <samsung-ipc.h>
 
 #include "ipc_devices.h"
 

@@ -29,11 +29,11 @@
 
 #include <openssl/md5.h>
 
-#include <radio.h>
+#include <samsung-ipc.h>
 
 #include "ipc_private.h"
 
-void md5hash2string(char *out, uint8_t *in)
+void md5hash2string(char *out, unsigned char *in)
 {
     int i;
 
