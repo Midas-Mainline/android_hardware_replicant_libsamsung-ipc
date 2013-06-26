@@ -203,8 +203,7 @@ int ipc_client_set_log_handler(struct ipc_client *client,
 int ipc_client_set_handlers(struct ipc_client *client,
     struct ipc_handlers *handlers)
 {
-    if (client == NULL ||
-       handlers == NULL)
+    if (client == NULL || handlers == NULL)
         return -1;
 
     memcpy(client->handlers, handlers, sizeof(struct ipc_handlers));
@@ -216,8 +215,7 @@ int ipc_client_set_io_handlers(struct ipc_client *client,
     ipc_io_handler_cb read, void *read_data,
     ipc_io_handler_cb write,void *write_data)
 {
-    if (client == NULL ||
-       client->handlers == NULL)
+    if (client == NULL || client->handlers == NULL)
         return -1;
 
     if (read != NULL)
@@ -236,9 +234,7 @@ int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data)
 {
     void *common_data;
 
-    if (client == NULL ||
-       client->handlers == NULL ||
-       data == NULL)
+    if (client == NULL || client->handlers == NULL || data == NULL)
         return -1;
 
     common_data = data;
@@ -258,8 +254,7 @@ int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data)
 
 void *ipc_client_get_handlers_common_data(struct ipc_client *client)
 {
-    if (client == NULL ||
-       client->handlers == NULL)
+    if (client == NULL || client->handlers == NULL)
         return NULL;
 
     return client->handlers->common_data;
@@ -269,8 +264,7 @@ int ipc_client_create_handlers_common_data(struct ipc_client *client)
 {
     void *common_data;
 
-    if (client == NULL ||
-       client->handlers == NULL)
+    if (client == NULL || client->handlers == NULL)
         return -1;
 
     common_data = client->handlers->common_data_create();
@@ -293,9 +287,8 @@ int ipc_client_destroy_handlers_common_data(struct ipc_client *client)
     void *common_data;
     int rc;
 
-    if (client == NULL ||
-       client->handlers == NULL ||
-       client->handlers->common_data_destroy == NULL)
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->common_data_destroy == NULL)
         return -1;
 
     rc = client->handlers->common_data_destroy(client->handlers->common_data);
@@ -320,9 +313,8 @@ int ipc_client_destroy_handlers_common_data(struct ipc_client *client)
 
 int ipc_client_set_handlers_common_data_fd(struct ipc_client *client, int fd)
 {
-    if (client == NULL ||
-       client->handlers == NULL ||
-       client->handlers->common_data_set_fd == NULL)
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->common_data_set_fd == NULL)
         return -1;
 
     return client->handlers->common_data_set_fd(client->handlers->common_data, fd);
@@ -330,9 +322,8 @@ int ipc_client_set_handlers_common_data_fd(struct ipc_client *client, int fd)
 
 int ipc_client_get_handlers_common_data_fd(struct ipc_client *client)
 {
-    if (client == NULL ||
-       client->handlers == NULL ||
-       client->handlers->common_data_get_fd == NULL)
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->common_data_get_fd == NULL)
         return -1;
 
     return client->handlers->common_data_get_fd(client->handlers->common_data);
@@ -341,8 +332,7 @@ int ipc_client_get_handlers_common_data_fd(struct ipc_client *client)
 
 int ipc_client_bootstrap_modem(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->ops == NULL ||
+    if (client == NULL || client->ops == NULL ||
         client->ops->bootstrap == NULL)
         return -1;
 
@@ -354,8 +344,7 @@ int ipc_client_open(struct ipc_client *client)
     int type;
     int fd;
 
-    if (client == NULL ||
-        client->handlers == NULL ||
+    if (client == NULL || client->handlers == NULL ||
         client->handlers->open == NULL)
         return -1;
 
@@ -366,8 +355,7 @@ int ipc_client_open(struct ipc_client *client)
 
 int ipc_client_close(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->handlers == NULL ||
+    if (client == NULL || client->handlers == NULL ||
         client->handlers->close == NULL)
         return -1;
 
@@ -376,8 +364,7 @@ int ipc_client_close(struct ipc_client *client)
 
 int ipc_client_power_on(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->handlers == NULL ||
+    if (client == NULL || client->handlers == NULL ||
         client->handlers->power_on == NULL)
         return -1;
 
@@ -386,8 +373,7 @@ int ipc_client_power_on(struct ipc_client *client)
 
 int ipc_client_power_off(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->handlers == NULL ||
+    if (client == NULL || client->handlers == NULL ||
         client->handlers->power_off == NULL)
         return -1;
 
@@ -396,12 +382,10 @@ int ipc_client_power_off(struct ipc_client *client)
 
 int ipc_client_gprs_handlers_available(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->handlers == NULL)
+    if (client == NULL || client->handlers == NULL)
         return -1;
 
-    if(client->handlers->gprs_activate != NULL && 
-        client->handlers->gprs_deactivate != NULL)
+    if(client->handlers->gprs_activate != NULL && client->handlers->gprs_deactivate != NULL)
         return 1;
     else
         return 0;
@@ -409,8 +393,7 @@ int ipc_client_gprs_handlers_available(struct ipc_client *client)
 
 int ipc_client_gprs_activate(struct ipc_client *client, int cid)
 {
-    if (client == NULL ||
-        client->handlers == NULL ||
+    if (client == NULL || client->handlers == NULL ||
         client->handlers->gprs_activate == NULL)
         return -1;
 
@@ -419,8 +402,7 @@ int ipc_client_gprs_activate(struct ipc_client *client, int cid)
 
 int ipc_client_gprs_deactivate(struct ipc_client *client, int cid)
 {
-    if (client == NULL ||
-        client->handlers == NULL ||
+    if (client == NULL || client->handlers == NULL ||
         client->handlers->gprs_deactivate == NULL)
         return -1;
 
@@ -429,8 +411,7 @@ int ipc_client_gprs_deactivate(struct ipc_client *client, int cid)
 
 char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid)
 {
-    if (client == NULL ||
-        client->gprs_specs == NULL ||
+    if (client == NULL || client->gprs_specs == NULL ||
         client->gprs_specs->gprs_get_iface == NULL)
         return NULL;
 
@@ -439,8 +420,7 @@ char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid)
 
 int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_client_gprs_capabilities *cap)
 {
-    if (client == NULL ||
-        client->gprs_specs == NULL ||
+    if (client == NULL || client->gprs_specs == NULL ||
         client->gprs_specs->gprs_get_capabilities == NULL)
         return -1;
 
@@ -452,9 +432,7 @@ int ipc_client_send(struct ipc_client *client, const unsigned short command,
 {
     struct ipc_message_info request;
 
-    if (client == NULL ||
-        client->ops == NULL ||
-        client->ops->send == NULL)
+    if (client == NULL || client->ops == NULL || client->ops->send == NULL)
         return -1;
 
     request.mseq = mseq;
@@ -471,9 +449,7 @@ int ipc_client_send(struct ipc_client *client, const unsigned short command,
 int ipc_client_recv(struct ipc_client *client,
     struct ipc_message_info *response)
 {
-    if (client == NULL ||
-        client->ops == NULL ||
-        client->ops->recv == NULL)
+    if (client == NULL || client->ops == NULL || client->ops->recv == NULL)
         return -1;
 
     return client->ops->recv(client, response);
@@ -482,6 +458,9 @@ int ipc_client_recv(struct ipc_client *client,
 void ipc_client_response_free(struct ipc_client *client,
     struct ipc_message_info *response)
 {
+    if (response == NULL)
+        return;
+
     if (response->data != NULL) {
         free(response->data);
         response->data = NULL;
