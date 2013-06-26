@@ -447,32 +447,15 @@ int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_clien
     return client->gprs_specs->gprs_get_capabilities(cap);
 }
 
-int _ipc_client_send(struct ipc_client *client, struct ipc_message_info *request)
+int ipc_client_send(struct ipc_client *client, const unsigned short command,
+    const char type, unsigned char *data, const int length, unsigned char mseq)
 {
+    struct ipc_message_info request;
+
     if (client == NULL ||
         client->ops == NULL ||
         client->ops->send == NULL)
         return -1;
-
-    return client->ops->send(client, request);
-}
-
-inline void ipc_client_send_get(struct ipc_client *client,
-    const unsigned short command, unsigned char mseq)
-{
-    ipc_client_send(client, command, IPC_TYPE_GET, 0, 0, mseq);
-}
-
-inline void ipc_client_send_exec(struct ipc_client *client,
-    const unsigned short command, unsigned char mseq)
-{
-    ipc_client_send(client, command, IPC_TYPE_EXEC, 0, 0, mseq);
-}
-
-void ipc_client_send(struct ipc_client *client, const unsigned short command,
-    const char type, unsigned char *data, const int length, unsigned char mseq)
-{
-    struct ipc_message_info request;
 
     request.mseq = mseq;
     request.aseq = 0xff;
@@ -482,7 +465,7 @@ void ipc_client_send(struct ipc_client *client, const unsigned short command,
     request.length = length;
     request.data = data;
 
-    _ipc_client_send(client, &request);
+    return client->ops->send(client, &request);
 }
 
 int ipc_client_recv(struct ipc_client *client,

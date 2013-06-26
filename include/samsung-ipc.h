@@ -93,16 +93,11 @@ char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid);
 int ipc_client_gprs_get_capabilities(struct ipc_client *client,
     struct ipc_client_gprs_capabilities *cap);
 
-/* Convenience functions for ipc_send */
-void ipc_client_send(struct ipc_client *client, const unsigned short command,
+int ipc_client_send(struct ipc_client *client, const unsigned short command,
     const char type, unsigned char *data, const int length, unsigned char mseq);
-void ipc_client_send_get(struct ipc_client *client,
-    const unsigned short command,unsigned char mseq);
-void ipc_client_send_exec(struct ipc_client *client,
-    const unsigned short command, unsigned char mseq);
-
 int ipc_client_recv(struct ipc_client *client,
     struct ipc_message_info *response);
+
 void ipc_client_response_free(struct ipc_client *client,
     struct ipc_message_info *response);
 
