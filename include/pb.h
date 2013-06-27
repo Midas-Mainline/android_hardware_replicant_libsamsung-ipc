@@ -27,7 +27,7 @@
  * Types
  */
 
-#define IPC_PB_ACCESS                               	        0x0601
+#define IPC_PB_ACCESS                                           0x0601
 #define IPC_PB_STORAGE                                          0x0602
 #define IPC_PB_STORAGE_LIST                                     0x0603
 #define IPC_PB_ENTRY_INFO                                       0x0604
