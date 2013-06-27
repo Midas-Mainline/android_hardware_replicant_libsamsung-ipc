@@ -42,7 +42,6 @@
 #define DEF_CALL_NUMBER "950"
 #define DEF_SIM_PIN     "1234"
 
-int client_fd = -1;
 int state = MODEM_STATE_LPM;
 int seq = 0;
 int in_call = 0;
@@ -369,47 +368,38 @@ void modem_response_handle(struct ipc_client *client, struct ipc_message_info *r
     }
 }
 
+
 int modem_read_loop(struct ipc_client *client)
 {
     struct ipc_message_info resp;
-    int fd = client_fd;
     int rc;
-    fd_set fds;
-
-    if(fd < 0) {
-        return -1;
-    }
 
     memset(&resp, 0, sizeof(resp));
-
-    FD_ZERO(&fds);
-    FD_SET(fd, &fds);
 
     while(1) {
         usleep(3000);
 
-        select(fd + 1, &fds, NULL, NULL, NULL);
-
-        if(FD_ISSET(fd, &fds))
-        {
-            rc = ipc_client_recv(client, &resp);
-
-            if(rc < 0) {
-                printf("[E] Can't RECV from modem: please run this again\n");
-                break;
-            }
-
-            modem_response_handle(client, &resp);
-
-            if(resp.data != NULL)
-                free(resp.data);
+        rc = ipc_client_poll(client, NULL);
+        if (rc < 0) {
+            continue;
         }
+
+        rc = ipc_client_recv(client, &resp);
+        if(rc < 0) {
+            printf("[E] Can't RECV from modem: please run this again\n");
+            break;
+        }
+
+        modem_response_handle(client, &resp);
+
+        if(resp.data != NULL)
+            free(resp.data);
     }
 
     return 0;
 }
 
-void modem_log_handler(const char *msg, void *user_data)
+void modem_log_handler(void *user_data, const char *msg)
 {
     int i, l;
     char *message;
@@ -433,7 +423,7 @@ void modem_log_handler(const char *msg, void *user_data)
     free(message);
 }
 
-void modem_log_handler_quiet(const char *message, void *user_data)
+void modem_log_handler_quiet(void *user_data, const char *msg)
 {
     return;
 }
@@ -442,18 +432,14 @@ int modem_start(struct ipc_client *client)
 {
     int rc = -1;
 
-//    ipc_client_set_handlers(client, &ipc_default_handlers);
-    ipc_client_create_handlers_common_data(client);
-
-    ipc_client_bootstrap_modem(client);
+    ipc_client_data_create(client);
+    ipc_client_bootstrap(client);
 
     usleep(300);
 
     rc = ipc_client_open(client);
     if(rc < 0)
         return -1;
-
-    client_fd = ipc_client_get_handlers_common_data_fd(client);
 
     rc = ipc_client_power_on(client);
     if(rc < 0)
@@ -531,7 +517,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    client_fmt = ipc_client_new(IPC_CLIENT_TYPE_FMT);
+    client_fmt = ipc_client_create(IPC_CLIENT_TYPE_FMT);
 
     if (client_fmt == 0) {
         printf("[E] Could not create IPC client; aborting ...\n");
@@ -539,8 +525,8 @@ int main(int argc, char *argv[])
     }
 
     if (debug == 0)
-        ipc_client_set_log_handler(client_fmt, modem_log_handler_quiet, NULL);
-    else ipc_client_set_log_handler(client_fmt, modem_log_handler, NULL);
+        ipc_client_set_log_callback(client_fmt, modem_log_handler_quiet, NULL);
+    else ipc_client_set_log_callback(client_fmt, modem_log_handler, NULL);
 
     while(opt_i < argc) {
         if(strncmp(argv[optind], "power-on", 8) == 0) {
@@ -552,8 +538,7 @@ int main(int argc, char *argv[])
                 printf("[E] Something went wrong while powering modem off\n");
             goto modem_quit;
         } else if (strncmp(argv[optind], "bootstrap", 9) == 0) {
-            ipc_client_create_handlers_common_data(client_fmt);
-            ipc_client_bootstrap_modem(client_fmt);
+            ipc_client_bootstrap(client_fmt);
         } else if(strncmp(argv[optind], "start", 5) == 0) {
             printf("[0] Starting modem on FMT client\n");
             rc = modem_start(client_fmt);
@@ -578,7 +563,7 @@ int main(int argc, char *argv[])
 
 modem_quit:
     if (client_fmt != 0)
-        ipc_client_free(client_fmt);
+        ipc_client_destroy(client_fmt);
 
     return 0;
 }

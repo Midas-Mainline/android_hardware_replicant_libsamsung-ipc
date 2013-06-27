@@ -18,6 +18,8 @@
  *
  */
 
+#include <time.h>
+
 #include <samsung-ipc.h>
 
 #ifndef __IPC_H__
@@ -34,41 +36,36 @@ struct ipc_ops {
 };
 
 struct ipc_handlers {
-    /* Transport handlers/data */
-    ipc_io_handler_cb read;
-    void *read_data;
-    ipc_io_handler_cb write;
-    void *write_data;
+    /* Transport handlers */
+    int (*open)(void *transport_data, int type);
+    int (*close)(void *transport_data);
 
-    int (*open)(int type, void *io_data);
-    int (*close)(void *io_data);
-    void *open_data;
-    void *close_data;
+    int (*read)(void *transport_data, void *buffer, unsigned int length);
+    int (*write)(void *transport_data, void *buffer, unsigned int length);
+    int (*poll)(void *transport_data, struct timeval *timeout);
+
+    void *transport_data;
 
     /* Power handlers */
-    ipc_handler_cb power_on;
-    void *power_on_data;
-    ipc_handler_cb power_off;
-    void *power_off_data;
+    int (*power_on)(void *power_data);
+    int (*power_off)(void *power_data);
+
+    void *power_data;
 
     /* GPRS handlers */
-    int (*gprs_activate)(void *io_data, int cid);
-    void *gprs_activate_data;
-    int (*gprs_deactivate)(void *io_data, int cid);
-    void *gprs_deactivate_data;
+    int (*gprs_activate)(void *gprs_data, int cid);
+    int (*gprs_deactivate)(void *gprs_data, int cid);
 
-    /* Handlers common data*/
-    void *common_data;
+    void *gprs_data;
 
-    void *(*common_data_create)(void);
-    int (*common_data_destroy)(void *io_data);
-    int (*common_data_set_fd)(void *io_data, int fd);
-    int (*common_data_get_fd)(void *io_data);
+    /* Data */
+    int (*data_create)(void **transport_data, void **power_data, void **gprs_data);
+    int (*data_destroy)(void *transport_data, void *power_data, void *gprs_data);
 };
 
 struct ipc_gprs_specs {
     char *(*gprs_get_iface)(int cid);
-    int (*gprs_get_capabilities)(struct ipc_client_gprs_capabilities *cap);
+    int (*gprs_get_capabilities)(struct ipc_client_gprs_capabilities *capabilities);
 };
 
 struct ipc_nv_data_specs {
@@ -85,7 +82,7 @@ struct ipc_nv_data_specs {
 struct ipc_client {
     int type;
 
-    ipc_client_log_handler_cb log_handler;
+    void (*log_callback)(void *log_data, const char *message);
     void *log_data;
 
     struct ipc_ops *ops;

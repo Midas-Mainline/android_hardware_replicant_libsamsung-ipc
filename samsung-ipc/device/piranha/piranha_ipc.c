@@ -24,34 +24,38 @@
 #include "xmm6260_ipc.h"
 #include "piranha_loader.h"
 
-struct ipc_ops piranha_fmt_ops = {
-    .send = xmm6260_ipc_fmt_client_send,
-    .recv = xmm6260_ipc_fmt_client_recv,
+struct ipc_ops piranha_ipc_fmt_ops = {
     .bootstrap = piranha_modem_bootstrap,
+    .send = xmm6260_ipc_fmt_send,
+    .recv = xmm6260_ipc_fmt_recv,
 };
 
-struct ipc_ops piranha_rfs_ops = {
-    .send = xmm6260_ipc_rfs_client_send,
-    .recv = xmm6260_ipc_rfs_client_recv,
+struct ipc_ops piranha_ipc_rfs_ops = {
     .bootstrap = NULL,
+    .send = xmm6260_ipc_rfs_send,
+    .recv = xmm6260_ipc_rfs_recv,
 };
 
-struct ipc_handlers piranha_default_handlers = {
+struct ipc_handlers piranha_ipc_handlers = {
     .read = xmm6260_ipc_read,
     .write = xmm6260_ipc_write,
     .open = xmm6260_ipc_open,
     .close = xmm6260_ipc_close,
+    .poll = xmm6260_ipc_poll,
+    .transport_data = NULL,
     .power_on = xmm6260_ipc_power_on,
     .power_off = xmm6260_ipc_power_off,
-    .common_data = NULL,
-    .common_data_create = xmm6260_ipc_common_data_create,
-    .common_data_destroy = xmm6260_ipc_common_data_destroy,
-    .common_data_set_fd = xmm6260_ipc_common_data_set_fd,
-    .common_data_get_fd = xmm6260_ipc_common_data_get_fd,
+    .power_data = NULL,
+    .gprs_activate = NULL,
+    .gprs_deactivate = NULL,
+    .gprs_data = NULL,
+    .data_create = xmm6260_ipc_data_create,
+    .data_destroy = xmm6260_ipc_data_destroy,
 };
 
-struct ipc_gprs_specs piranha_gprs_specs = {
+struct ipc_gprs_specs piranha_ipc_gprs_specs = {
     .gprs_get_iface = xmm6260_ipc_gprs_get_iface,
     .gprs_get_capabilities = xmm6260_ipc_gprs_get_capabilities,
 };
 
+// vim:ts=4:sw=4:expandtab

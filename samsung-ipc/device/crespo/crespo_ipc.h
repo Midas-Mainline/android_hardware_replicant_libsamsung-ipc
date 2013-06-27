@@ -31,7 +31,9 @@
 #define GPRS_IFACE_PREFIX       "rmnet"
 #define GPRS_IFACE_COUNT        3
 
-extern struct ipc_handlers crespo_ipc_default_handlers;
+struct crespo_ipc_transport_data {
+    int fd;
+};
 
 #endif
 

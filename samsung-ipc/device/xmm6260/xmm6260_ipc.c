@@ -50,7 +50,7 @@
 #define FMT_LOCK_NAME "xmm6260-fmt-lock"
 #define RFS_LOCK_NAME "xmm6260-rfs-lock"
 
-int xmm6260_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_info *request)
+int xmm6260_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
 {
     struct ipc_header *hdr;
     unsigned char *frame;
@@ -79,7 +79,7 @@ int xmm6260_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_in
 
     ipc_client_log_send(client, request, __func__);
 
-    client->handlers->write(frame, frame_length,  client->handlers->write_data);
+    client->handlers->write(client->handlers->transport_data, frame, frame_length);
 
     free(frame);
 
@@ -88,7 +88,7 @@ int xmm6260_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_in
     return 0;
 }
 
-int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_info *response)
+int xmm6260_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
     unsigned char buf[IPC_MAX_XFER] = {};
     unsigned char *data;
@@ -106,8 +106,7 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
 
     wake_lock(FMT_LOCK_NAME);
 
-    num_read = client->handlers->read(buf, IPC_MAX_XFER,
-        client->handlers->read_data);
+    num_read = client->handlers->read(client->handlers->transport_data, buf, IPC_MAX_XFER);
 
     if (num_read <= 0) {
         ipc_client_log(client, "read failed to read ipc length: %d", num_read);
@@ -120,7 +119,7 @@ int xmm6260_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_in
     left = ipc.length - num_read;
 
     if (left > 0)
-        num_read = client->handlers->read(buf + num_read, left, client->handlers->read_data);
+        num_read = client->handlers->read(client->handlers->transport_data, buf + num_read, left);
 
     memcpy(&ipc, buf, sizeof(ipc));
 
@@ -145,7 +144,7 @@ done:
     return 0;
 }
 
-int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_info *response)
+int xmm6260_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
     unsigned char buf[IPC_MAX_XFER] = {};
     struct rfs_hdr header;
@@ -157,7 +156,7 @@ int xmm6260_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_in
     wake_lock(RFS_LOCK_NAME);
 
     do {
-        rc = client->handlers->read(buf, IPC_MAX_XFER, client->handlers->read_data);
+        rc = client->handlers->read(client->handlers->transport_data, buf, IPC_MAX_XFER);
 
         if (rc < 0) {
             ipc_client_log(client, "Failed to read RFS data.");
@@ -213,7 +212,7 @@ done:
     return ret;
 }
 
-int xmm6260_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_info *request)
+int xmm6260_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *request)
 {
     struct rfs_hdr *header = NULL;
     char *data = NULL;
@@ -235,15 +234,21 @@ int xmm6260_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_in
 
     ipc_client_log_send(client, request, __func__);
 
-    rc = client->handlers->write(data, data_length, client->handlers->write_data);
+    rc = client->handlers->write(client->handlers->transport_data, data, data_length);
 
     wake_unlock(RFS_LOCK_NAME);
     return rc;
 }
 
-int xmm6260_ipc_open(int type, void *io_data)
+int xmm6260_ipc_open(void *transport_data, int type)
 {
-    int fd = -1;
+    struct xmm6260_ipc_transport_data *data;
+    int fd;
+
+    if (transport_data == NULL)
+        return -1;
+
+    data = (struct xmm6260_ipc_transport_data *) transport_data;
 
     switch(type)
     {
@@ -260,24 +265,23 @@ int xmm6260_ipc_open(int type, void *io_data)
     if(fd < 0)
         return -1;
 
-    if(io_data == NULL)
-        return -1;
-
-    memcpy(io_data, &fd, sizeof(int));
+    data->fd = fd;
 
     return 0;
 }
 
-int xmm6260_ipc_close(void *io_data)
+int xmm6260_ipc_close(void *transport_data)
 {
-    int fd = -1;
+    struct xmm6260_ipc_transport_data *data;
+    int fd;
 
-    if(io_data == NULL)
+    if (transport_data == NULL)
         return -1;
 
-    fd = *((int *) io_data);
+    data = (struct xmm6260_ipc_transport_data *) transport_data;
 
-    if(fd < 0)
+    fd = data->fd;
+    if (fd < 0)
         return -1;
 
     close(fd);
@@ -285,19 +289,18 @@ int xmm6260_ipc_close(void *io_data)
     return 0;
 }
 
-int xmm6260_ipc_read(void *data, unsigned int size, void *io_data)
+int xmm6260_ipc_read(void *transport_data, void *buffer, unsigned int length)
 {
-    int fd = -1;
+    struct xmm6260_ipc_transport_data *data;
+    int fd;
     int rc;
 
-    if(io_data == NULL)
+    if (transport_data == NULL)
         return -1;
 
-    if(data == NULL)
-        return -1;
+    data = (struct xmm6260_ipc_transport_data *) transport_data;
 
-    fd = *((int *) io_data);
-
+    fd = data->fd;
     if(fd < 0)
         return -1;
 
@@ -305,41 +308,86 @@ int xmm6260_ipc_read(void *data, unsigned int size, void *io_data)
     if (rc < 0)
         return -1;
 
-    rc = read(fd, data, size);
+    rc = read(fd, buffer, length);
     if(rc < 0)
         return -1;
 
     return rc;
 }
 
-int xmm6260_ipc_write(void *data, unsigned int size, void *io_data)
+int xmm6260_ipc_write(void *transport_data, void *buffer, unsigned int length)
 {
-    int fd = -1;
+    struct xmm6260_ipc_transport_data *data;
+    int fd;
     int rc;
 
-    if(io_data == NULL)
+    if (transport_data == NULL)
         return -1;
 
-    fd = *((int *) io_data);
+    data = (struct xmm6260_ipc_transport_data *) transport_data;
 
+    fd = data->fd;
     if(fd < 0)
         return -1;
 
-    rc = write(fd, data, size);
-
+    rc = write(fd, buffer, length);
     if(rc < 0)
         return -1;
 
     return rc;
 }
 
-int xmm6260_ipc_power_on(void *io_data)
+int xmm6260_ipc_poll(void *transport_data, struct timeval *timeout)
+{
+    struct xmm6260_ipc_transport_data *data;
+    fd_set fds;
+    int fd;
+    int rc;
+
+    if (transport_data == NULL)
+        return -1;
+
+    data = (struct xmm6260_ipc_transport_data *) transport_data;
+
+    fd = data->fd;
+    if (fd < 0)
+        return -1;
+
+    FD_ZERO(&fds);
+    FD_SET(fd, &fds);
+
+    rc = select(FD_SETSIZE, &fds, NULL, NULL, timeout);
+    return rc;
+}
+
+int xmm6260_ipc_power_on(void *power_data)
 {
     return 0;
 }
 
-int xmm6260_ipc_power_off(void *io_data)
+int xmm6260_ipc_power_off(void *power_data)
 {
+    return 0;
+}
+
+int xmm6260_ipc_data_create(void **transport_data, void **power_data, void **gprs_data)
+{
+    if (transport_data == NULL)
+        return -1;
+
+    *transport_data = (void *) malloc(sizeof(struct xmm6260_ipc_transport_data));
+    memset(*transport_data, 0, sizeof(struct xmm6260_ipc_transport_data));
+
+    return 0;
+}
+
+int xmm6260_ipc_data_destroy(void *transport_data, void *power_data, void *gprs_data)
+{
+    if (transport_data == NULL)
+        return -1;
+
+    free(transport_data);
+
     return 0;
 }
 
@@ -355,67 +403,15 @@ char *xmm6260_ipc_gprs_get_iface(int cid)
     return iface;
 }
 
-int xmm6260_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap)
+int xmm6260_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
 {
-    if (cap == NULL)
+    if (capabilities == NULL)
         return -1;
 
-    cap->port_list = 1;
-    cap->cid_max = GPRS_IFACE_COUNT;
+    capabilities->port_list = 1;
+    capabilities->cid_max = GPRS_IFACE_COUNT;
 
     return 0;
-}
-
-void *xmm6260_ipc_common_data_create(void)
-{
-    void *io_data;
-    int io_data_len;
-
-    io_data_len = sizeof(int);
-    io_data = malloc(io_data_len);
-
-    if(io_data == NULL)
-        return NULL;
-
-    memset(io_data, 0, io_data_len);
-
-    return io_data;
-}
-
-int xmm6260_ipc_common_data_destroy(void *io_data)
-{
-    // This was already done, not an error but we need to return
-    if(io_data == NULL)
-        return 0;
-
-    free(io_data);
-
-    return 0;
-}
-
-int xmm6260_ipc_common_data_set_fd(void *io_data, int fd)
-{
-    int *common_data;
-
-    if(io_data == NULL)
-        return -1;
-
-    common_data = (int *) io_data;
-    *common_data = fd;
-
-    return 0;
-}
-
-int xmm6260_ipc_common_data_get_fd(void *io_data)
-{
-    int *common_data;
-
-    if(io_data == NULL)
-        return -1;
-
-    common_data = (int *) io_data;
-
-    return (int) *(common_data);
 }
 
 // vim:ts=4:sw=4:expandtab

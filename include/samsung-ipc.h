@@ -19,6 +19,8 @@
  *
  */
 
+#include <time.h>
+
 #ifndef __SAMSUNG_IPC_H__
 #define __SAMSUNG_IPC_H__
 
@@ -56,50 +58,53 @@ struct ipc_client_gprs_capabilities {
  * Helpers
  */
 
-typedef void (*ipc_client_log_handler_cb)(const char *message, void *user_data);
+struct ipc_client *ipc_client_create(int client_type);
+int ipc_client_destroy(struct ipc_client *client);
 
-typedef int (*ipc_io_handler_cb)(void *data, unsigned int size, void *io_data);
-typedef int (*ipc_handler_cb)(void *io_data);
+void ipc_client_log(struct ipc_client *client, const char *message, ...);
+int ipc_client_set_log_callback(struct ipc_client *client,
+    void (*log_callback)(void *log_data, const char *message), void *log_data);
 
-struct ipc_client* ipc_client_new(int client_type);
-struct ipc_client *ipc_client_new_for_device(int device_type, int client_type);
-int ipc_client_free(struct ipc_client *client);
+int ipc_client_set_transport_handlers(struct ipc_client *client,
+    int (*open)(void *transport_data, int type),
+    int (*close)(void *transport_data),
+    int (*read)(void *transport_data, void *buffer, unsigned int length),
+    int (*write)(void *transport_data, void *buffer, unsigned int length),
+    int (*poll)(void *transport_data, struct timeval *timeout),
+    void *transport_data);
+int ipc_client_set_power_handlers(struct ipc_client *client,
+    int (*power_on)(void *power_data),
+    int (*power_off)(void *power_data),
+    void *power_data);
+int ipc_client_set_gprs_handlers(struct ipc_client *client,
+    int (*gprs_activate)(void *gprs_data, int cid),
+    int (*gprs_deactivate)(void *gprs_data, int cid),
+    void *gprs_data);
 
-int ipc_client_set_log_handler(struct ipc_client *client,
-    ipc_client_log_handler_cb log_handler_cb, void *user_data);
-
-int ipc_client_set_handlers(struct ipc_client *client,
-    struct ipc_handlers *handlers);
-int ipc_client_set_io_handlers(struct ipc_client *client,
-    ipc_io_handler_cb read, void *read_data,
-    ipc_io_handler_cb write, void *write_data);
-
-int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data);
-void *ipc_client_get_handlers_common_data(struct ipc_client *client);
-int ipc_client_create_handlers_common_data(struct ipc_client *client);
-int ipc_client_destroy_handlers_common_data(struct ipc_client *client);
-int ipc_client_set_handlers_common_data_fd(struct ipc_client *client, int fd);
-int ipc_client_get_handlers_common_data_fd(struct ipc_client *client);
-
-int ipc_client_bootstrap_modem(struct ipc_client *client);
-int ipc_client_open(struct ipc_client *client);
-int ipc_client_close(struct ipc_client *client);
-int ipc_client_power_on(struct ipc_client *client);
-int ipc_client_power_off(struct ipc_client *client);
-int ipc_client_gprs_handlers_available(struct ipc_client *client);
-int ipc_client_gprs_activate(struct ipc_client *client, int cid);
-int ipc_client_gprs_deactivate(struct ipc_client *client, int cid);
-char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid);
-int ipc_client_gprs_get_capabilities(struct ipc_client *client,
-    struct ipc_client_gprs_capabilities *cap);
-
+int ipc_client_bootstrap(struct ipc_client *client);
 int ipc_client_send(struct ipc_client *client, const unsigned short command,
     const char type, unsigned char *data, const int length, unsigned char mseq);
 int ipc_client_recv(struct ipc_client *client,
     struct ipc_message_info *response);
-
 void ipc_client_response_free(struct ipc_client *client,
     struct ipc_message_info *response);
+
+int ipc_client_open(struct ipc_client *client);
+int ipc_client_close(struct ipc_client *client);
+int ipc_client_poll(struct ipc_client *client, struct timeval *timeout);
+
+int ipc_client_power_on(struct ipc_client *client);
+int ipc_client_power_off(struct ipc_client *client);
+
+int ipc_client_gprs_activate(struct ipc_client *client, int cid);
+int ipc_client_gprs_deactivate(struct ipc_client *client, int cid);
+
+int ipc_client_data_create(struct ipc_client *client);
+int ipc_client_data_destroy(struct ipc_client *client);
+
+char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid);
+int ipc_client_gprs_get_capabilities(struct ipc_client *client,
+    struct ipc_client_gprs_capabilities *capabilities);
 
 /* Utility functions */
 void ipc_client_log_recv(struct ipc_client *client,

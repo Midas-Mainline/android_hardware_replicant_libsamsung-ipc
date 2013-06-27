@@ -47,10 +47,9 @@
 int phonet_iface_ifdown(void);
 int phonet_iface_ifup(void);
 
-struct aries_ipc_handlers_common_data
-{
+struct aries_ipc_transport_data {
+    struct sockaddr_pn spn;
     int fd;
-    struct sockaddr_pn *spn;
 };
 
 #endif

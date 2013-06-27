@@ -1,10 +1,10 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
- *                    Joerie de Gram <j.de.gram@gmail.com>
- *                    Simon Busch <morphis@gravedo.de>
- *                    Igor Almeida <igor.contato@gmail.com>
+ * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
+ * Copyright (C) 2011 Igor Almeida <igor.contato@gmail.com>
+ * Copyright (C) 2011 Joerie de Gram <j.de.gram@gmail.com>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 #include <stdlib.h>
@@ -100,7 +101,7 @@ int phonet_iface_ifup(void)
     return 0;
 }
 
-int aries_modem_bootstrap(struct ipc_client *client)
+int aries_ipc_bootstrap(struct ipc_client *client)
 {
     int s3c2410_serial3_fd = -1;
     int onedram_fd = -1;
@@ -412,7 +413,7 @@ exit:
     return rc;
 }
 
-int aries_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_info *request)
+int aries_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
 {
     struct ipc_header reqhdr;
     void *data;
@@ -434,36 +435,11 @@ int aries_ipc_fmt_client_send(struct ipc_client *client, struct ipc_message_info
 
     ipc_client_log_send(client, request, __func__);
 
-    rc = client->handlers->write(data, reqhdr.length, client->handlers->write_data);
+    rc = client->handlers->write(client->handlers->transport_data, data, reqhdr.length);
     return rc;
 }
 
-int aries_ipc_rfs_client_send(struct ipc_client *client, struct ipc_message_info *request)
-{
-    struct rfs_hdr *rfs_hdr;
-    void *data;
-    int rc = 0;
-
-    data = malloc(request->length + sizeof(struct rfs_hdr));
-    memset(data, 0, request->length + sizeof(struct rfs_hdr));
-
-    rfs_hdr = (struct rfs_hdr *) data;
-
-    rfs_hdr->id = request->mseq;
-    rfs_hdr->cmd = request->index;
-    rfs_hdr->len = request->length + sizeof(struct rfs_hdr);
-
-    memcpy((void *) (data + sizeof(struct rfs_hdr)), request->data, request->length);
-
-    assert(client->handlers->write != NULL);
-
-    ipc_client_log_send(client, request, __func__);
-
-    rc = client->handlers->write((uint8_t*) data, rfs_hdr->len, client->handlers->write_data);
-    return rc;
-}
-
-int aries_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_info *response)
+int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
     struct ipc_header *resphdr;
     void *data;
@@ -475,7 +451,7 @@ int aries_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_info
     memset(response, 0, sizeof(struct ipc_message_info));
 
     assert(client->handlers->read != NULL);
-    bread = client->handlers->read((uint8_t*) data, MAX_MODEM_DATA_SIZE, client->handlers->read_data);
+    bread = client->handlers->read(client->handlers->transport_data, (uint8_t*) data, MAX_MODEM_DATA_SIZE);
 
     if (bread < 0)
     {
@@ -513,7 +489,32 @@ int aries_ipc_fmt_client_recv(struct ipc_client *client, struct ipc_message_info
     return 0;
 }
 
-int aries_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_info *response)
+int aries_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *request)
+{
+    struct rfs_hdr *rfs_hdr;
+    void *data;
+    int rc = 0;
+
+    data = malloc(request->length + sizeof(struct rfs_hdr));
+    memset(data, 0, request->length + sizeof(struct rfs_hdr));
+
+    rfs_hdr = (struct rfs_hdr *) data;
+
+    rfs_hdr->id = request->mseq;
+    rfs_hdr->cmd = request->index;
+    rfs_hdr->len = request->length + sizeof(struct rfs_hdr);
+
+    memcpy((void *) (data + sizeof(struct rfs_hdr)), request->data, request->length);
+
+    assert(client->handlers->write != NULL);
+
+    ipc_client_log_send(client, request, __func__);
+
+    rc = client->handlers->write(client->handlers->transport_data, (uint8_t*) data, rfs_hdr->len);
+    return rc;
+}
+
+int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
     void *data;
     int bread = 0;
@@ -525,7 +526,7 @@ int aries_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_info
     memset(response, 0, sizeof(struct ipc_message_info));
 
     assert(client->handlers->read != NULL);
-    bread = client->handlers->read((uint8_t*) data, MAX_MODEM_DATA_SIZE, client->handlers->read_data);
+    bread = client->handlers->read(client->handlers->transport_data, (uint8_t*) data, MAX_MODEM_DATA_SIZE);
     if (bread < 0)
     {
         ipc_client_log(client, "aries_ipc_rfs_client_recv: can't receive enough bytes from modem to process incoming response!");
@@ -561,31 +562,27 @@ int aries_ipc_rfs_client_recv(struct ipc_client *client, struct ipc_message_info
     return 0;
 }
 
-int aries_ipc_open(int type, void *io_data)
+int aries_ipc_open(void *transport_data, int type)
 {
-    struct aries_ipc_handlers_common_data *common_data;
+    struct aries_ipc_transport_data *data;
     struct sockaddr_pn *spn;
     struct ifreq ifr;
 
     int reuse;
     int socket_rfs_magic;
 
-    int fd = -1;
+    int fd;
     int rc;
 
-    if(io_data == NULL)
-        goto error;
+    if (transport_data == NULL)
+        return -1;
 
-    common_data = (struct aries_ipc_handlers_common_data *) io_data;
-    spn = common_data->spn;
+    data = (struct aries_ipc_transport_data *) transport_data;
+    memset(data, 0, sizeof(struct aries_ipc_transport_data));
 
-    if(spn == NULL)
-        goto error;
+    spn = &data->spn;
 
     memset(&ifr, 0, sizeof(ifr));
-    memset(ifr.ifr_name, 0, IFNAMSIZ);
-    memset(spn, 0, sizeof(struct sockaddr_pn));
-
     strncpy(ifr.ifr_name, PHONET_IFACE, IFNAMSIZ);
 
     spn->spn_family = AF_PHONET;
@@ -609,56 +606,50 @@ int aries_ipc_open(int type, void *io_data)
 
     rc = setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, ifr.ifr_name, IFNAMSIZ);
     if(rc < 0)
-        goto error;
+        return -1;
 
     rc = ioctl(fd, SIOCGIFINDEX, &ifr);
     if(rc < 0)
-        goto error;
+        return -1;
 
     reuse = 1;
     rc = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
     if(rc < 0)
-        goto error;
+        return -1;
 
     rc = bind(fd, spn, sizeof(struct sockaddr_pn));
     if(rc < 0)
-        goto error;
+        return -1;
 
-    common_data->fd = fd;
+    data->fd = fd;
 
     if(type == IPC_CLIENT_TYPE_RFS)
     {
         socket_rfs_magic = SOCKET_RFS_MAGIC;
         rc = setsockopt(fd, SOL_SOCKET, SO_RFSMAGIC, &socket_rfs_magic, sizeof(socket_rfs_magic));
         if(rc < 0)
-            goto error;
+            return -1;
     }
 
     rc = phonet_iface_ifup();
     if(rc < 0)
-        goto error;
+        return -1;
 
-    goto end;
-
-error:
-    return -1;
-
-end:
     return 0;
 }
 
-int aries_ipc_close(void *io_data)
+int aries_ipc_close(void *transport_data)
 {
-    struct aries_ipc_handlers_common_data *common_data;
-    int fd = -1;
+    struct aries_ipc_transport_data *data;
+    int fd;
 
-    if(io_data == NULL)
+    if (transport_data == NULL)
         return -1;
 
-    common_data = (struct aries_ipc_handlers_common_data *) io_data;
-    fd = common_data->fd;
+    data = (struct aries_ipc_transport_data *) transport_data;
 
-    if(fd < 0)
+    fd = data->fd;
+    if (fd < 0)
         return -1;
 
     close(fd);
@@ -666,68 +657,84 @@ int aries_ipc_close(void *io_data)
     return 0;
 }
 
-int aries_ipc_read(void *data, unsigned int size, void *io_data)
+int aries_ipc_read(void *transport_data, void *buffer, unsigned int length)
 {
-    struct aries_ipc_handlers_common_data *common_data;
-    int spn_len;
-    int fd = -1;
+    struct aries_ipc_transport_data *data;
+    int spn_size;
+    int fd;
     int rc;
 
-    if(io_data == NULL)
+    if (transport_data == NULL || buffer == NULL)
         return -1;
 
-    if(data == NULL)
+    data = (struct aries_ipc_transport_data *) transport_data;
+
+    fd = data->fd;
+    if (fd < 0)
         return -1;
 
-    common_data = (struct aries_ipc_handlers_common_data *) io_data;
-    fd = common_data->fd;
+    spn_size = sizeof(struct sockaddr_pn);
 
-    if(fd < 0)
-        return -1;
-
-    spn_len = sizeof(struct sockaddr_pn);
-    rc = recvfrom(fd, data, size, 0, common_data->spn, &spn_len);
-
-    if(rc < 0)
+    rc = recvfrom(fd, buffer, length, 0, &data->spn, &spn_size);
+    if (rc < 0)
         return -1;
 
     return 0;
 }
 
-int aries_ipc_write(void *data, unsigned int size, void *io_data)
+int aries_ipc_write(void *transport_data, void *buffer, unsigned int length)
 {
-    struct aries_ipc_handlers_common_data *common_data;
-    int spn_len;
-    int fd = -1;
+    struct aries_ipc_transport_data *data;
+    int spn_size;
+    int fd;
     int rc;
 
-    if(io_data == NULL)
+    if (transport_data == NULL || buffer == NULL)
         return -1;
 
-    if(data == NULL)
+    data = (struct aries_ipc_transport_data *) transport_data;
+
+    fd = data->fd;
+    if (fd < 0)
         return -1;
 
-    common_data = (struct aries_ipc_handlers_common_data *) io_data;
-    fd = common_data->fd;
+    spn_size = sizeof(struct sockaddr_pn);
 
-    if(fd < 0)
-        return -1;
-
-    spn_len = sizeof(struct sockaddr_pn);
-
-    rc = sendto(fd, data, size, 0, common_data->spn, spn_len);
-
-    if(rc < 0)
+    rc = sendto(fd, buffer, length, 0, &data->spn, spn_size);
+    if (rc < 0)
         return -1;
 
     return 0;
 }
 
-int aries_ipc_power_on(void *data)
+int aries_ipc_poll(void *transport_data, struct timeval *timeout)
+{
+    struct aries_ipc_transport_data *data;
+    fd_set fds;
+    int fd;
+    int rc;
+
+    if (transport_data == NULL)
+        return -1;
+
+    data = (struct aries_ipc_transport_data *) transport_data;
+
+    fd = data->fd;
+    if (fd < 0)
+        return -1;
+
+    FD_ZERO(&fds);
+    FD_SET(fd, &fds);
+
+    rc = select(FD_SETSIZE, &fds, NULL, NULL, timeout);
+    return rc;
+}
+
+int aries_ipc_power_on(void *power_data)
 {
     int fd = open("/sys/class/modemctl/xmm/status", O_RDONLY);
     char status[1] = { 0 };
-    char power_data[4] = "on";
+    char data[4] = "on";
     int rc;
 
     if(fd < 0)
@@ -748,7 +755,7 @@ int aries_ipc_power_on(void *data)
     if(fd < 0)
         return -1;
 
-    rc = write(fd, power_data, 2);
+    rc = write(fd, data, 2);
 
     close(fd);
 
@@ -758,11 +765,11 @@ int aries_ipc_power_on(void *data)
     return 0;
 }
 
-int aries_ipc_power_off(void *data)
+int aries_ipc_power_off(void *power_data)
 {
     int fd = open("/sys/class/modemctl/xmm/status", O_RDONLY);
     char status[1] = { 0 };
-    char power_data[5] = "off";
+    char data[5] = "off";
     int rc;
 
     if(fd < 0)
@@ -783,7 +790,7 @@ int aries_ipc_power_off(void *data)
     if(fd < 0)
         return -1;
 
-    rc = write(fd, power_data, 3);
+    rc = write(fd, data, 3);
 
     close(fd);
 
@@ -793,9 +800,7 @@ int aries_ipc_power_off(void *data)
     return 0;
 }
 
-//TODO: there are also suspend/resume nodes
-
-int aries_ipc_gprs_activate(void *data, int cid)
+int aries_ipc_gprs_activate(void *gprs_data, int cid)
 {
     int fd = open("/sys/class/net/svnet0/pdp/activate", O_RDWR);
     char *activate_data = NULL;
@@ -820,7 +825,7 @@ int aries_ipc_gprs_activate(void *data, int cid)
 
 }
 
-int aries_ipc_gprs_deactivate(void *data, int cid)
+int aries_ipc_gprs_deactivate(void *gprs_data, int cid)
 {
     int fd = open("/sys/class/net/svnet0/pdp/deactivate", O_RDWR);
     char *deactivate_data = NULL;
@@ -840,6 +845,27 @@ int aries_ipc_gprs_deactivate(void *data, int cid)
 
     if(rc < 0)
         return -1;
+
+    return 0;
+}
+
+int aries_ipc_data_create(void **transport_data, void **power_data, void **gprs_data)
+{
+    if (transport_data == NULL)
+        return -1;
+
+    *transport_data = (void *) malloc(sizeof(struct aries_ipc_transport_data));
+    memset(*transport_data, 0, sizeof(struct aries_ipc_transport_data));
+
+    return 0;
+}
+
+int aries_ipc_data_destroy(void *transport_data, void *power_data, void *gprs_data)
+{
+    if (transport_data == NULL)
+        return -1;
+
+    free(transport_data);
 
     return 0;
 }
@@ -871,117 +897,47 @@ char *aries_ipc_gprs_get_iface(int cid)
     return NULL;
 }
 
-int aries_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *cap)
+int aries_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
 {
-    if (cap == NULL)
+    if (capabilities == NULL)
         return -1;
 
-    cap->port_list = 1;
-    cap->cid_max = GPRS_IFACE_COUNT;
+    capabilities->port_list = 1;
+    capabilities->cid_max = GPRS_IFACE_COUNT;
 
     return 0;
 }
 
-void *aries_ipc_common_data_create(void)
-{
-    struct aries_ipc_handlers_common_data *common_data;
-    void *io_data;
-    int io_data_len;
-    int spn_len;
-
-    io_data_len = sizeof(struct aries_ipc_handlers_common_data);
-    io_data = malloc(io_data_len);
-
-    if(io_data == NULL)
-        return NULL;
-
-    memset(io_data, 0, io_data_len);
-
-    common_data = (struct aries_ipc_handlers_common_data *) io_data;
-
-    spn_len = sizeof(struct sockaddr_pn);
-    common_data->spn = malloc(spn_len);
-
-    if(common_data == NULL)
-        return NULL;
-
-    memset(common_data->spn, 0, spn_len);
-
-    return io_data;
-}
-
-int aries_ipc_common_data_destroy(void *io_data)
-{
-    struct aries_ipc_handlers_common_data *common_data;
-
-    // This was already done, not an error but we need to return
-    if(io_data == NULL)
-        return 0;
-
-    common_data = (struct aries_ipc_handlers_common_data *) io_data;
-
-    if(common_data->spn != NULL)
-        free(common_data->spn);
-
-    free(io_data);
-
-    return 0;
-}
-
-int aries_ipc_common_data_set_fd(void *io_data, int fd)
-{
-    struct aries_ipc_handlers_common_data *common_data;
-
-    if(io_data == NULL)
-        return -1;
-
-    common_data = (struct aries_ipc_handlers_common_data *) io_data;
-    common_data->fd = fd;
-
-    return 0;
-}
-
-int aries_ipc_common_data_get_fd(void *io_data)
-{
-    struct aries_ipc_handlers_common_data *common_data;
-
-    if(io_data == NULL)
-        return -1;
-
-    common_data = (struct aries_ipc_handlers_common_data *) io_data;
-
-    return common_data->fd;
-}
-
-struct ipc_ops aries_fmt_ops = {
-    .send = aries_ipc_fmt_client_send,
-    .recv = aries_ipc_fmt_client_recv,
-    .bootstrap = aries_modem_bootstrap,
+struct ipc_ops aries_ipc_fmt_ops = {
+    .bootstrap = aries_ipc_bootstrap,
+    .send = aries_ipc_fmt_send,
+    .recv = aries_ipc_fmt_recv,
 };
 
-struct ipc_ops aries_rfs_ops = {
-    .send = aries_ipc_rfs_client_send,
-    .recv = aries_ipc_rfs_client_recv,
+struct ipc_ops aries_ipc_rfs_ops = {
     .bootstrap = NULL,
+    .send = aries_ipc_rfs_send,
+    .recv = aries_ipc_rfs_recv,
 };
 
-struct ipc_handlers aries_default_handlers = {
-    .read = aries_ipc_read,
-    .write = aries_ipc_write,
+struct ipc_handlers aries_ipc_handlers = {
     .open = aries_ipc_open,
     .close = aries_ipc_close,
+    .read = aries_ipc_read,
+    .write = aries_ipc_write,
+    .poll = aries_ipc_poll,
+    .transport_data = NULL,
     .power_on = aries_ipc_power_on,
     .power_off = aries_ipc_power_off,
+    .power_data = NULL,
     .gprs_activate = aries_ipc_gprs_activate,
     .gprs_deactivate = aries_ipc_gprs_deactivate,
-    .common_data = NULL,
-    .common_data_create = aries_ipc_common_data_create,
-    .common_data_destroy = aries_ipc_common_data_destroy,
-    .common_data_set_fd = aries_ipc_common_data_set_fd,
-    .common_data_get_fd = aries_ipc_common_data_get_fd,
+    .gprs_data = NULL,
+    .data_create = aries_ipc_data_create,
+    .data_destroy = aries_ipc_data_destroy,
 };
 
-struct ipc_gprs_specs aries_gprs_specs = {
+struct ipc_gprs_specs aries_ipc_gprs_specs = {
     .gprs_get_iface = aries_ipc_gprs_get_iface,
     .gprs_get_capabilities = aries_ipc_gprs_get_capabilities,
 };

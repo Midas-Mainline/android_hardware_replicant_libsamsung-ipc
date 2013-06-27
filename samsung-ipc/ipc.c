@@ -41,26 +41,6 @@
 #include "ipc.h"
 #include "ipc_devices.h"
 
-void log_handler_default(const char *message, void *user_data)
-{
-    printf("%s\n", message);
-}
-
-void ipc_client_log(struct ipc_client *client, const char *message, ...)
-{
-    if (!message || !client || !client->log_handler) {
-        return;
-    }
-
-    va_list args;
-    char buffer[4096];
-
-    va_start(args, message);
-    vsprintf(buffer, message, args);
-    client->log_handler(buffer, client->log_data);
-    va_end(args);
-}
-
 int ipc_device_detect(void)
 {
     char *board_name = NULL;
@@ -142,7 +122,7 @@ int ipc_device_detect(void)
     return index;
 }
 
-struct ipc_client *ipc_client_new(int client_type)
+struct ipc_client *ipc_client_create(int client_type)
 {
     struct ipc_client *client;
     int device_index = -1;
@@ -168,11 +148,16 @@ struct ipc_client *ipc_client_new(int client_type)
         case IPC_CLIENT_TYPE_FMT:
             client->ops = ipc_devices[device_index].fmt_ops;
             break;
+        default:
+            return NULL;
     }
 
-    client->handlers = (struct ipc_handlers *) malloc(sizeof(struct ipc_handlers));
     client->gprs_specs = ipc_devices[device_index].gprs_specs;
     client->nv_data_specs = ipc_devices[device_index].nv_data_specs;
+
+    // Handlers are subject to be modified
+    client->handlers = (struct ipc_handlers *) malloc(sizeof(struct ipc_handlers));
+    memset(client->handlers, 0, sizeof(struct ipc_handlers));
 
     if (ipc_devices[device_index].handlers != 0)
         memcpy(client->handlers, ipc_devices[device_index].handlers, sizeof(struct ipc_handlers));
@@ -180,251 +165,116 @@ struct ipc_client *ipc_client_new(int client_type)
     return client;
 }
 
-int ipc_client_free(struct ipc_client *client)
-{
-    free(client->handlers);
-    free(client);
-    client = NULL;
-    return 0;
-}
-
-int ipc_client_set_log_handler(struct ipc_client *client,
-    ipc_client_log_handler_cb log_handler_cb, void *user_data)
+int ipc_client_destroy(struct ipc_client *client)
 {
     if (client == NULL)
         return -1;
 
-    client->log_handler = log_handler_cb;
-    client->log_data = user_data;
+    if (client->handlers != NULL)
+        free(client->handlers);
+
+    memset(client, 0, sizeof(struct ipc_client));
+    free(client);
 
     return 0;
 }
 
-int ipc_client_set_handlers(struct ipc_client *client,
-    struct ipc_handlers *handlers)
+void ipc_client_log(struct ipc_client *client, const char *message, ...)
 {
-    if (client == NULL || handlers == NULL)
+    char buffer[4096];
+    va_list args;
+
+    if (client == NULL || client->log_callback == NULL || message == NULL)
+        return;
+
+    va_start(args, message);
+    vsnprintf(buffer, 4096, message, args);
+    client->log_callback(client->log_data, buffer);
+    va_end(args);
+}
+
+int ipc_client_set_log_callback(struct ipc_client *client,
+    void (*log_callback)(void *log_data, const char *message), void *log_data)
+{
+    if (client == NULL)
         return -1;
 
-    memcpy(client->handlers, handlers, sizeof(struct ipc_handlers));
+    client->log_callback = log_callback;
+    client->log_data = log_data;
 
     return 0;
 }
 
-int ipc_client_set_io_handlers(struct ipc_client *client,
-    ipc_io_handler_cb read, void *read_data,
-    ipc_io_handler_cb write,void *write_data)
+int ipc_client_set_transport_handlers(struct ipc_client *client,
+    int (*open)(void *transport_data, int type),
+    int (*close)(void *transport_data),
+    int (*read)(void *transport_data, void *buffer, unsigned int length),
+    int (*write)(void *transport_data, void *buffer, unsigned int length),
+    int (*poll)(void *transport_data, struct timeval *timeout),
+    void *transport_data)
 {
     if (client == NULL || client->handlers == NULL)
         return -1;
 
     if (read != NULL)
         client->handlers->read = read;
-    if (read_data != NULL)
-        client->handlers->read_data = read_data;
     if (write != NULL)
         client->handlers->write = write;
-    if (write_data != NULL)
-        client->handlers->write_data = write_data;
+    if (poll != NULL)
+        client->handlers->poll = poll;
+    if (open != NULL)
+        client->handlers->open = open;
+    if (close != NULL)
+        client->handlers->close = close;
+    if (transport_data != NULL)
+        client->handlers->transport_data = transport_data;
 
     return 0;
 }
 
-int ipc_client_set_handlers_common_data(struct ipc_client *client, void *data)
+int ipc_client_set_power_handlers(struct ipc_client *client,
+    int (*power_on)(void *power_data),
+    int (*power_off)(void *power_data),
+    void *power_data)
 {
-    void *common_data;
-
-    if (client == NULL || client->handlers == NULL || data == NULL)
-        return -1;
-
-    common_data = data;
-    client->handlers->common_data = common_data;
-
-    client->handlers->read_data = common_data;
-    client->handlers->write_data = common_data;
-    client->handlers->open_data = common_data;
-    client->handlers->close_data = common_data;
-    client->handlers->power_on_data = common_data;
-    client->handlers->power_off_data = common_data;
-    client->handlers->gprs_activate_data = common_data;
-    client->handlers->gprs_deactivate_data = common_data;
-
-    return 0;
-}
-
-void *ipc_client_get_handlers_common_data(struct ipc_client *client)
-{
-    if (client == NULL || client->handlers == NULL)
-        return NULL;
-
-    return client->handlers->common_data;
-}
-
-int ipc_client_create_handlers_common_data(struct ipc_client *client)
-{
-    void *common_data;
-
     if (client == NULL || client->handlers == NULL)
         return -1;
 
-    common_data = client->handlers->common_data_create();
-    client->handlers->common_data = common_data;
-
-    client->handlers->read_data = common_data;
-    client->handlers->write_data = common_data;
-    client->handlers->open_data = common_data;
-    client->handlers->close_data = common_data;
-    client->handlers->power_on_data = common_data;
-    client->handlers->power_off_data = common_data;
-    client->handlers->gprs_activate_data = common_data;
-    client->handlers->gprs_deactivate_data = common_data;
+    if (power_on != NULL)
+        client->handlers->power_on = power_on;
+    if (power_off != NULL)
+        client->handlers->power_off = power_off;
+    if (power_data != NULL)
+        client->handlers->power_data = power_data;
 
     return 0;
 }
 
-int ipc_client_destroy_handlers_common_data(struct ipc_client *client)
+int ipc_client_set_gprs_handlers(struct ipc_client *client,
+    int (*gprs_activate)(void *gprs_data, int cid),
+    int (*gprs_deactivate)(void *gprs_data, int cid),
+    void *gprs_data)
 {
-    void *common_data;
-    int rc;
-
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->common_data_destroy == NULL)
+    if (client == NULL || client->handlers == NULL)
         return -1;
 
-    rc = client->handlers->common_data_destroy(client->handlers->common_data);
-
-    if (rc < 0)
-        return -1;
-
-    common_data = NULL;
-    client->handlers->common_data = common_data;
-
-    client->handlers->read_data = common_data;
-    client->handlers->write_data = common_data;
-    client->handlers->open_data = common_data;
-    client->handlers->close_data = common_data;
-    client->handlers->power_on_data = common_data;
-    client->handlers->power_off_data = common_data;
-    client->handlers->gprs_activate_data = common_data;
-    client->handlers->gprs_deactivate_data = common_data;
+    if (gprs_activate != NULL)
+        client->handlers->gprs_activate = gprs_activate;
+    if (gprs_deactivate != NULL)
+        client->handlers->gprs_deactivate = gprs_deactivate;
+    if (gprs_data != NULL)
+        client->handlers->gprs_data = gprs_data;
 
     return 0;
 }
 
-int ipc_client_set_handlers_common_data_fd(struct ipc_client *client, int fd)
-{
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->common_data_set_fd == NULL)
-        return -1;
-
-    return client->handlers->common_data_set_fd(client->handlers->common_data, fd);
-}
-
-int ipc_client_get_handlers_common_data_fd(struct ipc_client *client)
-{
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->common_data_get_fd == NULL)
-        return -1;
-
-    return client->handlers->common_data_get_fd(client->handlers->common_data);
-}
-
-
-int ipc_client_bootstrap_modem(struct ipc_client *client)
+int ipc_client_bootstrap(struct ipc_client *client)
 {
     if (client == NULL || client->ops == NULL ||
         client->ops->bootstrap == NULL)
         return -1;
 
     return client->ops->bootstrap(client);
-}
-
-int ipc_client_open(struct ipc_client *client)
-{
-    int type;
-    int fd;
-
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->open == NULL)
-        return -1;
-
-    type = client->type;
-
-    return client->handlers->open(type, client->handlers->open_data);
-}
-
-int ipc_client_close(struct ipc_client *client)
-{
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->close == NULL)
-        return -1;
-
-    return client->handlers->close(client->handlers->close_data);
-}
-
-int ipc_client_power_on(struct ipc_client *client)
-{
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->power_on == NULL)
-        return -1;
-
-    return client->handlers->power_on(client->handlers->power_on_data);
-}
-
-int ipc_client_power_off(struct ipc_client *client)
-{
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->power_off == NULL)
-        return -1;
-
-    return client->handlers->power_off(client->handlers->power_off_data);
-}
-
-int ipc_client_gprs_handlers_available(struct ipc_client *client)
-{
-    if (client == NULL || client->handlers == NULL)
-        return -1;
-
-    if(client->handlers->gprs_activate != NULL && client->handlers->gprs_deactivate != NULL)
-        return 1;
-    else
-        return 0;
-}
-
-int ipc_client_gprs_activate(struct ipc_client *client, int cid)
-{
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->gprs_activate == NULL)
-        return -1;
-
-    return client->handlers->gprs_activate(client->handlers->gprs_activate_data, cid);
-}
-
-int ipc_client_gprs_deactivate(struct ipc_client *client, int cid)
-{
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->gprs_deactivate == NULL)
-        return -1;
-
-    return client->handlers->gprs_deactivate(client->handlers->gprs_deactivate_data, cid);
-}
-
-char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid)
-{
-    if (client == NULL || client->gprs_specs == NULL ||
-        client->gprs_specs->gprs_get_iface == NULL)
-        return NULL;
-
-    return client->gprs_specs->gprs_get_iface(cid);
-}
-
-int ipc_client_gprs_get_capabilities(struct ipc_client *client, struct ipc_client_gprs_capabilities *cap)
-{
-    if (client == NULL || client->gprs_specs == NULL ||
-        client->gprs_specs->gprs_get_capabilities == NULL)
-        return -1;
-
-    return client->gprs_specs->gprs_get_capabilities(cap);
 }
 
 int ipc_client_send(struct ipc_client *client, const unsigned short command,
@@ -461,10 +311,112 @@ void ipc_client_response_free(struct ipc_client *client,
     if (response == NULL)
         return;
 
-    if (response->data != NULL) {
+    if (response->data != NULL && response->length > 0) {
         free(response->data);
         response->data = NULL;
     }
+
+    memset(response, 0, sizeof(struct ipc_message_info));
+}
+
+int ipc_client_open(struct ipc_client *client)
+{
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->open == NULL)
+        return -1;
+
+    return client->handlers->open(client->handlers->transport_data, client->type);
+}
+
+int ipc_client_close(struct ipc_client *client)
+{
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->close == NULL)
+        return -1;
+
+    return client->handlers->close(client->handlers->transport_data);
+}
+
+int ipc_client_poll(struct ipc_client *client, struct timeval *timeout)
+{
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->poll == NULL)
+        return -1;
+
+    return client->handlers->poll(client->handlers->transport_data, timeout);
+}
+
+int ipc_client_power_on(struct ipc_client *client)
+{
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->power_on == NULL)
+        return -1;
+
+    return client->handlers->power_on(client->handlers->power_data);
+}
+
+int ipc_client_power_off(struct ipc_client *client)
+{
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->power_off == NULL)
+        return -1;
+
+    return client->handlers->power_off(client->handlers->power_data);
+}
+
+int ipc_client_gprs_activate(struct ipc_client *client, int cid)
+{
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->gprs_activate == NULL)
+        return -1;
+
+    return client->handlers->gprs_activate(client->handlers->gprs_data, cid);
+}
+
+int ipc_client_gprs_deactivate(struct ipc_client *client, int cid)
+{
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->gprs_deactivate == NULL)
+        return -1;
+
+    return client->handlers->gprs_deactivate(client->handlers->gprs_data, cid);
+}
+
+int ipc_client_data_create(struct ipc_client *client)
+{
+    if (client == NULL || client->handlers == NULL)
+        return -1;
+
+    return client->handlers->data_create(&client->handlers->transport_data,
+        &client->handlers->power_data, &client->handlers->power_data);
+}
+
+int ipc_client_data_destroy(struct ipc_client *client)
+{
+    if (client == NULL || client->handlers == NULL)
+        return -1;
+
+    return client->handlers->data_destroy(client->handlers->transport_data,
+        client->handlers->power_data, client->handlers->power_data);
+}
+
+char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid)
+{
+    if (client == NULL || client->gprs_specs == NULL ||
+        client->gprs_specs->gprs_get_iface == NULL)
+        return NULL;
+
+    return client->gprs_specs->gprs_get_iface(cid);
+}
+
+int ipc_client_gprs_get_capabilities(struct ipc_client *client,
+    struct ipc_client_gprs_capabilities *capabilities)
+{
+    if (client == NULL || client->gprs_specs == NULL ||
+        client->gprs_specs->gprs_get_capabilities == NULL)
+        return -1;
+
+    return client->gprs_specs->gprs_get_capabilities(capabilities);
 }
 
 // vim:ts=4:sw=4:expandtab

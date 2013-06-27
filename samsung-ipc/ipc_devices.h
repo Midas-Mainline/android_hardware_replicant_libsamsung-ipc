@@ -39,38 +39,37 @@ extern struct ipc_device_desc ipc_devices[];
 extern int ipc_devices_count;
 
 /* crespo */
-extern struct ipc_ops crespo_fmt_ops;
-extern struct ipc_ops crespo_rfs_ops;
-extern struct ipc_handlers crespo_default_handlers;
-extern struct ipc_gprs_specs crespo_2_6_35_gprs_specs;
-extern struct ipc_gprs_specs crespo_3_0_gprs_specs;
+extern struct ipc_ops crespo_ipc_fmt_ops;
+extern struct ipc_ops crespo_ipc_rfs_ops;
+extern struct ipc_handlers crespo_ipc_handlers;
+extern struct ipc_gprs_specs crespo_2_6_35_ipc_gprs_specs;
+extern struct ipc_gprs_specs crespo_3_0_ipc_gprs_specs;
 
 /* aries */
-extern struct ipc_ops aries_fmt_ops;
-extern struct ipc_ops aries_rfs_ops;
-extern struct ipc_handlers aries_default_handlers;
-extern struct ipc_gprs_specs aries_gprs_specs;
+extern struct ipc_ops aries_ipc_fmt_ops;
+extern struct ipc_ops aries_ipc_rfs_ops;
+extern struct ipc_handlers aries_ipc_handlers;
+extern struct ipc_gprs_specs aries_ipc_gprs_specs;
 
 /* galaxys2 */
-extern struct ipc_ops galaxys2_fmt_ops;
-extern struct ipc_ops galaxys2_fmt_ops;
-extern struct ipc_ops galaxys2_rfs_ops;
-extern struct ipc_handlers galaxys2_default_handlers;
-extern struct ipc_gprs_specs galaxys2_gprs_specs;
+extern struct ipc_ops galaxys2_ipc_fmt_ops;
+extern struct ipc_ops galaxys2_ipc_rfs_ops;
+extern struct ipc_handlers galaxys2_ipc_handlers;
+extern struct ipc_gprs_specs galaxys2_ipc_gprs_specs;
 
 /* maguro */
-extern struct ipc_ops maguro_fmt_ops;
-extern struct ipc_ops maguro_rfs_ops;
-extern struct ipc_handlers maguro_default_handlers;
-extern struct ipc_gprs_specs maguro_gprs_specs;
-extern struct ipc_nv_data_specs maguro_nv_data_specs;
+extern struct ipc_ops maguro_ipc_fmt_ops;
+extern struct ipc_ops maguro_ipc_rfs_ops;
+extern struct ipc_handlers maguro_ipc_handlers;
+extern struct ipc_gprs_specs maguro_ipc_gprs_specs;
+extern struct ipc_nv_data_specs maguro_ipc_nv_data_specs;
 
 /* piranha */
-extern struct ipc_ops piranha_fmt_ops;
-extern struct ipc_ops piranha_rfs_ops;
-extern struct ipc_handlers piranha_default_handlers;
-extern struct ipc_gprs_specs piranha_gprs_specs;
-extern struct ipc_nv_data_specs piranha_nv_data_specs;
+extern struct ipc_ops piranha_ipc_fmt_ops;
+extern struct ipc_ops piranha_ipc_rfs_ops;
+extern struct ipc_handlers piranha_ipc_handlers;
+extern struct ipc_gprs_specs piranha_ipc_gprs_specs;
+extern struct ipc_nv_data_specs piranha_ipc_nv_data_specs;
 
 #endif
 

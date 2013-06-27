@@ -623,7 +623,7 @@ fail:
     return ret;
 }
 
-int galaxys2_modem_bootstrap(struct ipc_client *client) {
+int galaxys2_ipc_bootstrap(struct ipc_client *client) {
     int ret = 0;
     struct modemctl_io_data io_data;
     memset(&io_data, 0, sizeof(client, io_data));

@@ -96,8 +96,8 @@ struct maguro_boot_tail_header name = {\
     .unknown = "\xea\xea",\
 }
 
-int maguro_modem_bootstrap(struct ipc_client *client);
-int maguro_power_off(void *io_data);
+int maguro_ipc_bootstrap(struct ipc_client *client);
+int maguro_ipc_power_off(void *io_data);
 
 #endif
 

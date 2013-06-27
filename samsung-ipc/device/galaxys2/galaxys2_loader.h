@@ -75,7 +75,7 @@ struct galaxys2_boot_cmd {
     uint32_t data_size;
 } __attribute__((packed));
 
-int galaxys2_modem_bootstrap(struct ipc_client *client);
+int galaxys2_ipc_bootstrap(struct ipc_client *client);
 
 #endif
 

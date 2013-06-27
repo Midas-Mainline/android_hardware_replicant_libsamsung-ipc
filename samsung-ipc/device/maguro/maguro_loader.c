@@ -638,7 +638,7 @@ fail:
     return ret;
 }
 
-int maguro_power_off(void *io_data_unused) {
+int maguro_ipc_power_off(void *io_data_unused) {
     int ret = -1;
     struct modemctl_io_data io_data;
 
@@ -659,7 +659,7 @@ fail:
     return ret;
 }
 
-int maguro_modem_bootstrap(struct ipc_client *client)
+int maguro_ipc_bootstrap(struct ipc_client *client)
 {
     int ret = -1, n = 0, fd = -1, i;
     struct modemctl_io_data io_data;

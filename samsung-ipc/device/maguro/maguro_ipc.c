@@ -31,41 +31,46 @@
 #include "xmm6260_ipc.h"
 #include "maguro_loader.h"
 
-struct ipc_ops maguro_fmt_ops = {
-    .send = xmm6260_ipc_fmt_client_send,
-    .recv = xmm6260_ipc_fmt_client_recv,
-    .bootstrap = maguro_modem_bootstrap,
+struct ipc_ops maguro_ipc_fmt_ops = {
+    .bootstrap = maguro_ipc_bootstrap,
+    .send = xmm6260_ipc_fmt_send,
+    .recv = xmm6260_ipc_fmt_recv,
 };
 
-struct ipc_ops maguro_rfs_ops = {
-    .send = xmm6260_ipc_rfs_client_send,
-    .recv = xmm6260_ipc_rfs_client_recv,
+struct ipc_ops maguro_ipc_rfs_ops = {
     .bootstrap = NULL,
+    .send = xmm6260_ipc_rfs_send,
+    .recv = xmm6260_ipc_rfs_recv,
 };
 
-struct ipc_handlers maguro_default_handlers = {
-    .read = xmm6260_ipc_read,
-    .write = xmm6260_ipc_write,
+struct ipc_handlers maguro_ipc_handlers = {
     .open = xmm6260_ipc_open,
     .close = xmm6260_ipc_close,
+    .read = xmm6260_ipc_read,
+    .write = xmm6260_ipc_write,
+    .poll = xmm6260_ipc_poll,
+    .transport_data = NULL,
     .power_on = xmm6260_ipc_power_on,
-    .power_off = maguro_power_off,
-    .common_data = NULL,
-    .common_data_create = xmm6260_ipc_common_data_create,
-    .common_data_destroy = xmm6260_ipc_common_data_destroy,
-    .common_data_set_fd = xmm6260_ipc_common_data_set_fd,
-    .common_data_get_fd = xmm6260_ipc_common_data_get_fd,
+    .power_off = xmm6260_ipc_power_off,
+    .power_data = NULL,
+    .gprs_activate = NULL,
+    .gprs_deactivate = NULL,
+    .gprs_data = NULL,
+    .data_create = xmm6260_ipc_data_create,
+    .data_destroy = xmm6260_ipc_data_destroy,
 };
 
-struct ipc_gprs_specs maguro_gprs_specs = {
+struct ipc_gprs_specs maguro_ipc_gprs_specs = {
     .gprs_get_iface = xmm6260_ipc_gprs_get_iface,
     .gprs_get_capabilities = xmm6260_ipc_gprs_get_capabilities,
 };
 
-struct ipc_nv_data_specs maguro_nv_data_specs = {
+struct ipc_nv_data_specs maguro_ipc_nv_data_specs = {
     .nv_data_path = "/factory/nv_data.bin",
     .nv_data_md5_path = "/factory/nv_data.bin.md5",
     .nv_state_path = "/factory/.nv_state",
     .nv_data_bak_path = "/factory/.nv_data.bak",
     .nv_data_md5_bak_path = "/factory/.nv_data.bak.md5",
 };
+
+// vim:ts=4:sw=4:expandtab
