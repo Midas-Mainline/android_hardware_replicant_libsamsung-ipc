@@ -34,7 +34,6 @@
 #include <assert.h>
 
 #include <samsung-ipc.h>
-#include <wakelock.h>
 
 #include "crespo_modem_ctl.h"
 #include "crespo_ipc.h"
@@ -339,8 +338,6 @@ int crespo_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *resp
 
     memset(response, 0, sizeof(struct ipc_message_info));
 
-    wake_lock("secril_fmt-interface");
-
     assert(client->handlers->read != NULL);
     bread = client->handlers->read(client->handlers->transport_data, (uint8_t*) &modem_data, sizeof(struct modem_io) + MAX_MODEM_DATA_SIZE);
     if (bread < 0)
@@ -375,8 +372,6 @@ int crespo_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *resp
     free(modem_data.data);
 
     ipc_client_log_recv(client, response, __func__);
-
-    wake_unlock("secril_fmt-interface");
 
     return 0;
 }
@@ -415,8 +410,6 @@ int crespo_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *resp
 
     memset(response, 0, sizeof(struct ipc_message_info));
 
-    wake_lock("secril_rfs-interface");
-
     assert(client->handlers->read != NULL);
     bread = client->handlers->read(client->handlers->transport_data, (uint8_t*) &modem_data, sizeof(struct modem_io) + MAX_MODEM_DATA_SIZE);
     if (bread < 0)
@@ -448,8 +441,6 @@ int crespo_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *resp
     free(modem_data.data);
 
     ipc_client_log_recv(client, response, __func__);
-
-    wake_unlock("secril_rfs-interface");
 
     return 0;
 }

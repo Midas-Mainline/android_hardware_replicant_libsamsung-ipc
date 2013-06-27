@@ -60,7 +60,6 @@ samsung-ipc_files := \
 	samsung-ipc/net.c \
 	samsung-ipc/sec.c \
 	samsung-ipc/sms.c \
-	samsung-ipc/wakelock.c \
 	samsung-ipc/device/crespo/crespo_ipc.c \
 	samsung-ipc/device/aries/aries_ipc.c \
 	samsung-ipc/device/xmm6260/xmm6260_loader.c \

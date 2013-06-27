@@ -38,7 +38,6 @@
 #include <assert.h>
 
 #include <samsung-ipc.h>
-#include <wakelock.h>
 
 #include "ipc.h"
 
@@ -47,17 +46,12 @@
 #include "xmm6260_modemctl.h"
 #include "modem_prj.h"
 
-#define FMT_LOCK_NAME "xmm6260-fmt-lock"
-#define RFS_LOCK_NAME "xmm6260-rfs-lock"
-
 int xmm6260_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
 {
     struct ipc_header *hdr;
     unsigned char *frame;
     unsigned char *payload;
     size_t frame_length;
-
-    wake_lock(FMT_LOCK_NAME);
 
     /* Frame IPC header + payload length */
     frame_length = (sizeof(*hdr) + request->length);
@@ -83,8 +77,6 @@ int xmm6260_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *req
 
     free(frame);
 
-    wake_unlock(FMT_LOCK_NAME);
-
     return 0;
 }
 
@@ -103,8 +95,6 @@ int xmm6260_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *res
 
     if (!client || !response)
         return -1;
-
-    wake_lock(FMT_LOCK_NAME);
 
     num_read = client->handlers->read(client->handlers->transport_data, buf, IPC_MAX_XFER);
 
@@ -140,7 +130,6 @@ int xmm6260_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *res
     ipc_client_log_recv(client, response, __func__);
 
 done:
-    wake_unlock(FMT_LOCK_NAME);
     return 0;
 }
 
@@ -152,8 +141,6 @@ int xmm6260_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *res
     unsigned count=0;
     int rc;
     int ret = 0;
-
-    wake_lock(RFS_LOCK_NAME);
 
     do {
         rc = client->handlers->read(client->handlers->transport_data, buf, IPC_MAX_XFER);
@@ -207,8 +194,6 @@ int xmm6260_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *res
     ipc_client_log_recv(client, response, __func__);
 
 done:
-
-    wake_unlock(RFS_LOCK_NAME);
     return ret;
 }
 
@@ -218,8 +203,6 @@ int xmm6260_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *req
     char *data = NULL;
     int data_length;
     int rc;
-
-    wake_lock(RFS_LOCK_NAME);
 
     data_length = sizeof(struct rfs_hdr) + request->length;
     data = malloc(data_length);
@@ -236,7 +219,6 @@ int xmm6260_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *req
 
     rc = client->handlers->write(client->handlers->transport_data, data, data_length);
 
-    wake_unlock(RFS_LOCK_NAME);
     return rc;
 }
 

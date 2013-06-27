@@ -27,7 +27,6 @@ libsamsung_ipc_la_SOURCES = \
 	gprs.c \
 	call.c \
 	net.c \
-	wakelock.c \
 	ipc.h \
 	ipc_devices.h \
 	device/crespo/crespo_ipc.c \
