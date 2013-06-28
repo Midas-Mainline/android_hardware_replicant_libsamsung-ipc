@@ -37,6 +37,7 @@
 
 struct ipc_client;
 struct ipc_handlers;
+struct ipc_header;
 
 struct ipc_message_info {
     unsigned char mseq;
@@ -106,20 +107,16 @@ char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid);
 int ipc_client_gprs_get_capabilities(struct ipc_client *client,
     struct ipc_client_gprs_capabilities *capabilities);
 
-/* Utility functions */
+const char *ipc_response_type_to_str(int type);
+const char *ipc_request_type_to_str(int type);
+const char *ipc_command_to_str(int command);
+void ipc_client_hex_dump(struct ipc_client *client, void *data, int size);
 void ipc_client_log_recv(struct ipc_client *client,
     struct ipc_message_info *response, const char *prefix);
 void ipc_client_log_send(struct ipc_client *client,
     struct ipc_message_info *request, const char *prefix);
-const char *ipc_response_type_to_str(int type);
-const char *ipc_request_type_to_str(int type);
-const char *ipc_command_to_str(int command);
-
-void ipc_client_hex_dump(struct ipc_client *client, void *data, int size);
-void *ipc_client_mtd_read(struct ipc_client *client, char *mtd_name, int size,
-    int block_size);
-void *ipc_client_file_read(struct ipc_client *client, char *file_name, int size,
-    int block_size);
+void ipc_header_fill(struct ipc_header *header, struct ipc_message_info *message);
+void ipc_message_info_fill(struct ipc_header *header, struct ipc_message_info *message);
 
 /*
  * Samsung-IPC protocol

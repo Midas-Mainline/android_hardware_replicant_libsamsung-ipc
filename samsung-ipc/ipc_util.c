@@ -1,6 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
+ * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
@@ -19,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <fcntl.h>
@@ -30,7 +32,6 @@
 #include <mtd/mtd-abi.h>
 
 #include <samsung-ipc.h>
-
 #include "ipc.h"
 
 /* Log utils */
@@ -440,6 +441,36 @@ void ipc_client_log_send(struct ipc_client *client,
 #endif
             break;
     }
+}
+
+void ipc_header_fill(struct ipc_header *header, struct ipc_message_info *message)
+{
+    if (header == NULL || message == NULL)
+        return;
+
+    memset(header, 0, sizeof(struct ipc_header));
+    header->mseq = message->mseq;
+    header->aseq = message->aseq;
+    header->group = message->group;
+    header->index = message->index;
+    header->type = message->type;
+    header->length = message->length + sizeof(struct ipc_header);
+}
+
+void ipc_message_info_fill(struct ipc_header *header, struct ipc_message_info *message)
+{
+    if (header == NULL || message == NULL)
+        return;
+
+    memset(message, 0, sizeof(struct ipc_message_info));
+    message->mseq = header->mseq;
+    message->aseq = header->aseq;
+    message->group = header->group;
+    message->index = header->index;
+    message->type = header->type;
+    message->cmd = IPC_COMMAND(message);
+    message->length = 0;
+    message->data = NULL;
 }
 
 void *ipc_client_mtd_read(struct ipc_client *client, char *mtd_name, int size,

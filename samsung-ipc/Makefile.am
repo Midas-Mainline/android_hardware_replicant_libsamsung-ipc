@@ -27,8 +27,10 @@ libsamsung_ipc_la_SOURCES = \
 	gprs.c \
 	call.c \
 	net.c \
+	util.c \
 	ipc.h \
 	ipc_devices.h \
+	util.h \
 	device/crespo/crespo_ipc.c \
 	device/aries/aries_ipc.c \
 	device/aries/sipc4.h \
