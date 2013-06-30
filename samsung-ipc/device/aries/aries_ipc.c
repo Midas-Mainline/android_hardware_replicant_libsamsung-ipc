@@ -56,6 +56,8 @@ int aries_ipc_bootstrap(struct ipc_client *client)
     struct timeval timeout;
     fd_set fds;
 
+    unsigned char *p;
+    unsigned char *pp;
     int rc;
     int i;
 
@@ -107,12 +109,16 @@ int aries_ipc_bootstrap(struct ipc_client *client)
 
     usleep(100000);
 
-    rc = xmm6160_psi_send(client, serial_fd, modem_image_data, ARIES_MODEM_IMAGE_SIZE);
+    p = (unsigned char *) modem_image_data;
+
+    rc = xmm6160_psi_send(client, serial_fd, (void *) p, ARIES_PSI_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 PSI failed");
         goto error;
     }
     ipc_client_log(client, "Sent XMM6160 PSI");
+
+    p += ARIES_PSI_SIZE;
 
     onedram_init = 0;
 
@@ -150,14 +156,18 @@ int aries_ipc_bootstrap(struct ipc_client *client)
     }
     ipc_client_log(client, "Mapped onedram to memory");
 
-    rc = xmm6160_modem_image_send(client, -1, onedram_address, modem_image_data, ARIES_MODEM_IMAGE_SIZE, 0);
+    pp = (unsigned char *) onedram_address;
+
+    rc = xmm6160_modem_image_send(client, -1, (void *) pp, (void *) p, ARIES_MODEM_IMAGE_SIZE - ARIES_PSI_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 modem image failed");
         goto error;
     }
     ipc_client_log(client, "Sent XMM6160 modem image");
 
-    rc = xmm6160_nv_data_send(client, -1, onedram_address, ARIES_NV_DATA_OFFSET);
+    pp = (unsigned char *) onedram_address + ARIES_ONEDRAM_NV_DATA_OFFSET;
+
+    rc = xmm6160_nv_data_send(client, -1, pp);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 nv_data failed");
         goto error;

@@ -44,6 +44,7 @@ int crespo_ipc_bootstrap(struct ipc_client *client)
     int modem_ctl_fd = -1;
     int serial_fd = -1;
 
+    unsigned char *p;
     int rc;
 
     if (client == NULL)
@@ -81,21 +82,29 @@ int crespo_ipc_bootstrap(struct ipc_client *client)
 
     usleep(100000);
 
-    rc = xmm6160_psi_send(client, serial_fd, modem_image_data, CRESPO_MODEM_IMAGE_SIZE);
+    p = (unsigned char *) modem_image_data;
+
+    rc = xmm6160_psi_send(client, serial_fd, (void *) p, CRESPO_PSI_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 PSI failed");
         goto error;
     }
     ipc_client_log(client, "Sent XMM6160 PSI");
 
-    rc = xmm6160_modem_image_send(client, modem_ctl_fd, NULL, modem_image_data, CRESPO_MODEM_IMAGE_SIZE, 0);
+    p += CRESPO_PSI_SIZE;
+
+    lseek(modem_ctl_fd, 0, SEEK_SET);
+
+    rc = xmm6160_modem_image_send(client, modem_ctl_fd, NULL, (void *) p, CRESPO_MODEM_IMAGE_SIZE - CRESPO_PSI_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 modem image failed");
         goto error;
     }
     ipc_client_log(client, "Sent XMM6160 modem image");
 
-    rc = xmm6160_nv_data_send(client, modem_ctl_fd, NULL, CRESPO_NV_DATA_OFFSET);
+    lseek(modem_ctl_fd, CRESPO_MODEM_CTL_NV_DATA_OFFSET, SEEK_SET);
+
+    rc = xmm6160_nv_data_send(client, modem_ctl_fd, NULL);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 nv_data failed");
         goto error;

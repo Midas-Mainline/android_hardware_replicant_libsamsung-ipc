@@ -25,7 +25,8 @@
 #define __ARIES_IPC_H__
 
 #define ARIES_MODEM_IMAGE_SIZE                                  0xA00000
-#define ARIES_NV_DATA_OFFSET                                    0xD80000
+#define ARIES_PSI_SIZE                                          0x5000
+#define ARIES_ONEDRAM_NV_DATA_OFFSET                            0xD80000
 #define ARIES_ONEDRAM_MEMORY_SIZE                               0xFFF000
 #define ARIES_ONEDRAM_INIT                                      0x12341234
 #define ARIES_ONEDRAM_MAGIC                                     0x45674567

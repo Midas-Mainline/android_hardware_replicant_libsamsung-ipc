@@ -25,17 +25,16 @@
 
 #define XMM6160_AT                              "AT"
 #define XMM6160_AT_COUNT                                        20
-#define XMM6160_PSI_SIZE                                        0x5000
 #define XMM6160_PSI_MAGIC                                       0x30
 #define XMM6160_PSI_ACK                                         0x01
 #define XMM6160_BOOTCORE_VERSION                                0xF0
 
 int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
-    void *modem_image_data, int modem_image_size);
+    void *modem_image_data, unsigned short psi_size);
 int xmm6160_modem_image_send(struct ipc_client *client, int device_fd,
-    void *device_address, void *modem_image_data, int modem_image_size,int modem_image_offset);
+    void *device_address, void *modem_image_data, int modem_image_size);
 int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
-    void *device_address, int modem_image_offset);
+    void *device_address);
 
 #endif
 

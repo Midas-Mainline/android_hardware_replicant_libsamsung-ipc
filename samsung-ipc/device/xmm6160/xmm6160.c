@@ -31,13 +31,12 @@
 #include "xmm6160.h"
 
 int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
-    void *modem_image_data, int modem_image_size)
+    void *modem_image_data, unsigned short psi_size)
 {
     char at[] = XMM6160_AT;
     unsigned char version;
     unsigned char info;
     unsigned char psi_magic;
-    unsigned short psi_size;
     unsigned char psi_crc;
     unsigned char psi_ack;
 
@@ -50,7 +49,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     int rc;
     int i;
 
-    if (client == NULL || serial_fd < 0 || modem_image_data == NULL || modem_image_size < XMM6160_PSI_SIZE)
+    if (client == NULL || serial_fd < 0 || modem_image_data == NULL || psi_size <= 0)
         return -1;
 
     tcgetattr(serial_fd, &termios);
@@ -106,8 +105,6 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     }
     ipc_client_log(client, "Wrote PSI magic (0x%x)", psi_magic);
 
-    psi_size = XMM6160_PSI_SIZE;
-
     rc = write(serial_fd, &psi_size, sizeof(psi_size));
     if (rc < (int) sizeof(psi_size)) {
         ipc_client_log(client, "Writing PSI size failed");
@@ -124,7 +121,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     p = (unsigned char *) modem_image_data;
     psi_crc = 0;
 
-    for (i=0; i < XMM6160_PSI_SIZE; i++) {
+    for (i=0; i < psi_size; i++) {
         rc = select(serial_fd + 1, NULL, &fds, NULL, &timeout);
         if (rc <= 0) {
             ipc_client_log(client, "Writing PSI failed");
@@ -189,29 +186,25 @@ complete:
 }
 
 int xmm6160_modem_image_send(struct ipc_client *client, int device_fd,
-    void *device_address, void *modem_image_data, int modem_image_size, int modem_image_offset)
+    void *device_address, void *modem_image_data, int modem_image_size)
 {
     int wc;
 
     unsigned char *p;
-    int length;
     int rc;
     int i;
 
-    if (client == NULL || (device_fd < 0 && device_address == NULL) || modem_image_data == NULL || modem_image_size <= XMM6160_PSI_SIZE)
+    if (client == NULL || (device_fd < 0 && device_address == NULL) || modem_image_data == NULL || modem_image_size <= 0)
         return -1;
 
-    p = (unsigned char *) modem_image_data + XMM6160_PSI_SIZE;
-    length = modem_image_size - XMM6160_PSI_SIZE;
+    p = (unsigned char *) modem_image_data;
 
     if (device_address != NULL) {
-        memcpy((void *) ((unsigned char *) device_address + modem_image_offset), p, length);
+        memcpy(device_address, (void *) p, modem_image_size);
     } else {
-        lseek(device_fd, modem_image_offset, SEEK_SET);
-
         wc = 0;
-        while (wc < length) {
-            rc = write(device_fd, p, length - wc);
+        while (wc < modem_image_size) {
+            rc = write(device_fd, (void *) p, modem_image_size - wc);
             if (rc < 0) {
                 ipc_client_log(client, "Writing modem image failed");
                 goto error;
@@ -234,7 +227,7 @@ complete:
 }
 
 int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
-    void *device_address, int modem_image_offset)
+    void *device_address)
 {
     void *nv_data = NULL;
     int wc;
@@ -271,10 +264,8 @@ int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
     length = nv_data_size(client);
 
     if (device_address != NULL) {
-        memcpy((void *) ((unsigned char *) device_address + modem_image_offset), p, length);
+        memcpy(device_address, p, length);
     } else {
-        lseek(device_fd, modem_image_offset, SEEK_SET);
-
         wc = 0;
         while (wc < length) {
             rc = write(device_fd, p, length - wc);
