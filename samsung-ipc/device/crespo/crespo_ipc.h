@@ -21,18 +21,18 @@
 #ifndef __CRESPO_IPC_H__
 #define __CRESPO_IPC_H__
 
-#define MODEM_IMAGE_SIZE                                        0xD80000
-#define NV_DATA_OFFSET                                          0xD80000
-#define MODEM_DATA_SIZE                                         0x50000
+#define CRESPO_MODEM_IMAGE_SIZE                                 0xD80000
+#define CRESPO_NV_DATA_OFFSET                                   0xD80000
+#define CRESPO_DATA_SIZE                                        0x50000
 
-#define MODEM_IMAGE_DEVICE                      "/dev/mtd/mtd5ro"
-#define MODEM_SERIAL_DEVICE                     "/dev/s3c2410_serial3"
-#define MODEM_CTL_DEVICE                        "/dev/modem_ctl"
-#define MODEM_FMT_DEVICE                        "/dev/modem_fmt"
-#define MODEM_RFS_DEVICE                        "/dev/modem_rfs"
+#define CRESPO_MODEM_IMAGE_DEVICE               "/dev/mtd/mtd5ro"
+#define CRESPO_MODEM_SERIAL_DEVICE              "/dev/s3c2410_serial3"
+#define CRESPO_MODEM_CTL_DEVICE                 "/dev/modem_ctl"
+#define CRESPO_MODEM_FMT_DEVICE                 "/dev/modem_fmt"
+#define CRESPO_MODEM_RFS_DEVICE                 "/dev/modem_rfs"
 
-#define GPRS_IFACE_PREFIX                       "rmnet"
-#define GPRS_IFACE_COUNT                                        3
+#define CRESPO_GPRS_IFACE_PREFIX                "rmnet"
+#define CRESPO_GPRS_IFACE_COUNT                                 3
 
 struct crespo_ipc_transport_data {
     int fd;

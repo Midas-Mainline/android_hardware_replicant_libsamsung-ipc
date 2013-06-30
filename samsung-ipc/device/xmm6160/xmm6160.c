@@ -33,7 +33,7 @@
 int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     void *modem_image_data, int modem_image_size)
 {
-    char modem_at[] = MODEM_AT;
+    char at[] = XMM6160_AT;
     unsigned char version;
     unsigned char info;
     unsigned char psi_magic;
@@ -50,7 +50,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     int rc;
     int i;
 
-    if (client == NULL || serial_fd < 0 || modem_image_data == NULL || modem_image_size < MODEM_PSI_SIZE)
+    if (client == NULL || serial_fd < 0 || modem_image_data == NULL || modem_image_size < XMM6160_PSI_SIZE)
         return -1;
 
     tcgetattr(serial_fd, &termios);
@@ -61,9 +61,9 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
 
     tcsetattr(serial_fd, TCSANOW, &termios);
 
-    length = strlen(modem_at);
-    for (i=0; i < MODEM_AT_COUNT; i++) {
-        rc = write(serial_fd, modem_at, length);
+    length = strlen(at);
+    for (i=0; i < XMM6160_AT_COUNT; i++) {
+        rc = write(serial_fd, at, length);
         if (rc < length) {
             ipc_client_log(client, "Writing AT in ASCII failed");
             goto error;
@@ -83,7 +83,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
         goto error;
     }
 
-    if (version != MODEM_BOOTCORE_VERSION) {
+    if (version != XMM6160_BOOTCORE_VERSION) {
         ipc_client_log(client, "Read wrong bootcore version (0x%x)", version);
         goto error;
     }
@@ -97,7 +97,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     }
     ipc_client_log(client, "Read info size (0x%x)", info);
 
-    psi_magic = MODEM_PSI_MAGIC;
+    psi_magic = XMM6160_PSI_MAGIC;
 
     rc = write(serial_fd, &psi_magic, sizeof(psi_magic));
     if (rc < (int) sizeof(psi_magic)) {
@@ -106,7 +106,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     }
     ipc_client_log(client, "Wrote PSI magic (0x%x)", psi_magic);
 
-    psi_size = MODEM_PSI_SIZE;
+    psi_size = XMM6160_PSI_SIZE;
 
     rc = write(serial_fd, &psi_size, sizeof(psi_size));
     if (rc < (int) sizeof(psi_size)) {
@@ -124,7 +124,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     p = (unsigned char *) modem_image_data;
     psi_crc = 0;
 
-    for (i=0; i < MODEM_PSI_SIZE; i++) {
+    for (i=0; i < XMM6160_PSI_SIZE; i++) {
         rc = select(serial_fd + 1, NULL, &fds, NULL, &timeout);
         if (rc <= 0) {
             ipc_client_log(client, "Writing PSI failed");
@@ -175,7 +175,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
             ipc_client_log(client, "Reading PSI ACK failed");
             goto error;
         }
-    } while (psi_ack != MODEM_PSI_ACK);
+    } while (psi_ack != XMM6160_PSI_ACK);
     ipc_client_log(client, "Read PSI ACK (0x%x)", psi_ack);
 
     rc = 0;
@@ -198,11 +198,11 @@ int xmm6160_modem_image_send(struct ipc_client *client, int device_fd,
     int rc;
     int i;
 
-    if (client == NULL || (device_fd < 0 && device_address == NULL) || modem_image_data == NULL || modem_image_size <= MODEM_PSI_SIZE)
+    if (client == NULL || (device_fd < 0 && device_address == NULL) || modem_image_data == NULL || modem_image_size <= XMM6160_PSI_SIZE)
         return -1;
 
-    p = (unsigned char *) modem_image_data + MODEM_PSI_SIZE;
-    length = modem_image_size - MODEM_PSI_SIZE;
+    p = (unsigned char *) modem_image_data + XMM6160_PSI_SIZE;
+    length = modem_image_size - XMM6160_PSI_SIZE;
 
     if (device_address != NULL) {
         memcpy((void *) ((unsigned char *) device_address + modem_image_offset), p, length);

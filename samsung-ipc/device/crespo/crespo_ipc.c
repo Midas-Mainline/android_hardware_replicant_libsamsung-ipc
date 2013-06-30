@@ -51,14 +51,14 @@ int crespo_ipc_bootstrap(struct ipc_client *client)
 
     ipc_client_log(client, "Starting crespo modem bootstrap");
 
-    modem_image_data = file_data_read(MODEM_IMAGE_DEVICE, MODEM_IMAGE_SIZE, 0x1000);
+    modem_image_data = file_data_read(CRESPO_MODEM_IMAGE_DEVICE, CRESPO_MODEM_IMAGE_SIZE, 0x1000);
     if (modem_image_data == NULL) {
         ipc_client_log(client, "Reading modem image data failed");
         goto error;
     }
     ipc_client_log(client, "Read modem image data");
 
-    modem_ctl_fd = open(MODEM_CTL_DEVICE, O_RDWR | O_NDELAY);
+    modem_ctl_fd = open(CRESPO_MODEM_CTL_DEVICE, O_RDWR | O_NDELAY);
     if (modem_ctl_fd < 0) {
         ipc_client_log(client, "Opening modem ctl failed");
         goto error;
@@ -72,7 +72,7 @@ int crespo_ipc_bootstrap(struct ipc_client *client)
     }
     ipc_client_log(client, "Reset modem");
 
-    serial_fd = open(MODEM_SERIAL_DEVICE, O_RDWR | O_NDELAY);
+    serial_fd = open(CRESPO_MODEM_SERIAL_DEVICE, O_RDWR | O_NDELAY);
     if (serial_fd < 0) {
         ipc_client_log(client, "Opening serial failed");
         goto error;
@@ -81,21 +81,21 @@ int crespo_ipc_bootstrap(struct ipc_client *client)
 
     usleep(100000);
 
-    rc = xmm6160_psi_send(client, serial_fd, modem_image_data, MODEM_IMAGE_SIZE);
+    rc = xmm6160_psi_send(client, serial_fd, modem_image_data, CRESPO_MODEM_IMAGE_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 PSI failed");
         goto error;
     }
     ipc_client_log(client, "Sent XMM6160 PSI");
 
-    rc = xmm6160_modem_image_send(client, modem_ctl_fd, NULL, modem_image_data, MODEM_IMAGE_SIZE, 0);
+    rc = xmm6160_modem_image_send(client, modem_ctl_fd, NULL, modem_image_data, CRESPO_MODEM_IMAGE_SIZE, 0);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 modem image failed");
         goto error;
     }
     ipc_client_log(client, "Sent XMM6160 modem image");
 
-    rc = xmm6160_nv_data_send(client, modem_ctl_fd, NULL, NV_DATA_OFFSET);
+    rc = xmm6160_nv_data_send(client, modem_ctl_fd, NULL, CRESPO_NV_DATA_OFFSET);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 nv_data failed");
         goto error;
@@ -158,7 +158,7 @@ int crespo_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *resp
         return -1;
 
     memset(&mio, 0, sizeof(struct modem_io));
-    mio.size = MODEM_DATA_SIZE;
+    mio.size = CRESPO_DATA_SIZE;
     mio.data = malloc(mio.size);
 
     rc = client->handlers->read(client->handlers->transport_data, &mio, sizeof(struct modem_io) + mio.size);
@@ -226,7 +226,7 @@ int crespo_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *resp
         return -1;
 
     memset(&mio, 0, sizeof(struct modem_io));
-    mio.size = MODEM_DATA_SIZE;
+    mio.size = CRESPO_DATA_SIZE;
     mio.data = malloc(mio.size);
 
     rc = client->handlers->read(client->handlers->transport_data, &mio, sizeof(struct modem_io) + mio.size);
@@ -260,23 +260,23 @@ complete:
     return rc;
 }
 
-int crespo_ipc_open(void *transport_data, int type)
+int crespo_ipc_open(void *data, int type)
 {
-    struct crespo_ipc_transport_data *data;
+    struct crespo_ipc_transport_data *transport_data;
     int fd;
 
-    if (transport_data == NULL)
+    if (data == NULL)
         return -1;
 
-    data = (struct crespo_ipc_transport_data *) transport_data;
+    transport_data = (struct crespo_ipc_transport_data *) data;
 
     switch(type)
     {
         case IPC_CLIENT_TYPE_FMT:
-            fd = open(MODEM_FMT_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+            fd = open(CRESPO_MODEM_FMT_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
             break;
         case IPC_CLIENT_TYPE_RFS:
-            fd = open(MODEM_RFS_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+            fd = open(CRESPO_MODEM_RFS_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
             break;
         default:
             return -1;
@@ -285,43 +285,43 @@ int crespo_ipc_open(void *transport_data, int type)
     if(fd < 0)
         return -1;
 
-    data->fd = fd;
+    transport_data->fd = fd;
 
     return 0;
 }
 
-int crespo_ipc_close(void *transport_data)
+int crespo_ipc_close(void *data)
 {
-    struct crespo_ipc_transport_data *data;
+    struct crespo_ipc_transport_data *transport_data;
     int fd;
 
-    if (transport_data == NULL)
+    if (data == NULL)
         return -1;
 
-    data = (struct crespo_ipc_transport_data *) transport_data;
+    transport_data = (struct crespo_ipc_transport_data *) data;
 
-    fd = data->fd;
+    fd = transport_data->fd;
     if (fd < 0)
         return -1;
 
-    data->fd = -1;
+    transport_data->fd = -1;
     close(fd);
 
     return 0;
 }
 
-int crespo_ipc_read(void *transport_data, void *buffer, unsigned int length)
+int crespo_ipc_read(void *data, void *buffer, unsigned int length)
 {
-    struct crespo_ipc_transport_data *data;
+    struct crespo_ipc_transport_data *transport_data;
     int fd;
     int rc;
 
-    if (transport_data == NULL || buffer == NULL || length == 0)
+    if (data == NULL || buffer == NULL || length == 0)
         return -1;
 
-    data = (struct crespo_ipc_transport_data *) transport_data;
+    transport_data = (struct crespo_ipc_transport_data *) data;
 
-    fd = data->fd;
+    fd = transport_data->fd;
     if (fd < 0)
         return -1;
 
@@ -332,18 +332,18 @@ int crespo_ipc_read(void *transport_data, void *buffer, unsigned int length)
     return 0;
 }
 
-int crespo_ipc_write(void *transport_data, void *buffer, unsigned int length)
+int crespo_ipc_write(void *data, void *buffer, unsigned int length)
 {
-    struct crespo_ipc_transport_data *data;
+    struct crespo_ipc_transport_data *transport_data;
     int fd;
     int rc;
 
-    if (transport_data == NULL || buffer == NULL || length == 0)
+    if (data == NULL || buffer == NULL || length == 0)
         return -1;
 
-    data = (struct crespo_ipc_transport_data *) transport_data;
+    transport_data = (struct crespo_ipc_transport_data *) data;
 
-    fd = data->fd;
+    fd = transport_data->fd;
     if (fd < 0)
         return -1;
 
@@ -354,19 +354,19 @@ int crespo_ipc_write(void *transport_data, void *buffer, unsigned int length)
     return 0;
 }
 
-int crespo_ipc_poll(void *transport_data, struct timeval *timeout)
+int crespo_ipc_poll(void *data, struct timeval *timeout)
 {
-    struct crespo_ipc_transport_data *data;
+    struct crespo_ipc_transport_data *transport_data;
     fd_set fds;
     int fd;
     int rc;
 
-    if (transport_data == NULL)
+    if (data == NULL)
         return -1;
 
-    data = (struct crespo_ipc_transport_data *) transport_data;
+    transport_data = (struct crespo_ipc_transport_data *) data;
 
-    fd = data->fd;
+    fd = transport_data->fd;
     if (fd < 0)
         return -1;
 
@@ -377,12 +377,12 @@ int crespo_ipc_poll(void *transport_data, struct timeval *timeout)
     return rc;
 }
 
-int crespo_ipc_power_on(void *power_data)
+int crespo_ipc_power_on(void *data)
 {
     int fd;
     int rc;
 
-    fd = open(MODEM_CTL_DEVICE, O_RDWR);
+    fd = open(CRESPO_MODEM_CTL_DEVICE, O_RDWR);
     if (fd < 0)
         return -1;
 
@@ -396,12 +396,12 @@ int crespo_ipc_power_on(void *power_data)
     return 0;
 }
 
-int crespo_ipc_power_off(void *power_data)
+int crespo_ipc_power_off(void *data)
 {
     int fd;
     int rc;
 
-    fd = open(MODEM_CTL_DEVICE, O_RDWR);
+    fd = open(CRESPO_MODEM_CTL_DEVICE, O_RDWR);
     if (fd < 0)
         return -1;
 
@@ -440,7 +440,7 @@ char *crespo_ipc_gprs_get_iface_single(int cid)
 {
     char *iface = NULL;
 
-    asprintf(&iface, "%s%d", GPRS_IFACE_PREFIX, 0);
+    asprintf(&iface, "%s%d", CRESPO_GPRS_IFACE_PREFIX, 0);
 
     return iface;
 }
@@ -460,10 +460,10 @@ char *crespo_ipc_gprs_get_iface(int cid)
 {
     char *iface = NULL;
 
-    if (cid > GPRS_IFACE_COUNT)
+    if (cid > CRESPO_GPRS_IFACE_COUNT)
         return NULL;
 
-    asprintf(&iface, "%s%d", GPRS_IFACE_PREFIX, cid - 1);
+    asprintf(&iface, "%s%d", CRESPO_GPRS_IFACE_PREFIX, cid - 1);
 
     return iface;
 }
@@ -474,7 +474,7 @@ int crespo_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabi
         return -1;
 
     capabilities->port_list = 0;
-    capabilities->cid_max = GPRS_IFACE_COUNT;
+    capabilities->cid_max = CRESPO_GPRS_IFACE_COUNT;
 
     return 0;
 }

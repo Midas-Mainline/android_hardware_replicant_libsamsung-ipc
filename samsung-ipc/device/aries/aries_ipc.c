@@ -61,21 +61,21 @@ int aries_ipc_bootstrap(struct ipc_client *client)
 
     ipc_client_log(client, "Starting aries modem bootstrap");
 
-    modem_image_data = file_data_read(MODEM_IMAGE_DEVICE, MODEM_IMAGE_SIZE, 0x1000);
+    modem_image_data = file_data_read(ARIES_MODEM_IMAGE_DEVICE, ARIES_MODEM_IMAGE_SIZE, 0x1000);
     if (modem_image_data == NULL) {
         ipc_client_log(client, "Reading modem image data failed");
         goto error;
     }
     ipc_client_log(client, "Read modem image data");
 
-    onedram_fd = open(ONEDRAM_DEVICE, O_RDWR);
+    onedram_fd = open(ARIES_ONEDRAM_DEVICE, O_RDWR);
     if (onedram_fd < 0) {
         ipc_client_log(client, "Opening onedram failed");
         goto error;
     }
     ipc_client_log(client, "Opened onedram");
 
-    rc = network_iface_down(MODEM_NETWORK_IFACE, AF_PHONET, SOCK_DGRAM);
+    rc = network_iface_down(ARIES_MODEM_IFACE, AF_PHONET, SOCK_DGRAM);
     if (rc < 0) {
         ipc_client_log(client, "Turning modem network iface down failed");
         goto error;
@@ -98,7 +98,7 @@ int aries_ipc_bootstrap(struct ipc_client *client)
     }
     ipc_client_log(client, "Powered the modem on");
 
-    serial_fd = open(MODEM_SERIAL_DEVICE, O_RDWR | O_NDELAY);
+    serial_fd = open(ARIES_MODEM_SERIAL_DEVICE, O_RDWR | O_NDELAY);
     if (serial_fd < 0) {
         ipc_client_log(client, "Opening serial failed");
         goto error;
@@ -107,7 +107,7 @@ int aries_ipc_bootstrap(struct ipc_client *client)
 
     usleep(100000);
 
-    rc = xmm6160_psi_send(client, serial_fd, modem_image_data, MODEM_IMAGE_SIZE);
+    rc = xmm6160_psi_send(client, serial_fd, modem_image_data, ARIES_MODEM_IMAGE_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 PSI failed");
         goto error;
@@ -140,38 +140,38 @@ int aries_ipc_bootstrap(struct ipc_client *client)
             ipc_client_log(client, "Reading onedram init failed");
             goto error;
         }
-    } while (onedram_init != ONEDRAM_INIT);
+    } while (onedram_init != ARIES_ONEDRAM_INIT);
     ipc_client_log(client, "Read onedram init (0x%x)", onedram_init);
 
-    onedram_address = mmap(NULL, ONEDRAM_MEMORY_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, onedram_fd, 0);
+    onedram_address = mmap(NULL, ARIES_ONEDRAM_MEMORY_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, onedram_fd, 0);
     if (onedram_address == NULL || onedram_address == (void *) 0xffffffff) {
             ipc_client_log(client, "Mapping onedram to memory failed");
             goto error;
     }
     ipc_client_log(client, "Mapped onedram to memory");
 
-    rc = xmm6160_modem_image_send(client, -1, onedram_address, modem_image_data, MODEM_IMAGE_SIZE, 0);
+    rc = xmm6160_modem_image_send(client, -1, onedram_address, modem_image_data, ARIES_MODEM_IMAGE_SIZE, 0);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 modem image failed");
         goto error;
     }
     ipc_client_log(client, "Sent XMM6160 modem image");
 
-    rc = xmm6160_nv_data_send(client, -1, onedram_address, NV_DATA_OFFSET);
+    rc = xmm6160_nv_data_send(client, -1, onedram_address, ARIES_NV_DATA_OFFSET);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6160 nv_data failed");
         goto error;
     }
     ipc_client_log(client, "Sent XMM6160 nv_data");
 
-    munmap(onedram_address, ONEDRAM_MEMORY_SIZE);
+    munmap(onedram_address, ARIES_ONEDRAM_MEMORY_SIZE);
     onedram_address = NULL;
 
     rc = ioctl(onedram_fd, ONEDRAM_REL_SEM);
     if (rc < 0)
         goto error;
 
-    onedram_magic = ONEDRAM_MAGIC;
+    onedram_magic = ARIES_ONEDRAM_MAGIC;
     rc = write(onedram_fd, &onedram_magic, sizeof(onedram_magic));
     if (rc < (int) sizeof(onedram_magic)) {
         ipc_client_log(client, "Writing onedram magic failed");
@@ -203,7 +203,7 @@ int aries_ipc_bootstrap(struct ipc_client *client)
             ipc_client_log(client, "Reading onedram deinit failed");
             goto error;
         }
-    } while (onedram_deinit != ONEDRAM_DEINIT);
+    } while (onedram_deinit != ARIES_ONEDRAM_DEINIT);
     ipc_client_log(client, "Read onedram deinit (0x%x)", onedram_deinit);
 
     rc = 0;
@@ -220,7 +220,7 @@ complete:
         close(serial_fd);
 
     if (onedram_address != NULL)
-        munmap(onedram_address, ONEDRAM_MEMORY_SIZE);
+        munmap(onedram_address, ARIES_ONEDRAM_MEMORY_SIZE);
 
     if (onedram_fd >= 0)
         close(onedram_fd);
@@ -262,9 +262,9 @@ int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *respo
     if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || response == NULL)
         return -1;
 
-    buffer = malloc(MODEM_DATA_SIZE);
+    buffer = malloc(ARIES_DATA_SIZE);
 
-    rc = client->handlers->read(client->handlers->transport_data, buffer, MODEM_DATA_SIZE);
+    rc = client->handlers->read(client->handlers->transport_data, buffer, ARIES_DATA_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Reading FMT data from the modem failed");
         goto error;
@@ -336,7 +336,7 @@ int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *respo
     if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || response == NULL)
         return -1;
 
-    length = MODEM_DATA_SIZE;
+    length = ARIES_DATA_SIZE;
     buffer = malloc(length);
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
@@ -372,9 +372,9 @@ complete:
     return rc;
 }
 
-int aries_ipc_open(void *transport_data, int type)
+int aries_ipc_open(void *data, int type)
 {
-    struct aries_ipc_transport_data *data;
+    struct aries_ipc_transport_data *transport_data;
     struct sockaddr_pn *spn;
     struct ifreq ifr;
 
@@ -384,16 +384,16 @@ int aries_ipc_open(void *transport_data, int type)
     int fd;
     int rc;
 
-    if (transport_data == NULL)
+    if (data == NULL)
         return -1;
 
-    data = (struct aries_ipc_transport_data *) transport_data;
+    transport_data = (struct aries_ipc_transport_data *) data;
     memset(data, 0, sizeof(struct aries_ipc_transport_data));
 
-    spn = &data->spn;
+    spn = &transport_data->spn;
 
     memset(&ifr, 0, sizeof(ifr));
-    strncpy(ifr.ifr_name, MODEM_NETWORK_IFACE, IFNAMSIZ);
+    strncpy(ifr.ifr_name, ARIES_MODEM_IFACE, IFNAMSIZ);
 
     spn->spn_family = AF_PHONET;
     spn->spn_dev = 0;
@@ -401,10 +401,10 @@ int aries_ipc_open(void *transport_data, int type)
     switch (type)
     {
         case IPC_CLIENT_TYPE_FMT:
-            spn->spn_resource = MODEM_FMT_SPN_RESSOURCE;
+            spn->spn_resource = ARIES_MODEM_FMT_SPN;
             break;
         case IPC_CLIENT_TYPE_RFS:
-            spn->spn_resource = MODEM_RFS_SPN_RESSOURCE;
+            spn->spn_resource = ARIES_MODEM_RFS_SPN;
             break;
         default:
             break;
@@ -431,105 +431,106 @@ int aries_ipc_open(void *transport_data, int type)
     if (rc < 0)
         return -1;
 
-    data->fd = fd;
+    transport_data->fd = fd;
 
     if (type == IPC_CLIENT_TYPE_RFS)
     {
-        socket_rfs_magic = MODEM_SOCKET_RFS_MAGIC;
+        socket_rfs_magic = ARIES_SOCKET_RFS_MAGIC;
         rc = setsockopt(fd, SOL_SOCKET, SO_IPC_RFS, &socket_rfs_magic, sizeof(socket_rfs_magic));
         if (rc < 0)
             return -1;
     }
 
-    rc = network_iface_up(MODEM_NETWORK_IFACE, AF_PHONET, SOCK_DGRAM);
+    rc = network_iface_up(ARIES_MODEM_IFACE, AF_PHONET, SOCK_DGRAM);
     if (rc < 0)
         return -1;
 
     return 0;
 }
 
-int aries_ipc_close(void *transport_data)
+int aries_ipc_close(void *data)
 {
-    struct aries_ipc_transport_data *data;
+    struct aries_ipc_transport_data *transport_data;
     int fd;
 
-    if (transport_data == NULL)
+    if (data == NULL)
         return -1;
 
-    data = (struct aries_ipc_transport_data *) transport_data;
+    transport_data = (struct aries_ipc_transport_data *) data;
 
-    fd = data->fd;
+    fd = transport_data->fd;
     if (fd < 0)
         return -1;
 
+    transport_data->fd = -1;
     close(fd);
 
     return 0;
 }
 
-int aries_ipc_read(void *transport_data, void *buffer, unsigned int length)
+int aries_ipc_read(void *data, void *buffer, unsigned int length)
 {
-    struct aries_ipc_transport_data *data;
+    struct aries_ipc_transport_data *transport_data;
     int spn_size;
     int fd;
     int rc;
 
-    if (transport_data == NULL || buffer == NULL || length == 0)
+    if (data == NULL || buffer == NULL || length == 0)
         return -1;
 
-    data = (struct aries_ipc_transport_data *) transport_data;
+    transport_data = (struct aries_ipc_transport_data *) data;
 
-    fd = data->fd;
+    fd = transport_data->fd;
     if (fd < 0)
         return -1;
 
     spn_size = sizeof(struct sockaddr_pn);
 
-    rc = recvfrom(fd, buffer, length, 0, (const struct sockaddr *) &data->spn, &spn_size);
+    rc = recvfrom(fd, buffer, length, 0, (const struct sockaddr *) &transport_data->spn, &spn_size);
     if (rc < 0)
         return -1;
 
     return 0;
 }
 
-int aries_ipc_write(void *transport_data, void *buffer, unsigned int length)
+int aries_ipc_write(void *data, void *buffer, unsigned int length)
 {
-    struct aries_ipc_transport_data *data;
+    struct aries_ipc_transport_data *transport_data;
     int spn_size;
     int fd;
     int rc;
 
-    if (transport_data == NULL || buffer == NULL || length == 0)
+    if (data == NULL || buffer == NULL || length == 0)
         return -1;
 
-    data = (struct aries_ipc_transport_data *) transport_data;
+    transport_data = (struct aries_ipc_transport_data *) data;
 
-    fd = data->fd;
+    fd = transport_data->fd;
     if (fd < 0)
         return -1;
 
     spn_size = sizeof(struct sockaddr_pn);
 
-    rc = sendto(fd, buffer, length, 0, (const struct sockaddr *) &data->spn, spn_size);
+    rc = sendto(fd, buffer, length, 0, (const struct sockaddr *) &transport_data->spn, spn_size);
     if (rc < 0)
         return -1;
 
     return 0;
 }
 
-int aries_ipc_poll(void *transport_data, struct timeval *timeout)
+int aries_ipc_poll(void *data, struct timeval *timeout)
 {
-    struct aries_ipc_transport_data *data;
+    struct aries_ipc_transport_data *transport_data;
     fd_set fds;
     int fd;
     int rc;
 
-    if (transport_data == NULL)
+    if (data == NULL)
         return -1;
 
-    data = (struct aries_ipc_transport_data *) transport_data;
+    transport_data = (struct aries_ipc_transport_data *) data;
 
-    fd = data->fd;
+    fd = transport_data->fd;
     if (fd < 0)
         return -1;
 
@@ -540,13 +541,13 @@ int aries_ipc_poll(void *transport_data, struct timeval *timeout)
     return rc;
 }
 
-int aries_ipc_power_on(void *power_data)
+int aries_ipc_power_on(void *data)
 {
     char buffer[] = "on\n";
     int value;
     int rc;
 
-    value = sysfs_value_read(MODEMCTL_STATUS_SYSFS);
+    value = sysfs_value_read(ARIES_MODEMCTL_STATUS_SYSFS);
     if (value < 0)
         return -1;
 
@@ -554,20 +555,20 @@ int aries_ipc_power_on(void *power_data)
     if (value == 1)
         return 0;
 
-    rc = sysfs_string_write(MODEMCTL_CONTROL_SYSFS, (char *) &buffer, strlen(buffer));
+    rc = sysfs_string_write(ARIES_MODEMCTL_CONTROL_SYSFS, (char *) &buffer, strlen(buffer));
     if (rc < 0)
         return -1;
 
     return 0;
 }
 
-int aries_ipc_power_off(void *power_data)
+int aries_ipc_power_off(void *data)
 {
     char buffer[] = "off\n";
     int value;
     int rc;
 
-    value = sysfs_value_read(MODEMCTL_STATUS_SYSFS);
+    value = sysfs_value_read(ARIES_MODEMCTL_STATUS_SYSFS);
     if (value < 0)
         return -1;
 
@@ -575,7 +576,7 @@ int aries_ipc_power_off(void *power_data)
     if (value == 0)
         return 0;
 
-    rc = sysfs_string_write(MODEMCTL_CONTROL_SYSFS, (char *) &buffer, strlen(buffer));
+    rc = sysfs_string_write(ARIES_MODEMCTL_CONTROL_SYSFS, (char *) &buffer, strlen(buffer));
     if (rc < 0)
         return -1;
 
@@ -603,22 +604,22 @@ int aries_ipc_data_destroy(void *transport_data, void *power_data, void *gprs_da
     return 0;
 }
 
-int aries_ipc_gprs_activate(void *gprs_data, int cid)
+int aries_ipc_gprs_activate(void *data, int cid)
 {
     int rc;
 
-    rc = sysfs_value_write(MODEM_PDP_ACTIVATE_SYSFS, cid);
+    rc = sysfs_value_write(ARIES_MODEM_PDP_ACTIVATE_SYSFS, cid);
     if (rc < 0)
         return -1;
 
     return 0;
 }
 
-int aries_ipc_gprs_deactivate(void *gprs_data, int cid)
+int aries_ipc_gprs_deactivate(void *data, int cid)
 {
     int rc;
 
-    rc = sysfs_value_write(MODEM_PDP_DEACTIVATE_SYSFS, cid);
+    rc = sysfs_value_write(ARIES_MODEM_PDP_DEACTIVATE_SYSFS, cid);
     if (rc < 0)
         return -1;
 
@@ -639,13 +640,13 @@ char *aries_ipc_gprs_get_iface(int cid)
     if (fd < 0)
         return NULL;
 
-    for(i = (GPRS_IFACE_COUNT - 1); i >= 0; i--) {
-        sprintf(ifr.ifr_name, "%s%d", GPRS_IFACE_PREFIX, i);
+    for(i = (ARIES_GPRS_IFACE_COUNT - 1); i >= 0; i--) {
+        sprintf(ifr.ifr_name, "%s%d", ARIES_GPRS_IFACE_PREFIX, i);
         rc = ioctl(fd, SIOCGIFFLAGS, &ifr);
         if(rc < 0 || ifr.ifr_flags & IFF_UP) {
             continue;
         } else {
-            asprintf(&iface, "%s%d", GPRS_IFACE_PREFIX, i);
+            asprintf(&iface, "%s%d", ARIES_GPRS_IFACE_PREFIX, i);
             return iface;
         }
     }
@@ -659,7 +660,7 @@ int aries_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabil
         return -1;
 
     capabilities->port_list = 1;
-    capabilities->cid_max = GPRS_IFACE_COUNT;
+    capabilities->cid_max = ARIES_GPRS_IFACE_COUNT;
 
     return 0;
 }

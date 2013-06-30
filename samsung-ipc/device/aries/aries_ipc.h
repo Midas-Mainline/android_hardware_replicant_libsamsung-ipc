@@ -24,30 +24,30 @@
 #ifndef __ARIES_IPC_H__
 #define __ARIES_IPC_H__
 
-#define MODEM_IMAGE_SIZE                                        0xA00000
-#define NV_DATA_OFFSET                                          0xD80000
-#define ONEDRAM_MEMORY_SIZE                                     0xFFF000
-#define ONEDRAM_INIT                                            0x12341234
-#define ONEDRAM_MAGIC                                           0x45674567
-#define ONEDRAM_DEINIT                                          0xABCDABCD
-#define MODEM_DATA_SIZE                                         0x50000
-#define MODEM_SOCKET_RFS_MAGIC                                  0x80000
+#define ARIES_MODEM_IMAGE_SIZE                                  0xA00000
+#define ARIES_NV_DATA_OFFSET                                    0xD80000
+#define ARIES_ONEDRAM_MEMORY_SIZE                               0xFFF000
+#define ARIES_ONEDRAM_INIT                                      0x12341234
+#define ARIES_ONEDRAM_MAGIC                                     0x45674567
+#define ARIES_ONEDRAM_DEINIT                                    0xABCDABCD
+#define ARIES_DATA_SIZE                                         0x50000
+#define ARIES_SOCKET_RFS_MAGIC                                  0x80000
 
 #define SO_IPC_RFS                                              0x21
-#define MODEM_FMT_SPN_RESSOURCE                                 0x01
-#define MODEM_RFS_SPN_RESSOURCE                                 0x41
+#define ARIES_MODEM_FMT_SPN                                     0x01
+#define ARIES_MODEM_RFS_SPN                                     0x41
 
-#define MODEM_IMAGE_DEVICE                      "/dev/block/bml12"
-#define MODEM_SERIAL_DEVICE                     "/dev/s3c2410_serial3"
-#define ONEDRAM_DEVICE                          "/dev/onedram"
-#define MODEMCTL_STATUS_SYSFS                   "/sys/class/modemctl/xmm/status"
-#define MODEMCTL_CONTROL_SYSFS                  "/sys/class/modemctl/xmm/control"
-#define MODEM_NETWORK_IFACE                     "svnet0"
-#define MODEM_PDP_ACTIVATE_SYSFS                "/sys/class/net/svnet0/pdp/activate"
-#define MODEM_PDP_DEACTIVATE_SYSFS              "/sys/class/net/svnet0/pdp/deactivate"
+#define ARIES_MODEM_IMAGE_DEVICE                "/dev/block/bml12"
+#define ARIES_MODEM_SERIAL_DEVICE               "/dev/s3c2410_serial3"
+#define ARIES_ONEDRAM_DEVICE                    "/dev/onedram"
+#define ARIES_MODEMCTL_STATUS_SYSFS             "/sys/class/modemctl/xmm/status"
+#define ARIES_MODEMCTL_CONTROL_SYSFS            "/sys/class/modemctl/xmm/control"
+#define ARIES_MODEM_IFACE                       "svnet0"
+#define ARIES_MODEM_PDP_ACTIVATE_SYSFS          "/sys/class/net/svnet0/pdp/activate"
+#define ARIES_MODEM_PDP_DEACTIVATE_SYSFS        "/sys/class/net/svnet0/pdp/deactivate"
 
-#define GPRS_IFACE_PREFIX                       "pdp"
-#define GPRS_IFACE_COUNT                                        3
+#define ARIES_GPRS_IFACE_PREFIX                 "pdp"
+#define ARIES_GPRS_IFACE_COUNT                                  3
 
 struct aries_ipc_transport_data {
     struct sockaddr_pn spn;

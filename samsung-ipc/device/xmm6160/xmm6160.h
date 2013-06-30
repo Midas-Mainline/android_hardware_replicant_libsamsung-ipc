@@ -23,12 +23,12 @@
 #ifndef __XMM6160_H__
 #define __XMM6160_H__
 
-#define MODEM_AT                                "AT"
-#define MODEM_AT_COUNT                                          20
-#define MODEM_PSI_SIZE                                          0x5000
-#define MODEM_PSI_MAGIC                                         0x30
-#define MODEM_PSI_ACK                                           0x01
-#define MODEM_BOOTCORE_VERSION                                  0xF0
+#define XMM6160_AT                              "AT"
+#define XMM6160_AT_COUNT                                        20
+#define XMM6160_PSI_SIZE                                        0x5000
+#define XMM6160_PSI_MAGIC                                       0x30
+#define XMM6160_PSI_ACK                                         0x01
+#define XMM6160_BOOTCORE_VERSION                                0xF0
 
 int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     void *modem_image_data, int modem_image_size);
