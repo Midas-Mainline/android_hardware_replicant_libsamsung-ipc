@@ -23,6 +23,8 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
+
 #ifndef __XMM6260_IPC_H__
 #define __XMM6260_IPC_H__
 

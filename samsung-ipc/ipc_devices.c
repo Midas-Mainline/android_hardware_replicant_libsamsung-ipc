@@ -32,7 +32,7 @@ struct ipc_device_desc ipc_devices[] = {
         .fmt_ops = &crespo_ipc_fmt_ops,
         .rfs_ops = &crespo_ipc_rfs_ops,
         .handlers = &crespo_ipc_handlers,
-        .gprs_specs = &crespo_2_6_35_ipc_gprs_specs,
+        .gprs_specs = &crespo_ipc_gprs_specs_single,
         .nv_data_specs = NULL,
     },
     {
@@ -42,7 +42,7 @@ struct ipc_device_desc ipc_devices[] = {
         .fmt_ops = &crespo_ipc_fmt_ops,
         .rfs_ops = &crespo_ipc_rfs_ops,
         .handlers = &crespo_ipc_handlers,
-        .gprs_specs = &crespo_3_0_ipc_gprs_specs,
+        .gprs_specs = &crespo_ipc_gprs_specs,
         .nv_data_specs = NULL,
     },
     {

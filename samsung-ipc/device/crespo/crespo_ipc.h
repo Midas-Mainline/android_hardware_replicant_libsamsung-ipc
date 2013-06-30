@@ -1,7 +1,7 @@
-/**
+/*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,15 +21,18 @@
 #ifndef __CRESPO_IPC_H__
 #define __CRESPO_IPC_H__
 
-#define BOOTCORE_VERSION        0xf0
-#define PSI_MAGIC               0x30
-#define PSI_DATA_LEN            0x5000
-#define RADIO_IMG_SIZE          0xd80000
+#define MODEM_IMAGE_SIZE                                        0xD80000
+#define NV_DATA_OFFSET                                          0xD80000
+#define MODEM_DATA_SIZE                                         0x50000
 
-#define MAX_MODEM_DATA_SIZE     0x50000
+#define MODEM_IMAGE_DEVICE                      "/dev/mtd/mtd5ro"
+#define MODEM_SERIAL_DEVICE                     "/dev/s3c2410_serial3"
+#define MODEM_CTL_DEVICE                        "/dev/modem_ctl"
+#define MODEM_FMT_DEVICE                        "/dev/modem_fmt"
+#define MODEM_RFS_DEVICE                        "/dev/modem_rfs"
 
-#define GPRS_IFACE_PREFIX       "rmnet"
-#define GPRS_IFACE_COUNT        3
+#define GPRS_IFACE_PREFIX                       "rmnet"
+#define GPRS_IFACE_COUNT                                        3
 
 struct crespo_ipc_transport_data {
     int fd;

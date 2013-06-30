@@ -42,8 +42,8 @@ extern int ipc_devices_count;
 extern struct ipc_ops crespo_ipc_fmt_ops;
 extern struct ipc_ops crespo_ipc_rfs_ops;
 extern struct ipc_handlers crespo_ipc_handlers;
-extern struct ipc_gprs_specs crespo_2_6_35_ipc_gprs_specs;
-extern struct ipc_gprs_specs crespo_3_0_ipc_gprs_specs;
+extern struct ipc_gprs_specs crespo_ipc_gprs_specs_single;
+extern struct ipc_gprs_specs crespo_ipc_gprs_specs;
 
 /* aries */
 extern struct ipc_ops aries_ipc_fmt_ops;

@@ -8,7 +8,6 @@ LOCAL_MODULE := libsamsung-ipc
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_C_INCLUDES := external/openssl/include
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/samsung-ipc/device/xmm6260/
 LOCAL_LDFLAGS += -lcrypto
 
 ifeq ($(TARGET_DEVICE),crespo)
@@ -63,6 +62,7 @@ samsung-ipc_files := \
 	samsung-ipc/util.c \
 	samsung-ipc/device/crespo/crespo_ipc.c \
 	samsung-ipc/device/aries/aries_ipc.c \
+	samsung-ipc/device/xmm6160/xmm6160.c \
 	samsung-ipc/device/xmm6260/xmm6260_loader.c \
 	samsung-ipc/device/xmm6260/xmm6260_modemctl.c \
 	samsung-ipc/device/xmm6260/xmm6260_ipc.c \
@@ -77,8 +77,11 @@ LOCAL_SRC_FILES := $(samsung-ipc_files)
 LOCAL_CFLAGS += -DIPC_BOARD_NAME_EXPLICIT=\"$(board_name)\"
 
 LOCAL_SHARED_LIBRARIES := libutils
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/include \
-	$(LOCAL_PATH)/samsung-ipc
+LOCAL_C_INCLUDES += \
+	$(LOCAL_PATH)/include \
+	$(LOCAL_PATH)/samsung-ipc \
+	$(LOCAL_PATH)/samsung-ipc/device/xmm6160/ \
+	$(LOCAL_PATH)/samsung-ipc/device/xmm6260/
 
 include $(BUILD_STATIC_LIBRARY)
 

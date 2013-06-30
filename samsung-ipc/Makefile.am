@@ -3,6 +3,7 @@ NULL =
 AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/samsung-ipc \
+	-I$(top_srcdir)/samsung-ipc/device/xmm6160 \
 	-I$(top_srcdir)/samsung-ipc/device/xmm6260 \
 	$(OPENSSL_CFLAGS) \
 	$(NULL)
@@ -39,6 +40,8 @@ libsamsung_ipc_la_SOURCES = \
 	device/aries/phonet.h \
 	device/crespo/crespo_modem_ctl.h \
 	device/crespo/crespo_ipc.h \
+	device/xmm6160/xmm6160.c \
+	device/xmm6160/xmm6160.h \
 	device/xmm6260/xmm6260_loader.c \
 	device/xmm6260/xmm6260_loader.h \
 	device/xmm6260/xmm6260_modemctl.c \

@@ -22,544 +22,354 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdint.h>
-#include <unistd.h>
 #include <stdbool.h>
-#include <termios.h>
+#include <string.h>
 #include <fcntl.h>
-#include <string.h>
+#include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <linux/netlink.h>
 #include <net/if.h>
-#include <asm/types.h>
-#include <mtd/mtd-abi.h>
-#include <assert.h>
-#include <string.h>
 
 #include <samsung-ipc.h>
+#include <ipc.h>
+#include <util.h>
 
-#include "aries_ipc.h"
-#include "ipc.h"
 #include "sipc4.h"
 #include "onedram.h"
 #include "phonet.h"
 
-int phonet_iface_ifdown(void)
-{
-    struct ifreq ifr;
-    int fd;
-    int rc;
-
-    memset(&ifr, 0, sizeof(ifr));
-    strncpy(ifr.ifr_name, PHONET_IFACE, IFNAMSIZ);
-
-    fd = socket(AF_PHONET, SOCK_DGRAM, 0);
-
-    rc = ioctl(fd, SIOCGIFFLAGS, &ifr);
-    if(rc < 0)
-        return -1;
-
-    ifr.ifr_flags = (ifr.ifr_flags & (~IFF_UP));
-
-    rc = ioctl(fd, SIOCSIFFLAGS, &ifr);
-    if(rc < 0)
-        return -1;
-
-    close(fd);
-
-    return 0;
-}
-
-int phonet_iface_ifup(void)
-{
-    struct ifreq ifr;
-    int fd;
-    int rc;
-
-    memset(&ifr, 0, sizeof(ifr));
-    strncpy(ifr.ifr_name, PHONET_IFACE, IFNAMSIZ);
-
-    fd = socket(AF_PHONET, SOCK_DGRAM, 0);
-
-    rc = ioctl(fd, SIOCGIFFLAGS, &ifr);
-    if(rc < 0)
-        return -1;
-
-    ifr.ifr_flags |= IFF_UP;
-
-    rc = ioctl(fd, SIOCSIFFLAGS, &ifr);
-    if(rc < 0)
-        return -1;
-
-    close(fd);
-
-    return 0;
-}
+#include "xmm6160.h"
+#include "aries_ipc.h"
 
 int aries_ipc_bootstrap(struct ipc_client *client)
 {
-    int s3c2410_serial3_fd = -1;
+    void *modem_image_data = NULL;
+    void *onedram_address = NULL;
+    unsigned int onedram_init;
+    unsigned int onedram_magic;
+    unsigned int onedram_deinit;
+
     int onedram_fd = -1;
+    int serial_fd = -1;
 
-    /* Control variables. */
-    int rc = 0;
-
-    /* Boot variables */
-    uint8_t *radio_img_p = NULL;
-    uint32_t onedram_data = 0;
-    uint8_t bootcore_version = 0;
-    uint8_t info_size = 0;
-    uint8_t crc_byte = 0;
-    int block_size = 0;
-
-    /* s3c2410 serial setup variables. */
-    struct termios termios;
-    int serial;
-
-    /* fds maniplation variables */
     struct timeval timeout;
     fd_set fds;
 
-    /* nv_data variables */
-    void *nv_data_p;
-    void *onedram_p;
-
-    /* General purpose variables. */
-    uint8_t data;
-    uint16_t data_16;
-    uint8_t *data_p;
+    int rc;
     int i;
 
-    ipc_client_log(client, "aries_ipc_bootstrap: enter");
+    ipc_client_log(client, "Starting aries modem bootstrap");
 
-    /* Read the radio.img image. */
-    ipc_client_log(client, "aries_ipc_bootstrap: reading radio image");
-    radio_img_p = ipc_client_mtd_read(client, "/dev/block/bml12", RADIO_IMG_READ_SIZE, RADIO_IMG_READ_SIZE);
-    ipc_client_log(client, "aries_ipc_bootstrap: radio image read");
-
-    ipc_client_log(client, "aries_ipc_bootstrap: open onedram");
-    onedram_fd=open("/dev/onedram", O_RDWR);
-    if(onedram_fd < 0)
+    modem_image_data = file_data_read(MODEM_IMAGE_DEVICE, MODEM_IMAGE_SIZE, 0x1000);
+    if (modem_image_data == NULL) {
+        ipc_client_log(client, "Reading modem image data failed");
         goto error;
+    }
+    ipc_client_log(client, "Read modem image data");
 
-    /* Reset the modem before init to send the first part of modem.img. */
-    ipc_client_log(client, "aries_ipc_bootstrap: turning %s iface down", PHONET_IFACE);
-    rc = phonet_iface_ifdown();
-    if(rc < 0)
+    onedram_fd = open(ONEDRAM_DEVICE, O_RDWR);
+    if (onedram_fd < 0) {
+        ipc_client_log(client, "Opening onedram failed");
         goto error;
+    }
+    ipc_client_log(client, "Opened onedram");
 
-    ipc_client_power_off(client);
-    ipc_client_log(client, "aries_ipc_bootstrap: sent PHONE \"off\" command");
+    rc = network_iface_down(MODEM_NETWORK_IFACE, AF_PHONET, SOCK_DGRAM);
+    if (rc < 0) {
+        ipc_client_log(client, "Turning modem network iface down failed");
+        goto error;
+    }
+    ipc_client_log(client, "Turned modem network iface down");
+
+    rc = ipc_client_power_off(client);
+    if (rc < 0) {
+        ipc_client_log(client, "Powering the modem off failed");
+        goto error;
+    }
+    ipc_client_log(client, "Powered the modem off");
+
     usleep(1000);
 
-    ipc_client_power_on(client);
-    ipc_client_log(client, "aries_ipc_bootstrap: sent PHONE \"on\" command");
-    usleep(200000);
-
-    ipc_client_log(client, "aries_ipc_bootstrap: open s3c2410_serial3");
-    s3c2410_serial3_fd=open("/dev/s3c2410_serial3", O_RDWR);
-    if(s3c2410_serial3_fd < 0)
-        goto error;
-
-    /* Setup the s3c2410 serial. */
-    ipc_client_log(client, "aries_ipc_bootstrap: setup s3c2410_serial3");
-    tcgetattr(s3c2410_serial3_fd, &termios);
-
-    cfmakeraw(&termios);
-    cfsetispeed(&termios, B115200);
-    cfsetospeed(&termios, B115200);
-
-    tcsetattr(s3c2410_serial3_fd, TCSANOW, &termios);
-
-    /* Send 'AT' in ASCII. */
-    ipc_client_log(client, "aries_ipc_bootstrap: sending AT in ASCII");
-    for(i=0 ; i < 20 ; i++)
-    {
-        rc = write(s3c2410_serial3_fd, "AT", 2);
-        usleep(50000);
-    }
-    ipc_client_log(client, "aries_ipc_bootstrap: sending AT in ASCII done");
-
-    /* Write the first part of modem.img. */
-    FD_ZERO(&fds);
-    FD_SET(s3c2410_serial3_fd, &fds);
-
-    timeout.tv_sec=5;
-    timeout.tv_usec=0;
-
-    if(select(s3c2410_serial3_fd + 1, &fds, NULL, NULL, &timeout) == 0)
-    {
-        ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
+    rc = ipc_client_power_on(client);
+    if (rc < 0) {
+        ipc_client_log(client, "Powering the modem on failed");
         goto error;
     }
+    ipc_client_log(client, "Powered the modem on");
 
-    /* Get and check bootcore version. */
-    read(s3c2410_serial3_fd, &bootcore_version, sizeof(bootcore_version));
-    ipc_client_log(client, "aries_ipc_bootstrap: got bootcore version: 0x%x", bootcore_version);
-
-    if(bootcore_version != BOOTCORE_VERSION)
+    serial_fd = open(MODEM_SERIAL_DEVICE, O_RDWR | O_NDELAY);
+    if (serial_fd < 0) {
+        ipc_client_log(client, "Opening serial failed");
         goto error;
+    }
+    ipc_client_log(client, "Opened serial");
+
+    usleep(100000);
+
+    rc = xmm6160_psi_send(client, serial_fd, modem_image_data, MODEM_IMAGE_SIZE);
+    if (rc < 0) {
+        ipc_client_log(client, "Sending XMM6160 PSI failed");
+        goto error;
+    }
+    ipc_client_log(client, "Sent XMM6160 PSI");
+
+    onedram_init = 0;
 
     FD_ZERO(&fds);
-    FD_SET(s3c2410_serial3_fd, &fds);
+    FD_SET(onedram_fd, &fds);
 
-    timeout.tv_sec=5;
-    timeout.tv_usec=0;
+    timeout.tv_sec = 4;
+    timeout.tv_usec = 0;
 
-    if(select(s3c2410_serial3_fd + 1, &fds, NULL, NULL, &timeout) == 0)
-    {
-        ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-        goto error;
-    }
-
-    /* Get info_size. */
-    read(s3c2410_serial3_fd, &info_size, sizeof(info_size));
-    ipc_client_log(client, "aries_ipc_bootstrap: got info_size: 0x%x", info_size);
-
-    /* Send PSI magic. */
-    data=PSI_MAGIC;
-    write(s3c2410_serial3_fd, &data, sizeof(uint8_t));
-    ipc_client_log(client, "aries_ipc_bootstrap: sent PSI_MAGIC (0x%x)", PSI_MAGIC);
-
-    /* Send PSI data len. */
-    data_16=PSI_DATA_LEN;
-    data_p=(uint8_t *)&data_16;
-
-    for(i=0 ; i < 2 ; i++)
-    {
-        write(s3c2410_serial3_fd, data_p, sizeof(uint8_t));
-        data_p++;
-    }
-    ipc_client_log(client, "aries_ipc_bootstrap: sent PSI_DATA_LEN (0x%x)", PSI_DATA_LEN);
-
-    timeout.tv_sec=5;
-    timeout.tv_usec=0;
-
-    data_p=radio_img_p;
-
-    ipc_client_log(client, "aries_ipc_bootstrap: sending the first part of radio.img");
-
-    for(i=0 ; i < PSI_DATA_LEN ; i++)
-    {
-        FD_ZERO(&fds);
-        FD_SET(s3c2410_serial3_fd, &fds);
-
-        if(select(s3c2410_serial3_fd + 1, NULL, &fds, NULL, &timeout) == 0)
-        {
-            ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
+    i = 0;
+    do {
+        rc = select(onedram_fd + 1, &fds, NULL, NULL, &timeout);
+        if (rc <= 0) {
+            ipc_client_log(client, "Reading onedram init failed");
             goto error;
         }
 
-        write(s3c2410_serial3_fd, data_p, 1);
-        crc_byte=crc_byte ^ *data_p;
+        rc = read(onedram_fd, &onedram_init, sizeof(onedram_init));
+        if (rc < (int) sizeof(onedram_init)) {
+            ipc_client_log(client, "Reading onedram init failed");
+            goto error;
+        }
 
-        data_p++;
+        if (i++ > 50) {
+            ipc_client_log(client, "Reading onedram init failed");
+            goto error;
+        }
+    } while (onedram_init != ONEDRAM_INIT);
+    ipc_client_log(client, "Read onedram init (0x%x)", onedram_init);
+
+    onedram_address = mmap(NULL, ONEDRAM_MEMORY_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, onedram_fd, 0);
+    if (onedram_address == NULL || onedram_address == (void *) 0xffffffff) {
+            ipc_client_log(client, "Mapping onedram to memory failed");
+            goto error;
     }
+    ipc_client_log(client, "Mapped onedram to memory");
 
-    ipc_client_log(client, "aries_ipc_bootstrap: first part of radio.img sent; crc_byte is 0x%x", crc_byte);
+    rc = xmm6160_modem_image_send(client, -1, onedram_address, modem_image_data, MODEM_IMAGE_SIZE, 0);
+    if (rc < 0) {
+        ipc_client_log(client, "Sending XMM6160 modem image failed");
+        goto error;
+    }
+    ipc_client_log(client, "Sent XMM6160 modem image");
+
+    rc = xmm6160_nv_data_send(client, -1, onedram_address, NV_DATA_OFFSET);
+    if (rc < 0) {
+        ipc_client_log(client, "Sending XMM6160 nv_data failed");
+        goto error;
+    }
+    ipc_client_log(client, "Sent XMM6160 nv_data");
+
+    munmap(onedram_address, ONEDRAM_MEMORY_SIZE);
+    onedram_address = NULL;
+
+    rc = ioctl(onedram_fd, ONEDRAM_REL_SEM);
+    if (rc < 0)
+        goto error;
+
+    onedram_magic = ONEDRAM_MAGIC;
+    rc = write(onedram_fd, &onedram_magic, sizeof(onedram_magic));
+    if (rc < (int) sizeof(onedram_magic)) {
+        ipc_client_log(client, "Writing onedram magic failed");
+        goto error;
+    }
+    ipc_client_log(client, "Wrote onedram magic");
 
     FD_ZERO(&fds);
-    FD_SET(s3c2410_serial3_fd, &fds);
+    FD_SET(onedram_fd, &fds);
 
-    if(select(s3c2410_serial3_fd + 1, NULL, &fds, NULL, &timeout) == 0)
-    {
-        ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
-        goto error;
-    }
+    timeout.tv_sec = 4;
+    timeout.tv_usec = 0;
 
-    write(s3c2410_serial3_fd, &crc_byte, sizeof(crc_byte));
-
-    ipc_client_log(client, "aries_ipc_bootstrap: crc_byte sent");
-
-    timeout.tv_sec=5;
-    timeout.tv_usec=0;
-
-    data = 0;
-    for(i = 0 ; data != 0x01 ; i++)
-    {
-        FD_ZERO(&fds);
-        FD_SET(s3c2410_serial3_fd, &fds);
-
-        if(select(s3c2410_serial3_fd + 1, &fds, NULL, NULL, &timeout) == 0)
-        {
-            ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
+    i = 0;
+    do {
+        rc = select(onedram_fd + 1, &fds, NULL, NULL, &timeout);
+        if (rc <= 0) {
+            ipc_client_log(client, "Reading onedram deinit failed");
             goto error;
         }
 
-        read(s3c2410_serial3_fd, &data, sizeof(data));
-
-        if(i > 50)
-        {
-            ipc_client_log(client, "aries_ipc_bootstrap: fairly too much attempts to get ACK");
-            goto error;
-        }
-    }
-
-    ipc_client_log(client, "aries_ipc_bootstrap: close s3c2410_serial3");
-    close(s3c2410_serial3_fd);
-
-    timeout.tv_sec=3;
-    timeout.tv_usec=0;
-
-    ipc_client_log(client, "aries_ipc_bootstrap: wait for 0x%04x from onedram", ONEDRAM_INIT_READ);
-
-    onedram_data = 0;
-    while(onedram_data != ONEDRAM_INIT_READ) {
-        FD_ZERO(&fds);
-        FD_SET(onedram_fd, &fds);
-
-        if(select(onedram_fd + 1, &fds, NULL, NULL, &timeout) == 0)
-        {
-            ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
+        rc = read(onedram_fd, &onedram_deinit, sizeof(onedram_deinit));
+        if (rc < (int) sizeof(onedram_deinit)) {
+            ipc_client_log(client, "Reading onedram deinit failed");
             goto error;
         }
 
-        read(onedram_fd, &onedram_data, sizeof(onedram_data));
-
-        ipc_client_log(client, "aries_ipc_bootstrap: read 0x%04x from onedram", onedram_data);
-    }
-
-    ipc_client_log(client, "aries_ipc_bootstrap: writing the rest of modem.img to onedram.");
-
-    /* Pointer to the remaining part of radio.img. */
-    data_p=radio_img_p + PSI_DATA_LEN;
-
-    onedram_p = mmap(NULL, ONENAND_MAP_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, onedram_fd, 0);
-
-    if(onedram_p == NULL || onedram_p < 0 || onedram_p == 0xffffffff)
-    {
-        ipc_client_log(client, "aries_ipc_bootstrap: could not map onedram to memory");
-        goto error;
-    }
-
-    ipc_client_log(client, "aries_ipc_bootstrap: mapped onedram to 0x%x", onedram_p);
-
-    memcpy(onedram_p, data_p, RADIO_IMG_READ_SIZE - PSI_DATA_LEN);
-
-    free(radio_img_p);
-
-    /* nv_data part. */
-
-    /* Check if all the nv_data files are ok. */
-    if (nv_data_check(client) < 0)
-        goto error;
-
-    /* Check if the MD5 is ok. */
-    if (nv_data_md5_check(client) < 0)
-        goto error;
-
-    /* Write nv_data.bin to modem_ctl. */
-    ipc_client_log(client, "aries_ipc_bootstrap: write nv_data to onedram");
-
-    nv_data_p = ipc_client_file_read(client, nv_data_path(client), nv_data_size(client), nv_data_chunk_size(client));
-    if (nv_data_p == NULL)
-        goto error;
-    data_p = nv_data_p;
-
-    memcpy(onedram_p + RADIO_IMG_MAX_SIZE, data_p, nv_data_size(client));
-
-    free(nv_data_p);
-
-    munmap(onedram_p, ONENAND_MAP_SIZE);
-
-    if(ioctl(onedram_fd, ONEDRAM_REL_SEM) < 0)
-    {
-        ipc_client_log(client, "aries_ipc_bootstrap: ONEDRAM_REL_SEM ioctl on onedram failed");
-        goto error;
-    }
-
-    onedram_data = ONEDRAM_DEINIT_CMD;
-
-    ipc_client_log(client, "aries_ipc_bootstrap: send 0x%04x", onedram_data);
-    write(onedram_fd, &onedram_data, sizeof(onedram_data));
-
-    timeout.tv_sec=3;
-    timeout.tv_usec=0;
-
-    ipc_client_log(client, "aries_ipc_bootstrap: wait for 0x%04x from onedram", ONEDRAM_DEINIT_READ);
-
-    onedram_data = 0;
-    while(onedram_data != ONEDRAM_DEINIT_READ) {
-        FD_ZERO(&fds);
-        FD_SET(onedram_fd, &fds);
-
-        if(select(onedram_fd + 1, &fds, NULL, NULL, &timeout) == 0)
-        {
-            ipc_client_log(client, "aries_ipc_bootstrap: select timeout passed");
+        if (i++ > 50) {
+            ipc_client_log(client, "Reading onedram deinit failed");
             goto error;
         }
-
-        read(onedram_fd, &onedram_data, sizeof(onedram_data));
-
-        ipc_client_log(client, "aries_ipc_bootstrap: read 0x%04x from onedram", onedram_data);
-    }
-
-    close(onedram_fd);
+    } while (onedram_deinit != ONEDRAM_DEINIT);
+    ipc_client_log(client, "Read onedram deinit (0x%x)", onedram_deinit);
 
     rc = 0;
-    goto exit;
+    goto complete;
 
 error:
-    ipc_client_log(client, "aries_ipc_bootstrap: something went wrong");
     rc = -1;
 
-exit:
-    ipc_client_log(client, "aries_ipc_bootstrap: exit");
+complete:
+    if (modem_image_data != NULL)
+        free(modem_image_data);
+
+    if (serial_fd >= 0)
+        close(serial_fd);
+
+    if (onedram_address != NULL)
+        munmap(onedram_address, ONEDRAM_MEMORY_SIZE);
+
+    if (onedram_fd >= 0)
+        close(onedram_fd);
+
     return rc;
 }
 
 int aries_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
 {
-    struct ipc_header reqhdr;
-    void *data;
-    int rc = 0;
+    struct ipc_header header;
+    void *buffer;
+    int rc;
 
-    reqhdr.mseq = request->mseq;
-    reqhdr.aseq = request->aseq;
-    reqhdr.group = request->group;
-    reqhdr.index = request->index;
-    reqhdr.type = request->type;
-    reqhdr.length = (uint16_t) (request->length + sizeof(struct ipc_header));
+    if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || request == NULL)
+        return -1;
 
-    data = malloc(reqhdr.length);
+    ipc_header_fill(&header, request);
 
-    memcpy(data, &reqhdr, sizeof(struct ipc_header));
-    memcpy((unsigned char *) (data + sizeof(struct ipc_header)), request->data, request->length);
-
-    assert(client->handlers->write != NULL);
+    buffer = malloc(header.length);
+    memcpy(buffer, &header, sizeof(struct ipc_header));
+    if (request->data != NULL && request->length > 0)
+        memcpy((void *) ((unsigned char *) buffer + sizeof(struct ipc_header)), request->data, request->length);
 
     ipc_client_log_send(client, request, __func__);
 
-    rc = client->handlers->write(client->handlers->transport_data, data, reqhdr.length);
+    rc = client->handlers->write(client->handlers->transport_data, buffer, header.length);
+
+    free(buffer);
+
     return rc;
 }
 
 int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
-    struct ipc_header *resphdr;
-    void *data;
-    int bread = 0;
+    struct ipc_header *header;
+    void *buffer = NULL;
+    int rc;
 
-    data = malloc(MAX_MODEM_DATA_SIZE);
-    memset(data, 0, MAX_MODEM_DATA_SIZE);
-
-    memset(response, 0, sizeof(struct ipc_message_info));
-
-    assert(client->handlers->read != NULL);
-    bread = client->handlers->read(client->handlers->transport_data, (uint8_t*) data, MAX_MODEM_DATA_SIZE);
-
-    if (bread < 0)
-    {
-        ipc_client_log(client, "aries_ipc_fmt_client_recv: can't receive enough bytes from modem to process incoming response!");
+    if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || response == NULL)
         return -1;
+
+    buffer = malloc(MODEM_DATA_SIZE);
+
+    rc = client->handlers->read(client->handlers->transport_data, buffer, MODEM_DATA_SIZE);
+    if (rc < 0) {
+        ipc_client_log(client, "Reading FMT data from the modem failed");
+        goto error;
     }
 
-    if(data == NULL)
-    {
-        ipc_client_log(client, "aries_ipc_fmt_client_recv: we retrieve less (or fairly too much) bytes from the modem than we exepected!");
-        return -1;
-    }
+    header = (struct ipc_header *) buffer;
 
-    resphdr = (struct ipc_header *) data;
+    ipc_message_info_fill(header, response);
 
-    response->mseq = resphdr->mseq;
-    response->aseq = resphdr->aseq;
-    response->group = resphdr->group;
-    response->index = resphdr->index;
-    response->type = resphdr->type;
-    response->cmd = IPC_COMMAND(response);
-    response->length = resphdr->length - sizeof(struct ipc_header);
-    response->data = NULL;
-
-    if(response->length > 0)
-    {
+    if (header->length > sizeof(struct ipc_header)) {
+        response->length = header->length - sizeof(struct ipc_header);
         response->data = malloc(response->length);
-        memcpy(response->data, (uint8_t *) data + sizeof(struct ipc_header), response->length);
+        memcpy(response->data, (void *) ((unsigned char *) buffer + sizeof(struct ipc_header)), response->length);
     }
-
-    free(data);
 
     ipc_client_log_recv(client, response, __func__);
+
+    goto complete;
+
+error:
+    rc = -1;
+
+complete:
+    if (buffer != NULL)
+        free(buffer);
+
+    return rc;
 
     return 0;
 }
 
 int aries_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *request)
 {
-    struct rfs_hdr *rfs_hdr;
-    void *data;
-    int rc = 0;
+    struct rfs_hdr *header;
+    void *buffer;
+    int length;
+    int rc;
 
-    data = malloc(request->length + sizeof(struct rfs_hdr));
-    memset(data, 0, request->length + sizeof(struct rfs_hdr));
+    if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || request == NULL)
+        return -1;
 
-    rfs_hdr = (struct rfs_hdr *) data;
+    length = sizeof(struct rfs_hdr) + request->length;
+    buffer = malloc(length);
 
-    rfs_hdr->id = request->mseq;
-    rfs_hdr->cmd = request->index;
-    rfs_hdr->len = request->length + sizeof(struct rfs_hdr);
+    header = (struct rfs_hdr *) buffer;
+    header->id = request->mseq;
+    header->cmd = request->index;
+    header->len = length;
 
-    memcpy((void *) (data + sizeof(struct rfs_hdr)), request->data, request->length);
-
-    assert(client->handlers->write != NULL);
+    if (request->data != NULL && request->length > 0)
+        memcpy((void *) ((unsigned char *) buffer + sizeof(struct rfs_hdr)), request->data, request->length);
 
     ipc_client_log_send(client, request, __func__);
 
-    rc = client->handlers->write(client->handlers->transport_data, (uint8_t*) data, rfs_hdr->len);
+    rc = client->handlers->write(client->handlers->transport_data, buffer, length);
+
+    free(buffer);
+
     return rc;
 }
 
 int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
-    void *data;
-    int bread = 0;
-    struct rfs_hdr *rfs_hdr;
+    struct rfs_hdr *header;
+    void *buffer = NULL;
+    int length;
+    int rc;
 
-    data = malloc(MAX_MODEM_DATA_SIZE);
-    memset(data, 0, MAX_MODEM_DATA_SIZE);
+    if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || response == NULL)
+        return -1;
+
+    length = MODEM_DATA_SIZE;
+    buffer = malloc(length);
+
+    rc = client->handlers->read(client->handlers->transport_data, buffer, length);
+    if (rc < 0) {
+        ipc_client_log(client, "Reading RFS data from the modem failed");
+        goto error;
+    }
+
+    header = (struct rfs_hdr *) buffer;
 
     memset(response, 0, sizeof(struct ipc_message_info));
-
-    assert(client->handlers->read != NULL);
-    bread = client->handlers->read(client->handlers->transport_data, (uint8_t*) data, MAX_MODEM_DATA_SIZE);
-    if (bread < 0)
-    {
-        ipc_client_log(client, "aries_ipc_rfs_client_recv: can't receive enough bytes from modem to process incoming response!");
-        return -1;
-    }
-
-    rfs_hdr = (struct rfs_hdr *) data;
-
-    if(rfs_hdr->len <= 0 || rfs_hdr->len >= MAX_MODEM_DATA_SIZE || data == NULL)
-    {
-        ipc_client_log(client, "aries_ipc_rfs_client_recv: we retrieve less (or fairly too much) bytes from the modem than we exepected!");
-        return -1;
-    }
-
-    response->mseq = 0;
-    response->aseq = rfs_hdr->id;
+    response->aseq = header->id;
     response->group = IPC_GROUP_RFS;
-    response->index = rfs_hdr->cmd;
-    response->type = 0;
-    response->length = rfs_hdr->len - sizeof(struct rfs_hdr);
-    response->data = NULL;
+    response->index = header->cmd;
 
-    if(response->length > 0)
-    {
+    if (header->len > sizeof(struct rfs_hdr)) {
+        response->length = header->len - sizeof(struct rfs_hdr);
         response->data = malloc(response->length);
-        memcpy(response->data, (uint8_t *) (data + sizeof(struct rfs_hdr)), response->length);
+        memcpy(response->data, (void *) ((unsigned char *) buffer + sizeof(struct rfs_hdr)), response->length);
     }
-
-    free(data);
 
     ipc_client_log_recv(client, response, __func__);
 
-    return 0;
+    goto complete;
+
+error:
+    rc = -1;
+
+complete:
+    if (buffer != NULL)
+        free(buffer);
+
+    return rc;
 }
 
 int aries_ipc_open(void *transport_data, int type)
@@ -583,29 +393,29 @@ int aries_ipc_open(void *transport_data, int type)
     spn = &data->spn;
 
     memset(&ifr, 0, sizeof(ifr));
-    strncpy(ifr.ifr_name, PHONET_IFACE, IFNAMSIZ);
+    strncpy(ifr.ifr_name, MODEM_NETWORK_IFACE, IFNAMSIZ);
 
     spn->spn_family = AF_PHONET;
     spn->spn_dev = 0;
 
-    switch(type)
+    switch (type)
     {
         case IPC_CLIENT_TYPE_FMT:
-            spn->spn_resource = PHONET_SPN_RES_FMT;
+            spn->spn_resource = MODEM_FMT_SPN_RESSOURCE;
             break;
         case IPC_CLIENT_TYPE_RFS:
-            spn->spn_resource = PHONET_SPN_RES_RFS;
+            spn->spn_resource = MODEM_RFS_SPN_RESSOURCE;
             break;
         default:
             break;
     }
 
     fd = socket(AF_PHONET, SOCK_DGRAM, 0);
-    if(fd < 0)
+    if (fd < 0)
         return -1;
 
     rc = setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, ifr.ifr_name, IFNAMSIZ);
-    if(rc < 0)
+    if (rc < 0)
         return -1;
 
     rc = ioctl(fd, SIOCGIFINDEX, &ifr);
@@ -614,25 +424,25 @@ int aries_ipc_open(void *transport_data, int type)
 
     reuse = 1;
     rc = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
-    if(rc < 0)
+    if (rc < 0)
         return -1;
 
-    rc = bind(fd, spn, sizeof(struct sockaddr_pn));
-    if(rc < 0)
+    rc = bind(fd, (const struct sockaddr *) spn, sizeof(struct sockaddr_pn));
+    if (rc < 0)
         return -1;
 
     data->fd = fd;
 
-    if(type == IPC_CLIENT_TYPE_RFS)
+    if (type == IPC_CLIENT_TYPE_RFS)
     {
-        socket_rfs_magic = SOCKET_RFS_MAGIC;
-        rc = setsockopt(fd, SOL_SOCKET, SO_RFSMAGIC, &socket_rfs_magic, sizeof(socket_rfs_magic));
-        if(rc < 0)
+        socket_rfs_magic = MODEM_SOCKET_RFS_MAGIC;
+        rc = setsockopt(fd, SOL_SOCKET, SO_IPC_RFS, &socket_rfs_magic, sizeof(socket_rfs_magic));
+        if (rc < 0)
             return -1;
     }
 
-    rc = phonet_iface_ifup();
-    if(rc < 0)
+    rc = network_iface_up(MODEM_NETWORK_IFACE, AF_PHONET, SOCK_DGRAM);
+    if (rc < 0)
         return -1;
 
     return 0;
@@ -664,7 +474,7 @@ int aries_ipc_read(void *transport_data, void *buffer, unsigned int length)
     int fd;
     int rc;
 
-    if (transport_data == NULL || buffer == NULL)
+    if (transport_data == NULL || buffer == NULL || length == 0)
         return -1;
 
     data = (struct aries_ipc_transport_data *) transport_data;
@@ -675,7 +485,7 @@ int aries_ipc_read(void *transport_data, void *buffer, unsigned int length)
 
     spn_size = sizeof(struct sockaddr_pn);
 
-    rc = recvfrom(fd, buffer, length, 0, &data->spn, &spn_size);
+    rc = recvfrom(fd, buffer, length, 0, (const struct sockaddr *) &data->spn, &spn_size);
     if (rc < 0)
         return -1;
 
@@ -689,7 +499,7 @@ int aries_ipc_write(void *transport_data, void *buffer, unsigned int length)
     int fd;
     int rc;
 
-    if (transport_data == NULL || buffer == NULL)
+    if (transport_data == NULL || buffer == NULL || length == 0)
         return -1;
 
     data = (struct aries_ipc_transport_data *) transport_data;
@@ -700,7 +510,7 @@ int aries_ipc_write(void *transport_data, void *buffer, unsigned int length)
 
     spn_size = sizeof(struct sockaddr_pn);
 
-    rc = sendto(fd, buffer, length, 0, &data->spn, spn_size);
+    rc = sendto(fd, buffer, length, 0, (const struct sockaddr *) &data->spn, spn_size);
     if (rc < 0)
         return -1;
 
@@ -732,34 +542,20 @@ int aries_ipc_poll(void *transport_data, struct timeval *timeout)
 
 int aries_ipc_power_on(void *power_data)
 {
-    int fd = open("/sys/class/modemctl/xmm/status", O_RDONLY);
-    char status[1] = { 0 };
-    char data[4] = "on";
+    char buffer[] = "on\n";
+    int value;
     int rc;
 
-    if(fd < 0)
+    value = sysfs_value_read(MODEMCTL_STATUS_SYSFS);
+    if (value < 0)
         return -1;
 
-    rc = read(fd, status, 1);
-
-    close(fd);
-
-    if(rc < 0)
-        return -1;
-
-    // it's already on
-    if(status[0] == '1')
+    /* The modem is already on */
+    if (value == 1)
         return 0;
 
-    fd = open("/sys/class/modemctl/xmm/control", O_RDWR);
-    if(fd < 0)
-        return -1;
-
-    rc = write(fd, data, 2);
-
-    close(fd);
-
-    if(rc < 0)
+    rc = sysfs_string_write(MODEMCTL_CONTROL_SYSFS, (char *) &buffer, strlen(buffer));
+    if (rc < 0)
         return -1;
 
     return 0;
@@ -767,83 +563,20 @@ int aries_ipc_power_on(void *power_data)
 
 int aries_ipc_power_off(void *power_data)
 {
-    int fd = open("/sys/class/modemctl/xmm/status", O_RDONLY);
-    char status[1] = { 0 };
-    char data[5] = "off";
+    char buffer[] = "off\n";
+    int value;
     int rc;
 
-    if(fd < 0)
+    value = sysfs_value_read(MODEMCTL_STATUS_SYSFS);
+    if (value < 0)
         return -1;
 
-    rc = read(fd, status, 1);
-
-    close(fd);
-
-    if(rc < 0)
-        return -1;
-
-    // it's already off
-    if(status[0] == '0')
+    /* The modem is already off */
+    if (value == 0)
         return 0;
 
-    fd = open("/sys/class/modemctl/xmm/control", O_RDWR);
-    if(fd < 0)
-        return -1;
-
-    rc = write(fd, data, 3);
-
-    close(fd);
-
-    if(rc < 0)
-        return -1;
-
-    return 0;
-}
-
-int aries_ipc_gprs_activate(void *gprs_data, int cid)
-{
-    int fd = open("/sys/class/net/svnet0/pdp/activate", O_RDWR);
-    char *activate_data = NULL;
-    int rc;
-
-    if(fd < 0)
-        return -1;
-
-    asprintf(&activate_data, "%d\n", cid);
-    if(activate_data == NULL)
-        return -1;
-
-    rc = write(fd, activate_data, strlen(activate_data));
-
-    free(activate_data);
-    close(fd);
-
-    if(rc < 0)
-        return -1;
-
-    return 0;
-
-}
-
-int aries_ipc_gprs_deactivate(void *gprs_data, int cid)
-{
-    int fd = open("/sys/class/net/svnet0/pdp/deactivate", O_RDWR);
-    char *deactivate_data = NULL;
-    int rc;
-
-    if(fd < 0)
-        return -1;
-
-    asprintf(&deactivate_data, "%d\n", cid);
-    if(deactivate_data == NULL)
-        return -1;
-
-    rc = write(fd, deactivate_data, strlen(deactivate_data));
-
-    free(deactivate_data);
-    close(fd);
-
-    if(rc < 0)
+    rc = sysfs_string_write(MODEMCTL_CONTROL_SYSFS, (char *) &buffer, strlen(buffer));
+    if (rc < 0)
         return -1;
 
     return 0;
@@ -870,6 +603,28 @@ int aries_ipc_data_destroy(void *transport_data, void *power_data, void *gprs_da
     return 0;
 }
 
+int aries_ipc_gprs_activate(void *gprs_data, int cid)
+{
+    int rc;
+
+    rc = sysfs_value_write(MODEM_PDP_ACTIVATE_SYSFS, cid);
+    if (rc < 0)
+        return -1;
+
+    return 0;
+}
+
+int aries_ipc_gprs_deactivate(void *gprs_data, int cid)
+{
+    int rc;
+
+    rc = sysfs_value_write(MODEM_PDP_DEACTIVATE_SYSFS, cid);
+    if (rc < 0)
+        return -1;
+
+    return 0;
+}
+
 char *aries_ipc_gprs_get_iface(int cid)
 {
     struct ifreq ifr;
@@ -881,9 +636,10 @@ char *aries_ipc_gprs_get_iface(int cid)
     memset(&ifr, 0, sizeof(ifr));
 
     fd = socket(AF_PHONET, SOCK_DGRAM, 0);
+    if (fd < 0)
+        return NULL;
 
-
-    for(i=GPRS_IFACE_COUNT-1 ; i >= 0 ; i--) {
+    for(i = (GPRS_IFACE_COUNT - 1); i >= 0; i--) {
         sprintf(ifr.ifr_name, "%s%d", GPRS_IFACE_PREFIX, i);
         rc = ioctl(fd, SIOCGIFFLAGS, &ifr);
         if(rc < 0 || ifr.ifr_flags & IFF_UP) {
