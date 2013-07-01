@@ -30,7 +30,7 @@
 #define XMM6160_BOOTCORE_VERSION                                0xF0
 
 int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
-    void *modem_image_data, unsigned short psi_size);
+    void *psi_data, unsigned short psi_size);
 int xmm6160_modem_image_send(struct ipc_client *client, int device_fd,
     void *device_address, void *modem_image_data, int modem_image_size);
 int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,

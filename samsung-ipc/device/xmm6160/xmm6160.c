@@ -31,7 +31,7 @@
 #include "xmm6160.h"
 
 int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
-    void *modem_image_data, unsigned short psi_size)
+    void *psi_data, unsigned short psi_size)
 {
     char at[] = XMM6160_AT;
     unsigned char version;
@@ -49,7 +49,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     int rc;
     int i;
 
-    if (client == NULL || serial_fd < 0 || modem_image_data == NULL || psi_size <= 0)
+    if (client == NULL || serial_fd < 0 || psi_data == NULL || psi_size <= 0)
         return -1;
 
     tcgetattr(serial_fd, &termios);
@@ -118,7 +118,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     timeout.tv_sec = 4;
     timeout.tv_usec = 0;
 
-    p = (unsigned char *) modem_image_data;
+    p = (unsigned char *) psi_data;
     psi_crc = 0;
 
     for (i=0; i < psi_size; i++) {
