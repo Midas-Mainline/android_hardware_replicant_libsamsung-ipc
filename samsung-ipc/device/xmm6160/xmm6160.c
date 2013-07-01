@@ -185,8 +185,8 @@ complete:
     return rc;
 }
 
-int xmm6160_modem_image_send(struct ipc_client *client, int device_fd,
-    void *device_address, void *modem_image_data, int modem_image_size)
+int xmm6160_firmware_send(struct ipc_client *client, int device_fd,
+    void *device_address, void *firmware_data, int firmware_size)
 {
     int wc;
 
@@ -194,19 +194,19 @@ int xmm6160_modem_image_send(struct ipc_client *client, int device_fd,
     int rc;
     int i;
 
-    if (client == NULL || (device_fd < 0 && device_address == NULL) || modem_image_data == NULL || modem_image_size <= 0)
+    if (client == NULL || (device_fd < 0 && device_address == NULL) || firmware_data == NULL || firmware_size <= 0)
         return -1;
 
-    p = (unsigned char *) modem_image_data;
+    p = (unsigned char *) firmware_data;
 
     if (device_address != NULL) {
-        memcpy(device_address, (void *) p, modem_image_size);
+        memcpy(device_address, (void *) p, firmware_size);
     } else {
         wc = 0;
-        while (wc < modem_image_size) {
-            rc = write(device_fd, (void *) p, modem_image_size - wc);
+        while (wc < firmware_size) {
+            rc = write(device_fd, (void *) p, firmware_size - wc);
             if (rc < 0) {
-                ipc_client_log(client, "Writing modem image failed");
+                ipc_client_log(client, "Writing firmware failed");
                 goto error;
             }
 
@@ -214,7 +214,7 @@ int xmm6160_modem_image_send(struct ipc_client *client, int device_fd,
             wc += rc;
         }
     }
-    ipc_client_log(client, "Wrote modem image");
+    ipc_client_log(client, "Wrote firmware");
 
     rc = 0;
     goto complete;

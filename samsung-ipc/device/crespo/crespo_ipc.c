@@ -95,12 +95,12 @@ int crespo_ipc_bootstrap(struct ipc_client *client)
 
     lseek(modem_ctl_fd, 0, SEEK_SET);
 
-    rc = xmm6160_modem_image_send(client, modem_ctl_fd, NULL, (void *) p, CRESPO_MODEM_IMAGE_SIZE - CRESPO_PSI_SIZE);
+    rc = xmm6160_firmware_send(client, modem_ctl_fd, NULL, (void *) p, CRESPO_MODEM_IMAGE_SIZE - CRESPO_PSI_SIZE);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6160 modem image failed");
+        ipc_client_log(client, "Sending XMM6160 firmware failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6160 modem image");
+    ipc_client_log(client, "Sent XMM6160 firmware");
 
     lseek(modem_ctl_fd, CRESPO_MODEM_CTL_NV_DATA_OFFSET, SEEK_SET);
 

@@ -158,12 +158,12 @@ int aries_ipc_bootstrap(struct ipc_client *client)
 
     pp = (unsigned char *) onedram_address;
 
-    rc = xmm6160_modem_image_send(client, -1, (void *) pp, (void *) p, ARIES_MODEM_IMAGE_SIZE - ARIES_PSI_SIZE);
+    rc = xmm6160_firmware_send(client, -1, (void *) pp, (void *) p, ARIES_MODEM_IMAGE_SIZE - ARIES_PSI_SIZE);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6160 modem image failed");
+        ipc_client_log(client, "Sending XMM6160 firmware failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6160 modem image");
+    ipc_client_log(client, "Sent XMM6160 firmware");
 
     pp = (unsigned char *) onedram_address + ARIES_ONEDRAM_NV_DATA_OFFSET;
 
