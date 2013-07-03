@@ -61,7 +61,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     tcsetattr(serial_fd, TCSANOW, &termios);
 
     length = strlen(at);
-    for (i=0; i < XMM6160_AT_COUNT; i++) {
+    for (i = 0; i < XMM6160_AT_COUNT; i++) {
         rc = write(serial_fd, at, length);
         if (rc < length) {
             ipc_client_log(client, "Writing AT in ASCII failed");
@@ -121,7 +121,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     p = (unsigned char *) psi_data;
     psi_crc = 0;
 
-    for (i=0; i < psi_size; i++) {
+    for (i = 0; i < psi_size; i++) {
         rc = select(serial_fd + 1, NULL, &fds, NULL, &timeout);
         if (rc <= 0) {
             ipc_client_log(client, "Writing PSI failed");
@@ -230,10 +230,10 @@ int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
     void *device_address)
 {
     void *nv_data = NULL;
+    int nv_size;
     int wc;
 
     unsigned char *p;
-    int length;
     int rc;
 
     if (client == NULL || (device_fd < 0 && device_address == NULL))
@@ -261,14 +261,14 @@ int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
     ipc_client_log(client, "Read nv_data");
 
     p = (unsigned char *) nv_data;
-    length = nv_data_size(client);
+    nv_size = nv_data_size(client);
 
     if (device_address != NULL) {
-        memcpy(device_address, p, length);
+        memcpy(device_address, p, nv_size);
     } else {
         wc = 0;
-        while (wc < length) {
-            rc = write(device_fd, p, length - wc);
+        while (wc < nv_size) {
+            rc = write(device_fd, p, nv_size - wc);
             if (rc < 0) {
                 ipc_client_log(client, "Writing modem image failed");
                 goto error;
