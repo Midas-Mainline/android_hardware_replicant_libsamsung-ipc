@@ -384,7 +384,8 @@ int ipc_client_gprs_deactivate(struct ipc_client *client, int cid)
 
 int ipc_client_data_create(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL)
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->data_create == NULL)
         return -1;
 
     return client->handlers->data_create(&client->handlers->transport_data,
@@ -393,7 +394,8 @@ int ipc_client_data_create(struct ipc_client *client)
 
 int ipc_client_data_destroy(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL)
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->data_destroy == NULL)
         return -1;
 
     return client->handlers->data_destroy(client->handlers->transport_data,
