@@ -55,6 +55,11 @@ struct aries_ipc_transport_data {
     int fd;
 };
 
+extern struct ipc_ops aries_ipc_fmt_ops;
+extern struct ipc_ops aries_ipc_rfs_ops;
+extern struct ipc_handlers aries_ipc_handlers;
+extern struct ipc_gprs_specs aries_ipc_gprs_specs;
+
 #endif
 
 // vim:ts=4:sw=4:expandtab

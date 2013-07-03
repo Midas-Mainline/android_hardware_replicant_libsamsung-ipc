@@ -39,6 +39,12 @@ struct crespo_ipc_transport_data {
     int fd;
 };
 
+extern struct ipc_ops crespo_ipc_fmt_ops;
+extern struct ipc_ops crespo_ipc_rfs_ops;
+extern struct ipc_handlers crespo_ipc_handlers;
+extern struct ipc_gprs_specs crespo_ipc_gprs_specs_single;
+extern struct ipc_gprs_specs crespo_ipc_gprs_specs;
+
 #endif
 
 // vim:ts=4:sw=4:expandtab

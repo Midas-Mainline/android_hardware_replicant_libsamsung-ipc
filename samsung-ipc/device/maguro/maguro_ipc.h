@@ -47,6 +47,12 @@ struct maguro_ipc_transport_data {
     int fd;
 };
 
+extern struct ipc_ops maguro_ipc_fmt_ops;
+extern struct ipc_ops maguro_ipc_rfs_ops;
+extern struct ipc_handlers maguro_ipc_handlers;
+extern struct ipc_gprs_specs maguro_ipc_gprs_specs;
+extern struct ipc_nv_data_specs maguro_ipc_nv_data_specs;
+
 #endif
 
 // vim:ts=4:sw=4:expandtab

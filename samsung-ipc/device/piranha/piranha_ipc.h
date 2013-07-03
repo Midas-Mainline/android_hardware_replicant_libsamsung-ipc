@@ -39,6 +39,12 @@ struct piranha_ipc_transport_data {
     int fd;
 };
 
+extern struct ipc_ops piranha_ipc_fmt_ops;
+extern struct ipc_ops piranha_ipc_rfs_ops;
+extern struct ipc_handlers piranha_ipc_handlers;
+extern struct ipc_gprs_specs piranha_ipc_gprs_specs;
+extern struct ipc_nv_data_specs piranha_ipc_nv_data_specs;
+
 #endif
 
 // vim:ts=4:sw=4:expandtab
