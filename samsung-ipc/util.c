@@ -34,7 +34,7 @@
 
 #include "util.h"
 
-void *file_data_read(char *path, int size, int block_size)
+void *file_data_read(char *path, int size, int chunk)
 {
     void *data = NULL;
     int fd = -1;
@@ -43,7 +43,7 @@ void *file_data_read(char *path, int size, int block_size)
     int count;
     int rc;
 
-    if (path == NULL || size <= 0 || block_size <= 0)
+    if (path == NULL || size <= 0 || chunk <= 0)
         return NULL;
 
     fd = open(path, O_RDONLY);
@@ -57,7 +57,7 @@ void *file_data_read(char *path, int size, int block_size)
 
     count = 0;
     while (count < size) {
-        rc = read(fd, p, size - count > block_size ? block_size : size - count);
+        rc = read(fd, p, size - count > chunk ? chunk : size - count);
         if (rc < 0)
             goto error;
 
