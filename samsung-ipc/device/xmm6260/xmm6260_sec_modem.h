@@ -27,7 +27,7 @@
 #define XMM6260_SEC_MODEM_RFS0_DEVICE           "/dev/umts_rfs0"
 #define XMM6260_SEC_MODEM_LINK_PM_DEVICE        "/dev/link_pm"
 #define XMM6260_SEC_MODEM_EHCI_POWER_SYSFS      "/sys/devices/platform/s5p-ehci/ehci_power"
-#define XMM6260_SEC_MODEM_OHCI_POWER_SYSFS      "/sys/devices/platform/s5p-ehci/ohci_power"
+#define XMM6260_SEC_MODEM_OHCI_POWER_SYSFS      "/sys/devices/platform/s5p-ohci/ohci_power"
 
 #define XMM6260_SEC_MODEM_GPRS_IFACE_PREFIX     "rmnet"
 #define XMM6260_SEC_MODEM_GPRS_IFACE_COUNT                      3
