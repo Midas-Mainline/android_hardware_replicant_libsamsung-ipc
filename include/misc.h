@@ -66,7 +66,7 @@ struct ipc_misc_time_info {
     unsigned char tz_valid, daylight_valid;
     unsigned char year, mon, day;
     unsigned char hour, min, sec;
-    char tz, dl, dv;
+    signed char tz, dl, dv;
     char plmn[6];
 } __attribute__((__packed__));
 
