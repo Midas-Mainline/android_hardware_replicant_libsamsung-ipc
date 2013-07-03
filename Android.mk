@@ -60,17 +60,15 @@ samsung-ipc_files := \
 	samsung-ipc/sec.c \
 	samsung-ipc/sms.c \
 	samsung-ipc/util.c \
+	samsung-ipc/device/xmm6160/xmm6160.c \
+	samsung-ipc/device/xmm6260/xmm6260.c \
+	samsung-ipc/device/xmm6260/xmm6260_hsic.c \
+	samsung-ipc/device/xmm6260/xmm6260_mipi.c \
+	samsung-ipc/device/xmm6260/xmm6260_sec_modem.c \
 	samsung-ipc/device/crespo/crespo_ipc.c \
 	samsung-ipc/device/aries/aries_ipc.c \
-	samsung-ipc/device/xmm6160/xmm6160.c \
-	samsung-ipc/device/xmm6260/xmm6260_loader.c \
-	samsung-ipc/device/xmm6260/xmm6260_modemctl.c \
-	samsung-ipc/device/xmm6260/xmm6260_ipc.c \
-	samsung-ipc/device/galaxys2/galaxys2_loader.c \
 	samsung-ipc/device/galaxys2/galaxys2_ipc.c \
-	samsung-ipc/device/maguro/maguro_loader.c \
 	samsung-ipc/device/maguro/maguro_ipc.c \
-	samsung-ipc/device/piranha/piranha_loader.c \
 	samsung-ipc/device/piranha/piranha_ipc.c
 
 LOCAL_SRC_FILES := $(samsung-ipc_files)

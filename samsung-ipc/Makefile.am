@@ -32,32 +32,33 @@ libsamsung_ipc_la_SOURCES = \
 	ipc.h \
 	ipc_devices.h \
 	util.h \
-	device/crespo/crespo_ipc.c \
-	device/aries/aries_ipc.c \
-	device/aries/sipc4.h \
-	device/aries/aries_ipc.h \
-	device/aries/onedram.h \
-	device/aries/phonet.h \
-	device/crespo/crespo_modem_ctl.h \
-	device/crespo/crespo_ipc.h \
 	device/xmm6160/xmm6160.c \
 	device/xmm6160/xmm6160.h \
-	device/xmm6260/xmm6260_loader.c \
-	device/xmm6260/xmm6260_loader.h \
-	device/xmm6260/xmm6260_modemctl.c \
-	device/xmm6260/xmm6260_modemctl.h \
-	device/xmm6260/xmm6260_ipc.c \
-	device/xmm6260/xmm6260_ipc.h \
+	device/xmm6260/xmm6260.c \
+	device/xmm6260/xmm6260_hsic.c \
+	device/xmm6260/xmm6260_mipi.c \
+	device/xmm6260/xmm6260_sec_modem.c \
+	device/xmm6260/xmm6260.h \
+	device/xmm6260/xmm6260_hsic.h \
+	device/xmm6260/xmm6260_mipi.h \
+	device/xmm6260/xmm6260_sec_modem.h \
+	device/xmm6260/modem.h \
+	device/xmm6260/modem_link_device_hsic.h \
 	device/xmm6260/modem_prj.h \
-	device/galaxys2/galaxys2_loader.c \
-	device/galaxys2/galaxys2_loader.h \
+	device/crespo/crespo_ipc.c \
+	device/crespo/crespo_ipc.h \
+	device/crespo/crespo_modem_ctl.h \
+	device/aries/aries_ipc.c \
+	device/aries/aries_ipc.h \
+	device/aries/sipc4.h \
+	device/aries/onedram.h \
+	device/aries/phonet.h \
 	device/galaxys2/galaxys2_ipc.c \
-	device/maguro/maguro_loader.c \
-	device/maguro/maguro_loader.h \
+	device/galaxys2/galaxys2_ipc.h \
 	device/maguro/maguro_ipc.c \
-	device/piranha/piranha_loader.c \
-	device/piranha/piranha_loader.h \
+	device/maguro/maguro_ipc.h \
 	device/piranha/piranha_ipc.c \
+	device/piranha/piranha_ipc.h \
 	$(NULL)
 
 libsamsung_ipc_la_LIBADD = \
