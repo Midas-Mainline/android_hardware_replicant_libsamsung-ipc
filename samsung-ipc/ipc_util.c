@@ -29,7 +29,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <asm/types.h>
-#include <mtd/mtd-abi.h>
 
 #include <samsung-ipc.h>
 #include "ipc.h"
@@ -471,97 +470,6 @@ void ipc_message_info_fill(struct ipc_header *header, struct ipc_message_info *m
     message->cmd = IPC_COMMAND(message);
     message->length = 0;
     message->data = NULL;
-}
-
-void *ipc_client_mtd_read(struct ipc_client *client, char *mtd_name, int size,
-    int block_size)
-{
-    void *mtd_p=NULL;
-    uint8_t *data_p=NULL;
-
-    loff_t offs;
-    int fd;
-    int i;
-
-    if (mtd_name == NULL || size <= 0 || block_size <= 0)
-        goto error;
-
-    ipc_client_log(client, "ipc_client_mtd_read: reading 0x%x bytes from %s with 0x%x bytes block size\n", size, mtd_name, block_size);
-
-    fd=open(mtd_name, O_RDONLY);
-    if (fd < 0)
-        goto error;
-
-    mtd_p=malloc(size);
-    if (mtd_p == NULL)
-        goto error;
-
-    memset(mtd_p, 0, size);
-
-    data_p=(uint8_t *) mtd_p;
-
-    for (i=0; i < size / block_size; i++)
-    {
-        offs = i * block_size;
-        if (ioctl(fd, MEMGETBADBLOCK, &offs) == 1)
-        {
-            ipc_client_log(client, "ipc_client_mtd_read: warning: bad block at offset %lld\n", (long long int) offs);
-            data_p+=block_size;
-            continue;
-        }
-
-        read(fd, data_p, block_size);
-        data_p+=block_size;
-    }
-
-    close(fd);
-
-    return mtd_p;
-
-error:
-    ipc_client_log(client, "ipc_client_mtd_read: something went wrong\n");
-    return NULL;
-}
-
-void *ipc_client_file_read(struct ipc_client *client, char *file_name, int size,
-    int block_size)
-{
-    void *file_p=NULL;
-    uint8_t *data_p=NULL;
-
-    int fd;
-    int i;
-
-    if (file_name == NULL || size <= 0 || block_size <= 0)
-        goto error;
-
-    ipc_client_log(client, "ipc_client_file_read: reading 0x%x bytes from %s with 0x%x bytes block size\n", size, file_name, block_size);
-
-    fd=open(file_name, O_RDONLY);
-    if (fd < 0)
-        goto error;
-
-    file_p=malloc(size);
-    if (file_p == NULL)
-        goto error;
-
-    memset(file_p, 0, size);
-
-    data_p=(uint8_t *) file_p;
-
-    for (i=0; i < size / block_size; i++)
-    {
-        read(fd, data_p, block_size);
-        data_p+=block_size;
-    }
-
-    close(fd);
-
-    return file_p;
-
-error:
-    ipc_client_log(client, "ipc_client_file_read: something went wrong\n");
-    return NULL;
 }
 
 // vim:ts=4:sw=4:expandtab

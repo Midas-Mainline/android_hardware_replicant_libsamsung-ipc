@@ -29,7 +29,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <asm/types.h>
-#include <mtd/mtd-abi.h>
 #include <linux/netlink.h>
 #include <net/if.h>
 
