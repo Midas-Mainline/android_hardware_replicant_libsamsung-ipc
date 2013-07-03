@@ -144,6 +144,7 @@ int crespo_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *requ
     memset(&mio, 0, sizeof(struct modem_io));
     mio.size = request->length + sizeof(struct ipc_header);
     mio.data = malloc(mio.size);
+
     memcpy(mio.data, &header, sizeof(struct ipc_header));
     if (request->data != NULL && request->length > 0)
         memcpy((void *) ((unsigned char *) mio.data + sizeof(struct ipc_header)), request->data, request->length);
@@ -151,8 +152,20 @@ int crespo_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *requ
     ipc_client_log_send(client, request, __func__);
 
     rc = client->handlers->write(client->handlers->transport_data, (void *) &mio, sizeof(struct modem_io));
+    if (rc < 0) {
+        ipc_client_log(client, "Writing FMT data to the modem failed");
+        goto error;
+    }
 
-    free(mio.data);
+    rc = 0;
+    goto complete;
+
+error:
+    rc = -1;
+
+complete:
+    if (mio.data != NULL)
+        free(mio.data);
 
     return rc;
 }
@@ -177,16 +190,19 @@ int crespo_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *resp
     }
 
     header = (struct ipc_header *) mio.data;
+
     ipc_message_info_fill(header, response);
 
     if (mio.size > sizeof(struct ipc_header)) {
         response->length = mio.size - sizeof(struct ipc_header);
         response->data = malloc(response->length);
+
         memcpy(response->data, (void *) ((unsigned char *) mio.data + sizeof(struct ipc_header)), response->length);
     }
 
     ipc_client_log_recv(client, response, __func__);
 
+    rc = 0;
     goto complete;
 
 error:
@@ -211,15 +227,28 @@ int crespo_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *requ
     mio.id = request->mseq;
     mio.cmd = request->index;
     mio.size = request->length;
+
     if (request->data != NULL && request->length > 0) {
         mio.data = malloc(mio.size);
+
         memcpy(mio.data, request->data, request->length);
     }
 
     ipc_client_log_send(client, request, __func__);
 
     rc = client->handlers->write(client->handlers->transport_data, (void *) &mio, sizeof(struct modem_io));
+    if (rc < 0) {
+        ipc_client_log(client, "Writing RFS data to the modem failed");
+        goto error;
+    }
 
+    rc = 0;
+    goto complete;
+
+error:
+    rc = -1;
+
+complete:
     if (mio.data != NULL)
         free(mio.data);
 
@@ -252,11 +281,13 @@ int crespo_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *resp
     if (mio.size > 0) {
         response->length = mio.size;
         response->data = malloc(response->length);
+
         memcpy(response->data, mio.data, response->length);
     }
 
     ipc_client_log_recv(client, response, __func__);
 
+    rc = 0;
     goto complete;
 
 error:
@@ -279,8 +310,7 @@ int crespo_ipc_open(void *data, int type)
 
     transport_data = (struct crespo_ipc_transport_data *) data;
 
-    switch(type)
-    {
+    switch (type) {
         case IPC_CLIENT_TYPE_FMT:
             fd = open(CRESPO_MODEM_FMT_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
             break;
@@ -291,7 +321,7 @@ int crespo_ipc_open(void *data, int type)
             return -1;
     }
 
-    if(fd < 0)
+    if (fd < 0)
         return -1;
 
     transport_data->fd = fd;
@@ -335,7 +365,7 @@ int crespo_ipc_read(void *data, void *buffer, unsigned int length)
         return -1;
 
     rc = ioctl(fd, IOCTL_MODEM_RECV, buffer);
-    if(rc < 0)
+    if (rc < 0)
         return -1;
 
     return 0;
@@ -382,7 +412,7 @@ int crespo_ipc_poll(void *data, struct timeval *timeout)
     FD_ZERO(&fds);
     FD_SET(fd, &fds);
 
-    rc = select(FD_SETSIZE, &fds, NULL, NULL, timeout);
+    rc = select(fd + 1, &fds, NULL, NULL, timeout);
     return rc;
 }
 
