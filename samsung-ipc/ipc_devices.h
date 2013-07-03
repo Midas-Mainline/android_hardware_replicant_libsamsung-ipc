@@ -23,6 +23,7 @@
 #include "device/crespo/crespo_ipc.h"
 #include "device/aries/aries_ipc.h"
 #include "device/galaxys2/galaxys2_ipc.h"
+#include "device/galaxys3/galaxys3_ipc.h"
 #include "device/maguro/maguro_ipc.h"
 #include "device/piranha/piranha_ipc.h"
 

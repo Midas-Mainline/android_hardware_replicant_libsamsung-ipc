@@ -55,6 +55,8 @@ libsamsung_ipc_la_SOURCES = \
 	device/aries/phonet.h \
 	device/galaxys2/galaxys2_ipc.c \
 	device/galaxys2/galaxys2_ipc.h \
+	device/galaxys3/galaxys3_ipc.c \
+	device/galaxys3/galaxys3_ipc.h \
 	device/maguro/maguro_ipc.c \
 	device/maguro/maguro_ipc.h \
 	device/piranha/piranha_ipc.c \

@@ -14,20 +14,12 @@ ifeq ($(TARGET_DEVICE),crespo)
 	board_name := herring
 endif
 
-ifeq ($(TARGET_DEVICE),galaxys2)
-	board_name := smdk4210
-endif
-
 ifeq ($(TARGET_DEVICE),galaxysmtd)
 	board_name := aries
 endif
 
 ifeq ($(TARGET_DEVICE),galaxytab)
 	board_name := gt-p1000
-endif
-
-ifeq ($(TARGET_DEVICE),spica)
-	board_name := i5700
 endif
 
 ifeq ($(TARGET_DEVICE),maguro)
@@ -40,6 +32,22 @@ endif
 
 ifeq ($(TARGET_DEVICE),p3100)
 	board_name := espresso
+endif
+
+ifeq ($(TARGET_DEVICE),i9100)
+	board_name := smdk4210
+endif
+
+ifeq ($(TARGET_DEVICE),galaxys2)
+	board_name := smdk4210
+endif
+
+ifeq ($(TARGET_DEVICE),i9300)
+	board_name := smdk4x12
+endif
+
+ifeq ($(TARGET_DEVICE),galaxys3)
+	board_name := smdk4x12
 endif
 
 ifeq ($(DEBUG),true)
@@ -68,6 +76,7 @@ samsung-ipc_files := \
 	samsung-ipc/device/crespo/crespo_ipc.c \
 	samsung-ipc/device/aries/aries_ipc.c \
 	samsung-ipc/device/galaxys2/galaxys2_ipc.c \
+	samsung-ipc/device/galaxys3/galaxys3_ipc.c \
 	samsung-ipc/device/maguro/maguro_ipc.c \
 	samsung-ipc/device/piranha/piranha_ipc.c
 

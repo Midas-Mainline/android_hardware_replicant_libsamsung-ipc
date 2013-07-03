@@ -65,7 +65,7 @@ struct ipc_device_desc ipc_devices[] = {
         .gprs_specs = &aries_ipc_gprs_specs,
         .nv_data_specs = NULL,
     },
-    {   
+    {
         .name = "galaxys2",
         .board_name = "i9100",
         .kernel_version = NULL,
@@ -75,7 +75,7 @@ struct ipc_device_desc ipc_devices[] = {
         .gprs_specs = &galaxys2_ipc_gprs_specs,
         .nv_data_specs = NULL,
     },
-    {   
+    {
         .name = "galaxys2",
         .board_name = "smdk4210",
         .kernel_version = NULL,
@@ -83,6 +83,26 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &galaxys2_ipc_rfs_ops,
         .handlers = &galaxys2_ipc_handlers,
         .gprs_specs = &galaxys2_ipc_gprs_specs,
+        .nv_data_specs = NULL,
+    },
+    {
+        .name = "galaxys3",
+        .board_name = "i9300",
+        .kernel_version = NULL,
+        .fmt_ops = &galaxys3_ipc_fmt_ops,
+        .rfs_ops = &galaxys3_ipc_rfs_ops,
+        .handlers = &galaxys3_ipc_handlers,
+        .gprs_specs = &galaxys3_ipc_gprs_specs,
+        .nv_data_specs = NULL,
+    },
+    {
+        .name = "galaxys3",
+        .board_name = "smdk4x12",
+        .kernel_version = NULL,
+        .fmt_ops = &galaxys3_ipc_fmt_ops,
+        .rfs_ops = &galaxys3_ipc_rfs_ops,
+        .handlers = &galaxys3_ipc_handlers,
+        .gprs_specs = &galaxys3_ipc_gprs_specs,
         .nv_data_specs = NULL,
     },
     {
