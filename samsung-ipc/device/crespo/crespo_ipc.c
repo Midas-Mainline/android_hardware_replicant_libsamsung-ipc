@@ -132,22 +132,22 @@ complete:
 
 int crespo_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
 {
-    struct ipc_header header;
+    struct ipc_fmt_header header;
     struct modem_io mio;
     int rc;
 
     if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || request == NULL)
         return -1;
 
-    ipc_header_fill(&header, request);
+    ipc_fmt_header_fill(&header, request);
 
     memset(&mio, 0, sizeof(struct modem_io));
-    mio.size = request->length + sizeof(struct ipc_header);
+    mio.size = request->length + sizeof(struct ipc_fmt_header);
     mio.data = malloc(mio.size);
 
-    memcpy(mio.data, &header, sizeof(struct ipc_header));
+    memcpy(mio.data, &header, sizeof(struct ipc_fmt_header));
     if (request->data != NULL && request->length > 0)
-        memcpy((void *) ((unsigned char *) mio.data + sizeof(struct ipc_header)), request->data, request->length);
+        memcpy((void *) ((unsigned char *) mio.data + sizeof(struct ipc_fmt_header)), request->data, request->length);
 
     ipc_client_log_send(client, request, __func__);
 
@@ -172,7 +172,7 @@ complete:
 
 int crespo_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
-    struct ipc_header *header;
+    struct ipc_fmt_header *header;
     struct modem_io mio;
     int rc;
 
@@ -184,20 +184,20 @@ int crespo_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *resp
     mio.data = malloc(mio.size);
 
     rc = client->handlers->read(client->handlers->transport_data, &mio, sizeof(struct modem_io) + mio.size);
-    if (rc < 0 || mio.data == NULL || mio.size < sizeof(struct ipc_header)) {
+    if (rc < 0 || mio.data == NULL || mio.size < sizeof(struct ipc_fmt_header)) {
         ipc_client_log(client, "Reading FMT data from the modem failed");
         goto error;
     }
 
-    header = (struct ipc_header *) mio.data;
+    header = (struct ipc_fmt_header *) mio.data;
 
-    ipc_message_info_fill(header, response);
+    ipc_fmt_message_fill(header, response);
 
-    if (mio.size > sizeof(struct ipc_header)) {
-        response->length = mio.size - sizeof(struct ipc_header);
+    if (mio.size > sizeof(struct ipc_fmt_header)) {
+        response->length = mio.size - sizeof(struct ipc_fmt_header);
         response->data = malloc(response->length);
 
-        memcpy(response->data, (void *) ((unsigned char *) mio.data + sizeof(struct ipc_header)), response->length);
+        memcpy(response->data, (void *) ((unsigned char *) mio.data + sizeof(struct ipc_fmt_header)), response->length);
     }
 
     ipc_client_log_recv(client, response, __func__);

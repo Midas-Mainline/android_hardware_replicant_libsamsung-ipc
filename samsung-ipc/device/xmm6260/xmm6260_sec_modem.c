@@ -174,7 +174,7 @@ int xmm6260_sec_modem_link_get_hostwake_wait(int device_fd)
 
 int xmm6260_sec_modem_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
 {
-    struct ipc_header header;
+    struct ipc_fmt_header header;
     void *buffer;
     unsigned char *p;
     int count;
@@ -183,13 +183,13 @@ int xmm6260_sec_modem_ipc_fmt_send(struct ipc_client *client, struct ipc_message
     if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || request == NULL)
         return -1;
 
-    ipc_header_fill(&header, request);
+    ipc_fmt_header_fill(&header, request);
 
     buffer = malloc(header.length);
 
-    memcpy(buffer, &header, sizeof(struct ipc_header));
+    memcpy(buffer, &header, sizeof(struct ipc_fmt_header));
     if (request->data != NULL && request->length > 0)
-        memcpy((void *) ((unsigned char *) buffer + sizeof(struct ipc_header)), request->data, request->length);
+        memcpy((void *) ((unsigned char *) buffer + sizeof(struct ipc_fmt_header)), request->data, request->length);
 
     ipc_client_log_send(client, request, __func__);
 
@@ -222,7 +222,7 @@ complete:
 
 int xmm6260_sec_modem_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
-    struct ipc_header *header;
+    struct ipc_fmt_header *header;
     void *buffer = NULL;
     unsigned char *p;
     int length;
@@ -236,24 +236,24 @@ int xmm6260_sec_modem_ipc_fmt_recv(struct ipc_client *client, struct ipc_message
     buffer = malloc(length);
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
-    if (rc < (int) sizeof(struct ipc_header)) {
+    if (rc < (int) sizeof(struct ipc_fmt_header)) {
         ipc_client_log(client, "Reading FMT header from the modem failed");
         goto error;
     }
 
-    header = (struct ipc_header *) buffer;
+    header = (struct ipc_fmt_header *) buffer;
 
-    ipc_message_info_fill(header, response);
+    ipc_fmt_message_fill(header, response);
 
-    if (header->length > sizeof(struct ipc_header)) {
-        response->length = header->length - sizeof(struct ipc_header);
+    if (header->length > sizeof(struct ipc_fmt_header)) {
+        response->length = header->length - sizeof(struct ipc_fmt_header);
         response->data = malloc(response->length);
 
         p = (unsigned char *) response->data;
 
-        count = rc - sizeof(struct ipc_header);
+        count = rc - sizeof(struct ipc_fmt_header);
         if (count > 0) {
-            memcpy(p, (void *) ((unsigned char *) buffer + sizeof(struct ipc_header)), count);
+            memcpy(p, (void *) ((unsigned char *) buffer + sizeof(struct ipc_fmt_header)), count);
             p += count;
         }
 
@@ -286,7 +286,7 @@ complete:
 
 int xmm6260_sec_modem_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *request)
 {
-    struct rfs_hdr header;
+    struct ipc_rfs_header header;
     void *buffer;
     unsigned char *p;
     int count;
@@ -296,23 +296,21 @@ int xmm6260_sec_modem_ipc_rfs_send(struct ipc_client *client, struct ipc_message
     if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || request == NULL)
         return -1;
 
-    header.id = request->mseq;
-    header.cmd = request->index;
-    header.len = sizeof(struct rfs_hdr) + request->length;
+    ipc_rfs_header_fill(&header, request);
 
-    buffer = malloc(header.len);
+    buffer = malloc(header.length);
 
-    memcpy(buffer, &header, sizeof(struct rfs_hdr));
+    memcpy(buffer, &header, sizeof(struct ipc_rfs_header));
     if (request->data != NULL && request->length > 0)
-        memcpy((void *) ((unsigned char *) buffer + sizeof(struct rfs_hdr)), request->data, request->length);
+        memcpy((void *) ((unsigned char *) buffer + sizeof(struct ipc_rfs_header)), request->data, request->length);
 
     ipc_client_log_send(client, request, __func__);
 
     p = (unsigned char *) buffer;
 
     count = 0;
-    while (count < (int) header.len) {
-        rc = client->handlers->write(client->handlers->transport_data, p, header.len - count);
+    while (count < (int) header.length) {
+        rc = client->handlers->write(client->handlers->transport_data, p, header.length - count);
         if (rc <= 0) {
             ipc_client_log(client, "Writing RFS data to the modem failed");
             goto error;
@@ -337,7 +335,7 @@ complete:
 
 int xmm6260_sec_modem_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
-    struct rfs_hdr *header;
+    struct ipc_rfs_header *header;
     void *buffer = NULL;
     unsigned char *p;
     int length;
@@ -351,27 +349,24 @@ int xmm6260_sec_modem_ipc_rfs_recv(struct ipc_client *client, struct ipc_message
     buffer = malloc(length);
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
-    if (rc < (int) sizeof(struct rfs_hdr)) {
+    if (rc < (int) sizeof(struct ipc_rfs_header)) {
         ipc_client_log(client, "Reading RFS header from the modem failed");
         goto error;
     }
 
-    header = (struct rfs_hdr *) buffer;
+    header = (struct ipc_rfs_header *) buffer;
 
-    memset(response, 0, sizeof(struct ipc_message_info));
-    response->aseq = header->id;
-    response->group = IPC_GROUP_RFS;
-    response->index = header->cmd;
+    ipc_rfs_message_fill(header, response);
 
-    if (header->len > sizeof(struct rfs_hdr)) {
-        response->length = header->len - sizeof(struct rfs_hdr);
+    if (header->length > sizeof(struct ipc_rfs_header)) {
+        response->length = header->length - sizeof(struct ipc_rfs_header);
         response->data = malloc(response->length);
 
         p = (unsigned char *) response->data;
 
-        count = rc - sizeof(struct rfs_hdr);
+        count = rc - sizeof(struct ipc_rfs_header);
         if (count > 0) {
-            memcpy(p, (void *) ((unsigned char *) buffer + sizeof(struct rfs_hdr)), count);
+            memcpy(p, (void *) ((unsigned char *) buffer + sizeof(struct ipc_rfs_header)), count);
             p += count;
         }
 

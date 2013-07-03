@@ -37,7 +37,9 @@
 
 struct ipc_client;
 struct ipc_handlers;
-struct ipc_header;
+
+struct ipc_fmt_header;
+struct ipc_rfs_header;
 
 struct ipc_message_info {
     unsigned char mseq;
@@ -115,8 +117,10 @@ void ipc_client_log_recv(struct ipc_client *client,
     struct ipc_message_info *response, const char *prefix);
 void ipc_client_log_send(struct ipc_client *client,
     struct ipc_message_info *request, const char *prefix);
-void ipc_header_fill(struct ipc_header *header, struct ipc_message_info *message);
-void ipc_message_info_fill(struct ipc_header *header, struct ipc_message_info *message);
+void ipc_fmt_header_fill(struct ipc_fmt_header *header, struct ipc_message_info *message);
+void ipc_fmt_message_fill(struct ipc_fmt_header *header, struct ipc_message_info *message);
+void ipc_rfs_header_fill(struct ipc_rfs_header *header, struct ipc_message_info *message);
+void ipc_rfs_message_fill(struct ipc_rfs_header *header, struct ipc_message_info *message);
 
 /*
  * Samsung-IPC protocol

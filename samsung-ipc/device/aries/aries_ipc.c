@@ -35,7 +35,6 @@
 #include <ipc.h>
 #include <util.h>
 
-#include "sipc4.h"
 #include "onedram.h"
 #include "phonet.h"
 
@@ -243,20 +242,20 @@ complete:
 
 int aries_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
 {
-    struct ipc_header header;
+    struct ipc_fmt_header header;
     void *buffer;
     int rc;
 
     if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || request == NULL)
         return -1;
 
-    ipc_header_fill(&header, request);
+    ipc_fmt_header_fill(&header, request);
 
     buffer = malloc(header.length);
 
-    memcpy(buffer, &header, sizeof(struct ipc_header));
+    memcpy(buffer, &header, sizeof(struct ipc_fmt_header));
     if (request->data != NULL && request->length > 0)
-        memcpy((void *) ((unsigned char *) buffer + sizeof(struct ipc_header)), request->data, request->length);
+        memcpy((void *) ((unsigned char *) buffer + sizeof(struct ipc_fmt_header)), request->data, request->length);
 
     ipc_client_log_send(client, request, __func__);
 
@@ -281,7 +280,7 @@ complete:
 
 int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
-    struct ipc_header *header;
+    struct ipc_fmt_header *header;
     void *buffer = NULL;
     int length;
     int rc;
@@ -293,20 +292,20 @@ int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *respo
     buffer = malloc(length);
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
-    if (rc < (int) sizeof(struct ipc_header)) {
+    if (rc < (int) sizeof(struct ipc_fmt_header)) {
         ipc_client_log(client, "Reading FMT data from the modem failed");
         goto error;
     }
 
-    header = (struct ipc_header *) buffer;
+    header = (struct ipc_fmt_header *) buffer;
 
-    ipc_message_info_fill(header, response);
+    ipc_fmt_message_fill(header, response);
 
-    if (header->length > sizeof(struct ipc_header)) {
-        response->length = header->length - sizeof(struct ipc_header);
+    if (header->length > sizeof(struct ipc_fmt_header)) {
+        response->length = header->length - sizeof(struct ipc_fmt_header);
         response->data = malloc(response->length);
 
-        memcpy(response->data, (void *) ((unsigned char *) buffer + sizeof(struct ipc_header)), response->length);
+        memcpy(response->data, (void *) ((unsigned char *) buffer + sizeof(struct ipc_fmt_header)), response->length);
     }
 
     ipc_client_log_recv(client, response, __func__);
@@ -328,26 +327,24 @@ complete:
 
 int aries_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *request)
 {
-    struct rfs_hdr header;
+    struct ipc_rfs_header header;
     void *buffer;
     int rc;
 
     if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || request == NULL)
         return -1;
 
-    header.id = request->mseq;
-    header.cmd = request->index;
-    header.len = sizeof(struct rfs_hdr) + request->length;
+    ipc_rfs_header_fill(&header, request);
 
-    buffer = malloc(header.len);
+    buffer = malloc(header.length);
 
-    memcpy(buffer, &header, sizeof(struct rfs_hdr));
+    memcpy(buffer, &header, sizeof(struct ipc_rfs_header));
     if (request->data != NULL && request->length > 0)
-        memcpy((void *) ((unsigned char *) buffer + sizeof(struct rfs_hdr)), request->data, request->length);
+        memcpy((void *) ((unsigned char *) buffer + sizeof(struct ipc_rfs_header)), request->data, request->length);
 
     ipc_client_log_send(client, request, __func__);
 
-    rc = client->handlers->write(client->handlers->transport_data, buffer, header.len);
+    rc = client->handlers->write(client->handlers->transport_data, buffer, header.length);
     if (rc < 0) {
         ipc_client_log(client, "Writing RFS data to the modem failed");
         goto error;
@@ -368,7 +365,7 @@ complete:
 
 int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *response)
 {
-    struct rfs_hdr *header;
+    struct ipc_rfs_header *header;
     void *buffer = NULL;
     int length;
     int rc;
@@ -380,23 +377,20 @@ int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *respo
     buffer = malloc(length);
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
-    if (rc < (int) sizeof(struct rfs_hdr)) {
+    if (rc < (int) sizeof(struct ipc_rfs_header)) {
         ipc_client_log(client, "Reading RFS data from the modem failed");
         goto error;
     }
 
-    header = (struct rfs_hdr *) buffer;
+    header = (struct ipc_rfs_header *) buffer;
 
-    memset(response, 0, sizeof(struct ipc_message_info));
-    response->aseq = header->id;
-    response->group = IPC_GROUP_RFS;
-    response->index = header->cmd;
+    ipc_rfs_message_fill(header, response);
 
-    if (header->len > sizeof(struct rfs_hdr)) {
-        response->length = header->len - sizeof(struct rfs_hdr);
+    if (header->length > sizeof(struct ipc_rfs_header)) {
+        response->length = header->length - sizeof(struct ipc_rfs_header);
         response->data = malloc(response->length);
 
-        memcpy(response->data, (void *) ((unsigned char *) buffer + sizeof(struct rfs_hdr)), response->length);
+        memcpy(response->data, (void *) ((unsigned char *) buffer + sizeof(struct ipc_rfs_header)), response->length);
     }
 
     ipc_client_log_recv(client, response, __func__);

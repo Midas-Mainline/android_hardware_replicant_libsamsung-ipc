@@ -442,21 +442,21 @@ void ipc_client_log_send(struct ipc_client *client,
     }
 }
 
-void ipc_header_fill(struct ipc_header *header, struct ipc_message_info *message)
+void ipc_fmt_header_fill(struct ipc_fmt_header *header, struct ipc_message_info *message)
 {
     if (header == NULL || message == NULL)
         return;
 
-    memset(header, 0, sizeof(struct ipc_header));
+    memset(header, 0, sizeof(struct ipc_fmt_header));
     header->mseq = message->mseq;
     header->aseq = message->aseq;
     header->group = message->group;
     header->index = message->index;
     header->type = message->type;
-    header->length = message->length + sizeof(struct ipc_header);
+    header->length = message->length + sizeof(struct ipc_fmt_header);
 }
 
-void ipc_message_info_fill(struct ipc_header *header, struct ipc_message_info *message)
+void ipc_fmt_message_fill(struct ipc_fmt_header *header, struct ipc_message_info *message)
 {
     if (header == NULL || message == NULL)
         return;
@@ -468,6 +468,30 @@ void ipc_message_info_fill(struct ipc_header *header, struct ipc_message_info *m
     message->index = header->index;
     message->type = header->type;
     message->cmd = IPC_COMMAND(message);
+    message->length = 0;
+    message->data = NULL;
+}
+
+void ipc_rfs_header_fill(struct ipc_rfs_header *header, struct ipc_message_info *message)
+{
+    if (header == NULL || message == NULL)
+        return;
+
+    memset(header, 0, sizeof(struct ipc_rfs_header));
+    header->id = message->mseq;
+    header->index = message->index;
+    header->length = message->length + sizeof(struct ipc_rfs_header);
+}
+
+void ipc_rfs_message_fill(struct ipc_rfs_header *header, struct ipc_message_info *message)
+{
+    if (header == NULL || message == NULL)
+        return;
+
+    memset(message, 0, sizeof(struct ipc_message_info));
+    message->aseq = header->id;
+    message->group = IPC_GROUP_RFS;
+    message->index = header->index;
     message->length = 0;
     message->data = NULL;
 }

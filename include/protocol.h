@@ -75,13 +75,19 @@
  * Structures
  */
 
-struct ipc_header {
+struct ipc_fmt_header {
     unsigned short length;
     unsigned char mseq;
     unsigned char aseq;
     unsigned char group;
     unsigned char index;
     unsigned char type;
+} __attribute__((__packed__));
+
+struct ipc_rfs_header {
+    unsigned int length;
+    unsigned char index;
+    unsigned char id;
 } __attribute__((__packed__));
 
 #endif
