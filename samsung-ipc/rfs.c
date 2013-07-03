@@ -32,20 +32,22 @@
 #include <samsung-ipc.h>
 
 #include "ipc.h"
+#include "util.h"
 
 void md5hash2string(char *out, unsigned char *in)
 {
     int i;
 
-    for (i=0; i < MD5_DIGEST_LENGTH; i++)
+    for (i = 0; i < MD5_DIGEST_LENGTH; i++)
     {
         /* After the first iteration, we override \0. */
         if (*in < 0x10)
             sprintf(out, "0%x", *in);
         else
             sprintf(out, "%x", *in);
+
         in++;
-        out+=2;
+        out += 2;
     }
 }
 
@@ -131,16 +133,12 @@ int nv_data_chunk_size(struct ipc_client *client)
 
 void nv_data_generate(struct ipc_client *client)
 {
-    ipc_client_log(client, "This feature isn't present yet");
-
-//  nv_data_backup_create();
+    return;
 }
 
 void nv_data_md5_compute(void *data_p, int size, char *secret, void *hash)
 {
     MD5_CTX ctx;
-
-//  MD5((unsigned char *)nv_data_p, nv_data_stat.st_size, nv_data_md5_hash);
 
     MD5_Init(&ctx);
     MD5_Update(&ctx, data_p, size);
@@ -159,7 +157,7 @@ void nv_data_md5_generate(struct ipc_client *client)
     ipc_client_log(client, "nv_data_md5_generate: enter");
 
     ipc_client_log(client, "nv_data_md5_generate: generating MD5 hash");
-    nv_data_p=ipc_client_file_read(client, nv_data_path(client),
+    nv_data_p = file_data_read(nv_data_path(client),
         nv_data_size(client), nv_data_chunk_size(client));
     nv_data_md5_compute(nv_data_p, nv_data_size(client), nv_data_secret(client), nv_data_md5_hash);
     free(nv_data_p);
@@ -238,14 +236,14 @@ void nv_data_backup_create(struct ipc_client *client)
     }
 
     /* Alloc the memory for the md5 hashes strings. */
-    nv_data_md5_hash_string=malloc(MD5_STRING_SIZE);
-    nv_data_md5_hash_read=malloc(MD5_STRING_SIZE);
+    nv_data_md5_hash_string = malloc(MD5_STRING_SIZE);
+    nv_data_md5_hash_read = malloc(MD5_STRING_SIZE);
 
     memset(nv_data_md5_hash_read, 0, MD5_STRING_SIZE);
     memset(nv_data_md5_hash_string, 0, MD5_STRING_SIZE);
 
     /* Read the content of the backup file. */
-    nv_data_p=ipc_client_file_read(client, nv_data_path(client),
+    nv_data_p = file_data_read(nv_data_path(client),
         nv_data_size(client), nv_data_chunk_size(client));
 
     /* Compute the backup file MD5 hash. */
@@ -271,7 +269,7 @@ void nv_data_backup_create(struct ipc_client *client)
     close(fd);
 
     /* Add 0x0 to end the string: not sure this is always part of the file. */
-    nv_data_md5_hash_read[MD5_STRING_SIZE - 1]='\0';
+    nv_data_md5_hash_read[MD5_STRING_SIZE - 1] = '\0';
 
     ipc_client_log(client, "nv_data_backup_create: backup file computed MD5: %s read MD5: %s",
         nv_data_md5_hash_string, nv_data_md5_hash_read);
@@ -342,7 +340,7 @@ nv_data_backup_create_write:
     }
 
     /* Read the newly-written .nv_data.bak. */
-    nv_data_bak_p = ipc_client_file_read(client, nv_data_bak_path(client), 
+    nv_data_bak_p = file_data_read(nv_data_bak_path(client), 
         nv_data_size(client), nv_data_chunk_size(client));
 
     /* Compute the MD5 hash for nv_data.bin. */
@@ -389,7 +387,7 @@ nv_data_backup_create_write:
         goto exit;
     }
 
-    data='1';
+    data = '1';
     rc = write(fd, &data, sizeof(data));
     if (rc < 0)
     {
@@ -454,14 +452,14 @@ void nv_data_backup_restore(struct ipc_client *client)
     }
 
     /* Alloc the memory for the md5 hashes strings. */
-    nv_data_md5_hash_string=malloc(MD5_STRING_SIZE);
-    nv_data_md5_hash_read=malloc(MD5_STRING_SIZE);
+    nv_data_md5_hash_string = malloc(MD5_STRING_SIZE);
+    nv_data_md5_hash_read = malloc(MD5_STRING_SIZE);
 
     memset(nv_data_md5_hash_read, 0, MD5_STRING_SIZE);
     memset(nv_data_md5_hash_string, 0, MD5_STRING_SIZE);
 
     /* Read the content of the backup file. */
-    nv_data_bak_p=ipc_client_file_read(client, nv_data_bak_path(client),
+    nv_data_bak_p = file_data_read(nv_data_bak_path(client),
         nv_data_size(client), nv_data_chunk_size(client));
 
     /* Compute the backup file MD5 hash. */
@@ -469,7 +467,7 @@ void nv_data_backup_restore(struct ipc_client *client)
     md5hash2string(nv_data_md5_hash_string, nv_data_md5_hash);
 
     /* Read the stored backup file MD5 hash. */
-    fd=open(nv_data_md5_bak_path(client), O_RDONLY);
+    fd = open(nv_data_md5_bak_path(client), O_RDONLY);
     rc = read(fd, nv_data_md5_hash_read, MD5_STRING_SIZE);
     if (rc < 0)
     {
@@ -481,7 +479,7 @@ void nv_data_backup_restore(struct ipc_client *client)
     close(fd);
 
     /* Add 0x0 to end the string: not sure this is always part of the file. */
-    nv_data_md5_hash_read[MD5_STRING_SIZE - 1]='\0';
+    nv_data_md5_hash_read[MD5_STRING_SIZE - 1] = '\0';
 
     ipc_client_log(client, "nv_data_backup_restore: backup file computed MD5: %s read MD5: %s",
         nv_data_md5_hash_string, nv_data_md5_hash_read);
@@ -524,7 +522,7 @@ nv_data_backup_restore_write:
     {
         ipc_client_log(client, "nv_data_backup_restore: nv_data.bin write try #%d", nv_data_write_tries + 1);
 
-        fd=open(nv_data_path(client), O_RDWR | O_CREAT | O_TRUNC, 0644);
+        fd = open(nv_data_path(client), O_RDWR | O_CREAT | O_TRUNC, 0644);
         if (fd < 0)
         {
             ipc_client_log(client, "nv_data_backup_restore: negative fd while opening /efs/nv_data.bin, error: %s", strerror(errno));
@@ -553,7 +551,7 @@ nv_data_backup_restore_write:
     }
 
     /* Read the newly-written nv_data.bin. */
-    nv_data_p=ipc_client_file_read(client, nv_data_path(client),
+    nv_data_p = file_data_read(nv_data_path(client),
         nv_data_size(client), nv_data_chunk_size(client));
 
     /* Compute the MD5 hash for nv_data.bin. */
@@ -603,7 +601,7 @@ nv_data_backup_restore_write:
         goto exit;
     }
 
-    data='1';
+    data = '1';
     rc = write(fd, &data, sizeof(data));
     if (rc <  0)
     {
@@ -628,8 +626,8 @@ exit:
 int nv_data_check(struct ipc_client *client)
 {
     struct stat nv_stat;
-    int nv_state_fd=-1;
-    int nv_state=0;
+    int nv_state_fd = -1;
+    int nv_state = 0;
     int rc;
 
     ipc_client_log(client, "nv_data_check: enter");
@@ -659,7 +657,7 @@ int nv_data_check(struct ipc_client *client)
         nv_data_backup_create(client);
     }
 
-    nv_state_fd=open(nv_state_path(client), O_RDONLY);
+    nv_state_fd = open(nv_state_path(client), O_RDONLY);
 
     if (nv_state_fd < 0 || fstat(nv_state_fd, &nv_stat) < 0)
     {
@@ -701,15 +699,15 @@ int nv_data_md5_check(struct ipc_client *client)
 
     ipc_client_log(client, "nv_data_md5_check: enter");
 
-    nv_data_md5_hash_string=malloc(MD5_STRING_SIZE);
-    nv_data_md5_hash_read=malloc(MD5_STRING_SIZE);
+    nv_data_md5_hash_string = malloc(MD5_STRING_SIZE);
+    nv_data_md5_hash_read = malloc(MD5_STRING_SIZE);
 
     memset(nv_data_md5_hash_read, 0, MD5_STRING_SIZE);
     memset(nv_data_md5_hash_string, 0, MD5_STRING_SIZE);
 
-    nv_data_p=ipc_client_file_read(client, nv_data_path(client),
+    nv_data_p = file_data_read(nv_data_path(client),
         nv_data_size(client), nv_data_chunk_size(client));
-    data_p=nv_data_p;
+    data_p = nv_data_p;
 
     nv_data_md5_compute(data_p, nv_data_size(client), nv_data_secret(client), nv_data_md5_hash);
 
@@ -717,7 +715,7 @@ int nv_data_md5_check(struct ipc_client *client)
 
     free(nv_data_p);
 
-    fd=open(nv_data_md5_path(client), O_RDONLY);
+    fd = open(nv_data_md5_path(client), O_RDONLY);
 
     /* Read the md5 stored in the file. */
     rc = read(fd, nv_data_md5_hash_read, MD5_STRING_SIZE);
@@ -728,7 +726,7 @@ int nv_data_md5_check(struct ipc_client *client)
     }
 
     /* Add 0x0 to end the string: not sure this is part of the file. */
-    nv_data_md5_hash_read[MD5_STRING_SIZE - 1]='\0';
+    nv_data_md5_hash_read[MD5_STRING_SIZE - 1] = '\0';
 
     ipc_client_log(client, "nv_data_md5_check: computed MD5: %s read MD5: %s", 
         nv_data_md5_hash_string, nv_data_md5_hash_read);
