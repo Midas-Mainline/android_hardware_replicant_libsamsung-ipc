@@ -42,6 +42,10 @@ ifeq ($(TARGET_DEVICE),galaxys2)
 	board_name := smdk4210
 endif
 
+ifeq ($(TARGET_DEVICE),n7000)
+	board_name := smdk4210
+endif
+
 ifeq ($(TARGET_DEVICE),i9300)
 	board_name := smdk4x12
 endif
