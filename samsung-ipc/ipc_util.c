@@ -315,6 +315,24 @@ const char *ipc_command_to_str(int command)
             return "IPC_SS_AOC";
         case IPC_SS_RELEASE_COMPLETE:
             return "IPC_SS_RELEASE_COMPLETE";
+        case IPC_SVC_ENTER:
+            return "IPC_SVC_ENTER";
+        case IPC_SVC_END:
+            return "IPC_SVC_END";
+        case IPC_SVC_PRO_KEYCODE:
+            return "IPC_SVC_PRO_KEYCODE";
+        case IPC_SVC_SCREEN_CFG:
+            return "IPC_SVC_SCREEN_CFG";
+        case IPC_SVC_DISPLAY_SCREEN:
+            return "IPC_SVC_DISPLAY_SCREEN";
+        case IPC_SVC_CHANGE_SVC_MODE:
+            return "IPC_SVC_CHANGE_SVC_MODE";
+        case IPC_SVC_DEVICE_TEST:
+            return "IPC_SVC_DEVICE_TEST";
+        case IPC_SVC_DEBUG_DUMP_MESSAGE:
+            return "IPC_SVC_DEBUG_DUMP_MESSAGE";
+        case IPC_SVC_DEBUG_STRING_MESSAGE:
+            return "IPC_SVC_DEBUG_STRING_MESSAGE";
         default:
             return "UNKNOWN";
     }
