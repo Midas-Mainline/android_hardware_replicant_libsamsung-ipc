@@ -62,6 +62,11 @@
 #define IPC_SMS_TYPE_STATUS_REPORT                              0x02
 #define IPC_SMS_TYPE_OUTGOING                                   0x02
 
+#define IPC_SMS_STATUS_REC_UNREAD                               0x01
+#define IPC_SMS_STATUS_REC_READ                                 0x02
+#define IPC_SMS_STATUS_STO_UNSENT                               0x03
+#define IPC_SMS_STATUS_STO_SENT                                 0x04
+
 /*
  * Structures
  */
@@ -104,6 +109,34 @@ struct ipc_sms_deliver_report_request {
 struct ipc_sms_deliver_report_response {
     unsigned short error;
 } __attribute__((__packed__));
+
+struct ipc_sms_del_msg_request_data {
+    unsigned char unknown; // This is usually set to 0x02
+    unsigned short index;
+} __attribute__((__packed__));
+
+struct ipc_sms_del_msg_response_data {
+    unsigned char unknown; // This is usually set to 0x02
+    unsigned short error;
+    unsigned short index;
+} __attribute__((__packed__));
+
+struct ipc_sms_save_msg_request_data {
+    unsigned char unknown; // This is usually set to 0x02
+    unsigned short index; // This is usually set to 0x0B
+    unsigned char status;
+    unsigned char length; // Total SMSC+PDU length
+} __attribute__((__packed__));
+
+struct ipc_sms_save_msg_response_data {
+    unsigned char unknown; // This is usually set to 0x02
+    unsigned short error;
+    unsigned short index;
+} __attribute__((__packed__));
+
+/*
+ * Helpers
+ */
 
 unsigned char *ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request *msg,
     char *smsc, unsigned char *pdu, int length);
