@@ -67,16 +67,6 @@ struct ipc_device_desc ipc_devices[] = {
     },
     {
         .name = "galaxys2",
-        .board_name = "i9100",
-        .kernel_version = NULL,
-        .fmt_ops = &galaxys2_ipc_fmt_ops,
-        .rfs_ops = &galaxys2_ipc_rfs_ops,
-        .handlers = &galaxys2_ipc_handlers,
-        .gprs_specs = &galaxys2_ipc_gprs_specs,
-        .nv_data_specs = NULL,
-    },
-    {
-        .name = "galaxys2",
         .board_name = "smdk4210",
         .kernel_version = NULL,
         .fmt_ops = &galaxys2_ipc_fmt_ops,
@@ -86,23 +76,23 @@ struct ipc_device_desc ipc_devices[] = {
         .nv_data_specs = NULL,
     },
     {
-        .name = "galaxys3",
-        .board_name = "i9300",
+        .name = "galaxys2",
+        .board_name = "i9100",
         .kernel_version = NULL,
-        .fmt_ops = &galaxys3_ipc_fmt_ops,
-        .rfs_ops = &galaxys3_ipc_rfs_ops,
-        .handlers = &galaxys3_ipc_handlers,
-        .gprs_specs = &galaxys3_ipc_gprs_specs,
+        .fmt_ops = &galaxys2_ipc_fmt_ops,
+        .rfs_ops = &galaxys2_ipc_rfs_ops,
+        .handlers = &galaxys2_ipc_handlers,
+        .gprs_specs = &galaxys2_ipc_gprs_specs,
         .nv_data_specs = NULL,
     },
     {
-        .name = "galaxys3",
+        .name = "i9300",
         .board_name = "smdk4x12",
         .kernel_version = NULL,
-        .fmt_ops = &galaxys3_ipc_fmt_ops,
-        .rfs_ops = &galaxys3_ipc_rfs_ops,
-        .handlers = &galaxys3_ipc_handlers,
-        .gprs_specs = &galaxys3_ipc_gprs_specs,
+        .fmt_ops = &i9300_ipc_fmt_ops,
+        .rfs_ops = &i9300_ipc_rfs_ops,
+        .handlers = &i9300_ipc_handlers,
+        .gprs_specs = &i9300_ipc_gprs_specs,
         .nv_data_specs = NULL,
     },
     {
@@ -134,7 +124,7 @@ struct ipc_device_desc ipc_devices[] = {
         .handlers = &piranha_ipc_handlers,
         .gprs_specs = &piranha_ipc_gprs_specs,
         .nv_data_specs = NULL,
-    }
+    },
 };
 
 int ipc_devices_count = sizeof(ipc_devices) / sizeof(struct ipc_device_desc);

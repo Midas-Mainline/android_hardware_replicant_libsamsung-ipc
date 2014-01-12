@@ -1,8 +1,7 @@
-BUILD_IPC-MODEMCTRL := true
-DEBUG := true
-
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
+
+DEBUG := true
 
 LOCAL_MODULE := libsamsung-ipc
 LOCAL_MODULE_TAGS := optional
@@ -10,48 +9,28 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_C_INCLUDES := external/openssl/include
 LOCAL_LDFLAGS += -lcrypto
 
-ifeq ($(TARGET_DEVICE),crespo)
-	board_name := herring
+ifneq (,$(filter crespo,$(TARGET_DEVICE)))
+	ipc_device_name := crespo
 endif
 
-ifeq ($(TARGET_DEVICE),galaxysmtd)
-	board_name := aries
+ifneq (,$(filter galaxysmtd galaxytab,$(TARGET_DEVICE)))
+	ipc_device_name := aries
 endif
 
-ifeq ($(TARGET_DEVICE),galaxytab)
-	board_name := gt-p1000
+ifneq (,$(filter maguro,$(TARGET_DEVICE)))
+	ipc_device_name := maguro
 endif
 
-ifeq ($(TARGET_DEVICE),maguro)
-	board_name := tuna
+ifneq (,$(filter p5100 p3100,$(TARGET_DEVICE)))
+	ipc_device_name := piranha
 endif
 
-ifeq ($(TARGET_DEVICE),p5100)
-	board_name := espresso10
+ifneq (,$(filter i9100 galaxys2 n7000,$(TARGET_DEVICE)))
+	ipc_device_name := galaxys2
 endif
 
-ifeq ($(TARGET_DEVICE),p3100)
-	board_name := espresso
-endif
-
-ifeq ($(TARGET_DEVICE),i9100)
-	board_name := smdk4210
-endif
-
-ifeq ($(TARGET_DEVICE),galaxys2)
-	board_name := smdk4210
-endif
-
-ifeq ($(TARGET_DEVICE),n7000)
-	board_name := smdk4210
-endif
-
-ifeq ($(TARGET_DEVICE),i9300)
-	board_name := smdk4x12
-endif
-
-ifeq ($(TARGET_DEVICE),galaxys3)
-	board_name := smdk4x12
+ifneq (,$(filter i9300,$(TARGET_DEVICE)))
+	ipc_device_name := i9300
 endif
 
 ifeq ($(DEBUG),true)
@@ -80,12 +59,12 @@ samsung-ipc_files := \
 	samsung-ipc/device/crespo/crespo_ipc.c \
 	samsung-ipc/device/aries/aries_ipc.c \
 	samsung-ipc/device/galaxys2/galaxys2_ipc.c \
-	samsung-ipc/device/galaxys3/galaxys3_ipc.c \
+	samsung-ipc/device/i9300/i9300_ipc.c \
 	samsung-ipc/device/maguro/maguro_ipc.c \
 	samsung-ipc/device/piranha/piranha_ipc.c
 
 LOCAL_SRC_FILES := $(samsung-ipc_files)
-LOCAL_CFLAGS += -DIPC_BOARD_NAME_EXPLICIT=\"$(board_name)\"
+LOCAL_CFLAGS += -DIPC_DEVICE_NAME=\"$(ipc_device_name)\"
 
 LOCAL_SHARED_LIBRARIES := libutils
 LOCAL_C_INCLUDES += \
@@ -95,8 +74,6 @@ LOCAL_C_INCLUDES += \
 	$(LOCAL_PATH)/samsung-ipc/device/xmm6260/
 
 include $(BUILD_STATIC_LIBRARY)
-
-ifeq ($(BUILD_IPC-MODEMCTRL),true)
 
 include $(CLEAR_VARS)
 
@@ -117,5 +94,3 @@ LOCAL_SHARED_LIBRARIES := libutils
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
 
 include $(BUILD_EXECUTABLE)
-
-endif

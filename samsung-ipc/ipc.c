@@ -43,48 +43,61 @@
 
 int ipc_device_detect(void)
 {
+    char buffer[4096] = { 0 };
+    struct utsname utsname;
     char *board_name = NULL;
     char *kernel_version = NULL;
+    char *name = NULL;
+    char *line, *p, *c;
     int index = -1;
+    int fd = -1;
+    int length;
+    int rc;
     int i;
 
-#ifdef IPC_BOARD_NAME_EXPLICIT
-    board_name = strdup(IPC_BOARD_NAME_EXPLICIT);
+#ifdef IPC_DEVICE_NAME
+    name = strdup(IPC_DEVICE_NAME);
+#endif
+
+#ifdef IPC_DEVICE_BOARD_NAME
+    board_name = strdup(IPC_DEVICE_BOARD_NAME);
 #else
-    char buf[4096];
+    // Read board name from cpuinfo
 
-    // gather board name type from /proc/cpuinfo
-    int fd = open("/proc/cpuinfo", O_RDONLY);
-    int bytesread = read(fd, buf, 4096);
+    fd = open("/proc/cpuinfo", O_RDONLY);
+    if (fd < 0)
+        goto error;
+
+    length = sizeof(buffer);
+    length = read(fd, &buffer, length);
+
     close(fd);
+    fd = -1;
 
-    // match hardware name with our supported devices
-    char *pch = strtok(buf, "\n");
-    while (pch != NULL)
-    {
-        int rc;
-        if ((rc = strncmp(pch, "Hardware", 9)) == 9)
-        {
-            char *str = (void *) (pch + 9);
-            int len = strlen(str);
-            char tmp;
+    line = strtok(buffer, "\n");
+    while (line != NULL) {
+        if (strncmp(line, "Hardware", 9) == 9) {
+            p = line + 11;
+            c = p;
 
-            for (i=0; i < len; i++)
-            {
-                tmp = (char) tolower(str[i]);
-                str[i] = tmp;
+            while (*c != '\n' && *c != '\0') {
+                *c = tolower(*c);
+                c++;
             }
 
-            board_name = strdup(pch);
+            *c = '\0';
+
+            board_name = strdup(p);
+            break;
         }
-        pch = strtok(NULL, "\n");
+
+        line = strtok(NULL, "\n");
     }
 #endif
 
-#ifdef IPC_KERNEL_VERSION_EXPLICIT
-    kernel_version = strdup(IPC_KERNEL_VERSION_EXPLICIT);
+#ifdef IPC_DEVICE_KERNEL_VERSION
+    kernel_version = strdup(IPC_DEVICE_KERNEL_VERSION);
 #else
-    struct utsname utsname;
     memset(&utsname, 0, sizeof(utsname));
 
     uname(&utsname);
@@ -92,32 +105,42 @@ int ipc_device_detect(void)
     kernel_version = strdup(utsname.release);
 #endif
 
-    for (i=0; i < ipc_devices_count; i++)
-    {
-        if (strstr(board_name, ipc_devices[i].board_name) != NULL)
-        {
-            if (ipc_devices[i].kernel_version != NULL)
-            {
-                if (strncmp(kernel_version, ipc_devices[i].kernel_version, strlen(ipc_devices[i].kernel_version)) == 0)
-                {
-                    index = i;
-                    break;
-                } else {
-                    // Kernel version didn't match but it may still work
-                    index = i;
-                }
-            } else {
-                index = i;
-                break;
-            }
-        }
+    for (i = 0; i < ipc_devices_count; i++) {
+        // Eliminate index if the name doesn't match
+        if (name != NULL && ipc_devices[i].name != NULL && strcmp(name, ipc_devices[i].name) != 0)
+            continue;
+
+        // Eliminate index if the board name doesn't match
+        if (board_name != NULL && ipc_devices[i].board_name != NULL && strcmp(board_name, ipc_devices[i].board_name) != 0)
+            continue;
+
+        // Keep index but don't break yet since we may have a better match with kernel version
+        index = i;
+
+        if (kernel_version == NULL || ipc_devices[i].kernel_version == NULL)
+            continue;
+
+        if (kernel_version != NULL && ipc_devices[i].kernel_version != NULL && strcmp(kernel_version, ipc_devices[i].kernel_version) != 0)
+            continue;
+
+        // Everything matches this particular index
+        break;
     }
 
+    goto complete;
+
+error:
+    index = -1;
+
+complete:
     if (board_name != NULL)
         free(board_name);
 
     if (kernel_version != NULL)
         free(kernel_version);
+
+    if (fd >= 0)
+        close(fd);
 
     return index;
 }
