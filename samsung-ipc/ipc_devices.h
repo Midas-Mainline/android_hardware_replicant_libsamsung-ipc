@@ -26,6 +26,7 @@
 #include "device/i9300/i9300_ipc.h"
 #include "device/maguro/maguro_ipc.h"
 #include "device/piranha/piranha_ipc.h"
+#include "device/n7100/n7100_ipc.h"
 
 #ifndef __IPC_DEVICES_H__
 #define __IPC_DEVICES_H__

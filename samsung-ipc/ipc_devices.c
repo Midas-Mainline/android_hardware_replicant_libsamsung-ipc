@@ -125,6 +125,16 @@ struct ipc_device_desc ipc_devices[] = {
         .gprs_specs = &piranha_ipc_gprs_specs,
         .nv_data_specs = NULL,
     },
+    {
+        .name = "n7100",
+        .board_name = "smdk4x12",
+        .kernel_version = NULL,
+        .fmt_ops = &n7100_ipc_fmt_ops,
+        .rfs_ops = &n7100_ipc_rfs_ops,
+        .handlers = &n7100_ipc_handlers,
+        .gprs_specs = &n7100_ipc_gprs_specs,
+        .nv_data_specs = NULL,
+    },
 };
 
 int ipc_devices_count = sizeof(ipc_devices) / sizeof(struct ipc_device_desc);

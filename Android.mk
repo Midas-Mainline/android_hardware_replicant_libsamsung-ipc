@@ -33,6 +33,10 @@ ifneq (,$(filter i9300,$(TARGET_DEVICE)))
 	ipc_device_name := i9300
 endif
 
+ifneq (,$(filter n7100,$(TARGET_DEVICE)))
+	ipc_device_name := n7100
+endif
+
 ifeq ($(DEBUG),true)
 	LOCAL_CFLAGS += -DDEBUG
 	LOCAL_CFLAGS += -DLOG_STDOUT
@@ -61,7 +65,8 @@ samsung-ipc_files := \
 	samsung-ipc/device/galaxys2/galaxys2_ipc.c \
 	samsung-ipc/device/i9300/i9300_ipc.c \
 	samsung-ipc/device/maguro/maguro_ipc.c \
-	samsung-ipc/device/piranha/piranha_ipc.c
+	samsung-ipc/device/piranha/piranha_ipc.c \
+	samsung-ipc/device/n7100/n7100_ipc.c
 
 LOCAL_SRC_FILES := $(samsung-ipc_files)
 LOCAL_CFLAGS += -DIPC_DEVICE_NAME=\"$(ipc_device_name)\"
