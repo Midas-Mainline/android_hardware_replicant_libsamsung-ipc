@@ -243,7 +243,11 @@ complete:
 int aries_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
 {
     struct ipc_fmt_header header;
-    void *buffer;
+    void *buffer = NULL;
+    unsigned char *p;
+    int length = 0;
+    int count = 0;
+    int chunk;
     int rc;
 
     if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || request == NULL)
@@ -251,18 +255,30 @@ int aries_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *reque
 
     ipc_fmt_header_fill(&header, request);
 
+    length = header.length;
     buffer = malloc(header.length);
 
     memcpy(buffer, &header, sizeof(struct ipc_fmt_header));
-    if (request->data != NULL && request->length > 0)
-        memcpy((void *) ((unsigned char *) buffer + sizeof(struct ipc_fmt_header)), request->data, request->length);
+    if (request->data != NULL && request->length > 0) {
+        p = (unsigned char *) buffer + sizeof(header);
+        memcpy(p, request->data, request->length);
+    }
 
     ipc_client_log_send(client, request, __func__);
 
-    rc = client->handlers->write(client->handlers->transport_data, buffer, header.length);
-    if (rc < header.length) {
-        ipc_client_log(client, "Writing FMT data to the modem failed");
-        goto error;
+    p = (unsigned char *) buffer;
+
+    while (count < length) {
+        chunk = length - count < ARIES_DATA_SIZE ? length - count : ARIES_DATA_SIZE;
+
+        rc = client->handlers->write(client->handlers->transport_data, p, chunk);
+        if (rc < 0) {
+            ipc_client_log(client, "Writing FMT data to the modem failed");
+            goto error;
+        }
+
+        count += rc;
+        p += rc;
     }
 
     rc = 0;
@@ -282,7 +298,10 @@ int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *respo
 {
     struct ipc_fmt_header *header;
     void *buffer = NULL;
-    int length;
+    unsigned char *p;
+    int length = 0;
+    int count = 0;
+    int chunk;
     int rc;
 
     if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || response == NULL)
@@ -293,7 +312,7 @@ int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *respo
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
     if (rc < (int) sizeof(struct ipc_fmt_header)) {
-        ipc_client_log(client, "Reading FMT data from the modem failed");
+        ipc_client_log(client, "Reading FMT header from the modem failed");
         goto error;
     }
 
@@ -301,11 +320,31 @@ int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *respo
 
     ipc_fmt_message_fill(header, response);
 
-    if (header->length > sizeof(struct ipc_fmt_header)) {
-        response->length = header->length - sizeof(struct ipc_fmt_header);
-        response->data = malloc(response->length);
+    length = header->length - sizeof(struct ipc_fmt_header);
+    if (length > 0) {
+        response->length = length;
+        response->data = malloc(length);
 
-        memcpy(response->data, (void *) ((unsigned char *) buffer + sizeof(struct ipc_fmt_header)), response->length);
+        count = rc - sizeof(struct ipc_fmt_header);
+        if (count > 0) {
+            p = (unsigned char *) buffer + sizeof(struct ipc_fmt_header);
+            memcpy(response->data, p, count);
+        }
+    }
+
+    p = (unsigned char *) response->data + count;
+
+    while (count < length) {
+        chunk = length - count < ARIES_DATA_SIZE ? length - count : ARIES_DATA_SIZE;
+
+        rc = client->handlers->read(client->handlers->transport_data, p, chunk);
+        if (rc < 0) {
+            ipc_client_log(client, "Reading FMT data from the modem failed");
+            goto error;
+        }
+
+        count += rc;
+        p += rc;
     }
 
     ipc_client_log_recv(client, response, __func__);
@@ -321,14 +360,16 @@ complete:
         free(buffer);
 
     return rc;
-
-    return 0;
 }
 
 int aries_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *request)
 {
     struct ipc_rfs_header header;
-    void *buffer;
+    void *buffer = NULL;
+    unsigned char *p;
+    int length = 0;
+    int count = 0;
+    int chunk;
     int rc;
 
     if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || request == NULL)
@@ -336,18 +377,30 @@ int aries_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *reque
 
     ipc_rfs_header_fill(&header, request);
 
-    buffer = malloc(header.length);
+    length = header.length;
+    buffer = malloc(length);
 
-    memcpy(buffer, &header, sizeof(struct ipc_rfs_header));
-    if (request->data != NULL && request->length > 0)
-        memcpy((void *) ((unsigned char *) buffer + sizeof(struct ipc_rfs_header)), request->data, request->length);
+    memcpy(buffer, &header, sizeof(header));
+    if (request->data != NULL && request->length > 0) {
+        p = (unsigned char *) buffer + sizeof(header);
+        memcpy(p, request->data, request->length);
+    }
 
     ipc_client_log_send(client, request, __func__);
 
-    rc = client->handlers->write(client->handlers->transport_data, buffer, header.length);
-    if (rc < 0) {
-        ipc_client_log(client, "Writing RFS data to the modem failed");
-        goto error;
+    p = (unsigned char *) buffer;
+
+    while (count < length) {
+        chunk = length - count < ARIES_DATA_SIZE ? length - count : ARIES_DATA_SIZE;
+
+        rc = client->handlers->write(client->handlers->transport_data, p, chunk);
+        if (rc < 0) {
+            ipc_client_log(client, "Writing RFS data to the modem failed");
+            goto error;
+        }
+
+        count += rc;
+        p += rc;
     }
 
     rc = 0;
@@ -367,7 +420,10 @@ int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *respo
 {
     struct ipc_rfs_header *header;
     void *buffer = NULL;
-    int length;
+    unsigned char *p;
+    int length = 0;
+    int count = 0;
+    int chunk;
     int rc;
 
     if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || response == NULL)
@@ -378,7 +434,7 @@ int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *respo
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
     if (rc < (int) sizeof(struct ipc_rfs_header)) {
-        ipc_client_log(client, "Reading RFS data from the modem failed");
+        ipc_client_log(client, "Reading RFS header from the modem failed");
         goto error;
     }
 
@@ -386,11 +442,31 @@ int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *respo
 
     ipc_rfs_message_fill(header, response);
 
-    if (header->length > sizeof(struct ipc_rfs_header)) {
-        response->length = header->length - sizeof(struct ipc_rfs_header);
-        response->data = malloc(response->length);
+    length = header->length - sizeof(struct ipc_rfs_header);
+    if (length > 0) {
+        response->length = length;
+        response->data = malloc(length);
 
-        memcpy(response->data, (void *) ((unsigned char *) buffer + sizeof(struct ipc_rfs_header)), response->length);
+        count = rc - sizeof(struct ipc_rfs_header);
+        if (count > 0) {
+            p = (unsigned char *) buffer + sizeof(struct ipc_rfs_header);
+            memcpy(response->data, p, count);
+        }
+    }
+
+    p = (unsigned char *) response->data + count;
+
+    while (count < length) {
+        chunk = length - count < ARIES_DATA_SIZE ? length - count : ARIES_DATA_SIZE;
+
+        rc = client->handlers->read(client->handlers->transport_data, p, chunk);
+        if (rc < 0) {
+            ipc_client_log(client, "Reading RFS data from the modem failed");
+            goto error;
+        }
+
+        count += rc;
+        p += rc;
     }
 
     ipc_client_log_recv(client, response, __func__);
@@ -580,7 +656,7 @@ int aries_ipc_power_on(void *data)
     if (value < 0)
         return -1;
 
-    /* The modem is already on */
+    // The modem is already on
     if (value == 1)
         return 0;
 
@@ -601,7 +677,7 @@ int aries_ipc_power_off(void *data)
     if (value < 0)
         return -1;
 
-    /* The modem is already off */
+    // The modem is already off
     if (value == 0)
         return 0;
 
