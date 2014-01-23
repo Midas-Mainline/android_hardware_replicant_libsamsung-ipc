@@ -400,8 +400,8 @@ void ipc_client_log_recv(struct ipc_client *client,
     switch (client->type) {
         case IPC_CLIENT_TYPE_FMT:
             ipc_client_log(client, "%s: RECV FMT!", prefix);
-            ipc_client_log(client, "%s: Response: aseq=0x%02x command=%s (0x%04x) type=%s",
-                prefix, response->aseq, ipc_command_to_str(IPC_COMMAND(response)), IPC_COMMAND(response), ipc_response_type_to_str(response->type));
+            ipc_client_log(client, "%s: Response: aseq=0x%02x, command=%s, type=%s, length=%d",
+                prefix, response->aseq, ipc_command_to_str(IPC_COMMAND(response)), ipc_response_type_to_str(response->type), response->length);
 #ifdef DEBUG
             if (response->length > 0) {
                 ipc_client_log(client, "==== FMT DATA DUMP ====");
@@ -413,8 +413,8 @@ void ipc_client_log_recv(struct ipc_client *client,
             break;
         case IPC_CLIENT_TYPE_RFS:
             ipc_client_log(client, "%s: RECV RFS!", prefix);
-            ipc_client_log(client, "%s: Response: aseq=0x%02x command=%s (0x%04x)",
-                prefix, response->aseq, ipc_command_to_str(IPC_COMMAND(response)), IPC_COMMAND(response));
+            ipc_client_log(client, "%s: Response: aseq=0x%02x, command=%s, length=%d",
+                prefix, response->aseq, ipc_command_to_str(IPC_COMMAND(response)), response->length);
 #ifdef DEBUG
             if (response->length > 0) {
                 ipc_client_log(client, "==== RFS DATA DUMP ====");
@@ -433,8 +433,8 @@ void ipc_client_log_send(struct ipc_client *client,
     switch (client->type) {
         case IPC_CLIENT_TYPE_FMT:
             ipc_client_log(client, "%s: SEND FMT!", prefix);
-            ipc_client_log(client, "%s: Request: mseq=0x%02x command=%s (0x%04x) type=%s",
-                prefix, request->mseq, ipc_command_to_str(IPC_COMMAND(request)), IPC_COMMAND(request), ipc_request_type_to_str(request->type));
+            ipc_client_log(client, "%s: Request: mseq=0x%02x, command=%s, type=%s, length=%d",
+                prefix, request->mseq, ipc_command_to_str(IPC_COMMAND(request)), ipc_request_type_to_str(request->type), request->length);
 #ifdef DEBUG
             if (request->length > 0) {
                 ipc_client_log(client, "==== FMT DATA DUMP ====");
@@ -446,8 +446,8 @@ void ipc_client_log_send(struct ipc_client *client,
             break;
         case IPC_CLIENT_TYPE_RFS:
             ipc_client_log(client, "%s: SEND RFS!", prefix);
-            ipc_client_log(client, "%s: Request: mseq=0x%02x command=%s (0x%04x)",
-                prefix, request->mseq, ipc_command_to_str(IPC_COMMAND(request)), IPC_COMMAND(request));
+            ipc_client_log(client, "%s: Request: mseq=0x%02x, command=%s, length=%d",
+                prefix, request->mseq, ipc_command_to_str(IPC_COMMAND(request)), request->length);
 #ifdef DEBUG
             if (request->length > 0) {
                 ipc_client_log(client, "==== RFS DATA DUMP ====");
