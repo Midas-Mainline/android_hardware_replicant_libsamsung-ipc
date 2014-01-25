@@ -24,7 +24,7 @@
 #define __SAMSUNG_IPC_SEC_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_SEC_SIM_STATUS                                      0x0501

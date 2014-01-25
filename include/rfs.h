@@ -23,7 +23,7 @@
 #define __SAMSUNG_IPC_RFS_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_RFS_NV_READ_ITEM                                    0x4201

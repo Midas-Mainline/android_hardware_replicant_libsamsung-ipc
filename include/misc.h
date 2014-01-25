@@ -25,7 +25,7 @@
 #define __SAMSUNG_IPC_MISC_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_MISC_ME_VERSION                                     0x0A01

@@ -23,7 +23,7 @@
 #define __SAMSUNG_IPC_SAT_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_SAT_PROFILE_DOWNLOAD                                0x0E01

@@ -23,7 +23,7 @@
 #define __SAMSUNG_IPC_PROTOCOL_H__
 
 /*
- * Types
+ * Commands
  */
 
 /* AP -> Baseband */

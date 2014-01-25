@@ -24,7 +24,7 @@
 #define __SAMSUNG_IPC_SS_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_SS_WAITING                                          0x0C01

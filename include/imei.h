@@ -23,7 +23,7 @@
 #define __SAMSUNG_IPC_IMEI_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_IMEI_START                                          0x1001

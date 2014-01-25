@@ -24,7 +24,7 @@
 #define __SAMSUNG_IPC_DISP_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_DISP_ICON_INFO                                      0x0701

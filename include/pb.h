@@ -23,7 +23,7 @@
 #define __SAMSUNG_IPC_PB_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_PB_ACCESS                                           0x0601

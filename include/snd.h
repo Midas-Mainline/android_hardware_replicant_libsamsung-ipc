@@ -23,7 +23,7 @@
 #define __SAMSUNG_IPC_SND_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_SND_SPKR_VOLUME_CTRL                                0x0901

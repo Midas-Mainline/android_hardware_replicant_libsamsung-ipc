@@ -24,7 +24,7 @@
 #define __SAMSUNG_IPC_GEN_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_GEN_PHONE_RES                                       0x8001

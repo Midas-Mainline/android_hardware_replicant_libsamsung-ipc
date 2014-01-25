@@ -23,7 +23,7 @@
 #define __SAMSUNG_IPC_SVC_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_SVC_ENTER                                           0x0B01

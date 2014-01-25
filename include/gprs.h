@@ -24,7 +24,7 @@
 #define __SAMSUNG_IPC_GPRS_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_GPRS_DEFINE_PDP_CONTEXT                             0x0D01

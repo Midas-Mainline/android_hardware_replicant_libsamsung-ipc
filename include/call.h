@@ -24,7 +24,7 @@
 #define __SAMSUNG_IPC_CALL_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_CALL_OUTGOING                                       0x0201

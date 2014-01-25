@@ -24,7 +24,7 @@
 #define __SAMSUNG_IPC_SMS_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_SMS_SEND_MSG                                        0x0401

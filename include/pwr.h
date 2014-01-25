@@ -25,7 +25,7 @@
 #define __SAMSUNG_IPC_PWR_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_PWR_PHONE_PWR_UP                                    0x0101

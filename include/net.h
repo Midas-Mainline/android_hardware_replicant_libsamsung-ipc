@@ -25,7 +25,7 @@
 #define __SAMSUNG_IPC_NET_H__
 
 /*
- * Types
+ * Commands
  */
 
 #define IPC_NET_PREF_PLMN                                       0x0801
