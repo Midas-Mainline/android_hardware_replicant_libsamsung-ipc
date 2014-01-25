@@ -1,8 +1,8 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
+ * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
  *
  * Based on the incomplete C++ implementation which is:
  * Copyright (C) 2012 Sergey Gridasov <grindars@gmail.com>
@@ -19,7 +19,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 #include <stdlib.h>

@@ -1,8 +1,8 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
+ * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
