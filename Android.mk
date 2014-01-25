@@ -1,13 +1,23 @@
-LOCAL_PATH:= $(call my-dir)
+# This file is part of libsamsung-ipc.
+#
+# Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
+#
+# libsamsung-ipc is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# libsamsung-ipc is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
+
+LOCAL_PATH := $(call my-dir)
+
 include $(CLEAR_VARS)
-
-DEBUG := true
-
-LOCAL_MODULE := libsamsung-ipc
-LOCAL_MODULE_TAGS := optional
-
-LOCAL_C_INCLUDES := external/openssl/include
-LOCAL_LDFLAGS += -lcrypto
 
 ifneq (,$(filter crespo,$(TARGET_DEVICE)))
 	ipc_device_name := crespo
@@ -37,12 +47,7 @@ ifneq (,$(filter n7100,$(TARGET_DEVICE)))
 	ipc_device_name := n7100
 endif
 
-ifeq ($(DEBUG),true)
-	LOCAL_CFLAGS += -DDEBUG
-	LOCAL_CFLAGS += -DLOG_STDOUT
-endif
-
-samsung-ipc_files := \
+LOCAL_SRC_FILES := \
 	samsung-ipc/ipc.c \
 	samsung-ipc/ipc_util.c \
 	samsung-ipc/ipc_devices.c \
@@ -68,34 +73,34 @@ samsung-ipc_files := \
 	samsung-ipc/device/piranha/piranha_ipc.c \
 	samsung-ipc/device/n7100/n7100_ipc.c
 
-LOCAL_SRC_FILES := $(samsung-ipc_files)
-LOCAL_CFLAGS += -DIPC_DEVICE_NAME=\"$(ipc_device_name)\"
-
-LOCAL_SHARED_LIBRARIES := libutils
-LOCAL_C_INCLUDES += \
+LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/include \
 	$(LOCAL_PATH)/samsung-ipc \
 	$(LOCAL_PATH)/samsung-ipc/device/xmm6160/ \
-	$(LOCAL_PATH)/samsung-ipc/device/xmm6260/
+	$(LOCAL_PATH)/samsung-ipc/device/xmm6260/ \
+	external/openssl/include
+
+LOCAL_CFLAGS += \
+	-DIPC_DEVICE_NAME=\"$(ipc_device_name)\" \
+	-DDEBUG
+
+LOCAL_SHARED_LIBRARIES := libutils libcrypto
+
+LOCAL_MODULE := libsamsung-ipc
+LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := ipc-modemctrl
-LOCAL_MODULE_TAGS := optional
+LOCAL_SRC_FILES := tools/modemctrl.c
 
-ifeq ($(DEBUG),true)
-	LOCAL_CFLAGS += -DDEBUG
-	LOCAL_CFLAGS += -DLOG_STDOUT
-endif
-
-modemctrl_files := tools/modemctrl.c
-
-LOCAL_SRC_FILES := $(modemctrl_files)
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
 
 LOCAL_STATIC_LIBRARIES := libsamsung-ipc
 LOCAL_SHARED_LIBRARIES := libutils
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
+
+LOCAL_MODULE := ipc-modemctrl
+LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_EXECUTABLE)
