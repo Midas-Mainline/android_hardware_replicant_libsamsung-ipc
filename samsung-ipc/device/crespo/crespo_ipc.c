@@ -179,7 +179,7 @@ int crespo_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *resp
         return -1;
 
     memset(&mio, 0, sizeof(struct modem_io));
-    mio.size = CRESPO_DATA_SIZE;
+    mio.size = CRESPO_BUFFER_LENGTH;
     mio.data = malloc(mio.size);
 
     rc = client->handlers->read(client->handlers->transport_data, &mio, sizeof(struct modem_io) + mio.size);
@@ -263,7 +263,7 @@ int crespo_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *resp
         return -1;
 
     memset(&mio, 0, sizeof(struct modem_io));
-    mio.size = CRESPO_DATA_SIZE;
+    mio.size = CRESPO_BUFFER_LENGTH;
     mio.data = malloc(mio.size);
 
     rc = client->handlers->read(client->handlers->transport_data, &mio, sizeof(struct modem_io) + mio.size);

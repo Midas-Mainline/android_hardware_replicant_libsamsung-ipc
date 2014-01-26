@@ -268,7 +268,7 @@ int aries_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *reque
     p = (unsigned char *) buffer;
 
     while (count < length) {
-        chunk = length - count < ARIES_DATA_SIZE ? length - count : ARIES_DATA_SIZE;
+        chunk = length - count < ARIES_BUFFER_LENGTH ? length - count : ARIES_BUFFER_LENGTH;
 
         rc = client->handlers->write(client->handlers->transport_data, p, chunk);
         if (rc < 0) {
@@ -306,7 +306,7 @@ int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *respo
     if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || response == NULL)
         return -1;
 
-    length = ARIES_DATA_SIZE;
+    length = ARIES_BUFFER_LENGTH;
     buffer = malloc(length);
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
@@ -334,7 +334,7 @@ int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *respo
     p = (unsigned char *) response->data + count;
 
     while (count < length) {
-        chunk = length - count < ARIES_DATA_SIZE ? length - count : ARIES_DATA_SIZE;
+        chunk = length - count < ARIES_BUFFER_LENGTH ? length - count : ARIES_BUFFER_LENGTH;
 
         rc = client->handlers->read(client->handlers->transport_data, p, chunk);
         if (rc < 0) {
@@ -390,7 +390,7 @@ int aries_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *reque
     p = (unsigned char *) buffer;
 
     while (count < length) {
-        chunk = length - count < ARIES_DATA_SIZE ? length - count : ARIES_DATA_SIZE;
+        chunk = length - count < ARIES_BUFFER_LENGTH ? length - count : ARIES_BUFFER_LENGTH;
 
         rc = client->handlers->write(client->handlers->transport_data, p, chunk);
         if (rc < 0) {
@@ -428,7 +428,7 @@ int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *respo
     if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || response == NULL)
         return -1;
 
-    length = ARIES_DATA_SIZE;
+    length = ARIES_BUFFER_LENGTH;
     buffer = malloc(length);
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
@@ -456,7 +456,7 @@ int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *respo
     p = (unsigned char *) response->data + count;
 
     while (count < length) {
-        chunk = length - count < ARIES_DATA_SIZE ? length - count : ARIES_DATA_SIZE;
+        chunk = length - count < ARIES_BUFFER_LENGTH ? length - count : ARIES_BUFFER_LENGTH;
 
         rc = client->handlers->read(client->handlers->transport_data, p, chunk);
         if (rc < 0) {

@@ -31,7 +31,7 @@
 #define ARIES_ONEDRAM_MAGIC                                     0x45674567
 #define ARIES_ONEDRAM_DEINIT                                    0xABCDABCD
 #define ARIES_SOCKET_RFS_MAGIC                                  0x80000
-#define ARIES_DATA_SIZE                                         4032
+#define ARIES_BUFFER_LENGTH                                     4032
 
 #define SO_IPC_RFS                                              0x21
 #define ARIES_MODEM_FMT_SPN                                     0x01

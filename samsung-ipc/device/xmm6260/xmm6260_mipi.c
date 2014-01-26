@@ -302,11 +302,11 @@ complete:
 }
 
 int xmm6260_mipi_command_send(int device_fd, unsigned short code,
-    void *data, int size, int ack, int short_tail)
+    void *data, int size, int ack, int short_footer)
 {
     struct xmm6260_mipi_command_header header;
-    struct xmm6260_mipi_command_tail tail;
-    int tail_size;
+    struct xmm6260_mipi_command_footer footer;
+    int footer_size;
     void *buffer = NULL;
     int length;
 
@@ -327,20 +327,20 @@ int xmm6260_mipi_command_send(int device_fd, unsigned short code,
     header.code = code;
     header.data_size = size;
 
-    tail.checksum = (size & 0xffff) + code;
-    tail.magic = XMM6260_MIPI_COMMAND_TAIL_MAGIC;
-    tail.unknown = XMM6260_MIPI_COMMAND_TAIL_UNKNOWN;
+    footer.checksum = (size & 0xffff) + code;
+    footer.magic = XMM6260_MIPI_COMMAND_FOOTER_MAGIC;
+    footer.unknown = XMM6260_MIPI_COMMAND_FOOTER_UNKNOWN;
 
     p = (unsigned char *) data;
 
     for (i = 0; i < size; i++)
-        tail.checksum += *p++;
+        footer.checksum += *p++;
 
-    tail_size = sizeof(tail);
-    if (short_tail)
-        tail_size -= sizeof(short);
+    footer_size = sizeof(footer);
+    if (short_footer)
+        footer_size -= sizeof(short);
 
-    length = sizeof(header) + size + tail_size;
+    length = sizeof(header) + size + footer_size;
     buffer = malloc(length);
 
     p = (unsigned char *) buffer;
@@ -348,7 +348,7 @@ int xmm6260_mipi_command_send(int device_fd, unsigned short code,
     p += sizeof(header);
     memcpy(p, data, size);
     p += size;
-    memcpy(p, &tail, tail_size);
+    memcpy(p, &footer, footer_size);
 
     rc = write(device_fd, buffer, length);
     if (rc < length)

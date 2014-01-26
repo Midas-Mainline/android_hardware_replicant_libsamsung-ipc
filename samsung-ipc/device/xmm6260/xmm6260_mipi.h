@@ -30,8 +30,8 @@
 #define XMM6260_MIPI_EBL_CHUNK                                  0xDFC
 #define XMM6260_MIPI_MODEM_DATA_CHUNK                           0xDF2
 #define XMM6260_MIPI_COMMAND_HEADER_MAGIC                       0x02
-#define XMM6260_MIPI_COMMAND_TAIL_MAGIC                         0x03
-#define XMM6260_MIPI_COMMAND_TAIL_UNKNOWN                       0xEAEA
+#define XMM6260_MIPI_COMMAND_FOOTER_MAGIC                       0x03
+#define XMM6260_MIPI_COMMAND_FOOTER_UNKNOWN                     0xEAEA
 
 struct xmm6260_mipi_psi_header {
     unsigned char padding;
@@ -46,7 +46,7 @@ struct xmm6260_mipi_command_header {
     unsigned short data_size;
 } __attribute__((packed));
 
-struct xmm6260_mipi_command_tail {
+struct xmm6260_mipi_command_footer {
     unsigned short checksum;
     unsigned short magic;
     unsigned short unknown;

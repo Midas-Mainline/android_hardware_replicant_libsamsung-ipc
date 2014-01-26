@@ -23,7 +23,7 @@
 #define CRESPO_MODEM_IMAGE_SIZE                                 0xD80000
 #define CRESPO_PSI_SIZE                                         0x5000
 #define CRESPO_MODEM_CTL_NV_DATA_OFFSET                         0xD80000
-#define CRESPO_DATA_SIZE                                        0x50000
+#define CRESPO_BUFFER_LENGTH                                    0x50000
 
 #define CRESPO_MODEM_IMAGE_DEVICE               "/dev/mtd/mtd5ro"
 #define CRESPO_MODEM_SERIAL_DEVICE              "/dev/s3c2410_serial3"
