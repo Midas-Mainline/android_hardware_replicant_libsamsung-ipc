@@ -834,8 +834,8 @@ int nv_data_write(struct ipc_client *client, int offset, int length, char *buf)
 void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client,
     struct ipc_message_info *info)
 {
-    struct ipc_rfs_io *rfs_io = (struct ipc_rfs_io *) info->data;
-    struct ipc_rfs_io_confirm *rfs_io_conf;
+    struct ipc_rfs_nv_read_item_data *rfs_io = (struct ipc_rfs_nv_read_item_data *) info->data;
+    struct ipc_rfs_nv_read_item_confirm_header *rfs_io_conf;
     void *rfs_data;
     int rc;
 
@@ -845,9 +845,9 @@ void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client,
         return;
     }
 
-    rfs_io_conf = malloc(rfs_io->length + sizeof(struct ipc_rfs_io_confirm));
-    memset(rfs_io_conf, 0, rfs_io->length + sizeof(struct ipc_rfs_io_confirm));
-    rfs_data = rfs_io_conf + sizeof(struct ipc_rfs_io_confirm);
+    rfs_io_conf = malloc(rfs_io->length + sizeof(struct ipc_rfs_nv_read_item_confirm_header));
+    memset(rfs_io_conf, 0, rfs_io->length + sizeof(struct ipc_rfs_nv_read_item_confirm_header));
+    rfs_data = rfs_io_conf + sizeof(struct ipc_rfs_nv_read_item_confirm_header);
 
     ipc_client_log(client, "Asked to read 0x%x bytes at offset 0x%x", rfs_io->length, rfs_io->offset);
     rc = nv_data_read(client, rfs_io->offset, rfs_io->length, rfs_data);
@@ -863,15 +863,15 @@ void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client,
     rfs_io_conf->length = rfs_io->length;
 
     ipc_client_send(client, IPC_RFS_NV_READ_ITEM, 0, (unsigned char *) rfs_io_conf,
-                    rfs_io->length + sizeof(struct ipc_rfs_io_confirm), info->aseq);
+                    rfs_io->length + sizeof(struct ipc_rfs_nv_read_item_confirm_header), info->aseq);
     free(rfs_io_conf);
 }
 
 void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client,
     struct ipc_message_info *info)
 {
-    struct ipc_rfs_io *rfs_io = (struct ipc_rfs_io *) info->data;
-    struct ipc_rfs_io_confirm *rfs_io_conf;
+    struct ipc_rfs_nv_read_item_confirm_header *rfs_io = (struct ipc_rfs_nv_read_item_confirm_header *) info->data;
+    struct ipc_rfs_nv_write_item_confirm_data *rfs_io_conf;
     void *rfs_data;
     int rc;
 
@@ -881,7 +881,7 @@ void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client,
         return;
     }
 
-    rfs_data = info->data + sizeof(struct ipc_rfs_io);
+    rfs_data = info->data + sizeof(struct ipc_rfs_nv_read_item_confirm_header);
 
 #ifdef DEBUG
     ipc_client_log(client, "Write rfs_data dump:");
@@ -892,13 +892,13 @@ void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client,
     rc = nv_data_write(client, rfs_io->offset, rfs_io->length, rfs_data);
 
     ipc_client_log(client, "Sending RFS IO Confirm message (rc is %d)", rc);
-    rfs_io_conf = (struct ipc_rfs_io_confirm*) malloc(sizeof(struct ipc_rfs_io_confirm));
+    rfs_io_conf = (struct ipc_rfs_nv_write_item_confirm_data *) malloc(sizeof(struct ipc_rfs_nv_write_item_confirm_data));
     rfs_io_conf->confirm = rc < 0 ? 0 : 1;
     rfs_io_conf->offset = rfs_io->offset;
     rfs_io_conf->length = rfs_io->length;
 
     ipc_client_send(client, IPC_RFS_NV_WRITE_ITEM, 0, (unsigned char *) rfs_io_conf,
-                    sizeof(struct ipc_rfs_io_confirm), info->aseq);
+                    sizeof(struct ipc_rfs_nv_write_item_confirm_data), info->aseq);
     free(rfs_io_conf);
 }
 

@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
- * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,19 +52,11 @@
 #define IPC_CALL_PREFIX_NONE                                    0x00
 #define IPC_CALL_PREFIX_INTL                                    0x11
 
-/* Only for ipc_call_status, NOT call_list */
-#define IPC_CALL_STATE_DIALING                                  0x01
-#define IPC_CALL_STATE_IGNORING_INCOMING_STATUS                 0x02
-#define IPC_CALL_STATE_CONNECTED                                0x03
-#define IPC_CALL_STATE_RELEASED                                 0x04
-#define IPC_CALL_STATE_CONNECTING                               0x05
-
-#define IPC_CALL_LIST_ENTRY_STATE_ACTIVE                        0x01
-#define IPC_CALL_LIST_ENTRY_STATE_HOLDING                       0x02
-#define IPC_CALL_LIST_ENTRY_STATE_DIALING                       0x03
-#define IPC_CALL_LIST_ENTRY_STATE_ALERTING                      0x04
-#define IPC_CALL_LIST_ENTRY_STATE_INCOMING                      0x05
-#define IPC_CALL_LIST_ENTRY_STATE_WAITING                       0x06
+#define IPC_CALL_STATUS_DIALING                                 0x01
+#define IPC_CALL_STATUS_IGNORING_INCOMING_STATUS                0x02
+#define IPC_CALL_STATUS_CONNECTED                               0x03
+#define IPC_CALL_STATUS_RELEASED                                0x04
+#define IPC_CALL_STATUS_CONNECTING                              0x05
 
 #define IPC_CALL_END_CAUSE_NORMAL                               0x05
 #define IPC_CALL_END_CAUSE_REJECTED                             0x2F
@@ -73,6 +65,13 @@
 #define IPC_CALL_TERM_MO                                        0x01
 #define IPC_CALL_TERM_MT                                        0x02
 
+#define IPC_CALL_LIST_ENTRY_STATUS_ACTIVE                       0x01
+#define IPC_CALL_LIST_ENTRY_STATUS_HOLDING                      0x02
+#define IPC_CALL_LIST_ENTRY_STATUS_DIALING                      0x03
+#define IPC_CALL_LIST_ENTRY_STATUS_ALERTING                     0x04
+#define IPC_CALL_LIST_ENTRY_STATUS_INCOMING                     0x05
+#define IPC_CALL_LIST_ENTRY_STATUS_WAITING                      0x06
+
 #define IPC_CALL_DTMF_STATE_START                               0x01
 #define IPC_CALL_DTMF_STATE_STOP                                0x02
 
@@ -80,43 +79,43 @@
  * Structures
  */
 
-struct ipc_call_incoming {
-    unsigned char unk;
+struct ipc_call_outgoing_data {
+    unsigned char unknown;
+    unsigned char type; // IPC_CALL_TYPE
+    unsigned char identity; // IPC_CALL_IDENTITY
+    unsigned char number_length;
+    unsigned char prefix; // IPC_CALL_PREFIX
+    unsigned char number[86];
+} __attribute__((__packed__));
+
+struct ipc_call_incoming_data {
+    unsigned char unknown;
     unsigned char type; // IPC_CALL_TYPE_...
     unsigned char id;
     unsigned char line;
 } __attribute__((__packed__));
 
-struct ipc_call_outgoing {
-    unsigned char unk;
-    unsigned char type; // IPC_CALL_TYPE_...
-    unsigned char identity; // IPC_CALL_IDENTITY_...
-    unsigned char length;
-    unsigned char prefix; // IPC_CALL_PREFIX_...
-    unsigned char number[86];
-} __attribute__((__packed__));
-
-struct ipc_call_status {
-    unsigned char unk;
-    unsigned char type;
+struct ipc_call_status_data {
+    unsigned char unknown;
+    unsigned char type; // IPC_CALL_TYPE
     unsigned char id;
-    unsigned char state;
+    unsigned char status; // IPC_CALL_STATUS
     unsigned char reason;
-    unsigned char end_cause;
+    unsigned char end_cause; // IPC_CALL_END_CAUSE
 } __attribute__((__packed__));
 
 struct ipc_call_list_entry {
-    unsigned char unk0;
-    unsigned char type; // IPC_CALL_TYPE_...
-    unsigned char idx;
-    unsigned char term; // IPC_CALL_TERM_...
-    unsigned char state; // IPC_CALL_LIST_ENTRY_STATE_...
-    unsigned char mpty;
-    unsigned char number_len;
-    unsigned char unk4;
+    unsigned char unknown1;
+    unsigned char type; // IPC_CALL_TYPE
+    unsigned char id;
+    unsigned char term; // IPC_CALL_TERM
+    unsigned char status; // IPC_CALL_LIST_ENTRY_STATUS
+    unsigned char unknown2;
+    unsigned char number_length;
+    unsigned char unknown3;
 } __attribute__((__packed__));
 
-struct ipc_call_cont_dtmf {
+struct ipc_call_cont_dtmf_data {
     unsigned char state;
     unsigned char tone;
 } __attribute__((__packed__));
@@ -125,14 +124,14 @@ struct ipc_call_cont_dtmf {
  * Helpers
  */
 
-void ipc_call_outgoing_setup(struct ipc_call_outgoing *message, unsigned char type,
+void ipc_call_outgoing_setup(struct ipc_call_outgoing_data *message, unsigned char type,
     unsigned char identity, unsigned char prefix, char *number);
 unsigned int ipc_call_list_response_get_num_entries(struct ipc_message_info *response);
 struct ipc_call_list_entry* ipc_call_list_response_get_entry(struct ipc_message_info *response,
     unsigned int num);
 char *ipc_call_list_response_get_entry_number(struct ipc_message_info *response,
     unsigned int num);
-unsigned char *ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf *message,
+unsigned char *ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf_data *message,
     unsigned char *burst, int burst_len);
 
 #endif

@@ -43,12 +43,6 @@
 #define IPC_PWR_PHONE_STATE_LPM                                 0x0001
 #define IPC_PWR_PHONE_STATE_NORMAL                              0x0202
 
-/*
- * Macros
- */
-
-#define IPC_PWR_R(f)                            (f & 0xff)
-
 #endif
 
 // vim:ts=4:sw=4:expandtab

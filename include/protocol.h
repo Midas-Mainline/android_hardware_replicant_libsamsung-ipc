@@ -26,14 +26,14 @@
  * Commands
  */
 
-/* AP -> Baseband */
+/* Requests */
 #define IPC_TYPE_EXEC                                           0x01
 #define IPC_TYPE_GET                                            0x02
 #define IPC_TYPE_SET                                            0x03
 #define IPC_TYPE_CFRM                                           0x04
 #define IPC_TYPE_EVENT                                          0x05
 
-/* Baseband -> AP */
+/* Responses */
 #define IPC_TYPE_INDI                                           0x01
 #define IPC_TYPE_RESP                                           0x02
 #define IPC_TYPE_NOTI                                           0x03

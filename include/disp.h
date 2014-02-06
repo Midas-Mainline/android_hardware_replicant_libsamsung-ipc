@@ -35,14 +35,14 @@
  * Structures
  */
 
-struct ipc_disp_icon_info {
+struct ipc_disp_icon_info_data {
     unsigned char rssi;
     unsigned char bars;
     unsigned char act;
     unsigned char reg;
 } __attribute__((__packed__));
 
-struct ipc_disp_rssi_info {
+struct ipc_disp_rssi_info_data {
     unsigned char rssi;
 } __attribute__((__packed__));
 

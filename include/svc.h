@@ -87,13 +87,13 @@
  */
 
 struct ipc_svc_enter_data {
-    unsigned char mode;
-    unsigned char type;
+    unsigned char mode; // IPC_SVC_MODE
+    unsigned char type; // IPC_SVC_TYPE
     unsigned char unknown;
 } __attribute__((__packed__));
 
 struct ipc_svc_end_data {
-    unsigned char mode;
+    unsigned char mode; // IPC_SVC_MODE
 } __attribute__((__packed__));
 
 struct ipc_svc_pro_keycode_data {
@@ -115,7 +115,7 @@ struct ipc_svc_display_screen_data {
 } __attribute__((__packed__));
 
 struct ipc_svc_change_svc_mode_data {
-    unsigned char mode;
+    unsigned char mode; // IPC_SVC_MODE
 } __attribute__((__packed__));
 
 #endif

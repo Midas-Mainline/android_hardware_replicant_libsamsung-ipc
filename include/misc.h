@@ -47,21 +47,21 @@
  * Structures
  */
 
-struct ipc_misc_me_version {
-    unsigned char unk;
-    char sw_version[32];
-    char hw_version[32];
+struct ipc_misc_me_version_data {
+    unsigned char unknown;
+    char software_version[32];
+    char hardware_version[32];
     char cal_date[32];
     char misc[32];
 } __attribute__((__packed__));
 
-struct ipc_misc_me_sn {
-    unsigned char type; // IPC_MISC_ME_SN_SERIAL_NUM*
+struct ipc_misc_me_sn_data {
+    unsigned char type; // IPC_MISC_ME_SN_SERIAL_NUM
     unsigned char length;
     char data[32];
 } __attribute__((__packed__));
 
-struct ipc_misc_time_info {
+struct ipc_misc_time_info_data {
     unsigned char tz_valid, daylight_valid;
     unsigned char year, mon, day;
     unsigned char hour, min, sec;

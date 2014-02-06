@@ -57,7 +57,7 @@
  * Structures
  */
 
-struct ipc_snd_spkr_volume_ctrl {
+struct ipc_snd_spkr_volume_ctrl_data {
     unsigned char type;
     unsigned char volume;
 } __attribute__((__packed__));

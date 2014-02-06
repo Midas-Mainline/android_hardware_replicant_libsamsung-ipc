@@ -22,15 +22,14 @@
 
 #include <samsung-ipc.h>
 
-void ipc_net_regist_get_setup(struct ipc_net_regist_get *message,
+void ipc_net_regist_setup(struct ipc_net_regist_request_data *message,
     unsigned char domain)
 {
-    /* FIXME: could that be IPC_NET_ACCESS_TECHNOLOGY_... (act) ? */
-    message->net = 0xff;
+    message->act = IPC_NET_ACCESS_TECHNOLOGY_UNKNOWN;
     message->domain = domain;
 }
 
-void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_set *message,
+void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_request_data *message,
     unsigned char mode, char *plmn, unsigned char act)
 {
     int message_plmn_len;
@@ -42,11 +41,11 @@ void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_set *message,
 
     message_plmn_len = sizeof(message->plmn);
 
-    memset(message, 0, sizeof(struct ipc_net_plmn_sel_set));
+    memset(message, 0, sizeof(struct ipc_net_plmn_sel_request_data));
 
     if (mode == IPC_NET_PLMN_SEL_AUTO)
     {
-        message->mode = IPC_NET_PLMN_SEL_AUTO;
+        message->mode_sel = IPC_NET_PLMN_SEL_AUTO;
         message->act = IPC_NET_ACCESS_TECHNOLOGY_UNKNOWN;
     }
     else if (mode == IPC_NET_PLMN_SEL_MANUAL)
@@ -63,7 +62,7 @@ void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_set *message,
         if (plmn_len < message_plmn_len)
             memset((void *) (message->plmn + plmn_len), '#', message_plmn_len - plmn_len);
 
-        message->mode = IPC_NET_PLMN_SEL_MANUAL;
+        message->mode_sel = IPC_NET_PLMN_SEL_MANUAL;
         message->act = act;
     }
 }

@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
- * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,99 +46,92 @@
  * Values
  */
 
-#define IPC_NET_PLMN_STATUS_AVAILABLE                           0x02
-#define IPC_NET_PLMN_STATUS_CURRENT                             0x03
-#define IPC_NET_PLMN_STATUS_FORBIDDEN                           0x04
-
 #define IPC_NET_PLMN_SEL_MANUAL                                 0x03
 #define IPC_NET_PLMN_SEL_AUTO                                   0x02
 
-#define IPC_NET_REGISTRATION_STATE_NONE                         0x01
-#define IPC_NET_REGISTRATION_STATE_HOME                         0x02
-#define IPC_NET_REGISTRATION_STATE_SEARCHING                    0x03
-#define IPC_NET_REGISTRATION_STATE_EMERGENCY                    0x04
-#define IPC_NET_REGISTRATION_STATE_UNKNOWN                      0x05
-#define IPC_NET_REGISTRATION_STATE_ROAMING                      0x06
+#define IPC_NET_MODE_SEL_GSM_UMTS                               0x01
+#define IPC_NET_MODE_SEL_GSM_ONLY                               0x02
+#define IPC_NET_MODE_SEL_UMTS_ONLY                              0x03
 
-#define IPC_NET_ACCESS_TECHNOLOGY_UNKNOWN                       0xff
+#define IPC_NET_ACCESS_TECHNOLOGY_UNKNOWN                       0xFF
 #define IPC_NET_ACCESS_TECHNOLOGY_GSM                           0x00
 #define IPC_NET_ACCESS_TECHNOLOGY_GSM2                          0x01
 #define IPC_NET_ACCESS_TECHNOLOGY_GPRS                          0x02
 #define IPC_NET_ACCESS_TECHNOLOGY_EDGE                          0x03
 #define IPC_NET_ACCESS_TECHNOLOGY_UMTS                          0x04
 
+#define IPC_NET_PLMN_STATUS_AVAILABLE                           0x02
+#define IPC_NET_PLMN_STATUS_CURRENT                             0x03
+#define IPC_NET_PLMN_STATUS_FORBIDDEN                           0x04
+
 #define IPC_NET_SERVICE_DOMAIN_GSM                              0x02
 #define IPC_NET_SERVICE_DOMAIN_GPRS                             0x03
 
-#define IPC_NET_MODE_SEL_GSM_UMTS                               0x01
-#define IPC_NET_MODE_SEL_GSM_ONLY                               0x02
-#define IPC_NET_MODE_SEL_UMTS_ONLY                              0x03
+#define IPC_NET_REGISTRATION_STATUS_NONE                        0x01
+#define IPC_NET_REGISTRATION_STATUS_HOME                        0x02
+#define IPC_NET_REGISTRATION_STATUS_SEARCHING                   0x03
+#define IPC_NET_REGISTRATION_STATUS_EMERGENCY                   0x04
+#define IPC_NET_REGISTRATION_STATUS_UNKNOWN                     0x05
+#define IPC_NET_REGISTRATION_STATUS_ROAMING                     0x06
 
 /*
  * Structures
  */
 
-struct ipc_net_regist_get {
-    /* ignore, ipc_net_regist_get_setup will do for you */
-    unsigned char net;
-    /* IPC_NET_SERVICE_DOMAIN_.. */
-    unsigned char domain;
+struct ipc_net_plmn_sel_response_data {
+    unsigned char plmn_sel; // IPC_NET_PLMN_SEL
 } __attribute__((__packed__));
 
-struct ipc_net_regist_response {
-    /* IPC_NET_ACCESS_TECHNOLOGY_... */
-    unsigned char act;
-    /* IPC_NET_SERVICE_DOMAIN_... */
-    unsigned char domain;
-    /* IPC_NET_REGISTRATION_STATE_... */
-    unsigned char reg_state;
+struct ipc_net_plmn_sel_request_data {
+    unsigned char mode_sel; // IPC_NET_MODE_SEL
+    char plmn[6];
+    unsigned char act; // IPC_NET_ACCESS_TECHNOLOGY
+} __attribute__((__packed__));
+
+struct ipc_net_current_plmn_data {
+    unsigned char unknown[3];
+    char plmn[5];
+    unsigned char type;
+    unsigned short lac;
+} __attribute__((__packed__));
+
+struct ipc_net_plmn_list_header {
+    unsigned char count;
+} __attribute__((__packed__));
+
+struct ipc_net_plmn_list_entry {
+    unsigned char status; // IPC_NET_PLMN_STATUS
+    char plmn[6];
+    unsigned char type;
+    unsigned char unknown[2];
+} __attribute__((__packed__));
+
+struct ipc_net_regist_request_data {
+    unsigned char act; // IPC_NET_ACCESS_TECHNOLOGY
+    unsigned char domain; // IPC_NET_SERVICE_DOMAIN
+} __attribute__((__packed__));
+
+struct ipc_net_regist_response_data {
+    unsigned char act; // IPC_NET_ACCESS_TECHNOLOGY
+    unsigned char domain; // IPC_NET_SERVICE_DOMAIN
+    unsigned char status; // IPC_NET_REGISTRATION_STATUS
     unsigned char edge;
     unsigned short lac;
     unsigned int cid;
-    char rej_cause;
+    unsigned char fail_cause;
 } __attribute__((__packed__));
 
-struct ipc_net_current_plmn_response {
-    char unk0;
-    unsigned char slevel;
-    char unk1;
-    char plmn[5];
-    unsigned char type; // IPC_NET_SERVICE_TYPE_... ?
-    unsigned short lac;
-} __attribute__((__packed__));
-
-struct ipc_net_plmn_entry {
-    unsigned char status; // IPC_NET_PLMN_STATUS_...
-    char plmn[6];
-    unsigned char type;
-    char unk[2];
-} __attribute__((__packed__));
-
-struct ipc_net_plmn_entries {
-    unsigned char num;
-} __attribute__((__packed__));
-
-struct ipc_net_mode_sel {
-    unsigned char mode_sel;
-} __attribute__((__packed__));
-
-struct ipc_net_plmn_sel_get {
-    unsigned char plmn_sel;
-} __attribute__((__packed__));
-
-struct ipc_net_plmn_sel_set {
-    unsigned char mode;
-    char plmn[6]; // 5 plmn bytes + 1 '#' byte
-    unsigned char act; // IPC_NET_ACCESS_TECHNOLOGY_...
+struct ipc_net_mode_sel_data {
+    unsigned char mode_sel; // IPC_NET_MODE_SEL
 } __attribute__((__packed__));
 
 /*
  * Helpers
  */
 
-void ipc_net_regist_get_setup(struct ipc_net_regist_get *message,
+void ipc_net_regist_setup(struct ipc_net_regist_request_data *message,
     unsigned char domain);
-void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_set *message,
+void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_request_data *message,
     unsigned char mode, char *plmn, unsigned char act);
 
 #endif

@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
- * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,98 +49,92 @@
  * Values
  */
 
-#define IPC_GPRS_STATE_NOT_ENABLED                              0x00
-#define IPC_GPRS_STATE_ENABLED                                  0x01
-#define IPC_GPRS_STATE_DISABLED                                 0x03
+#define IPC_GPRS_STATUS_NOT_ENABLED                             0x00
+#define IPC_GPRS_STATUS_ENABLED                                 0x01
+#define IPC_GPRS_STATUS_DISABLED                                0x03
 
-#define IPC_GPRS_FAIL_INSUFFICIENT_RESOURCES                    0x0004
-#define IPC_GPRS_FAIL_MISSING_UKNOWN_APN                        0x0005
-#define IPC_GPRS_FAIL_UNKNOWN_PDP_ADDRESS_TYPE                  0x0006
-#define IPC_GPRS_FAIL_USER_AUTHENTICATION                       0x0007
-#define IPC_GPRS_FAIL_ACTIVATION_REJECT_GGSN                    0x0008
-#define IPC_GPRS_FAIL_ACTIVATION_REJECT_UNSPECIFIED             0x0009
-#define IPC_GPRS_FAIL_SERVICE_OPTION_NOT_SUPPORTED              0x000A
-#define IPC_GPRS_FAIL_SERVICE_OPTION_NOT_SUBSCRIBED             0x000B
-#define IPC_GPRS_FAIL_SERVICE_OPTION_OUT_OF_ORDER               0x000C
-#define IPC_GPRS_FAIL_NSAPI_IN_USE                              0x000D
-
-#define IPC_GPRS_PDP_CONTEXT_GET_DESC_COUNT                     0x03
+#define IPC_GPRS_FAIL_CAUSE_INSUFFICIENT_RESOURCES              0x0004
+#define IPC_GPRS_FAIL_CAUSE_MISSING_UKNOWN_APN                  0x0005
+#define IPC_GPRS_FAIL_CAUSE_UNKNOWN_PDP_ADDRESS_TYPE            0x0006
+#define IPC_GPRS_FAIL_CAUSE_USER_AUTHENTICATION                 0x0007
+#define IPC_GPRS_FAIL_CAUSE_ACTIVATION_REJECT_GGSN              0x0008
+#define IPC_GPRS_FAIL_CAUSE_ACTIVATION_REJECT_UNSPECIFIED       0x0009
+#define IPC_GPRS_FAIL_CAUSE_SERVICE_OPTION_NOT_SUPPORTED        0x000A
+#define IPC_GPRS_FAIL_CAUSE_SERVICE_OPTION_NOT_SUBSCRIBED       0x000B
+#define IPC_GPRS_FAIL_CAUSE_SERVICE_OPTION_OUT_OF_ORDER         0x000C
+#define IPC_GPRS_FAIL_CAUSE_NSAPI_IN_USE                        0x000D
 
 /*
  * Structures
  */
 
-struct ipc_gprs_define_pdp_context {
+struct ipc_gprs_define_pdp_context_data {
     unsigned char enable;
     unsigned char cid;
-    unsigned char unk;
+    unsigned char magic;
     unsigned char apn[124];
 } __attribute__((__packed__));
 
-struct ipc_gprs_pdp_context_set {
+struct ipc_gprs_pdp_context_request_set_data {
     unsigned char enable;
     unsigned char cid;
-    unsigned char unk0[4];
+    unsigned char magic[4];
     unsigned char username[32];
     unsigned char password[32];
-    unsigned char unk1[32];
-    unsigned char unk2;
+    unsigned char unknown1[32];
+    unsigned char unknown2;
 } __attribute__((__packed__));
 
-struct ipc_gprs_pdp_context_get_desc {
+struct ipc_gprs_pdp_context_request_get_entry {
     unsigned char cid;
-    unsigned char state;
+    unsigned char status; // IPC_GPRS_STATUS
 } __attribute__((__packed__));
 
-struct ipc_gprs_pdp_context_get {
-    unsigned char unk;
-    struct ipc_gprs_pdp_context_get_desc desc[IPC_GPRS_PDP_CONTEXT_GET_DESC_COUNT];
+struct ipc_gprs_pdp_context_request_get_data {
+    unsigned char unknown;
+    struct ipc_gprs_pdp_context_request_get_entry entries[3];
 } __attribute__((__packed__));
 
-struct ipc_gprs_ip_configuration {
+struct ipc_gprs_ip_configuration_data {
     unsigned char cid;
     unsigned char field_flag;
-    unsigned char unk1;
+    unsigned char unknown1;
     unsigned char ip[4];
     unsigned char dns1[4];
     unsigned char dns2[4];
     unsigned char gateway[4];
     unsigned char subnet_mask[4];
-    unsigned char unk2[4];
+    unsigned char unknown2[4];
 } __attribute__((__packed__));
 
-struct ipc_gprs_call_status {
-    unsigned char cid;
-    unsigned char state;
-    unsigned short fail_cause;
+struct ipc_gprs_hsdpa_status_data {
+    unsigned char status;
 } __attribute__((__packed__));
 
-struct ipc_gprs_hsdpa_status {
-    unsigned char reg_state;
-} __attribute__((__packed__));
-
-struct ipc_gprs_ps {
-    unsigned char unk[2];
-} __attribute__((__packed__));
-
-struct ipc_gprs_current_session_data_counter {
+struct ipc_gprs_current_session_data_counter_data {
     unsigned char cid;
     unsigned int rx_count;
     unsigned int tx_count;
 } __attribute__((__packed__));
 
-struct ipc_gprs_port_list {
-    unsigned char unk[804];
+struct ipc_gprs_call_status_data {
+    unsigned char cid;
+    unsigned char status;
+    unsigned short fail_cause; // IPC_GPRS_FAIL_CAUSE
+} __attribute__((__packed__));
+
+struct ipc_gprs_port_list_data {
+    unsigned char magic[804];
 } __attribute__((__packed__));
 
 /*
  * Helpers
  */
 
-void ipc_gprs_port_list_setup(struct ipc_gprs_port_list *message);
-void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context_set *message,
+void ipc_gprs_port_list_setup(struct ipc_gprs_port_list_data *message);
+void ipc_gprs_pdp_context_request_set_setup(struct ipc_gprs_pdp_context_request_set_data *message,
     unsigned char cid, int enable, char *username, char *password);
-void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context *message,
+void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context_data *message,
     unsigned char cid, int enable, char *apn);
 
 #endif

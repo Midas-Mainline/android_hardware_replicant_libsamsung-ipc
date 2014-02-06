@@ -49,12 +49,23 @@
  * Structures
  */
 
-struct ipc_rfs_io {
+struct ipc_rfs_nv_read_item_data {
     unsigned int offset;
     unsigned int length;
 } __attribute__((__packed__));
 
-struct ipc_rfs_io_confirm {
+struct ipc_rfs_nv_read_item_confirm_header {
+    unsigned char confirm;
+    unsigned int offset;
+    unsigned int length;
+} __attribute__((__packed__));
+
+struct ipc_rfs_nv_write_item_header {
+    unsigned int offset;
+    unsigned int length;
+} __attribute__((__packed__));
+
+struct ipc_rfs_nv_write_item_confirm_data {
     unsigned char confirm;
     unsigned int offset;
     unsigned int length;

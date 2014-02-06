@@ -45,16 +45,15 @@
 #define IPC_SS_USSD_NO_ACTION_REQUIRE                           0x01
 #define IPC_SS_USSD_ACTION_REQUIRE                              0x02
 #define IPC_SS_USSD_TERMINATED_BY_NET                           0x03
-#define IPC_SS_USSD_OTHER_CLIENT                                0x04 //guess
-#define IPC_SS_USSD_NOT_SUPPORT                                 0x05 //guess
-#define IPC_SS_USSD_TIME_OUT                                    0x06 //guess
+#define IPC_SS_USSD_OTHER_CLIENT                                0x04
+#define IPC_SS_USSD_NOT_SUPPORT                                 0x05
+#define IPC_SS_USSD_TIME_OUT                                    0x06
 
 /*
  * Structures
  */
 
-/* This is followed by the encoded (according to the dcs) bytes of the USSD message */
-struct ipc_ss_ussd {
+struct ipc_ss_ussd_header {
     unsigned char state;
     unsigned char dcs;
     unsigned char length;

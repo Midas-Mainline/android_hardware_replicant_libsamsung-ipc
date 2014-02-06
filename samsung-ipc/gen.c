@@ -21,7 +21,7 @@
 
 #include <samsung-ipc.h>
 
-int ipc_gen_phone_res_check(struct ipc_gen_phone_res *res)
+int ipc_gen_phone_res_check(struct ipc_gen_phone_res_data *res)
 {
     if (res == NULL)
         return -1;

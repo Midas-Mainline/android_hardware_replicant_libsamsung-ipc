@@ -33,7 +33,7 @@
  * Structures
  */
 
-struct ipc_gen_phone_res {
+struct ipc_gen_phone_res_data {
     unsigned char group;
     unsigned char index;
     unsigned char type;
@@ -44,7 +44,7 @@ struct ipc_gen_phone_res {
  * Helpers
  */
 
-int ipc_gen_phone_res_check(struct ipc_gen_phone_res *res);
+int ipc_gen_phone_res_check(struct ipc_gen_phone_res_data *res);
 
 #endif
 

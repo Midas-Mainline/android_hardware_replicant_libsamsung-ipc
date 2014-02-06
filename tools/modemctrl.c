@@ -86,20 +86,20 @@ void modem_snd_audio_path_ctrl(struct ipc_client *client)
 
 void modem_exec_call_out(struct ipc_client *client, char *num)
 {
-    struct ipc_call_outgoing call_out;
+    struct ipc_call_outgoing_data call_out;
 
     modem_snd_no_mic_mute(client);
 
-    memset(&call_out, 0, sizeof(struct ipc_call_outgoing));
+    memset(&call_out, 0, sizeof(struct ipc_call_outgoing_data));
 
     call_out.type = IPC_CALL_TYPE_VOICE;
     call_out.identity = IPC_CALL_IDENTITY_DEFAULT;
-    call_out.length=strlen(num);
+    call_out.number_length=strlen(num);
     /* 0x21 = +33 */
     call_out.prefix=IPC_CALL_PREFIX_NONE; //0x21;//IPC_CALL_PREFIX_NONE;
-    memcpy(call_out.number, num, call_out.length);
+    memcpy(call_out.number, num, call_out.number_length);
 
-    ipc_client_send(client, IPC_CALL_OUTGOING, IPC_TYPE_EXEC, (void *) &call_out, sizeof(struct ipc_call_outgoing), seq_get());
+    ipc_client_send(client, IPC_CALL_OUTGOING, IPC_TYPE_EXEC, (void *) &call_out, sizeof(struct ipc_call_outgoing_data), seq_get());
 
     out_call = 1;
 
@@ -137,18 +137,18 @@ void modem_set_sms_device_ready(struct ipc_client *client)
 
 void modem_set_sec_pin_status(struct ipc_client *client, char *pin1, char *pin2)
 {
-    struct ipc_sec_pin_status_set pin_status;
-    struct ipc_sec_lock_info_get lock_info_req;
+    struct ipc_sec_sim_status_request_data pin_status;
+    struct ipc_sec_lock_info_request_data lock_info_req;
 
     printf("[I] Sending PIN1 unlock request\n");
 
-    ipc_sec_pin_status_set_setup(&pin_status, IPC_SEC_PIN_TYPE_PIN1, pin1, pin2);
+    ipc_sec_sim_status_setup(&pin_status, IPC_SEC_PIN_TYPE_PIN1, pin1, pin2);
     ipc_client_send(client, IPC_SEC_SIM_STATUS, IPC_TYPE_SET, (void *) &pin_status, sizeof(pin_status), seq_get());
 }
 
 void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp)
 {
-    struct ipc_sec_sim_status_response *sim_status;
+    struct ipc_sec_sim_status_response_data *sim_status;
     unsigned char type;
     int status;
     char *data;
@@ -230,7 +230,7 @@ void modem_response_sms(struct ipc_client *client, struct ipc_message_info *resp
 
 void modem_response_call(struct ipc_client *client, struct ipc_message_info *resp)
 {
-    struct ipc_call_status *stat;
+    struct ipc_call_status_data *stat;
 
     switch(IPC_COMMAND(resp))
     {
@@ -248,29 +248,29 @@ void modem_response_call(struct ipc_client *client, struct ipc_message_info *res
             modem_get_call_list(client);
         break;
         case IPC_CALL_STATUS:
-            stat = (struct ipc_call_status *)resp->data;
+            stat = (struct ipc_call_status_data *)resp->data;
 
-            if(stat->state == IPC_CALL_STATE_DIALING)
+            if(stat->status == IPC_CALL_STATUS_DIALING)
             {
                 printf("[I] Sending clock ctrl and restore alsa\n");
                 modem_snd_clock_ctrl(client);
 //        system("alsa_ctl -f /data/alsa_state_modem restore");
 
-                printf("[I] CALL STATE DIALING!!!\n");
+                printf("[I] CALL STATUS DIALING!!!\n");
 
                 modem_snd_spkr_volume_ctrl(client);
                 modem_snd_audio_path_ctrl(client);
 
                 modem_get_call_list(client);
             }
-            if(stat->state == IPC_CALL_STATE_CONNECTED)
+            if(stat->status == IPC_CALL_STATUS_CONNECTED)
             {
-                printf("[I] CALL STATE CONNECTED!!!\n");
+                printf("[I] CALL STATUS CONNECTED!!!\n");
                 modem_snd_no_mic_mute(client);
             }
-            if(stat->state == IPC_CALL_STATE_RELEASED)
+            if(stat->status == IPC_CALL_STATUS_RELEASED)
             {
-                printf("[I] CALL STATE RELEASED!!!\n");
+                printf("[I] CALL STATUS RELEASED!!!\n");
                 modem_snd_no_mic_mute(client);
             }
         break;
@@ -310,7 +310,7 @@ void modem_response_pwr(struct ipc_client *client, struct ipc_message_info *resp
 
 void modem_response_net(struct ipc_client *client, struct ipc_message_info *resp)
 {
-    struct ipc_net_regist_response *regi;
+    struct ipc_net_regist_response_data *regi;
     struct ipc_net_plmn_entry *plmn;
     char mnc[6];
 
@@ -318,7 +318,7 @@ void modem_response_net(struct ipc_client *client, struct ipc_message_info *resp
     {
         case IPC_NET_REGIST:
             regi = (struct ipc_net_regist_response*) resp->data;
-            if(regi->reg_state == IPC_NET_REGISTRATION_STATE_HOME)
+            if(regi->status == IPC_NET_REGISTRATION_STATUS_HOME)
             {
                 printf("[I] Registered with network successfully!\n");
 

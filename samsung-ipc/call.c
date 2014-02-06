@@ -25,7 +25,7 @@
 
 #define OUTGOING_NUMBER_MAX_LENGTH 86
 
-void ipc_call_outgoing_setup(struct ipc_call_outgoing *message, unsigned char type,
+void ipc_call_outgoing_setup(struct ipc_call_outgoing_data *message, unsigned char type,
     unsigned char identity, unsigned char prefix, char *number)
 {
     int length;
@@ -37,12 +37,12 @@ void ipc_call_outgoing_setup(struct ipc_call_outgoing *message, unsigned char ty
     if (length > OUTGOING_NUMBER_MAX_LENGTH)
         length = OUTGOING_NUMBER_MAX_LENGTH;
 
-    memset(message, 0, sizeof(struct ipc_call_outgoing));
+    memset(message, 0, sizeof(struct ipc_call_outgoing_data));
 
     message->type = type;
     message->identity = identity;
     message->prefix = prefix;
-    message->length = length;
+    message->number_length = length;
 
     strncpy((char *) message->number, number, length);
 }
@@ -71,7 +71,7 @@ struct ipc_call_list_entry* ipc_call_list_response_get_entry(struct ipc_message_
     for (n = 0; n < num + 1; n++)
     {
         entry = (struct ipc_call_list_entry *) (response->data + pos);
-        pos += (unsigned int) (sizeof(struct ipc_call_list_entry) + entry->number_len);
+        pos += (unsigned int) (sizeof(struct ipc_call_list_entry) + entry->number_length);
     }
 
     return entry;
@@ -93,7 +93,7 @@ char *ipc_call_list_response_get_entry_number(struct ipc_message_info *response,
     for (n = 0; n < num + 1; n++)
     {
         if (entry != NULL)
-            pos += entry->number_len;
+            pos += entry->number_length;
 
         entry = (struct ipc_call_list_entry *) (response->data + pos);
         pos += (unsigned int) sizeof(struct ipc_call_list_entry);
@@ -102,17 +102,17 @@ char *ipc_call_list_response_get_entry_number(struct ipc_message_info *response,
     if (entry == NULL || (unsigned char *) (response->data + pos) == NULL)
         return NULL;
 
-    number = (char *) malloc(sizeof(char) * entry->number_len);
-    strncpy(number, (char *) (response->data + pos), entry->number_len);
+    number = (char *) malloc(sizeof(char) * entry->number_length);
+    strncpy(number, (char *) (response->data + pos), entry->number_length);
 
     return number;
 }
 
-unsigned char *ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf *message,
+unsigned char *ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf_data *message,
     unsigned char *burst, int burst_len)
 {
     unsigned char *data = NULL;
-    int data_len = sizeof(struct ipc_call_cont_dtmf) + burst_len;
+    int data_len = sizeof(struct ipc_call_cont_dtmf_data) + burst_len;
 
     if (message == NULL || burst == NULL || burst_len <= 0)
         return NULL;
@@ -120,8 +120,8 @@ unsigned char *ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf *message,
     data = (unsigned char *) malloc(sizeof(unsigned char) * data_len);
     memset(data, 0, data_len);
 
-    memcpy(data, message, sizeof(struct ipc_call_cont_dtmf));
-    memcpy(data + sizeof(struct ipc_call_cont_dtmf), burst, burst_len);
+    memcpy(data, message, sizeof(struct ipc_call_cont_dtmf_data));
+    memcpy(data + sizeof(struct ipc_call_cont_dtmf_data), burst, burst_len);
 
     return data;
 }

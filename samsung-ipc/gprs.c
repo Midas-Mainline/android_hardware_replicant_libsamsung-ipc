@@ -22,7 +22,7 @@
 
 #include <samsung-ipc.h>
 
-void ipc_gprs_port_list_setup(struct ipc_gprs_port_list *message)
+void ipc_gprs_port_list_setup(struct ipc_gprs_port_list_data *message)
 {
     // FIXME: These are only known-to-work values used on most devices
     unsigned char bytes[] = {
@@ -32,41 +32,41 @@ void ipc_gprs_port_list_setup(struct ipc_gprs_port_list *message)
     if (message == NULL)
         return;
 
-    memset(message, 0, sizeof(struct ipc_gprs_port_list));
+    memset(message, 0, sizeof(struct ipc_gprs_port_list_data));
 
-    memcpy(message->unk, bytes, sizeof(bytes));
+    memcpy(message->magic, bytes, sizeof(bytes));
 }
 
-void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context *message,
+void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context_data *message,
     unsigned char cid, int enable, char *apn)
 {
     if (message == NULL)
         return;
 
-    memset(message, 0, sizeof(struct ipc_gprs_define_pdp_context));
+    memset(message, 0, sizeof(struct ipc_gprs_define_pdp_context_data));
 
     message->enable = enable ? 1 : 0;
     message->cid = cid;
-    message->unk = 0x2;
+    message->magic = 0x2;
 
     strncpy((char *) message->apn, apn, 124);
 }
 
-void ipc_gprs_pdp_context_setup(struct ipc_gprs_pdp_context_set *message,
+void ipc_gprs_pdp_context_request_set_setup(struct ipc_gprs_pdp_context_request_set_data *message,
     unsigned char cid, int enable, char *username, char *password)
 {
     if (message == NULL)
         return;
 
-    memset(message, 0, sizeof(struct ipc_gprs_pdp_context_set));
+    memset(message, 0, sizeof(struct ipc_gprs_pdp_context_request_set_data));
 
     message->enable = enable ? 1 : 0;
     message->cid = cid;
 
     if (enable && username != NULL && password != NULL)
     {
-        message->unk0[2] = 0x13;
-        message->unk2 = 0x1;
+        message->magic[2] = 0x13;
+        message->unknown2 = 0x1;
         strncpy((char *) message->username, username, 32);
         strncpy((char *) message->password, password, 32);
     }

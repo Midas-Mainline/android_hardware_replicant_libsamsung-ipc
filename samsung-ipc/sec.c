@@ -23,52 +23,52 @@
 
 #include <samsung-ipc.h>
 
-void ipc_sec_pin_status_set_setup(struct ipc_sec_pin_status_set *message,
+void ipc_sec_sim_status_setup(struct ipc_sec_sim_status_request_data *message,
     unsigned char pin_type, char *pin1, char *pin2)
 {
     if (message == NULL)
         return;
 
-    memset(message, 0, sizeof(struct ipc_sec_pin_status_set));
+    memset(message, 0, sizeof(struct ipc_sec_sim_status_request_data));
 
     message->type = pin_type;
 
     if (pin1 != NULL)
     {
         strncpy((char *) message->pin1, pin1, 8);
-        message->length1 = strlen(pin1);
+        message->pin1_length = strlen(pin1);
     }
 
     if (pin2 != NULL)
     {
         strncpy((char *) message->pin2, pin2, 8);
-        message->length2 = strlen(pin2);
+        message->pin2_length = strlen(pin2);
     }
 }
 
-void ipc_sec_lock_info_get_setup(struct ipc_sec_lock_info_get *message,
+void ipc_sec_lock_info_setup(struct ipc_sec_lock_info_request_data *message,
     unsigned char pin_type)
 {
     if (message == NULL)
         return;
 
-    message->unk0 = 1;
-    message->pin_type = pin_type;
+    message->magic = 1;
+    message->type = pin_type;
 }
 
 char *ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *response)
 {
     int n = 0;
-    int offset = (int) sizeof(struct ipc_sec_rsim_access_response);
+    int offset = (int) sizeof(struct ipc_sec_rsim_access_response_header);
     int size = 0;
 
     if (response == NULL)
         return NULL;
 
-    struct ipc_sec_rsim_access_response *rsimresp = (struct ipc_sec_rsim_access_response*) response->data;
-    char *file_data = (char *) malloc(sizeof(char) * rsimresp->len);
+    struct ipc_sec_rsim_access_response_header *rsimresp = (struct ipc_sec_rsim_access_response_header*) response->data;
+    char *file_data = (char *) malloc(sizeof(char) * rsimresp->length);
 
-    for (n = 0; n < rsimresp->len; n++)
+    for (n = 0; n < rsimresp->length; n++)
     {
         if (response->data[offset + n] == 0x0)
             continue;
@@ -80,40 +80,40 @@ char *ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *respon
         }
     }
 
-    if (size < rsimresp->len)
+    if (size < rsimresp->length)
         file_data = (char *) realloc(file_data, sizeof(char) * size);
 
     return file_data;
 }
 
-void ipc_sec_phone_lock_set_setup(struct ipc_sec_phone_lock_set *message,
+void ipc_sec_phone_lock_request_set_setup(struct ipc_sec_phone_lock_request_set_data *message,
     int pin_type, int enable, char *passwd)
 {
-    message->type = pin_type;
-    message->lock = enable ? 1 : 0;
+    message->facility_type = pin_type;
+    message->active = enable ? 1 : 0;
 
     if (passwd != NULL)
     {
         strncpy((char *) message->password, passwd, 39);
-        message->length = strlen(passwd);
+        message->password_length = strlen(passwd);
     }
 }
 
-void ipc_sec_change_locking_pw_set_setup(struct ipc_sec_change_locking_pw_set *message,
+void ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *message,
     int type, char *passwd_old, char *passwd_new)
 {
-    message->facility = type;
+    message->facility_type = type;
 
     if (passwd_old != NULL)
     {
         strncpy((char *) message->password_old, passwd_old, 39);
-        message->length_old = strlen(passwd_old);
+        message->password_old_length = strlen(passwd_old);
     }
 
     if (passwd_new != NULL)
     {
         strncpy((char *) message->password_new, passwd_new, 39);
-        message->length_new = strlen(passwd_new);
+        message->password_new_length = strlen(passwd_new);
     }
 }
 

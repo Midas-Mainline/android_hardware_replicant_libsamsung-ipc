@@ -49,17 +49,17 @@
  * Values
  */
 
+#define IPC_SMS_TYPE_POINT_TO_POINT                             0x01
+#define IPC_SMS_TYPE_STATUS_REPORT                              0x02
+#define IPC_SMS_TYPE_OUTGOING                                   0x02
+
+#define IPC_SMS_MSG_TYPE_MULTIPLE                               0x01
+#define IPC_SMS_MSG_TYPE_SINGLE                                 0x02
+
 #define IPC_SMS_ACK_NO_ERROR                                    0x0000
 #define IPC_SMS_ACK_PDA_FULL_ERROR                              0x8080
 #define IPC_SMS_ACK_MALFORMED_REQ_ERROR                         0x8061
 #define IPC_SMS_ACK_UNSPEC_ERROR                                0x806F
-
-#define IPC_SMS_MSG_MULTIPLE                                    0x01
-#define IPC_SMS_MSG_SINGLE                                      0x02
-
-#define IPC_SMS_TYPE_POINT_TO_POINT                             0x01
-#define IPC_SMS_TYPE_STATUS_REPORT                              0x02
-#define IPC_SMS_TYPE_OUTGOING                                   0x02
 
 #define IPC_SMS_STATUS_REC_UNREAD                               0x01
 #define IPC_SMS_STATUS_REC_READ                                 0x02
@@ -70,65 +70,59 @@
  * Structures
  */
 
-/*
- * This is followed by:
- * smsc_string (variable length, 1st byte is length)
- * pdu (variable length)
- */
-struct ipc_sms_send_msg_request {
-    unsigned char type;
-    unsigned char msg_type;
-    unsigned char unk;
+struct ipc_sms_send_msg_request_header {
+    unsigned char type; // IPC_SMS_TYPE
+    unsigned char msg_type; // IPC_SMS_MSG_TYPE
+    unsigned char unknown;
     unsigned char length;
-    unsigned char smsc_len;
 } __attribute__((__packed__));
 
-struct ipc_sms_send_msg_response {
-    unsigned char type;
-    unsigned short error;
-    unsigned char msg_tpid;
-    unsigned char unk;
+struct ipc_sms_send_msg_response_data {
+    unsigned char type; // IPC_SMS_TYPE
+    unsigned short ack; // IPC_SMS_ACK
+    unsigned char id;
+    unsigned char unknown;
 } __attribute__((__packed__));
 
-struct ipc_sms_incoming_msg {
-    unsigned char msg_type;
-    unsigned char type;
+struct ipc_sms_incoming_msg_header {
+    unsigned char msg_type; // IPC_SMS_MSG_TYPE
+    unsigned char type; // IPC_SMS_TYPE
     unsigned short sim_index;
-    unsigned char msg_tpid;
+    unsigned char id;
     unsigned char length;
 } __attribute__((__packed__));
 
-struct ipc_sms_deliver_report_request {
-    unsigned char type;
-    unsigned short error;
-    unsigned char msg_tpid;
-    unsigned char unk;
+struct ipc_sms_deliver_report_request_data {
+    unsigned char type; // IPC_SMS_TYPE
+    unsigned short ack; // IPC_SMS_ACK
+    unsigned char id;
+    unsigned char unknown;
 } __attribute__((__packed__));
 
-struct ipc_sms_deliver_report_response {
-    unsigned short error;
+struct ipc_sms_deliver_report_response_data {
+    unsigned short ack; // IPC_SMS_ACK
 } __attribute__((__packed__));
 
 struct ipc_sms_del_msg_request_data {
-    unsigned char unknown; // This is usually set to 0x02
+    unsigned char magic;
     unsigned short index;
 } __attribute__((__packed__));
 
 struct ipc_sms_del_msg_response_data {
-    unsigned char unknown; // This is usually set to 0x02
+    unsigned char magic;
     unsigned short error;
     unsigned short index;
 } __attribute__((__packed__));
 
 struct ipc_sms_save_msg_request_data {
-    unsigned char unknown; // This is usually set to 0x02
-    unsigned short index; // This is usually set to 0x0B
-    unsigned char status;
-    unsigned char length; // Total SMSC+PDU length
+    unsigned char magic;
+    unsigned short index;
+    unsigned char status; // IPC_SMS_STATUS
+    unsigned char length;
 } __attribute__((__packed__));
 
 struct ipc_sms_save_msg_response_data {
-    unsigned char unknown; // This is usually set to 0x02
+    unsigned char magic;
     unsigned short error;
     unsigned short index;
 } __attribute__((__packed__));
@@ -137,8 +131,8 @@ struct ipc_sms_save_msg_response_data {
  * Helpers
  */
 
-unsigned char *ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request *msg,
-    char *smsc, unsigned char *pdu, int length);
+unsigned char *ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request_header *msg, char *smsc,
+    unsigned char *pdu, int pdu_length);
 
 #endif
 
