@@ -20,13 +20,13 @@
 
 #include <samsung-ipc.h>
 
-#include "device/crespo/crespo_ipc.h"
-#include "device/aries/aries_ipc.h"
-#include "device/galaxys2/galaxys2_ipc.h"
-#include "device/maguro/maguro_ipc.h"
-#include "device/piranha/piranha_ipc.h"
-#include "device/i9300/i9300_ipc.h"
-#include "device/n7100/n7100_ipc.h"
+#include "devices/crespo/crespo_ipc.h"
+#include "devices/aries/aries_ipc.h"
+#include "devices/galaxys2/galaxys2_ipc.h"
+#include "devices/maguro/maguro_ipc.h"
+#include "devices/piranha/piranha_ipc.h"
+#include "devices/i9300/i9300_ipc.h"
+#include "devices/n7100/n7100_ipc.h"
 
 #ifndef __IPC_DEVICES_H__
 #define __IPC_DEVICES_H__

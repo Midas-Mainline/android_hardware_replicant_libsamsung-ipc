@@ -51,18 +51,18 @@ LOCAL_SRC_FILES := \
 	samsung-ipc/ipc.c \
 	samsung-ipc/ipc_devices.c \
 	samsung-ipc/ipc_util.c \
-	samsung-ipc/device/xmm6160/xmm6160.c \
-	samsung-ipc/device/xmm6260/xmm6260.c \
-	samsung-ipc/device/xmm6260/xmm6260_hsic.c \
-	samsung-ipc/device/xmm6260/xmm6260_mipi.c \
-	samsung-ipc/device/xmm6260/xmm6260_sec_modem.c \
-	samsung-ipc/device/crespo/crespo_ipc.c \
-	samsung-ipc/device/aries/aries_ipc.c \
-	samsung-ipc/device/galaxys2/galaxys2_ipc.c \
-	samsung-ipc/device/maguro/maguro_ipc.c \
-	samsung-ipc/device/piranha/piranha_ipc.c \
-	samsung-ipc/device/i9300/i9300_ipc.c \
-	samsung-ipc/device/n7100/n7100_ipc.c \
+	samsung-ipc/devices/xmm6160/xmm6160.c \
+	samsung-ipc/devices/xmm6260/xmm6260.c \
+	samsung-ipc/devices/xmm6260/xmm6260_hsic.c \
+	samsung-ipc/devices/xmm6260/xmm6260_mipi.c \
+	samsung-ipc/devices/xmm6260/xmm6260_sec_modem.c \
+	samsung-ipc/devices/crespo/crespo_ipc.c \
+	samsung-ipc/devices/aries/aries_ipc.c \
+	samsung-ipc/devices/galaxys2/galaxys2_ipc.c \
+	samsung-ipc/devices/maguro/maguro_ipc.c \
+	samsung-ipc/devices/piranha/piranha_ipc.c \
+	samsung-ipc/devices/i9300/i9300_ipc.c \
+	samsung-ipc/devices/n7100/n7100_ipc.c \
 	samsung-ipc/util.c \
 	samsung-ipc/call.c \
 	samsung-ipc/sms.c \
@@ -76,8 +76,8 @@ LOCAL_SRC_FILES := \
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/include \
 	$(LOCAL_PATH)/samsung-ipc \
-	$(LOCAL_PATH)/samsung-ipc/device/xmm6160/ \
-	$(LOCAL_PATH)/samsung-ipc/device/xmm6260/ \
+	$(LOCAL_PATH)/samsung-ipc/devices/xmm6160/ \
+	$(LOCAL_PATH)/samsung-ipc/devices/xmm6260/ \
 	external/openssl/include
 
 LOCAL_CFLAGS += \
