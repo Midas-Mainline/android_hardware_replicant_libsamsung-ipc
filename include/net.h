@@ -30,7 +30,7 @@
 
 #define IPC_NET_PREF_PLMN                                       0x0801
 #define IPC_NET_PLMN_SEL                                        0x0802
-#define IPC_NET_CURRENT_PLMN                                    0x0803
+#define IPC_NET_SERVING_NETWORK                                 0x0803
 #define IPC_NET_PLMN_LIST                                       0x0804
 #define IPC_NET_REGIST                                          0x0805
 #define IPC_NET_SUBSCRIBER_NUM                                  0x0806
@@ -40,7 +40,7 @@
 #define IPC_NET_MODE_SEL                                        0x080A
 #define IPC_NET_ACQ_ORDER                                       0x080B
 #define IPC_NET_IDENTITY                                        0x080C
-#define IPC_NET_CURRENT_RRC_STATUS                              0x080D
+#define IPC_NET_PREFERRED_NETWORK_INFO                          0x080D
 
 /*
  * Values
@@ -88,7 +88,7 @@ struct ipc_net_plmn_sel_request_data {
     unsigned char act; // IPC_NET_ACCESS_TECHNOLOGY
 } __attribute__((__packed__));
 
-struct ipc_net_current_plmn_data {
+struct ipc_net_serving_network_data {
     unsigned char unknown[3];
     char plmn[5];
     unsigned char type;

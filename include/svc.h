@@ -33,8 +33,8 @@
 #define IPC_SVC_DISPLAY_SCREEN                                  0x0B05
 #define IPC_SVC_CHANGE_SVC_MODE                                 0x0B06
 #define IPC_SVC_DEVICE_TEST                                     0x0B07
-#define IPC_SVC_DEBUG_DUMP_MESSAGE                              0x0B08
-#define IPC_SVC_DEBUG_STRING_MESSAGE                            0x0B09
+#define IPC_SVC_DEBUG_DUMP                                      0x0B08
+#define IPC_SVC_DEBUG_STRING                                    0x0B09
 
 /*
  * Values

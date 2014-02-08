@@ -34,14 +34,14 @@
 #define IPC_GPRS_ENTER_DATA                                     0x0D05
 #define IPC_GPRS_SHOW_PDP_ADDR                                  0x0D06
 #define IPC_GPRS_MS_CLASS                                       0x0D07
-#define IPC_GPRS_3G_QUAL_SERVICE_PROFILE                        0x0D08
+#define IPC_GPRS_3G_QUAL_SRVC_PROFILE                           0x0D08
 #define IPC_GPRS_IP_CONFIGURATION                               0x0D09
 #define IPC_GPRS_DEFINE_SEC_PDP_CONTEXT                         0x0D0A
 #define IPC_GPRS_TFT                                            0x0D0B
 #define IPC_GPRS_HSDPA_STATUS                                   0x0D0C
-#define IPC_GPRS_CURRENT_SESSION_DATA_COUNT                     0x0D0D
+#define IPC_GPRS_CURRENT_SESSION_DATA_COUNTER                   0x0D0D
 #define IPC_GPRS_DATA_DORMANT                                   0x0D0E
-#define IPC_GPRS_DUN_PIN_CTRL                                   0x0D0F
+#define IPC_GPRS_PIN_CTRL                                       0x0D0F
 #define IPC_GPRS_CALL_STATUS                                    0x0D10
 #define IPC_GPRS_PORT_LIST                                      0x0D11
 

@@ -40,7 +40,7 @@
 #define IPC_SMS_SVC_OPTION                                      0x040B
 #define IPC_SMS_MEM_STATUS                                      0x040C
 #define IPC_SMS_CBS_MSG                                         0x040D
-#define IPC_SMS_CBS_CONFIG                                      0x040E
+#define IPC_SMS_CBS_CFG                                         0x040E
 #define IPC_SMS_STORED_MSG_STATUS                               0x040F
 #define IPC_SMS_PARAM_COUNT                                     0x0410
 #define IPC_SMS_PARAM                                           0x0411

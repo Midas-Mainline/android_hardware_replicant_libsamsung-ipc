@@ -23,13 +23,13 @@
 
 #include <samsung-ipc.h>
 
-void ipc_sec_sim_status_setup(struct ipc_sec_sim_status_request_data *message,
+void ipc_sec_pin_status_setup(struct ipc_sec_pin_status_request_data *message,
     unsigned char pin_type, char *pin1, char *pin2)
 {
     if (message == NULL)
         return;
 
-    memset(message, 0, sizeof(struct ipc_sec_sim_status_request_data));
+    memset(message, 0, sizeof(struct ipc_sec_pin_status_request_data));
 
     message->type = pin_type;
 
@@ -46,7 +46,7 @@ void ipc_sec_sim_status_setup(struct ipc_sec_sim_status_request_data *message,
     }
 }
 
-void ipc_sec_lock_info_setup(struct ipc_sec_lock_info_request_data *message,
+void ipc_sec_lock_infomation_setup(struct ipc_sec_lock_infomation_request_data *message,
     unsigned char pin_type)
 {
     if (message == NULL)

@@ -68,6 +68,20 @@ const char *ipc_request_type_to_str(int type)
 const char *ipc_command_to_str(int command)
 {
     switch (command) {
+        case IPC_PWR_PHONE_PWR_UP:
+            return "IPC_PWR_PHONE_PWR_UP";
+        case IPC_PWR_PHONE_PWR_OFF:
+            return "IPC_PWR_PHONE_PWR_OFF";
+        case IPC_PWR_PHONE_RESET:
+            return "IPC_PWR_PHONE_RESET";
+        case IPC_PWR_BATT_STATUS:
+            return "IPC_PWR_BATT_STATUS";
+        case IPC_PWR_BATT_TYPE:
+            return "IPC_PWR_BATT_TYPE";
+        case IPC_PWR_BATT_COMP:
+            return "IPC_PWR_BATT_COMP";
+        case IPC_PWR_PHONE_STATE:
+            return "IPC_PWR_PHONE_STATE";
         case IPC_CALL_OUTGOING:
             return "IPC_CALL_OUTGOING";
         case IPC_CALL_INCOMING:
@@ -88,158 +102,6 @@ const char *ipc_command_to_str(int command)
             return "IPC_CALL_WAITING";
         case IPC_CALL_LINE_ID:
             return "IPC_CALL_LINE_ID";
-        case IPC_DISP_ICON_INFO:
-            return "IPC_DISP_ICON_INFO";
-        case IPC_DISP_HOMEZONE_INFO:
-            return "IPC_DISP_HOMEZONE_INFO";
-        case IPC_DISP_RSSI_INFO:
-            return "IPC_DISP_RSSI_INFO";
-        case IPC_GEN_PHONE_RES:
-            return "IPC_GEN_PHONE_RES";
-        case IPC_GPRS_DEFINE_PDP_CONTEXT:
-            return "IPC_GPRS_DEFINE_PDP_CONTEXT";
-        case IPC_GPRS_QOS:
-            return "IPC_GPRS_QOS";
-        case IPC_GPRS_PS:
-            return "IPC_GPRS_PS";
-        case IPC_GPRS_PDP_CONTEXT:
-            return "IPC_GPRS_PDP_CONTEXT";
-        case IPC_GPRS_ENTER_DATA:
-            return "IPC_GPRS_ENTER_DATA";
-        case IPC_GPRS_SHOW_PDP_ADDR:
-            return "IPC_GPRS_SHOW_PDP_ADDR";
-        case IPC_GPRS_MS_CLASS:
-            return "IPC_GPRS_MS_CLASS";
-        case IPC_GPRS_3G_QUAL_SERVICE_PROFILE:
-            return "IPC_GPRS_3G_QUAL_SERVICE_PROFILE";
-        case IPC_GPRS_IP_CONFIGURATION:
-            return "IPC_GPRS_IP_CONFIGURATION";
-        case IPC_GPRS_DEFINE_SEC_PDP_CONTEXT:
-            return "IPC_GPRS_DEFINE_SEC_PDP_CONTEXT";
-        case IPC_GPRS_TFT:
-            return "IPC_GPRS_TFT";
-        case IPC_GPRS_HSDPA_STATUS:
-            return "IPC_GPRS_HSDPA_STATUS";
-        case IPC_GPRS_CURRENT_SESSION_DATA_COUNT:
-            return "IPC_GPRS_CURRENT_SESSION_DATA_COUNT";
-        case IPC_GPRS_DATA_DORMANT:
-            return "IPC_GPRS_DATA_DORMANT";
-        case IPC_GPRS_DUN_PIN_CTRL:
-            return "IPC_GPRS_DUN_PIN_CTRL";
-        case IPC_GPRS_CALL_STATUS:
-            return "IPC_GPRS_CALL_STATUS";
-        case IPC_GPRS_PORT_LIST:
-            return "IPC_GPRS_PORT_LIST";
-        case IPC_IMEI_START:
-            return "IPC_IMEI_START";
-        case IPC_IMEI_CHECK_DEVICE_INFO:
-            return "IPC_IMEI_CHECK_DEVICE_INFO";
-        case IPC_MISC_ME_VERSION:
-            return "IPC_MISC_ME_VERSION";
-        case IPC_MISC_ME_IMSI:
-            return "IPC_MISC_ME_IMSI";
-        case IPC_MISC_ME_SN:
-            return "IPC_MISC_ME_SN";
-        case IPC_MISC_TIME_INFO:
-            return "IPC_MISC_TIME_INFO";
-        case IPC_MISC_DEBUG_LEVEL:
-            return "IPC_MISC_DEBUG_LEVEL";
-        case IPC_NET_PREF_PLMN:
-            return "IPC_NET_PREF_PLMN";
-        case IPC_NET_PLMN_SEL:
-            return "IPC_NET_PLMN_SEL";
-        case IPC_NET_CURRENT_PLMN:
-            return "IPC_NET_CURRENT_PLMN";
-        case IPC_NET_PLMN_LIST:
-            return "IPC_NET_PLMN_LIST";
-        case IPC_NET_REGIST:
-            return "IPC_NET_REGIST";
-        case IPC_NET_SUBSCRIBER_NUM:
-            return "IPC_NET_SUBSCRIBER_NUM";
-        case IPC_NET_BAND_SEL:
-            return "IPC_NET_BAND_SEL";
-        case IPC_NET_SERVICE_DOMAIN_CONFIG:
-            return "IPC_NET_SERVICE_DOMAIN_CONFIG";
-        case IPC_NET_POWERON_ATTACH:
-            return "IPC_NET_POWERON_ATTACH";
-        case IPC_NET_MODE_SEL:
-            return "IPC_NET_MODE_SEL";
-        case IPC_NET_ACQ_ORDER:
-            return "IPC_NET_ACQ_ORDER";
-        case IPC_NET_IDENTITY:
-            return "IPC_NET_IDENTITY";
-        case IPC_NET_CURRENT_RRC_STATUS:
-            return "IPC_NET_CURRENT_RRC_STATUS";
-        case IPC_PB_ACCESS:
-            return "IPC_PB_ACCESS";
-        case IPC_PB_STORAGE:
-            return "IPC_PB_STORAGE";
-        case IPC_PB_STORAGE_LIST:
-            return "IPC_PB_STORAGE_LIST";
-        case IPC_PB_ENTRY_INFO:
-            return "IPC_PB_ENTRY_INFO";
-        case IPC_PB_CAPABILITY_INFO:
-            return "IPC_PB_CAPABILITY_INFO";
-        case IPC_PWR_PHONE_PWR_UP:
-            return "IPC_PWR_PHONE_PWR_UP";
-        case IPC_PWR_PHONE_PWR_OFF:
-            return "IPC_PWR_PHONE_PWR_OFF";
-        case IPC_PWR_PHONE_RESET:
-            return "IPC_PWR_PHONE_RESET";
-        case IPC_PWR_BATT_STATUS:
-            return "IPC_PWR_BATT_STATUS";
-        case IPC_PWR_BATT_TYPE:
-            return "IPC_PWR_BATT_TYPE";
-        case IPC_PWR_BATT_COMP:
-            return "IPC_PWR_BATT_COMP";
-        case IPC_PWR_PHONE_STATE:
-            return "IPC_PWR_PHONE_STATE";
-        case IPC_RFS_NV_READ_ITEM:
-            return "IPC_RFS_NV_READ_ITEM";
-        case IPC_RFS_NV_WRITE_ITEM:
-            return "IPC_RFS_NV_WRITE_ITEM";
-        case IPC_SAT_PROFILE_DOWNLOAD:
-            return "IPC_SAT_PROFILE_DOWNLOAD";
-        case IPC_SAT_ENVELOPE_CMD:
-            return "IPC_SAT_ENVELOPE_CMD";
-        case IPC_SAT_PROACTIVE_CMD:
-            return "IPC_SAT_PROACTIVE_CMD";
-        case IPC_SAT_TERMINATE_USAT_SESSION:
-            return "IPC_SAT_TERMINATE_USAT_SESSION";
-        case IPC_SAT_EVENT_DOWNLOAD:
-            return "IPC_SAT_EVENT_DOWNLOAD";
-        case IPC_SAT_PROVIDE_LOCAL_INFO:
-            return "IPC_SAT_PROVIDE_LOCAL_INFO";
-        case IPC_SAT_POLLING:
-            return "IPC_SAT_POLLING";
-        case IPC_SAT_REFRESH:
-            return "IPC_SAT_REFRESH";
-        case IPC_SAT_SETUP_EVENT_LIST:
-            return "IPC_SAT_SETUP_EVENT_LIST";
-        case IPC_SAT_CALL_CONTROL_RESULT:
-            return "IPC_SAT_CALL_CONTROL_RESULT";
-        case IPC_SAT_IMAGE_CLUT:
-            return "IPC_SAT_IMAGE_CLUT";
-        case IPC_SAT_CALL_PROCESSING:
-            return "IPC_SAT_CALL_PROCESSING";
-        case IPC_SEC_SIM_STATUS:
-            return "IPC_SEC_SIM_STATUS";
-        case IPC_SEC_PHONE_LOCK:
-            return "IPC_SEC_PHONE_LOCK";
-        case IPC_SEC_CHANGE_LOCKING_PW:
-            return "IPC_SEC_CHANGE_LOCKING_PW";
-        case IPC_SEC_SIM_LANG:
-            return "IPC_SEC_SIM_LANG";
-        case IPC_SEC_RSIM_ACCESS:
-            return "IPC_SEC_RSIM_ACCESS";
-        case IPC_SEC_GSIM_ACCESS:
-            return "IPC_SEC_GSIM_ACCESS";
-        case IPC_SEC_SIM_ICC_TYPE:
-            return "IPC_SEC_SIM_ICC_TYPE";
-        case IPC_SEC_LOCK_INFO:
-            return "IPC_SEC_LOCK_INFO";
-        case IPC_SEC_ISIM_AUTH:
-            return "IPC_SEC_ISIM_AUTH";
         case IPC_SMS_SEND_MSG:
             return "IPC_SMS_SEND_MSG";
         case IPC_SMS_INCOMING_MSG:
@@ -266,14 +128,74 @@ const char *ipc_command_to_str(int command)
             return "IPC_SMS_MEM_STATUS";
         case IPC_SMS_CBS_MSG:
             return "IPC_SMS_CBS_MSG";
-        case IPC_SMS_CBS_CONFIG:
-            return "IPC_SMS_CBS_CONFIG";
+        case IPC_SMS_CBS_CFG:
+            return "IPC_SMS_CBS_CFG";
         case IPC_SMS_STORED_MSG_STATUS:
             return "IPC_SMS_STORED_MSG_STATUS";
         case IPC_SMS_PARAM_COUNT:
             return "IPC_SMS_PARAM_COUNT";
         case IPC_SMS_PARAM:
             return "IPC_SMS_PARAM";
+        case IPC_SEC_PIN_STATUS:
+            return "IPC_SEC_PIN_STATUS";
+        case IPC_SEC_PHONE_LOCK:
+            return "IPC_SEC_PHONE_LOCK";
+        case IPC_SEC_CHANGE_LOCKING_PW:
+            return "IPC_SEC_CHANGE_LOCKING_PW";
+        case IPC_SEC_SIM_LANG:
+            return "IPC_SEC_SIM_LANG";
+        case IPC_SEC_RSIM_ACCESS:
+            return "IPC_SEC_RSIM_ACCESS";
+        case IPC_SEC_GSIM_ACCESS:
+            return "IPC_SEC_GSIM_ACCESS";
+        case IPC_SEC_SIM_ICC_TYPE:
+            return "IPC_SEC_SIM_ICC_TYPE";
+        case IPC_SEC_LOCK_INFOMATION:
+            return "IPC_SEC_LOCK_INFOMATION";
+        case IPC_SEC_IMS_AUTH:
+            return "IPC_SEC_IMS_AUTH";
+        case IPC_PB_ACCESS:
+            return "IPC_PB_ACCESS";
+        case IPC_PB_STORAGE:
+            return "IPC_PB_STORAGE";
+        case IPC_PB_STORAGE_LIST:
+            return "IPC_PB_STORAGE_LIST";
+        case IPC_PB_ENTRY_INFO:
+            return "IPC_PB_ENTRY_INFO";
+        case IPC_PB_3GPB_CAPA:
+            return "IPC_PB_3GPB_CAPA";
+        case IPC_DISP_ICON_INFO:
+            return "IPC_DISP_ICON_INFO";
+        case IPC_DISP_HOMEZONE_INFO:
+            return "IPC_DISP_HOMEZONE_INFO";
+        case IPC_DISP_RSSI_INFO:
+            return "IPC_DISP_RSSI_INFO";
+        case IPC_NET_PREF_PLMN:
+            return "IPC_NET_PREF_PLMN";
+        case IPC_NET_PLMN_SEL:
+            return "IPC_NET_PLMN_SEL";
+        case IPC_NET_SERVING_NETWORK:
+            return "IPC_NET_SERVING_NETWORK";
+        case IPC_NET_PLMN_LIST:
+            return "IPC_NET_PLMN_LIST";
+        case IPC_NET_REGIST:
+            return "IPC_NET_REGIST";
+        case IPC_NET_SUBSCRIBER_NUM:
+            return "IPC_NET_SUBSCRIBER_NUM";
+        case IPC_NET_BAND_SEL:
+            return "IPC_NET_BAND_SEL";
+        case IPC_NET_SERVICE_DOMAIN_CONFIG:
+            return "IPC_NET_SERVICE_DOMAIN_CONFIG";
+        case IPC_NET_POWERON_ATTACH:
+            return "IPC_NET_POWERON_ATTACH";
+        case IPC_NET_MODE_SEL:
+            return "IPC_NET_MODE_SEL";
+        case IPC_NET_ACQ_ORDER:
+            return "IPC_NET_ACQ_ORDER";
+        case IPC_NET_IDENTITY:
+            return "IPC_NET_IDENTITY";
+        case IPC_NET_PREFERRED_NETWORK_INFO:
+            return "IPC_NET_PREFERRED_NETWORK_INFO";
         case IPC_SND_SPKR_VOLUME_CTRL:
             return "IPC_SND_SPKR_VOLUME_CTRL";
         case IPC_SND_MIC_MUTE_CTRL:
@@ -294,6 +216,34 @@ const char *ipc_command_to_str(int command)
             return "IPC_SND_CLOCK_CTRL";
         case IPC_SND_WB_AMR_STATUS:
             return "IPC_SND_WB_AMR_STATUS";
+        case IPC_MISC_ME_VERSION:
+            return "IPC_MISC_ME_VERSION";
+        case IPC_MISC_ME_IMSI:
+            return "IPC_MISC_ME_IMSI";
+        case IPC_MISC_ME_SN:
+            return "IPC_MISC_ME_SN";
+        case IPC_MISC_TIME_INFO:
+            return "IPC_MISC_TIME_INFO";
+        case IPC_MISC_DEBUG_LEVEL:
+            return "IPC_MISC_DEBUG_LEVEL";
+        case IPC_SVC_ENTER:
+            return "IPC_SVC_ENTER";
+        case IPC_SVC_END:
+            return "IPC_SVC_END";
+        case IPC_SVC_PRO_KEYCODE:
+            return "IPC_SVC_PRO_KEYCODE";
+        case IPC_SVC_SCREEN_CFG:
+            return "IPC_SVC_SCREEN_CFG";
+        case IPC_SVC_DISPLAY_SCREEN:
+            return "IPC_SVC_DISPLAY_SCREEN";
+        case IPC_SVC_CHANGE_SVC_MODE:
+            return "IPC_SVC_CHANGE_SVC_MODE";
+        case IPC_SVC_DEVICE_TEST:
+            return "IPC_SVC_DEVICE_TEST";
+        case IPC_SVC_DEBUG_DUMP:
+            return "IPC_SVC_DEBUG_DUMP";
+        case IPC_SVC_DEBUG_STRING:
+            return "IPC_SVC_DEBUG_STRING";
         case IPC_SS_WAITING:
             return "IPC_SS_WAITING";
         case IPC_SS_CLI:
@@ -314,24 +264,74 @@ const char *ipc_command_to_str(int command)
             return "IPC_SS_AOC";
         case IPC_SS_RELEASE_COMPLETE:
             return "IPC_SS_RELEASE_COMPLETE";
-        case IPC_SVC_ENTER:
-            return "IPC_SVC_ENTER";
-        case IPC_SVC_END:
-            return "IPC_SVC_END";
-        case IPC_SVC_PRO_KEYCODE:
-            return "IPC_SVC_PRO_KEYCODE";
-        case IPC_SVC_SCREEN_CFG:
-            return "IPC_SVC_SCREEN_CFG";
-        case IPC_SVC_DISPLAY_SCREEN:
-            return "IPC_SVC_DISPLAY_SCREEN";
-        case IPC_SVC_CHANGE_SVC_MODE:
-            return "IPC_SVC_CHANGE_SVC_MODE";
-        case IPC_SVC_DEVICE_TEST:
-            return "IPC_SVC_DEVICE_TEST";
-        case IPC_SVC_DEBUG_DUMP_MESSAGE:
-            return "IPC_SVC_DEBUG_DUMP_MESSAGE";
-        case IPC_SVC_DEBUG_STRING_MESSAGE:
-            return "IPC_SVC_DEBUG_STRING_MESSAGE";
+        case IPC_GPRS_DEFINE_PDP_CONTEXT:
+            return "IPC_GPRS_DEFINE_PDP_CONTEXT";
+        case IPC_GPRS_QOS:
+            return "IPC_GPRS_QOS";
+        case IPC_GPRS_PS:
+            return "IPC_GPRS_PS";
+        case IPC_GPRS_PDP_CONTEXT:
+            return "IPC_GPRS_PDP_CONTEXT";
+        case IPC_GPRS_ENTER_DATA:
+            return "IPC_GPRS_ENTER_DATA";
+        case IPC_GPRS_SHOW_PDP_ADDR:
+            return "IPC_GPRS_SHOW_PDP_ADDR";
+        case IPC_GPRS_MS_CLASS:
+            return "IPC_GPRS_MS_CLASS";
+        case IPC_GPRS_3G_QUAL_SRVC_PROFILE:
+            return "IPC_GPRS_3G_QUAL_SRVC_PROFILE";
+        case IPC_GPRS_IP_CONFIGURATION:
+            return "IPC_GPRS_IP_CONFIGURATION";
+        case IPC_GPRS_DEFINE_SEC_PDP_CONTEXT:
+            return "IPC_GPRS_DEFINE_SEC_PDP_CONTEXT";
+        case IPC_GPRS_TFT:
+            return "IPC_GPRS_TFT";
+        case IPC_GPRS_HSDPA_STATUS:
+            return "IPC_GPRS_HSDPA_STATUS";
+        case IPC_GPRS_CURRENT_SESSION_DATA_COUNTER:
+            return "IPC_GPRS_CURRENT_SESSION_DATA_COUNTER";
+        case IPC_GPRS_DATA_DORMANT:
+            return "IPC_GPRS_DATA_DORMANT";
+        case IPC_GPRS_PIN_CTRL:
+            return "IPC_GPRS_PIN_CTRL";
+        case IPC_GPRS_CALL_STATUS:
+            return "IPC_GPRS_CALL_STATUS";
+        case IPC_GPRS_PORT_LIST:
+            return "IPC_GPRS_PORT_LIST";
+        case IPC_SAT_PROFILE_DOWNLOAD:
+            return "IPC_SAT_PROFILE_DOWNLOAD";
+        case IPC_SAT_ENVELOPE_CMD:
+            return "IPC_SAT_ENVELOPE_CMD";
+        case IPC_SAT_PROACTIVE_CMD:
+            return "IPC_SAT_PROACTIVE_CMD";
+        case IPC_SAT_TERMINATE_USAT_SESSION:
+            return "IPC_SAT_TERMINATE_USAT_SESSION";
+        case IPC_SAT_EVENT_DOWNLOAD:
+            return "IPC_SAT_EVENT_DOWNLOAD";
+        case IPC_SAT_PROVIDE_LOCAL_INFO:
+            return "IPC_SAT_PROVIDE_LOCAL_INFO";
+        case IPC_SAT_POLLING:
+            return "IPC_SAT_POLLING";
+        case IPC_SAT_REFRESH:
+            return "IPC_SAT_REFRESH";
+        case IPC_SAT_SETUP_EVENT_LIST:
+            return "IPC_SAT_SETUP_EVENT_LIST";
+        case IPC_SAT_CALL_CONTROL_RESULT:
+            return "IPC_SAT_CALL_CONTROL_RESULT";
+        case IPC_SAT_IMAGE_CLUT:
+            return "IPC_SAT_IMAGE_CLUT";
+        case IPC_SAT_SETUP_CALL_PROCESSING:
+            return "IPC_SAT_SETUP_CALL_PROCESSING";
+        case IPC_IMEI_START:
+            return "IPC_IMEI_START";
+        case IPC_IMEI_CHECK_DEVICE_INFO:
+            return "IPC_IMEI_CHECK_DEVICE_INFO";
+        case IPC_RFS_NV_READ_ITEM:
+            return "IPC_RFS_NV_READ_ITEM";
+        case IPC_RFS_NV_WRITE_ITEM:
+            return "IPC_RFS_NV_WRITE_ITEM";
+        case IPC_GEN_PHONE_RES:
+            return "IPC_GEN_PHONE_RES";
         default:
             return "UNKNOWN";
     }

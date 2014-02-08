@@ -27,33 +27,33 @@
  * Commands
  */
 
-#define IPC_SEC_SIM_STATUS                                      0x0501
+#define IPC_SEC_PIN_STATUS                                      0x0501
 #define IPC_SEC_PHONE_LOCK                                      0x0502
 #define IPC_SEC_CHANGE_LOCKING_PW                               0x0503
 #define IPC_SEC_SIM_LANG                                        0x0504
 #define IPC_SEC_RSIM_ACCESS                                     0x0505
 #define IPC_SEC_GSIM_ACCESS                                     0x0506
 #define IPC_SEC_SIM_ICC_TYPE                                    0x0507
-#define IPC_SEC_LOCK_INFO                                       0x0508
-#define IPC_SEC_ISIM_AUTH                                       0x0509
+#define IPC_SEC_LOCK_INFOMATION                                 0x0508
+#define IPC_SEC_IMS_AUTH                                        0x0509
 
 /*
  * Values
  */
 
-#define IPC_SEC_SIM_STATUS_READY                                0x00
-#define IPC_SEC_SIM_STATUS_SIM_LOCK_REQUIRED                    0x01
-#define IPC_SEC_SIM_STATUS_INSIDE_PF_ERROR                      0x02
-#define IPC_SEC_SIM_STATUS_LOCK_SC                              0x03
-#define IPC_SEC_SIM_STATUS_LOCK_FD                              0x04
-#define IPC_SEC_SIM_STATUS_LOCK_PN                              0x05
-#define IPC_SEC_SIM_STATUS_LOCK_PU                              0x06
-#define IPC_SEC_SIM_STATUS_LOCK_PP                              0x07
-#define IPC_SEC_SIM_STATUS_LOCK_PC                              0x08
-#define IPC_SEC_SIM_STATUS_CARD_NOT_PRESENT                     0x80
-#define IPC_SEC_SIM_STATUS_CARD_ERROR                           0x81
-#define IPC_SEC_SIM_STATUS_INIT_COMPLETE                        0x82
-#define IPC_SEC_SIM_STATUS_PB_INIT_COMPLETE                     0x83
+#define IPC_SEC_PIN_STATUS_READY                                0x00
+#define IPC_SEC_PIN_STATUS_SIM_LOCK_REQUIRED                    0x01
+#define IPC_SEC_PIN_STATUS_INSIDE_PF_ERROR                      0x02
+#define IPC_SEC_PIN_STATUS_LOCK_SC                              0x03
+#define IPC_SEC_PIN_STATUS_LOCK_FD                              0x04
+#define IPC_SEC_PIN_STATUS_LOCK_PN                              0x05
+#define IPC_SEC_PIN_STATUS_LOCK_PU                              0x06
+#define IPC_SEC_PIN_STATUS_LOCK_PP                              0x07
+#define IPC_SEC_PIN_STATUS_LOCK_PC                              0x08
+#define IPC_SEC_PIN_STATUS_CARD_NOT_PRESENT                     0x80
+#define IPC_SEC_PIN_STATUS_CARD_ERROR                           0x81
+#define IPC_SEC_PIN_STATUS_INIT_COMPLETE                        0x82
+#define IPC_SEC_PIN_STATUS_PB_INIT_COMPLETE                     0x83
 
 #define IPC_SEC_FACILITY_LOCK_TYPE_SC_UNLOCKED                  0x00
 #define IPC_SEC_FACILITY_LOCK_TYPE_SC_PIN1_REQ                  0x01
@@ -90,12 +90,12 @@
  * Structures
  */
 
-struct ipc_sec_sim_status_response_data {
-    unsigned char status; // IPC_SEC_SIM_STATUS
+struct ipc_sec_pin_status_response_data {
+    unsigned char status; // IPC_SEC_PIN_STATUS
     unsigned char facility_lock; // IPC_SEC_FACILITY_LOCK_TYPE
 } __attribute__((__packed__));
 
-struct ipc_sec_sim_status_request_data {
+struct ipc_sec_pin_status_request_data {
     unsigned char type; // IPC_SEC_PIN_TYPE
     unsigned char pin1_length;
     unsigned char pin2_length;
@@ -150,12 +150,12 @@ struct ipc_sec_sim_icc_type {
     unsigned char type; // IPC_SEC_SIM_CARD_TYPE
 } __attribute__((__packed__));
 
-struct ipc_sec_lock_info_request_data {
+struct ipc_sec_lock_infomation_request_data {
     unsigned char magic;
     unsigned char type; // IPC_SEC_PIN_TYPE
 } __attribute__((__packed__));
 
-struct ipc_sec_lock_info_response_data {
+struct ipc_sec_lock_infomation_response_data {
     unsigned char unknown;
     unsigned char type; // IPC_SEC_PIN_TYPE
     unsigned char key;
@@ -166,9 +166,9 @@ struct ipc_sec_lock_info_response_data {
  * Helpers
  */
 
-void ipc_sec_sim_status_setup(struct ipc_sec_sim_status_request_data *message,
+void ipc_sec_pin_status_setup(struct ipc_sec_pin_status_request_data *message,
     unsigned char pin_type, char *pin1, char *pin2);
-void ipc_sec_lock_info_setup(struct ipc_sec_lock_info_request_data *message,
+void ipc_sec_lock_infomation_setup(struct ipc_sec_lock_infomation_request_data *message,
     unsigned char pin_type);
 void ipc_sec_phone_lock_request_set_setup(struct ipc_sec_phone_lock_request_set_data *message,
     int pin_type, int enable, char *passwd);

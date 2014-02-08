@@ -37,7 +37,7 @@
 #define IPC_SAT_SETUP_EVENT_LIST                                0x0E09
 #define IPC_SAT_CALL_CONTROL_RESULT                             0x0E0A
 #define IPC_SAT_IMAGE_CLUT                                      0x0E0B
-#define IPC_SAT_CALL_PROCESSING                                 0x0E0C
+#define IPC_SAT_SETUP_CALL_PROCESSING                           0x0E0C
 
 #endif
 

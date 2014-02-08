@@ -137,33 +137,32 @@ void modem_set_sms_device_ready(struct ipc_client *client)
 
 void modem_set_sec_pin_status(struct ipc_client *client, char *pin1, char *pin2)
 {
-    struct ipc_sec_sim_status_request_data pin_status;
-    struct ipc_sec_lock_info_request_data lock_info_req;
+    struct ipc_sec_pin_status_request_data pin_status;
 
     printf("[I] Sending PIN1 unlock request\n");
 
-    ipc_sec_sim_status_setup(&pin_status, IPC_SEC_PIN_TYPE_PIN1, pin1, pin2);
-    ipc_client_send(client, IPC_SEC_SIM_STATUS, IPC_TYPE_SET, (void *) &pin_status, sizeof(pin_status), seq_get());
+    ipc_sec_pin_status_setup(&pin_status, IPC_SEC_PIN_TYPE_PIN1, pin1, pin2);
+    ipc_client_send(client, IPC_SEC_PIN_STATUS, IPC_TYPE_SET, (void *) &pin_status, sizeof(pin_status), seq_get());
 }
 
 void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp)
 {
-    struct ipc_sec_sim_status_response_data *sim_status;
+    struct ipc_sec_pin_status_response_data *sim_status;
     unsigned char type;
     int status;
     char *data;
 
     switch(IPC_COMMAND(resp))
     {
-        case IPC_SEC_SIM_STATUS :
-            sim_status = (struct ipc_sec_sim_status_response *)resp->data;
+        case IPC_SEC_PIN_STATUS :
+            sim_status = (struct ipc_sec_pin_status_response_data *)resp->data;
 
             switch(sim_status->status)
             {
-                case IPC_SEC_SIM_STATUS_CARD_NOT_PRESENT:
+                case IPC_SEC_PIN_STATUS_CARD_NOT_PRESENT:
                     printf("[I] SIM card is definitely absent\n");
                 break;
-                case IPC_SEC_SIM_STATUS_LOCK_SC:
+                case IPC_SEC_PIN_STATUS_LOCK_SC:
                     switch(sim_status->facility_lock)
                     {
                         case IPC_SEC_FACILITY_LOCK_TYPE_SC_PIN1_REQ:
@@ -182,13 +181,13 @@ void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp
                         break;
                     }
                 break;
-                case IPC_SEC_SIM_STATUS_INIT_COMPLETE:
+                case IPC_SEC_PIN_STATUS_INIT_COMPLETE:
                     printf("[3] SIM init complete\n");
                     if(state == MODEM_STATE_NORMAL)
                         state = MODEM_STATE_SIM_OK;
 
                 break;
-                case IPC_SEC_SIM_STATUS_PB_INIT_COMPLETE:
+                case IPC_SEC_PIN_STATUS_PB_INIT_COMPLETE:
                     printf("[I] SIM Phone Book init complete\n");
                 break;
             }
@@ -317,14 +316,14 @@ void modem_response_net(struct ipc_client *client, struct ipc_message_info *resp
     switch(IPC_COMMAND(resp))
     {
         case IPC_NET_REGIST:
-            regi = (struct ipc_net_regist_response*) resp->data;
+            regi = (struct ipc_net_regist_response_data *) resp->data;
             if(regi->status == IPC_NET_REGISTRATION_STATUS_HOME)
             {
                 printf("[I] Registered with network successfully!\n");
 
             }
         break;
-        case IPC_NET_CURRENT_PLMN:
+        case IPC_NET_SERVING_NETWORK:
 
             memcpy(mnc, (char *)(resp->data + 3), 5);
             mnc[5]=0;
