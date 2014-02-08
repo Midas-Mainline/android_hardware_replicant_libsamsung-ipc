@@ -1,8 +1,8 @@
 libsamsung-ipc
 ==============
 
-This is an implementation of the modem protocol found in a lot of Samsung devices
-mostly smartphones.
+libsamsung-ipc is a free software implementation of the Samsung IPC modem protocol,
+found in many Samsung devices.
 
 Compilation and installation
 ============================

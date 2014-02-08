@@ -6,7 +6,7 @@ datarootdir=@datarootdir@
 datadir=@datadir@
 
 Name: libsamsung-ipc
-Description: A implemenation of the protocol to speak with modems found in most Samsung devices
+Description: Free software implementation of the Samsung IPC modem protocol, found in many Samsung devices
 Version: @VERSION@
 Requires:
 Libs: -L${libdir} -lsamsung-ipc
