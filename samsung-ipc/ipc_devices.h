@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2012 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2012-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,9 @@
 #include "device/crespo/crespo_ipc.h"
 #include "device/aries/aries_ipc.h"
 #include "device/galaxys2/galaxys2_ipc.h"
-#include "device/i9300/i9300_ipc.h"
 #include "device/maguro/maguro_ipc.h"
 #include "device/piranha/piranha_ipc.h"
+#include "device/i9300/i9300_ipc.h"
 #include "device/n7100/n7100_ipc.h"
 
 #ifndef __IPC_DEVICES_H__

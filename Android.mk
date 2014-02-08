@@ -27,16 +27,16 @@ ifneq (,$(filter galaxysmtd galaxytab,$(TARGET_DEVICE)))
 	ipc_device_name := aries
 endif
 
+ifneq (,$(filter i9100 galaxys2 n7000,$(TARGET_DEVICE)))
+	ipc_device_name := galaxys2
+endif
+
 ifneq (,$(filter maguro,$(TARGET_DEVICE)))
 	ipc_device_name := maguro
 endif
 
 ifneq (,$(filter p5100 p3100,$(TARGET_DEVICE)))
 	ipc_device_name := piranha
-endif
-
-ifneq (,$(filter i9100 galaxys2 n7000,$(TARGET_DEVICE)))
-	ipc_device_name := galaxys2
 endif
 
 ifneq (,$(filter i9300,$(TARGET_DEVICE)))
@@ -49,17 +49,8 @@ endif
 
 LOCAL_SRC_FILES := \
 	samsung-ipc/ipc.c \
-	samsung-ipc/ipc_util.c \
 	samsung-ipc/ipc_devices.c \
-	samsung-ipc/call.c \
-	samsung-ipc/rfs.c \
-	samsung-ipc/gen.c \
-	samsung-ipc/gprs.c \
-	samsung-ipc/misc.c \
-	samsung-ipc/net.c \
-	samsung-ipc/sec.c \
-	samsung-ipc/sms.c \
-	samsung-ipc/util.c \
+	samsung-ipc/ipc_util.c \
 	samsung-ipc/device/xmm6160/xmm6160.c \
 	samsung-ipc/device/xmm6260/xmm6260.c \
 	samsung-ipc/device/xmm6260/xmm6260_hsic.c \
@@ -68,10 +59,19 @@ LOCAL_SRC_FILES := \
 	samsung-ipc/device/crespo/crespo_ipc.c \
 	samsung-ipc/device/aries/aries_ipc.c \
 	samsung-ipc/device/galaxys2/galaxys2_ipc.c \
-	samsung-ipc/device/i9300/i9300_ipc.c \
 	samsung-ipc/device/maguro/maguro_ipc.c \
 	samsung-ipc/device/piranha/piranha_ipc.c \
-	samsung-ipc/device/n7100/n7100_ipc.c
+	samsung-ipc/device/i9300/i9300_ipc.c \
+	samsung-ipc/device/n7100/n7100_ipc.c \
+	samsung-ipc/util.c \
+	samsung-ipc/call.c \
+	samsung-ipc/sms.c \
+	samsung-ipc/sec.c \
+	samsung-ipc/net.c \
+	samsung-ipc/misc.c \
+	samsung-ipc/gprs.c \
+	samsung-ipc/rfs.c \
+	samsung-ipc/gen.c
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/include \

@@ -85,16 +85,6 @@ struct ipc_device_desc ipc_devices[] = {
         .nv_data_specs = NULL,
     },
     {
-        .name = "i9300",
-        .board_name = "smdk4x12",
-        .kernel_version = NULL,
-        .fmt_ops = &i9300_ipc_fmt_ops,
-        .rfs_ops = &i9300_ipc_rfs_ops,
-        .handlers = &i9300_ipc_handlers,
-        .gprs_specs = &i9300_ipc_gprs_specs,
-        .nv_data_specs = NULL,
-    },
-    {
         .name = "maguro",
         .board_name = "tuna",
         .kernel_version = NULL,
@@ -122,6 +112,16 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &piranha_ipc_rfs_ops,
         .handlers = &piranha_ipc_handlers,
         .gprs_specs = &piranha_ipc_gprs_specs,
+        .nv_data_specs = NULL,
+    },
+    {
+        .name = "i9300",
+        .board_name = "smdk4x12",
+        .kernel_version = NULL,
+        .fmt_ops = &i9300_ipc_fmt_ops,
+        .rfs_ops = &i9300_ipc_rfs_ops,
+        .handlers = &i9300_ipc_handlers,
+        .gprs_specs = &i9300_ipc_gprs_specs,
         .nv_data_specs = NULL,
     },
     {

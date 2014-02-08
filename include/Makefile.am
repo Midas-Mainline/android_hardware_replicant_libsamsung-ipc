@@ -13,6 +13,7 @@ samsung_ipcinclude_HEADERS = \
 	net.h \
 	snd.h \
 	misc.h \
+	svc.h \
 	ss.h \
 	gprs.h \
 	sat.h \

@@ -23,6 +23,7 @@
 #define NETPHONET_PHONET_H
 
 #include <sys/types.h>
+#include <stdint.h>
 
 #include <sys/socket.h>
 #ifndef AF_PHONET
