@@ -1,7 +1,8 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com
+ * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
+ * Copyright (C) 2014 Paul Kocialkowsk <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,49 +23,47 @@
 
 #include <samsung-ipc.h>
 
-void ipc_net_regist_setup(struct ipc_net_regist_request_data *message,
-    unsigned char domain)
+int ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel_request_data *data,
+    unsigned char mode_sel, const char *plmn, unsigned char act)
 {
-    message->act = IPC_NET_ACCESS_TECHNOLOGY_UNKNOWN;
-    message->domain = domain;
-}
+    size_t plmn_length;
 
-void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_request_data *message,
-    unsigned char mode, char *plmn, unsigned char act)
-{
-    int message_plmn_len;
-    int plmn_len;
-    int i;
+    if (data == NULL)
+        return -1;
 
-    if (message == NULL)
-        return;
+    memset(data, 0, sizeof(struct ipc_net_plmn_sel_request_data));
+    data->mode_sel = mode_sel;
 
-    message_plmn_len = sizeof(message->plmn);
+    if (mode_sel == IPC_NET_PLMN_SEL_AUTO) {
+        data->act = IPC_NET_ACCESS_TECHNOLOGY_UNKNOWN;
+    } else {
+        plmn_length = strlen(plmn);
+        if (plmn_length > sizeof(data->plmn))
+            plmn_length = sizeof(data->plmn);
 
-    memset(message, 0, sizeof(struct ipc_net_plmn_sel_request_data));
-
-    if (mode == IPC_NET_PLMN_SEL_AUTO)
-    {
-        message->mode_sel = IPC_NET_PLMN_SEL_AUTO;
-        message->act = IPC_NET_ACCESS_TECHNOLOGY_UNKNOWN;
-    }
-    else if (mode == IPC_NET_PLMN_SEL_MANUAL)
-    {
-        plmn_len = strlen(plmn);
-
-        // Only copy the first (6) bytes if there are more
-        if(plmn_len > message_plmn_len)
-            plmn_len = message_plmn_len;
-
-        strncpy(message->plmn, plmn, plmn_len);
+        strncpy((char *) data->plmn, plmn, plmn_length);
 
         // If there are less (5 is the usual case) PLMN bytes, fill the rest with '#'
-        if (plmn_len < message_plmn_len)
-            memset((void *) (message->plmn + plmn_len), '#', message_plmn_len - plmn_len);
+        if (plmn_length < sizeof(data->plmn))
+            memset(data->plmn + plmn_length, '#', sizeof(data->plmn) - plmn_length);
 
-        message->mode_sel = IPC_NET_PLMN_SEL_MANUAL;
-        message->act = act;
+        data->act = act;
     }
+
+    return 0;
+}
+
+int ipc_net_regist_setup(struct ipc_net_regist_request_data *data,
+    unsigned char domain)
+{
+    if (data == NULL)
+        return -1;
+
+    memset(data, 0, sizeof(struct ipc_net_regist_request_data));
+    data->act = IPC_NET_ACCESS_TECHNOLOGY_UNKNOWN;
+    data->domain = domain;
+
+    return 0;
 }
 
 // vim:ts=4:sw=4:expandtab

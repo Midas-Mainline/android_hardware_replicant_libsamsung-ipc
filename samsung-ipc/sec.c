@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
- * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,98 +23,128 @@
 
 #include <samsung-ipc.h>
 
-void ipc_sec_pin_status_setup(struct ipc_sec_pin_status_request_data *message,
-    unsigned char pin_type, char *pin1, char *pin2)
+int ipc_sec_pin_status_setup(struct ipc_sec_pin_status_request_data *data,
+    unsigned char type, const char *pin1, const char *pin2)
 {
-    if (message == NULL)
-        return;
+    size_t pin1_length;
+    size_t pin2_length;
 
-    memset(message, 0, sizeof(struct ipc_sec_pin_status_request_data));
+    if (data == NULL)
+        return -1;
 
-    message->type = pin_type;
+    memset(data, 0, sizeof(struct ipc_sec_pin_status_request_data));
+    data->type = type;
 
-    if (pin1 != NULL)
-    {
-        strncpy((char *) message->pin1, pin1, 8);
-        message->pin1_length = strlen(pin1);
+    if (pin1 != NULL) {
+        pin1_length = strlen(pin1);
+        if (pin1_length > sizeof(data->pin1))
+            pin1_length = sizeof(data->pin1);
+
+        strncpy((char *) data->pin1, pin1, pin1_length);
     }
 
-    if (pin2 != NULL)
-    {
-        strncpy((char *) message->pin2, pin2, 8);
-        message->pin2_length = strlen(pin2);
+    if (pin2 != NULL) {
+        pin2_length = strlen(pin2);
+        if (pin2_length > sizeof(data->pin2))
+            pin2_length = sizeof(data->pin2);
+
+        strncpy((char *) data->pin2, pin2, pin2_length);
     }
+
+    return 0;
 }
 
-void ipc_sec_lock_infomation_setup(struct ipc_sec_lock_infomation_request_data *message,
-    unsigned char pin_type)
+int ipc_sec_phone_lock_request_set_setup(struct ipc_sec_phone_lock_request_set_data *data,
+    unsigned char facility_type, unsigned char active, const char *password)
 {
-    if (message == NULL)
-        return;
+    size_t password_length;
 
-    message->magic = 1;
-    message->type = pin_type;
+    if (data == NULL)
+        return -1;
+
+    memset(data, 0, sizeof(struct ipc_sec_phone_lock_request_set_data));
+    data->facility_type = facility_type;
+    data->active = active;
+
+    if (password != NULL) {
+        password_length = strlen(password);
+        if (password_length > sizeof(data->password))
+            password_length = sizeof(data->password);
+
+        data->password_length = (unsigned char) password_length;
+        strncpy((char *) data->password, password, password_length);
+    } else {
+        data->password_length = 0;
+    }
+
+    return 0;
 }
 
-char *ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *response)
+int ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *data,
+    unsigned char facility_type, const char *password_old,
+    const char *password_new)
 {
-    int n = 0;
-    int offset = (int) sizeof(struct ipc_sec_rsim_access_response_header);
-    int size = 0;
+    size_t password_old_length;
+    size_t password_new_length;
 
-    if (response == NULL)
+    if (data == NULL)
+        return -1;
+
+    data->facility_type = facility_type;
+
+    if (password_old != NULL) {
+        password_old_length = strlen(password_old);
+        if (password_old_length > sizeof(data->password_old_length))
+            password_old_length = sizeof(data->password_old_length);
+
+        data->password_old_length = (unsigned char) password_old_length;
+        strncpy((char *) data->password_old, password_old, password_old_length);
+    } else {
+        data->password_old_length = 0;
+    }
+
+    if (password_new != NULL) {
+        password_new_length = strlen(password_new);
+        if (password_new_length > sizeof(data->password_new_length))
+            password_new_length = sizeof(data->password_new_length);
+
+        data->password_new_length = (unsigned char) password_new_length;
+        strncpy((char *) data->password_new, password_new, password_new_length);
+    } else {
+        data->password_new_length = 0;
+    }
+
+    return 0;
+}
+
+void *ipc_sec_rsim_access_get_file_data(const void *data, size_t size)
+{
+    struct ipc_sec_rsim_access_response_header *header;
+    void *file_data;
+
+    if (data == NULL || size < sizeof(struct ipc_sec_rsim_access_response_header))
         return NULL;
 
-    struct ipc_sec_rsim_access_response_header *rsimresp = (struct ipc_sec_rsim_access_response_header*) response->data;
-    char *file_data = (char *) malloc(sizeof(char) * rsimresp->length);
+    header = (struct ipc_sec_rsim_access_response_header *) data;
 
-    for (n = 0; n < rsimresp->length; n++)
-    {
-        if (response->data[offset + n] == 0x0)
-            continue;
-        else if (response->data[offset + n] == 0xff)
-            break;
-        else {
-            file_data[size] = response->data[offset + n];
-            size++;
-        }
-    }
+    file_data = calloc(1, header->length);
 
-    if (size < rsimresp->length)
-        file_data = (char *) realloc(file_data, sizeof(char) * size);
+    memcpy(file_data, (void *) ((unsigned char *) data + sizeof(struct ipc_sec_rsim_access_response_header)), header->length);
 
     return file_data;
 }
 
-void ipc_sec_phone_lock_request_set_setup(struct ipc_sec_phone_lock_request_set_data *message,
-    int pin_type, int enable, char *passwd)
+int ipc_sec_lock_infomation_setup(struct ipc_sec_lock_infomation_request_data *data,
+    unsigned char type)
 {
-    message->facility_type = pin_type;
-    message->active = enable ? 1 : 0;
+    if (data == NULL)
+        return -1;
 
-    if (passwd != NULL)
-    {
-        strncpy((char *) message->password, passwd, 39);
-        message->password_length = strlen(passwd);
-    }
-}
+    memset(data, 0, sizeof(struct ipc_sec_lock_infomation_request_data));
+    data->magic = 0x01;
+    data->type = type;
 
-void ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *message,
-    int type, char *passwd_old, char *passwd_new)
-{
-    message->facility_type = type;
-
-    if (passwd_old != NULL)
-    {
-        strncpy((char *) message->password_old, passwd_old, 39);
-        message->password_old_length = strlen(passwd_old);
-    }
-
-    if (passwd_new != NULL)
-    {
-        strncpy((char *) message->password_new, passwd_new, 39);
-        message->password_new_length = strlen(passwd_new);
-    }
+    return 0;
 }
 
 // vim:ts=4:sw=4:expandtab

@@ -129,10 +129,10 @@ struct ipc_net_mode_sel_data {
  * Helpers
  */
 
-void ipc_net_regist_setup(struct ipc_net_regist_request_data *message,
+int ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel_request_data *data,
+    unsigned char mode_sel, const char *plmn, unsigned char act);
+int ipc_net_regist_setup(struct ipc_net_regist_request_data *data,
     unsigned char domain);
-void ipc_net_plmn_sel_set_setup(struct ipc_net_plmn_sel_request_data *message,
-    unsigned char mode, char *plmn, unsigned char act);
 
 #endif
 

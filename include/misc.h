@@ -55,6 +55,10 @@ struct ipc_misc_me_version_data {
     char misc[32];
 } __attribute__((__packed__));
 
+struct ipc_misc_me_imsi_header {
+    unsigned char length;
+} __attribute__((__packed__));
+
 struct ipc_misc_me_sn_data {
     unsigned char type; // IPC_MISC_ME_SN_SERIAL_NUM
     unsigned char length;
@@ -73,7 +77,7 @@ struct ipc_misc_time_info_data {
  * Helpers
  */
 
-char *ipc_misc_me_imsi_response_get_imsi(struct ipc_message_info *response);
+char *ipc_misc_me_imsi_get_imsi(const void *data, size_t size);
 
 #endif
 

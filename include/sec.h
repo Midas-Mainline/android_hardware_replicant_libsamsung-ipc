@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
- * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -166,15 +166,16 @@ struct ipc_sec_lock_infomation_response_data {
  * Helpers
  */
 
-void ipc_sec_pin_status_setup(struct ipc_sec_pin_status_request_data *message,
-    unsigned char pin_type, char *pin1, char *pin2);
-void ipc_sec_lock_infomation_setup(struct ipc_sec_lock_infomation_request_data *message,
-    unsigned char pin_type);
-void ipc_sec_phone_lock_request_set_setup(struct ipc_sec_phone_lock_request_set_data *message,
-    int pin_type, int enable, char *passwd);
-char *ipc_sec_rsim_access_response_get_file_data(struct ipc_message_info *response);
-void ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *message,
-    int type, char *passwd_old, char *passwd_new);
+int ipc_sec_pin_status_setup(struct ipc_sec_pin_status_request_data *data,
+    unsigned char type, const char *pin1, const char *pin2);
+int ipc_sec_phone_lock_request_set_setup(struct ipc_sec_phone_lock_request_set_data *data,
+    unsigned char facility_type, unsigned char active, const char *password);
+int ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *data,
+    unsigned char facility_type, const char *password_old,
+    const char *password_new);
+void *ipc_sec_rsim_access_get_file_data(const void *data, size_t size);
+int ipc_sec_lock_infomation_setup(struct ipc_sec_lock_infomation_request_data *data,
+    unsigned char type);
 
 #endif
 

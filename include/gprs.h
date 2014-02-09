@@ -78,11 +78,11 @@ struct ipc_gprs_define_pdp_context_data {
 struct ipc_gprs_pdp_context_request_set_data {
     unsigned char enable;
     unsigned char cid;
-    unsigned char magic[4];
+    unsigned char magic1[4];
     unsigned char username[32];
     unsigned char password[32];
     unsigned char unknown1[32];
-    unsigned char unknown2;
+    unsigned char magic2;
 } __attribute__((__packed__));
 
 struct ipc_gprs_pdp_context_request_get_entry {
@@ -131,11 +131,12 @@ struct ipc_gprs_port_list_data {
  * Helpers
  */
 
-void ipc_gprs_port_list_setup(struct ipc_gprs_port_list_data *message);
-void ipc_gprs_pdp_context_request_set_setup(struct ipc_gprs_pdp_context_request_set_data *message,
-    unsigned char cid, int enable, char *username, char *password);
-void ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context_data *message,
-    unsigned char cid, int enable, char *apn);
+int ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context_data *data,
+    unsigned char enable, unsigned char cid, const char *apn);
+int ipc_gprs_pdp_context_request_set_setup(struct ipc_gprs_pdp_context_request_set_data *data,
+    unsigned char enable, unsigned char cid, const char *username,
+    const char *password);
+int ipc_gprs_port_list_setup(struct ipc_gprs_port_list_data *data);
 
 #endif
 

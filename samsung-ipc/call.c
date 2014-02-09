@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
- * Copyright (C) 2013 Paul Kocialkowsk <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowsk <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,105 +23,110 @@
 
 #include <samsung-ipc.h>
 
-#define OUTGOING_NUMBER_MAX_LENGTH 86
-
-void ipc_call_outgoing_setup(struct ipc_call_outgoing_data *message, unsigned char type,
-    unsigned char identity, unsigned char prefix, char *number)
+int ipc_call_outgoing_setup(struct ipc_call_outgoing_data *data,
+    unsigned char type, unsigned char identity, unsigned char prefix,
+    const char *number)
 {
-    int length;
+    size_t number_length;
 
-    if (message == NULL || number == NULL)
-        return;
+    if (data == NULL || number == NULL)
+        return -1;
 
-    length = strlen(number);
-    if (length > OUTGOING_NUMBER_MAX_LENGTH)
-        length = OUTGOING_NUMBER_MAX_LENGTH;
+    number_length = strlen(number);
+    if (number_length > sizeof(data->number))
+        number_length = sizeof(data->number);
 
-    memset(message, 0, sizeof(struct ipc_call_outgoing_data));
+    memset(data, 0, sizeof(struct ipc_call_outgoing_data));
+    data->type = type;
+    data->identity = identity;
+    data->prefix = prefix;
+    data->number_length = (unsigned char) number_length;
 
-    message->type = type;
-    message->identity = identity;
-    message->prefix = prefix;
-    message->number_length = length;
+    strncpy((char *) data->number, number, number_length);
 
-    strncpy((char *) message->number, number, length);
+    return 0;
 }
 
-/* Retrieve number of calls in list of calls */
-unsigned int ipc_call_list_response_get_num_entries(struct ipc_message_info *response)
+unsigned char ipc_call_list_get_count(const void *data, size_t size)
 {
-    if (response == NULL || response->data == NULL || response->length < sizeof(unsigned int))
+    struct ipc_call_list_header *header;
+
+    if (data == NULL || size < sizeof(struct ipc_call_list_header))
         return 0;
 
-    return *((unsigned int *) response->data);
+    header = (struct ipc_call_list_header *) data;
+
+    return header->count;
 }
 
-/* Retrieve one specific entry from a list of calls */
-struct ipc_call_list_entry* ipc_call_list_response_get_entry(struct ipc_message_info *response,
-    unsigned int num)
+struct ipc_call_list_entry *ipc_call_list_get_entry(const void *data,
+    size_t size, unsigned int index)
 {
-    unsigned int count, pos, n;
     struct ipc_call_list_entry *entry = NULL;
+    unsigned char count;
+    unsigned char i;
+    size_t offset;
 
-    count = ipc_call_list_response_get_num_entries(response);
-    if (num > count || count == 0)
+    if (data == NULL)
         return NULL;
 
-    pos = 1;
-    for (n = 0; n < num + 1; n++)
-    {
-        entry = (struct ipc_call_list_entry *) (response->data + pos);
-        pos += (unsigned int) (sizeof(struct ipc_call_list_entry) + entry->number_length);
+    count = ipc_call_list_get_count(data, size);
+    if (count == 0)
+        return NULL;
+
+    offset = sizeof(struct ipc_call_list_header);
+
+    for (i = 0; i < (index + 1); i++) {
+        entry = (struct ipc_call_list_entry *) ((unsigned char *) data + offset);
+        offset += sizeof(struct ipc_call_list_entry) + entry->number_length;
     }
+
+    if (offset > size)
+        return NULL;
 
     return entry;
 }
 
-/* Retrieve the number of a call entry in the list of calls */
-char *ipc_call_list_response_get_entry_number(struct ipc_message_info *response,
-    unsigned int num)
+char *ipc_call_list_get_entry_number(const void *data,
+    size_t size, unsigned int index)
 {
-    unsigned int count, pos, n;
-    struct ipc_call_list_entry *entry = NULL;
+    struct ipc_call_list_entry *entry;
     char *number;
+    size_t number_length;
 
-    count = ipc_call_list_response_get_num_entries(response);
-    if (num > count || count == 0)
+    entry = ipc_call_list_get_entry(data, size, index);
+    if (entry == NULL)
         return NULL;
 
-    pos = 1;
-    for (n = 0; n < num + 1; n++)
-    {
-        if (entry != NULL)
-            pos += entry->number_length;
+    // entry->number_length doesn't count the final null character
+    number_length = entry->number_length + sizeof(char);
 
-        entry = (struct ipc_call_list_entry *) (response->data + pos);
-        pos += (unsigned int) sizeof(struct ipc_call_list_entry);
-    }
+    number = (char *) calloc(1, number_length);
 
-    if (entry == NULL || (unsigned char *) (response->data + pos) == NULL)
-        return NULL;
-
-    number = (char *) malloc(sizeof(char) * entry->number_length);
-    strncpy(number, (char *) (response->data + pos), entry->number_length);
+    strncpy(number, (char *) entry + sizeof(struct ipc_call_list_entry), entry->number_length);
+    number[entry->number_length] = '\0';
 
     return number;
 }
 
-unsigned char *ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf_data *message,
-    unsigned char *burst, int burst_len)
+void *ipc_call_burst_dtmf_setup(const struct ipc_call_burst_dtmf_entry *entries,
+    unsigned char count)
 {
-    unsigned char *data = NULL;
-    int data_len = sizeof(struct ipc_call_cont_dtmf_data) + burst_len;
+    struct ipc_call_burst_dtmf_header *header;
+    void *data;
+    size_t size;
 
-    if (message == NULL || burst == NULL || burst_len <= 0)
+    if (entries == NULL)
         return NULL;
 
-    data = (unsigned char *) malloc(sizeof(unsigned char) * data_len);
-    memset(data, 0, data_len);
+    size = sizeof(struct ipc_call_burst_dtmf_header) + count * sizeof(struct ipc_call_burst_dtmf_entry);
 
-    memcpy(data, message, sizeof(struct ipc_call_cont_dtmf_data));
-    memcpy(data + sizeof(struct ipc_call_cont_dtmf_data), burst, burst_len);
+    data = calloc(1, size);
+
+    header = (struct ipc_call_burst_dtmf_header *) data;
+    header->count = count;
+
+    memcpy((void *) ((unsigned char *) data + sizeof(struct ipc_call_burst_dtmf_header)), entries, count * sizeof(struct ipc_call_burst_dtmf_entry));
 
     return data;
 }

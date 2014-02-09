@@ -2,6 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
+ * Copyright (C) 2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,26 +23,37 @@
 
 #include <samsung-ipc.h>
 
-unsigned char *ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request_header *msg, char *smsc,
-    unsigned char *pdu, int pdu_length)
+void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
+    const char *smsc, const char *pdu)
 {
-    unsigned char *data = NULL, *p = NULL;
-    unsigned int data_length = 0, smsc_len = 0;
+    void *data;
+    size_t size;
+    unsigned char smsc_length;
+    unsigned char *p;
 
-    if (msg == NULL || smsc == NULL || pdu == NULL)
+    if (header == NULL || smsc == NULL || pdu == NULL)
         return NULL;
 
-    smsc_len = strlen(smsc);
-    data_length = smsc_len + pdu_length + sizeof(struct ipc_sms_send_msg_request_header);
-    data = (unsigned char *) malloc(sizeof(unsigned char) * data_length);
-    memset(data, 0, data_length);
+    smsc_length = (unsigned char) strlen(smsc);
 
-    p = data;
-    memcpy(p, msg, sizeof(struct ipc_sms_send_msg_request_header));
+    size = sizeof(struct ipc_sms_send_msg_request_header) + sizeof(smsc_length) + strlen(smsc) + strlen(pdu);
+    header->length = (unsigned char) size;
+
+    data = calloc(1, size);
+
+    p = (unsigned char *) data;
+
+    memcpy(p, header, sizeof(struct ipc_sms_send_msg_request_header));
     p += sizeof(struct ipc_sms_send_msg_request_header);
-    memcpy(p, (char *) (smsc + 1), smsc_len);
-    p += smsc_len;
-    memcpy(p, pdu, pdu_length);
+
+    memcpy(p, &smsc_length, sizeof(smsc_length));
+    p += sizeof(smsc_length);
+
+    memcpy(p, smsc, smsc_length);
+    p += smsc_length;
+
+    memcpy(p, pdu, strlen(pdu));
+    p += strlen(pdu);
 
     return data;
 }

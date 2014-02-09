@@ -104,6 +104,10 @@ struct ipc_call_status_data {
     unsigned char end_cause; // IPC_CALL_END_CAUSE
 } __attribute__((__packed__));
 
+struct ipc_call_list_header {
+    unsigned char count;
+} __attribute__((__packed__));
+
 struct ipc_call_list_entry {
     unsigned char unknown1;
     unsigned char type; // IPC_CALL_TYPE
@@ -115,6 +119,15 @@ struct ipc_call_list_entry {
     unsigned char unknown3;
 } __attribute__((__packed__));
 
+struct ipc_call_burst_dtmf_header {
+    unsigned char count;
+} __attribute__((__packed__));
+
+struct ipc_call_burst_dtmf_entry {
+    unsigned char state;
+    unsigned char tone;
+} __attribute__((__packed__));
+
 struct ipc_call_cont_dtmf_data {
     unsigned char state;
     unsigned char tone;
@@ -124,15 +137,16 @@ struct ipc_call_cont_dtmf_data {
  * Helpers
  */
 
-void ipc_call_outgoing_setup(struct ipc_call_outgoing_data *message, unsigned char type,
-    unsigned char identity, unsigned char prefix, char *number);
-unsigned int ipc_call_list_response_get_num_entries(struct ipc_message_info *response);
-struct ipc_call_list_entry* ipc_call_list_response_get_entry(struct ipc_message_info *response,
-    unsigned int num);
-char *ipc_call_list_response_get_entry_number(struct ipc_message_info *response,
-    unsigned int num);
-unsigned char *ipc_call_cont_dtmf_burst_pack(struct ipc_call_cont_dtmf_data *message,
-    unsigned char *burst, int burst_len);
+int ipc_call_outgoing_setup(struct ipc_call_outgoing_data *data,
+    unsigned char type, unsigned char identity, unsigned char prefix,
+    const char *number);
+unsigned char ipc_call_list_get_count(const void *data, size_t size);
+struct ipc_call_list_entry *ipc_call_list_get_entry(const void *data,
+    size_t size, unsigned int index);
+char *ipc_call_list_get_entry_number(const void *data,
+    size_t size, unsigned int index);
+void *ipc_call_burst_dtmf_setup(const struct ipc_call_burst_dtmf_entry *entries,
+    unsigned char count);
 
 #endif
 

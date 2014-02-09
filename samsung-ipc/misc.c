@@ -2,6 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
+ * Copyright (C) 2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,17 +23,26 @@
 
 #include <samsung-ipc.h>
 
-#define DEFAULT_IMSI_LENGTH 15
-
-char *ipc_misc_me_imsi_response_get_imsi(struct ipc_message_info *response)
+char *ipc_misc_me_imsi_get_imsi(const void *data, size_t size)
 {
-    if (response == NULL || response->data[0] != DEFAULT_IMSI_LENGTH)
+    struct ipc_misc_me_imsi_header *header;
+    char *imsi;
+    size_t imsi_length;
+
+    if (data == NULL || size < sizeof(struct ipc_misc_me_imsi_header))
         return NULL;
 
-    char *buffer = (char *) malloc(sizeof(char) * DEFAULT_IMSI_LENGTH);
-    memcpy(buffer, &response->data[1], DEFAULT_IMSI_LENGTH);
+    header = (struct ipc_misc_me_imsi_header *) data;
 
-    return buffer;
+    // header->length doesn't count the final null character
+    imsi_length = header->length + sizeof(char);
+
+    imsi = (char *) calloc(1, imsi_length);
+
+    strncpy(imsi, (char *) data + sizeof(struct ipc_misc_me_imsi_header), header->length);
+    imsi[header->length] = '\0';
+
+    return imsi;
 }
 
 // vim:ts=4:sw=4:expandtab

@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
- * Copyright (C) 2011 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -131,8 +131,8 @@ struct ipc_sms_save_msg_response_data {
  * Helpers
  */
 
-unsigned char *ipc_sms_send_msg_pack(struct ipc_sms_send_msg_request_header *msg, char *smsc,
-    unsigned char *pdu, int pdu_length);
+void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
+    const char *smsc, const char *pdu);
 
 #endif
 
