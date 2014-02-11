@@ -117,7 +117,7 @@ int ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *data,
     return 0;
 }
 
-void *ipc_sec_rsim_access_get_file_data(const void *data, size_t size)
+void *ipc_sec_rsim_access_file_data_extract(const void *data, size_t size)
 {
     struct ipc_sec_rsim_access_response_header *header;
     void *file_data;

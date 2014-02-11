@@ -23,7 +23,7 @@
 
 #include <samsung-ipc.h>
 
-char *ipc_misc_me_imsi_get_imsi(const void *data, size_t size)
+char *ipc_misc_me_imsi_imsi_extract(const void *data, size_t size)
 {
     struct ipc_misc_me_imsi_header *header;
     char *imsi;

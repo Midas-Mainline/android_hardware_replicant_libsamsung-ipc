@@ -140,11 +140,10 @@ struct ipc_call_cont_dtmf_data {
 int ipc_call_outgoing_setup(struct ipc_call_outgoing_data *data,
     unsigned char type, unsigned char identity, unsigned char prefix,
     const char *number);
-unsigned char ipc_call_list_get_count(const void *data, size_t size);
-struct ipc_call_list_entry *ipc_call_list_get_entry(const void *data,
+unsigned char ipc_call_list_count_extract(const void *data, size_t size);
+struct ipc_call_list_entry *ipc_call_list_entry_extract(const void *data,
     size_t size, unsigned int index);
-char *ipc_call_list_get_entry_number(const void *data,
-    size_t size, unsigned int index);
+char *ipc_call_list_entry_number_extract(const struct ipc_call_list_entry *entry);
 void *ipc_call_burst_dtmf_setup(const struct ipc_call_burst_dtmf_entry *entries,
     unsigned char count);
 

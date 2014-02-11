@@ -47,7 +47,7 @@ int ipc_call_outgoing_setup(struct ipc_call_outgoing_data *data,
     return 0;
 }
 
-unsigned char ipc_call_list_get_count(const void *data, size_t size)
+unsigned char ipc_call_list_count_extract(const void *data, size_t size)
 {
     struct ipc_call_list_header *header;
 
@@ -59,7 +59,7 @@ unsigned char ipc_call_list_get_count(const void *data, size_t size)
     return header->count;
 }
 
-struct ipc_call_list_entry *ipc_call_list_get_entry(const void *data,
+struct ipc_call_list_entry *ipc_call_list_entry_extract(const void *data,
     size_t size, unsigned int index)
 {
     struct ipc_call_list_entry *entry = NULL;
@@ -70,7 +70,7 @@ struct ipc_call_list_entry *ipc_call_list_get_entry(const void *data,
     if (data == NULL)
         return NULL;
 
-    count = ipc_call_list_get_count(data, size);
+    count = ipc_call_list_count_extract(data, size);
     if (count == 0)
         return NULL;
 
@@ -87,14 +87,11 @@ struct ipc_call_list_entry *ipc_call_list_get_entry(const void *data,
     return entry;
 }
 
-char *ipc_call_list_get_entry_number(const void *data,
-    size_t size, unsigned int index)
+char *ipc_call_list_entry_number_extract(const struct ipc_call_list_entry *entry)
 {
-    struct ipc_call_list_entry *entry;
     char *number;
     size_t number_length;
 
-    entry = ipc_call_list_get_entry(data, size, index);
     if (entry == NULL)
         return NULL;
 

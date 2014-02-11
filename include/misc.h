@@ -77,7 +77,7 @@ struct ipc_misc_time_info_data {
  * Helpers
  */
 
-char *ipc_misc_me_imsi_get_imsi(const void *data, size_t size);
+char *ipc_misc_me_imsi_imsi_extract(const void *data, size_t size);
 
 #endif
 
