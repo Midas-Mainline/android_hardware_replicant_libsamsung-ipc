@@ -444,4 +444,74 @@ int ipc_client_gprs_get_capabilities(struct ipc_client *client,
     return client->gprs_specs->gprs_get_capabilities(capabilities);
 }
 
+char *ipc_client_nv_data_path(struct ipc_client *client)
+{
+    if (client == NULL ||
+        client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_path == NULL)
+        return NULL;
+
+    return client->nv_data_specs->nv_data_path;
+}
+
+char *ipc_client_nv_data_md5_path(struct ipc_client *client)
+{
+    if (client == NULL ||
+        client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_md5_path == NULL)
+        return NULL;
+
+    return client->nv_data_specs->nv_data_md5_path;
+}
+
+char *ipc_client_nv_data_backup_path(struct ipc_client *client)
+{
+    if (client == NULL ||
+        client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_backup_path == NULL)
+        return NULL;
+
+    return client->nv_data_specs->nv_data_backup_path;
+}
+
+char *ipc_client_nv_data_backup_md5_path(struct ipc_client *client)
+{
+    if (client == NULL ||
+        client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_backup_md5_path == NULL)
+        return NULL;
+
+    return client->nv_data_specs->nv_data_backup_md5_path;
+}
+
+char *ipc_client_nv_data_secret(struct ipc_client *client)
+{
+    if (client == NULL ||
+        client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_secret == NULL)
+        return NULL;
+
+    return client->nv_data_specs->nv_data_secret;
+}
+
+int ipc_client_nv_data_size(struct ipc_client *client)
+{
+    if (client == NULL ||
+        client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_size == 0)
+        return -1;
+
+    return client->nv_data_specs->nv_data_size;
+}
+
+int ipc_client_nv_data_chunk_size(struct ipc_client *client)
+{
+    if (client == NULL ||
+        client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_chunk_size == 0)
+        return -1;
+
+    return client->nv_data_specs->nv_data_chunk_size;
+}
+
 // vim:ts=4:sw=4:expandtab

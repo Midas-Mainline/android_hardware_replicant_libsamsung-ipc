@@ -58,6 +58,7 @@ extern struct ipc_ops aries_ipc_fmt_ops;
 extern struct ipc_ops aries_ipc_rfs_ops;
 extern struct ipc_handlers aries_ipc_handlers;
 extern struct ipc_gprs_specs aries_ipc_gprs_specs;
+extern struct ipc_nv_data_specs aries_ipc_nv_data_specs;
 
 #endif
 

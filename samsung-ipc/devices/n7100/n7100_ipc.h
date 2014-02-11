@@ -42,6 +42,7 @@ extern struct ipc_ops n7100_ipc_fmt_ops;
 extern struct ipc_ops n7100_ipc_rfs_ops;
 extern struct ipc_handlers n7100_ipc_handlers;
 extern struct ipc_gprs_specs n7100_ipc_gprs_specs;
+extern struct ipc_nv_data_specs n7100_ipc_nv_data_specs;
 
 #endif
 

@@ -393,9 +393,11 @@ struct ipc_gprs_specs maguro_ipc_gprs_specs = {
 struct ipc_nv_data_specs maguro_ipc_nv_data_specs = {
     .nv_data_path = MAGURO_NV_DATA_PATH,
     .nv_data_md5_path = MAGURO_NV_DATA_MD5_PATH,
-    .nv_state_path = MAGURO_NV_STATE_PATH,
-    .nv_data_bak_path = MAGURO_NV_DATA_BAK_PATH,
-    .nv_data_md5_bak_path = MAGURO_NV_DATA_MD5_BAK_PATH,
+    .nv_data_backup_path = MAGURO_NV_DATA_BACKUP_PATH,
+    .nv_data_backup_md5_path = MAGURO_NV_DATA_BACKUP_MD5_PATH,
+    .nv_data_secret = XMM6260_NV_DATA_SECRET,
+    .nv_data_size = XMM6260_NV_DATA_SIZE,
+    .nv_data_chunk_size = XMM6260_NV_DATA_CHUNK_SIZE,
 };
 
 // vim:ts=4:sw=4:expandtab

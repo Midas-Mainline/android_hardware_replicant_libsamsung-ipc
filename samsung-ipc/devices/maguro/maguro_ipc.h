@@ -38,9 +38,8 @@
 
 #define MAGURO_NV_DATA_PATH                     "/factory/nv_data.bin"
 #define MAGURO_NV_DATA_MD5_PATH                 "/factory/nv_data.bin.md5"
-#define MAGURO_NV_STATE_PATH                    "/factory/.nv_state"
-#define MAGURO_NV_DATA_BAK_PATH                 "/factory/.nv_data.bak"
-#define MAGURO_NV_DATA_MD5_BAK_PATH             "/factory/.nv_data.bak.md5"
+#define MAGURO_NV_DATA_BACKUP_PATH              "/factory/.nv_data.bak"
+#define MAGURO_NV_DATA_BACKUP_MD5_PATH          "/factory/.nv_data.bak.md5"
 
 struct maguro_ipc_transport_data {
     int fd;

@@ -43,6 +43,7 @@ extern struct ipc_ops crespo_ipc_rfs_ops;
 extern struct ipc_handlers crespo_ipc_handlers;
 extern struct ipc_gprs_specs crespo_ipc_gprs_specs_single;
 extern struct ipc_gprs_specs crespo_ipc_gprs_specs;
+extern struct ipc_nv_data_specs crespo_ipc_nv_data_specs;
 
 #endif
 

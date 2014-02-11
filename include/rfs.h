@@ -30,22 +30,6 @@
 #define IPC_RFS_NV_WRITE_ITEM                                   0x4202
 
 /*
- * Values
- */
-
-#define NV_DATA_SIZE_DEFAULT                                    0x200000
-#define NV_DATA_CHUNK_SIZE_DEFAULT                              0x1000
-
-#define NV_DATA_PATH_DEFAULT                    "/efs/nv_data.bin"
-#define NV_DATA_MD5_PATH_DEFAULT                "/efs/nv_data.bin.md5"
-#define NV_DATA_BAK_PATH_DEFAULT                "/efs/.nv_data.bak"
-#define NV_DATA_MD5_BAK_PATH_DEFAULT            "/efs/.nv_data.bak.md5"
-#define NV_STATE_PATH_DEFAULT                   "/efs/.nv_state"
-#define NV_DATA_SECRET_DEFAULT                  "Samsung_Android_RIL"
-
-#define MD5_STRING_SIZE                         MD5_DIGEST_LENGTH * 2 + 1
-
-/*
  * Structures
  */
 
@@ -76,14 +60,6 @@ struct ipc_rfs_nv_write_item_confirm_data {
  */
 
 void md5hash2string(char *out, unsigned char *in);
-char *nv_data_path(struct ipc_client *client);
-char *nv_data_md5_path(struct ipc_client *client);
-char *nv_data_bak_path(struct ipc_client *client);
-char *nv_data_md5_bak_path(struct ipc_client *client);
-char *nv_state_path(struct ipc_client *client);
-char *nv_data_secret(struct ipc_client *client);
-int nv_data_size(struct ipc_client *client);
-int nv_data_chunk_size(struct ipc_client *client);
 void nv_data_generate(struct ipc_client *client);
 void nv_data_md5_compute(void *data_p, int size, char *secret, void *hash);
 void nv_data_md5_generate(struct ipc_client *client);

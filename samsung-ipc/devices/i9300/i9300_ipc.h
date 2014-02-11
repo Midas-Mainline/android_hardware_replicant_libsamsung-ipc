@@ -42,6 +42,7 @@ extern struct ipc_ops i9300_ipc_fmt_ops;
 extern struct ipc_ops i9300_ipc_rfs_ops;
 extern struct ipc_handlers i9300_ipc_handlers;
 extern struct ipc_gprs_specs i9300_ipc_gprs_specs;
+extern struct ipc_nv_data_specs i9300_ipc_nv_data_specs;
 
 #endif
 

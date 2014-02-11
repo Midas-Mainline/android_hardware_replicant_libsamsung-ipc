@@ -408,4 +408,14 @@ struct ipc_gprs_specs n7100_ipc_gprs_specs = {
     .gprs_get_capabilities = n7100_ipc_gprs_get_capabilities,
 };
 
+struct ipc_nv_data_specs n7100_ipc_nv_data_specs = {
+    .nv_data_path = XMM6260_NV_DATA_PATH,
+    .nv_data_md5_path = XMM6260_NV_DATA_MD5_PATH,
+    .nv_data_backup_path = XMM6260_NV_DATA_BACKUP_PATH,
+    .nv_data_backup_md5_path = XMM6260_NV_DATA_BACKUP_MD5_PATH,
+    .nv_data_secret = XMM6260_NV_DATA_SECRET,
+    .nv_data_size = XMM6260_NV_DATA_SIZE,
+    .nv_data_chunk_size = XMM6260_NV_DATA_CHUNK_SIZE,
+};
+
 // vim:ts=4:sw=4:expandtab

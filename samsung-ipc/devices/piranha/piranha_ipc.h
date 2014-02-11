@@ -43,6 +43,7 @@ extern struct ipc_ops piranha_ipc_rfs_ops;
 extern struct ipc_handlers piranha_ipc_handlers;
 extern struct ipc_gprs_specs piranha_ipc_gprs_specs;
 extern struct ipc_nv_data_specs piranha_ipc_nv_data_specs;
+extern struct ipc_nv_data_specs piranha_ipc_nv_data_specs;
 
 #endif
 

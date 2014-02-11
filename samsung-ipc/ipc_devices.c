@@ -32,7 +32,7 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &crespo_ipc_rfs_ops,
         .handlers = &crespo_ipc_handlers,
         .gprs_specs = &crespo_ipc_gprs_specs_single,
-        .nv_data_specs = NULL,
+        .nv_data_specs = &crespo_ipc_nv_data_specs,
     },
     {
         .name = "crespo",
@@ -42,7 +42,7 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &crespo_ipc_rfs_ops,
         .handlers = &crespo_ipc_handlers,
         .gprs_specs = &crespo_ipc_gprs_specs,
-        .nv_data_specs = NULL,
+        .nv_data_specs = &crespo_ipc_nv_data_specs,
     },
     {
         .name = "aries",
@@ -52,7 +52,7 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &aries_ipc_rfs_ops,
         .handlers = &aries_ipc_handlers,
         .gprs_specs = &aries_ipc_gprs_specs,
-        .nv_data_specs = NULL,
+        .nv_data_specs = &aries_ipc_nv_data_specs,
     },
     {
         .name = "aries",
@@ -62,7 +62,7 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &aries_ipc_rfs_ops,
         .handlers = &aries_ipc_handlers,
         .gprs_specs = &aries_ipc_gprs_specs,
-        .nv_data_specs = NULL,
+        .nv_data_specs = &aries_ipc_nv_data_specs,
     },
     {
         .name = "galaxys2",
@@ -72,7 +72,7 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &galaxys2_ipc_rfs_ops,
         .handlers = &galaxys2_ipc_handlers,
         .gprs_specs = &galaxys2_ipc_gprs_specs,
-        .nv_data_specs = NULL,
+        .nv_data_specs = &galaxys2_ipc_nv_data_specs,
     },
     {
         .name = "galaxys2",
@@ -82,7 +82,7 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &galaxys2_ipc_rfs_ops,
         .handlers = &galaxys2_ipc_handlers,
         .gprs_specs = &galaxys2_ipc_gprs_specs,
-        .nv_data_specs = NULL,
+        .nv_data_specs = &galaxys2_ipc_nv_data_specs,
     },
     {
         .name = "maguro",
@@ -102,7 +102,7 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &piranha_ipc_rfs_ops,
         .handlers = &piranha_ipc_handlers,
         .gprs_specs = &piranha_ipc_gprs_specs,
-        .nv_data_specs = NULL,
+        .nv_data_specs = &piranha_ipc_nv_data_specs,
     },
     {
         .name = "piranha",
@@ -112,7 +112,7 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &piranha_ipc_rfs_ops,
         .handlers = &piranha_ipc_handlers,
         .gprs_specs = &piranha_ipc_gprs_specs,
-        .nv_data_specs = NULL,
+        .nv_data_specs = &piranha_ipc_nv_data_specs,
     },
     {
         .name = "i9300",
@@ -122,7 +122,7 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &i9300_ipc_rfs_ops,
         .handlers = &i9300_ipc_handlers,
         .gprs_specs = &i9300_ipc_gprs_specs,
-        .nv_data_specs = NULL,
+        .nv_data_specs = &i9300_ipc_nv_data_specs,
     },
     {
         .name = "n7100",
@@ -132,7 +132,7 @@ struct ipc_device_desc ipc_devices[] = {
         .rfs_ops = &n7100_ipc_rfs_ops,
         .handlers = &n7100_ipc_handlers,
         .gprs_specs = &n7100_ipc_gprs_specs,
-        .nv_data_specs = NULL,
+        .nv_data_specs = &n7100_ipc_nv_data_specs,
     },
 };
 

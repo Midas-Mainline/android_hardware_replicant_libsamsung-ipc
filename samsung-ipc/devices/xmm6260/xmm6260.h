@@ -38,6 +38,14 @@
 #define XMM6260_NV_DATA_ADDRESS                                 0x60E80000
 #define XMM6260_MPS_DATA_ADDRESS                                0x61080000
 
+#define XMM6260_NV_DATA_PATH                    "/efs/nv_data.bin"
+#define XMM6260_NV_DATA_MD5_PATH                "/efs/nv_data.bin.md5"
+#define XMM6260_NV_DATA_BACKUP_PATH             "/efs/.nv_data.bak"
+#define XMM6260_NV_DATA_BACKUP_MD5_PATH         "/efs/.nv_data.bak.md5"
+#define XMM6260_NV_DATA_SECRET                  "Samsung_Android_RIL"
+#define XMM6260_NV_DATA_SIZE                                    0x200000
+#define XMM6260_NV_DATA_CHUNK_SIZE                              0x1000
+
 unsigned char xmm6260_crc_calculate(void *buffer, int length);
 
 #endif

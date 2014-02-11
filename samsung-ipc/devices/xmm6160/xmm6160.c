@@ -252,7 +252,7 @@ int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
     }
     ipc_client_log(client, "Checked nv_data md5");
 
-    nv_data = file_data_read(nv_data_path(client), nv_data_size(client), nv_data_chunk_size(client));
+    nv_data = file_data_read(ipc_client_nv_data_path(client), ipc_client_nv_data_size(client), ipc_client_nv_data_chunk_size(client));
     if (nv_data == NULL) {
         ipc_client_log(client, "Reading nv_data failed");
         goto error;
@@ -260,7 +260,7 @@ int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
     ipc_client_log(client, "Read nv_data");
 
     p = (unsigned char *) nv_data;
-    nv_size = nv_data_size(client);
+    nv_size = ipc_client_nv_data_size(client);
 
     if (device_address != NULL) {
         memcpy(device_address, p, nv_size);

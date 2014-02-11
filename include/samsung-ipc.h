@@ -108,6 +108,14 @@ char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid);
 int ipc_client_gprs_get_capabilities(struct ipc_client *client,
     struct ipc_client_gprs_capabilities *capabilities);
 
+char *ipc_client_nv_data_path(struct ipc_client *client);
+char *ipc_client_nv_data_md5_path(struct ipc_client *client);
+char *ipc_client_nv_data_backup_path(struct ipc_client *client);
+char *ipc_client_nv_data_backup_md5_path(struct ipc_client *client);
+char *ipc_client_nv_data_secret(struct ipc_client *client);
+int ipc_client_nv_data_size(struct ipc_client *client);
+int ipc_client_nv_data_chunk_size(struct ipc_client *client);
+
 const char *ipc_response_type_to_str(int type);
 const char *ipc_request_type_to_str(int type);
 const char *ipc_command_to_str(int command);
