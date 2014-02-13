@@ -28,7 +28,7 @@
 
 #include <samsung-ipc.h>
 #include <ipc.h>
-#include <util.h>
+#include <utils.h>
 
 #include "modem.h"
 #include "modem_prj.h"

@@ -29,7 +29,7 @@
 
 #include <samsung-ipc.h>
 #include <ipc.h>
-#include <util.h>
+#include <utils.h>
 
 #include "crespo_modem_ctl.h"
 
@@ -51,7 +51,7 @@ int crespo_ipc_bootstrap(struct ipc_client *client)
 
     ipc_client_log(client, "Starting crespo modem bootstrap");
 
-    modem_image_data = file_data_read(CRESPO_MODEM_IMAGE_DEVICE, CRESPO_MODEM_IMAGE_SIZE, 0x1000);
+    modem_image_data = file_data_read(CRESPO_MODEM_IMAGE_DEVICE, CRESPO_MODEM_IMAGE_SIZE, 0x1000, 0);
     if (modem_image_data == NULL) {
         ipc_client_log(client, "Reading modem image data failed");
         goto error;

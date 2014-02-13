@@ -25,7 +25,7 @@
 #include <sys/select.h>
 
 #include <samsung-ipc.h>
-#include <util.h>
+#include <utils.h>
 
 #include "xmm6160.h"
 
@@ -252,7 +252,7 @@ int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
     }
     ipc_client_log(client, "Checked nv_data md5");
 
-    nv_data = file_data_read(ipc_client_nv_data_path(client), ipc_client_nv_data_size(client), ipc_client_nv_data_chunk_size(client));
+    nv_data = file_data_read(ipc_client_nv_data_path(client), ipc_client_nv_data_size(client), ipc_client_nv_data_chunk_size(client), 0);
     if (nv_data == NULL) {
         ipc_client_log(client, "Reading nv_data failed");
         goto error;

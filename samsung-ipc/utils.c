@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,33 +31,37 @@
 #include <linux/netlink.h>
 #include <net/if.h>
 
-#include "util.h"
+#include "utils.h"
 
-void *file_data_read(char *path, int size, int chunk)
+void *file_data_read(const char *path, size_t size, size_t chunk_size,
+    size_t offset)
 {
     void *data = NULL;
     int fd = -1;
-
+    size_t count;
+    off_t seek;
     unsigned char *p;
-    int count;
     int rc;
 
-    if (path == NULL || size <= 0 || chunk <= 0)
+    if (path == NULL || size == 0 || chunk_size == 0 || chunk_size > size)
         return NULL;
 
     fd = open(path, O_RDONLY);
     if (fd < 0)
         goto error;
 
-    data = malloc(size);
-    memset(data, 0, size);
+    seek = lseek(fd, (off_t) offset, SEEK_SET);
+    if (seek < (off_t) offset)
+        goto error;
+
+    data = calloc(1, size);
 
     p = (unsigned char *) data;
 
     count = 0;
     while (count < size) {
-        rc = read(fd, p, size - count > chunk ? chunk : size - count);
-        if (rc < 0)
+        rc = read(fd, p, size - count > chunk_size ? chunk_size : size - count);
+        if (rc <= 0)
             goto error;
 
         p += rc;
@@ -67,9 +71,10 @@ void *file_data_read(char *path, int size, int chunk)
     goto complete;
 
 error:
-    if (data != NULL)
+    if (data != NULL) {
         free(data);
-    data = NULL;
+        data = NULL;
+    }
 
 complete:
     if (fd >= 0)
@@ -78,7 +83,52 @@ complete:
     return data;
 }
 
-int network_iface_up(char *iface, int domain, int type)
+int file_data_write(const char *path, const void *data, size_t size,
+    size_t chunk_size, size_t offset)
+{
+    int fd = -1;
+    size_t count;
+    off_t seek;
+    unsigned char *p;
+    int rc;
+
+    if (path == NULL || data == NULL || size == 0 || chunk_size == 0 || chunk_size > size)
+        return -1;
+
+    fd = open(path, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    if (fd < 0)
+        goto error;
+
+    seek = lseek(fd, (off_t) offset, SEEK_SET);
+    if (seek < (off_t) offset)
+        goto error;
+
+    p = (unsigned char *) data;
+
+    count = 0;
+    while (count < size) {
+        rc = write(fd, p, size - count > chunk_size ? chunk_size : size - count);
+        if (rc <= 0)
+            goto error;
+
+        p += rc;
+        count += rc;
+    }
+
+    rc = 0;
+    goto complete;
+
+error:
+    rc = -1;
+
+complete:
+    if (fd >= 0)
+        close(fd);
+
+    return rc;
+}
+
+int network_iface_up(const char *iface, int domain, int type)
 {
     struct ifreq ifr;
     int fd = -1;
@@ -117,7 +167,7 @@ complete:
     return rc;
 }
 
-int network_iface_down(char *iface, int domain, int type)
+int network_iface_down(const char *iface, int domain, int type)
 {
     struct ifreq ifr;
     int fd = -1;
@@ -156,7 +206,7 @@ complete:
     return rc;
 }
 
-int sysfs_value_read(char *path)
+int sysfs_value_read(const char *path)
 {
     char buffer[100];
     int value;
@@ -187,7 +237,7 @@ complete:
     return value;
 }
 
-int sysfs_value_write(char *path, int value)
+int sysfs_value_write(const char *path, int value)
 {
     char buffer[100];
     int fd = -1;
@@ -219,20 +269,54 @@ complete:
     return rc;
 }
 
-int sysfs_string_read(char *path, char *buffer, int length)
+char *sysfs_string_read(const char *path, size_t length)
 {
+    char *string = NULL;
     int fd = -1;
     int rc;
 
-    if (path == NULL || buffer == NULL || length <= 0)
-        return -1;
+    if (path == NULL || length == 0)
+        return NULL;
 
     fd = open(path, O_RDONLY);
     if (fd < 0)
         goto error;
 
-    rc = read(fd, buffer, length);
+    string = (char *) calloc(1, length);
+
+    rc = read(fd, string, length);
     if (rc <= 0)
+        goto error;
+
+    goto complete;
+
+error:
+    if (string != NULL) {
+        free(string);
+        string = NULL;
+    }
+
+complete:
+    if (fd >= 0)
+        close(fd);
+
+    return string;
+}
+
+int sysfs_string_write(const char *path, const char *buffer, size_t length)
+{
+    int fd = -1;
+    int rc;
+
+    if (path == NULL || buffer == NULL || length == 0)
+        return -1;
+
+    fd = open(path, O_WRONLY);
+    if (fd < 0)
+        goto error;
+
+    rc = write(fd, buffer, length);
+    if (rc < (int) length)
         goto error;
 
     rc = 0;
@@ -248,33 +332,76 @@ complete:
     return rc;
 }
 
-int sysfs_string_write(char *path, char *buffer, int length)
+char *data2string(const void *data, size_t size)
 {
-    int fd = -1;
+    char *string;
+    size_t length;
+    char *p;
+    size_t i;
+
+    if (data == NULL || size == 0)
+        return NULL;
+
+    length = size * 2 + 1;
+    string = (char *) calloc(1, length);
+
+    p = string;
+
+    for (i = 0; i < size; i++) {
+        sprintf(p, "%02x", *((unsigned char *) data + i));
+        p += 2 * sizeof(char);
+    }
+
+    return string;
+}
+
+void *string2data(const char *string, size_t *size_p)
+{
+    void *data;
+    size_t size;
+    size_t length;
+    int shift;
+    unsigned char *p;
+    unsigned int b;
+    size_t i;
     int rc;
 
-    if (path == NULL || buffer == NULL || length <= 0)
-        return -1;
+    if (string == NULL)
+        return NULL;
 
-    fd = open(path, O_WRONLY);
-    if (fd < 0)
-        goto error;
+    length = strlen(string);
+    if (length == 0)
+        return NULL;
 
-    rc = write(fd, buffer, length);
-    if (rc <= 0)
-        goto error;
+    if (length % 2 == 0) {
+        size = length / 2;
+        shift = 0;
+    } else {
+        size = (length - (length % 2)) / 2 + 1;
+        shift = 1;
+    }
 
-    rc = 0;
-    goto complete;
+    data = calloc(1, size);
 
-error:
-    rc = -1;
+    p = (unsigned char *) data;
 
-complete:
-    if (fd >= 0)
-        close(fd);
+    for (i = 0; i < length; i++) {
+        rc = sscanf(&string[i], "%01x", &b);
+        if (rc < 1)
+            b = 0;
 
-    return rc;
+        if ((shift % 2) == 0)
+            *p |= ((b & 0x0f) << 4);
+        else
+            *p++ |= b & 0x0f;
+
+        shift++;
+    }
+
+    if (size_p != NULL)
+        *size_p = size;
+
+    return data;
 }
 
 // vim:ts=4:sw=4:expandtab

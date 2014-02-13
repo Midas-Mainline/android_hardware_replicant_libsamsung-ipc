@@ -1,8 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
- * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,13 +21,18 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
-void *file_data_read(char *file_name, int size, int block_size);
-int network_iface_up(char *iface, int domain, int type);
-int network_iface_down(char *iface, int domain, int type);
-int sysfs_value_read(char *path);
-int sysfs_value_write(char *path, int value);
-int sysfs_string_read(char *path, char *buffer, int length);
-int sysfs_string_write(char *path, char *buffer, int length);
+void *file_data_read(const char *path, size_t size, size_t chunk_size,
+    size_t offset);
+int file_data_write(const char *path, const void *data, size_t size,
+    size_t chunk_size, size_t offset);
+int network_iface_up(const char *iface, int domain, int type);
+int network_iface_down(const char *iface, int domain, int type);
+int sysfs_value_read(const char *path);
+int sysfs_value_write(const char *path, int value);
+char *sysfs_string_read(const char *path, size_t length);
+int sysfs_string_write(const char *path, const char *buffer, size_t length);
+char *data2string(const void *data, size_t size);
+void *string2data(const char *string, size_t *size_p);
 
 #endif
 

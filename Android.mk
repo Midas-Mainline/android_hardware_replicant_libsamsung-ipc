@@ -63,7 +63,7 @@ LOCAL_SRC_FILES := \
 	samsung-ipc/devices/piranha/piranha_ipc.c \
 	samsung-ipc/devices/i9300/i9300_ipc.c \
 	samsung-ipc/devices/n7100/n7100_ipc.c \
-	samsung-ipc/util.c \
+	samsung-ipc/utils.c \
 	samsung-ipc/call.c \
 	samsung-ipc/sms.c \
 	samsung-ipc/sec.c \

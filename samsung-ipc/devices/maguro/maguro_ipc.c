@@ -26,7 +26,7 @@
 
 #include <samsung-ipc.h>
 #include <ipc.h>
-#include <util.h>
+#include <utils.h>
 
 #include "xmm6260.h"
 #include "xmm6260_mipi.h"
@@ -142,7 +142,7 @@ int maguro_ipc_bootstrap(struct ipc_client *client)
     }
     ipc_client_log(client, "Sent XMM6260 MIPI nv_data");
 
-    mps_data = file_data_read(MAGURO_MPS_DATA_DEVICE, MAGURO_MPS_DATA_SIZE, MAGURO_MPS_DATA_SIZE);
+    mps_data = file_data_read(MAGURO_MPS_DATA_DEVICE, MAGURO_MPS_DATA_SIZE, MAGURO_MPS_DATA_SIZE, 0);
     if (mps_data == NULL) {
         ipc_client_log(client, "Reading MPS data failed");
         goto error;

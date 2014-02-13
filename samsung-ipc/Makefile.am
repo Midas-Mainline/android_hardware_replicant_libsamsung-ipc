@@ -52,8 +52,8 @@ libsamsung_ipc_la_SOURCES = \
 	devices/i9300/i9300_ipc.h \
 	devices/n7100/n7100_ipc.c \
 	devices/n7100/n7100_ipc.h \
-	util.c \
-	util.h \
+	utils.c \
+	utils.h \
 	call.c \
 	sms.c \
 	sec.c \
