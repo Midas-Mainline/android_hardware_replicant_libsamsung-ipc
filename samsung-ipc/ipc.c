@@ -494,22 +494,22 @@ char *ipc_client_nv_data_secret(struct ipc_client *client)
     return client->nv_data_specs->nv_data_secret;
 }
 
-int ipc_client_nv_data_size(struct ipc_client *client)
+size_t ipc_client_nv_data_size(struct ipc_client *client)
 {
     if (client == NULL ||
         client->nv_data_specs == NULL ||
         client->nv_data_specs->nv_data_size == 0)
-        return -1;
+        return 0;
 
     return client->nv_data_specs->nv_data_size;
 }
 
-int ipc_client_nv_data_chunk_size(struct ipc_client *client)
+size_t ipc_client_nv_data_chunk_size(struct ipc_client *client)
 {
     if (client == NULL ||
         client->nv_data_specs == NULL ||
         client->nv_data_specs->nv_data_chunk_size == 0)
-        return -1;
+        return 0;
 
     return client->nv_data_specs->nv_data_chunk_size;
 }

@@ -74,8 +74,8 @@ struct ipc_nv_data_specs {
     char *nv_data_backup_path;
     char *nv_data_backup_md5_path;
     char *nv_data_secret;
-    int nv_data_size;
-    int nv_data_chunk_size;
+    size_t nv_data_size;
+    size_t nv_data_chunk_size;
 };
 
 struct ipc_client {
