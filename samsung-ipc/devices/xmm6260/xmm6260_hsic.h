@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,16 +51,16 @@ struct xmm6260_hsic_command_header {
 } __attribute__((packed));
 
 int xmm6260_hsic_psi_send(struct ipc_client *client, int device_fd,
-    void *psi_data, unsigned short psi_size);
+    const void *psi_data, unsigned short psi_size);
 int xmm6260_hsic_ebl_send(struct ipc_client *client, int device_fd,
-    void *ebl_data, int ebl_size);
+    const void *ebl_data, size_t ebl_size);
 
 int xmm6260_hsic_port_config_send(struct ipc_client *client, int device_fd);
 int xmm6260_hsic_sec_start_send(struct ipc_client *client, int device_fd,
-    void *sec_data, int sec_size);
+    const void *sec_data, size_t sec_size);
 int xmm6260_hsic_sec_end_send(struct ipc_client *client, int device_fd);
 int xmm6260_hsic_firmware_send(struct ipc_client *client, int device_fd,
-    void *firmware_data, int firmware_size);
+    const void *firmware_data, size_t firmware_size);
 int xmm6260_hsic_nv_data_send(struct ipc_client *client, int device_fd);
 int xmm6260_hsic_hw_reset_send(struct ipc_client *client, int device_fd);
 

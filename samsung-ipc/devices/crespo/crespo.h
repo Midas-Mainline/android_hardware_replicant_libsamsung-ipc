@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __CRESPO_IPC_H__
-#define __CRESPO_IPC_H__
+#ifndef __CRESPO_H__
+#define __CRESPO_H__
 
 #define CRESPO_MODEM_IMAGE_SIZE                                 0xD80000
 #define CRESPO_PSI_SIZE                                         0x5000
@@ -34,16 +34,16 @@
 #define CRESPO_GPRS_IFACE_PREFIX                "rmnet"
 #define CRESPO_GPRS_IFACE_COUNT                                 3
 
-struct crespo_ipc_transport_data {
+struct crespo_transport_data {
     int fd;
 };
 
-extern struct ipc_ops crespo_ipc_fmt_ops;
-extern struct ipc_ops crespo_ipc_rfs_ops;
-extern struct ipc_handlers crespo_ipc_handlers;
-extern struct ipc_gprs_specs crespo_ipc_gprs_specs_single;
-extern struct ipc_gprs_specs crespo_ipc_gprs_specs;
-extern struct ipc_nv_data_specs crespo_ipc_nv_data_specs;
+extern struct ipc_client_ops crespo_fmt_ops;
+extern struct ipc_client_ops crespo_rfs_ops;
+extern struct ipc_client_handlers crespo_handlers;
+extern struct ipc_client_gprs_specs crespo_gprs_specs_single;
+extern struct ipc_client_gprs_specs crespo_gprs_specs;
+extern struct ipc_client_nv_data_specs crespo_nv_data_specs;
 
 #endif
 

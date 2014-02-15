@@ -21,7 +21,7 @@ libsamsung_ipc_la_SOURCES = \
 	ipc.h \
 	ipc_devices.c \
 	ipc_devices.h \
-	ipc_util.c \
+	ipc_utils.c \
 	devices/xmm6160/xmm6160.c \
 	devices/xmm6160/xmm6160.h \
 	devices/xmm6260/xmm6260.c \
@@ -35,23 +35,23 @@ libsamsung_ipc_la_SOURCES = \
 	devices/xmm6260/modem.h \
 	devices/xmm6260/modem_link_device_hsic.h \
 	devices/xmm6260/modem_prj.h \
-	devices/crespo/crespo_ipc.c \
-	devices/crespo/crespo_ipc.h \
+	devices/crespo/crespo.c \
+	devices/crespo/crespo.h \
 	devices/crespo/crespo_modem_ctl.h \
-	devices/aries/aries_ipc.c \
-	devices/aries/aries_ipc.h \
+	devices/aries/aries.c \
+	devices/aries/aries.h \
 	devices/aries/onedram.h \
 	devices/aries/phonet.h \
-	devices/galaxys2/galaxys2_ipc.c \
-	devices/galaxys2/galaxys2_ipc.h \
-	devices/maguro/maguro_ipc.c \
-	devices/maguro/maguro_ipc.h \
-	devices/piranha/piranha_ipc.c \
-	devices/piranha/piranha_ipc.h \
-	devices/i9300/i9300_ipc.c \
-	devices/i9300/i9300_ipc.h \
-	devices/n7100/n7100_ipc.c \
-	devices/n7100/n7100_ipc.h \
+	devices/galaxys2/galaxys2.c \
+	devices/galaxys2/galaxys2.h \
+	devices/maguro/maguro.c \
+	devices/maguro/maguro.h \
+	devices/piranha/piranha.c \
+	devices/piranha/piranha.h \
+	devices/i9300/i9300.c \
+	devices/i9300/i9300.h \
+	devices/n7100/n7100.c \
+	devices/n7100/n7100.h \
 	utils.c \
 	utils.h \
 	call.c \

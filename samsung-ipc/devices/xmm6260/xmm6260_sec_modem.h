@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,19 +40,23 @@ int xmm6260_sec_modem_link_control_active(int device_fd, int active);
 int xmm6260_sec_modem_link_connected_wait(int device_fd);
 int xmm6260_sec_modem_link_get_hostwake_wait(int device_fd);
 
-int xmm6260_sec_modem_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request);
-int xmm6260_sec_modem_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *response);
-int xmm6260_sec_modem_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *request);
-int xmm6260_sec_modem_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *response);
+int xmm6260_sec_modem_fmt_send(struct ipc_client *client,
+    struct ipc_message *message);
+int xmm6260_sec_modem_fmt_recv(struct ipc_client *client,
+    struct ipc_message *message);
+int xmm6260_sec_modem_rfs_send(struct ipc_client *client,
+    struct ipc_message *message);
+int xmm6260_sec_modem_rfs_recv(struct ipc_client *client,
+    struct ipc_message *message);
 
-int xmm6260_sec_modem_ipc_open(int type);
-int xmm6260_sec_modem_ipc_close(int fd);
-int xmm6260_sec_modem_ipc_read(int fd, void *buffer, unsigned int length);
-int xmm6260_sec_modem_ipc_write(int fd, void *buffer, unsigned int length);
-int xmm6260_sec_modem_ipc_poll(int fd, struct timeval *timeout);
+int xmm6260_sec_modem_open(int type);
+int xmm6260_sec_modem_close(int fd);
+int xmm6260_sec_modem_read(int fd, void *buffer, size_t length);
+int xmm6260_sec_modem_write(int fd, const void *buffer, size_t length);
+int xmm6260_sec_modem_poll(int fd, struct timeval *timeout);
 
-char *xmm6260_sec_modem_ipc_gprs_get_iface(int cid);
-int xmm6260_sec_modem_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities);
+char *xmm6260_sec_modem_gprs_get_iface(int cid);
+int xmm6260_sec_modem_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities);
 
 #endif
 

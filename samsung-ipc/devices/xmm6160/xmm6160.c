@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include "xmm6160.h"
 
 int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
-    void *psi_data, unsigned short psi_size)
+    const void *psi_data, unsigned short psi_size)
 {
     char at[] = XMM6160_AT;
     unsigned char version;
@@ -38,17 +38,15 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     unsigned char psi_magic;
     unsigned char psi_crc;
     unsigned char psi_ack;
-
     struct termios termios;
     struct timeval timeout;
     fd_set fds;
-
+    size_t length;
     unsigned char *p;
-    int length;
     int rc;
     int i;
 
-    if (client == NULL || serial_fd < 0 || psi_data == NULL || psi_size <= 0)
+    if (client == NULL || serial_fd < 0 || psi_data == NULL || psi_size == 0)
         return -1;
 
     tcgetattr(serial_fd, &termios);
@@ -62,7 +60,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     length = strlen(at);
     for (i = 0; i < XMM6160_AT_COUNT; i++) {
         rc = write(serial_fd, at, length);
-        if (rc < length) {
+        if (rc < (int) length) {
             ipc_client_log(client, "Writing AT in ASCII failed");
             goto error;
         }
@@ -185,15 +183,14 @@ complete:
 }
 
 int xmm6160_firmware_send(struct ipc_client *client, int device_fd,
-    void *device_address, void *firmware_data, int firmware_size)
+    void *device_address, const void *firmware_data, size_t firmware_size)
 {
-    int wc;
-
+    size_t wc;
     unsigned char *p;
     int rc;
     int i;
 
-    if (client == NULL || (device_fd < 0 && device_address == NULL) || firmware_data == NULL || firmware_size <= 0)
+    if (client == NULL || (device_fd < 0 && device_address == NULL) || firmware_data == NULL || firmware_size == 0)
         return -1;
 
     p = (unsigned char *) firmware_data;
@@ -204,7 +201,7 @@ int xmm6160_firmware_send(struct ipc_client *client, int device_fd,
         wc = 0;
         while (wc < firmware_size) {
             rc = write(device_fd, (void *) p, firmware_size - wc);
-            if (rc < 0) {
+            if (rc <= 0) {
                 ipc_client_log(client, "Writing firmware failed");
                 goto error;
             }
@@ -229,9 +226,8 @@ int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
     void *device_address)
 {
     void *nv_data = NULL;
-    int nv_size;
-    int wc;
-
+    size_t nv_size;
+    size_t wc;
     unsigned char *p;
     int rc;
 
@@ -239,6 +235,8 @@ int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
         return -1;
 
     nv_size = ipc_client_nv_data_size(client);
+    if (nv_size == 0)
+        return -1;
 
     nv_data = ipc_nv_data_load(client);
     if (nv_data == NULL) {
@@ -255,7 +253,7 @@ int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
         wc = 0;
         while (wc < nv_size) {
             rc = write(device_fd, p, nv_size - wc);
-            if (rc < 0) {
+            if (rc <= 0) {
                 ipc_client_log(client, "Writing modem image failed");
                 goto error;
             }

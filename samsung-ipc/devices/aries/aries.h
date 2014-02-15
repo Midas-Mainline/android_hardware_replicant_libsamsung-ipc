@@ -20,8 +20,8 @@
 
 #include "phonet.h"
 
-#ifndef __ARIES_IPC_H__
-#define __ARIES_IPC_H__
+#ifndef __ARIES_H__
+#define __ARIES_H__
 
 #define ARIES_MODEM_IMAGE_SIZE                                  0xA00000
 #define ARIES_PSI_SIZE                                          0x5000
@@ -49,16 +49,16 @@
 #define ARIES_GPRS_IFACE_PREFIX                 "pdp"
 #define ARIES_GPRS_IFACE_COUNT                                  3
 
-struct aries_ipc_transport_data {
+struct aries_transport_data {
     struct sockaddr_pn spn;
     int fd;
 };
 
-extern struct ipc_ops aries_ipc_fmt_ops;
-extern struct ipc_ops aries_ipc_rfs_ops;
-extern struct ipc_handlers aries_ipc_handlers;
-extern struct ipc_gprs_specs aries_ipc_gprs_specs;
-extern struct ipc_nv_data_specs aries_ipc_nv_data_specs;
+extern struct ipc_client_ops aries_fmt_ops;
+extern struct ipc_client_ops aries_rfs_ops;
+extern struct ipc_client_handlers aries_handlers;
+extern struct ipc_client_gprs_specs aries_gprs_specs;
+extern struct ipc_client_nv_data_specs aries_nv_data_specs;
 
 #endif
 

@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@
 #define XMM6260_NV_DATA_SIZE                                    0x200000
 #define XMM6260_NV_DATA_CHUNK_SIZE                              0x1000
 
-unsigned char xmm6260_crc_calculate(void *buffer, int length);
+unsigned char xmm6260_crc_calculate(const void *data, size_t size);
 
 #endif
 

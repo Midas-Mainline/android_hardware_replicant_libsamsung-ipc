@@ -17,8 +17,8 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __N7100_IPC_H__
-#define __N7100_IPC_H__
+#ifndef __N7100_H__
+#define __N7100_H__
 
 #define N7100_MODEM_IMAGE_SIZE                               0x1000000
 #define N7100_PSI_OFFSET                                     0x1000
@@ -34,15 +34,15 @@
 
 #define N7100_MODEM_IMAGE_DEVICE             "/dev/block/mmcblk0p10"
 
-struct n7100_ipc_transport_data {
+struct n7100_transport_data {
     int fd;
 };
 
-extern struct ipc_ops n7100_ipc_fmt_ops;
-extern struct ipc_ops n7100_ipc_rfs_ops;
-extern struct ipc_handlers n7100_ipc_handlers;
-extern struct ipc_gprs_specs n7100_ipc_gprs_specs;
-extern struct ipc_nv_data_specs n7100_ipc_nv_data_specs;
+extern struct ipc_client_ops n7100_fmt_ops;
+extern struct ipc_client_ops n7100_rfs_ops;
+extern struct ipc_client_handlers n7100_handlers;
+extern struct ipc_client_gprs_specs n7100_gprs_specs;
+extern struct ipc_client_nv_data_specs n7100_nv_data_specs;
 
 #endif
 

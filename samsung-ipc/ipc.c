@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
- * Copyright (C) 2013 Paul Kocialkowsk <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowsk <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ int ipc_device_detect(void)
     char *line, *p, *c;
     int index = -1;
     int fd = -1;
-    int length;
+    size_t length;
     int rc;
     int i;
 
@@ -68,8 +68,7 @@ int ipc_device_detect(void)
     if (fd < 0)
         goto error;
 
-    length = sizeof(buffer);
-    length = read(fd, &buffer, length);
+    length = read(fd, &buffer, sizeof(buffer));
 
     close(fd);
     fd = -1;
@@ -145,26 +144,22 @@ complete:
     return index;
 }
 
-struct ipc_client *ipc_client_create(int client_type)
+struct ipc_client *ipc_client_create(int type)
 {
-    struct ipc_client *client;
-    int device_index = -1;
+    struct ipc_client *client = NULL;
+    int device_index;
+
+    if (type < 0 || type > IPC_CLIENT_TYPE_RFS)
+        return NULL;
 
     device_index = ipc_device_detect();
-
     if (device_index < 0 || device_index > ipc_devices_count)
-        return NULL;
+        goto error;
 
-    if (client_type < 0 || client_type > IPC_CLIENT_TYPE_RFS)
-        return NULL;
+    client = (struct ipc_client *) calloc(1, sizeof(struct ipc_client));
+    client->type = type;
 
-    client = (struct ipc_client *) malloc(sizeof(struct ipc_client));
-    memset(client, 0, sizeof(struct ipc_client));
-
-    client->type = client_type;
-
-    switch (client_type)
-    {
+    switch (type) {
         case IPC_CLIENT_TYPE_RFS:
             client->ops = ipc_devices[device_index].rfs_ops;
             break;
@@ -172,19 +167,27 @@ struct ipc_client *ipc_client_create(int client_type)
             client->ops = ipc_devices[device_index].fmt_ops;
             break;
         default:
-            return NULL;
+            goto error;
     }
 
     client->gprs_specs = ipc_devices[device_index].gprs_specs;
     client->nv_data_specs = ipc_devices[device_index].nv_data_specs;
 
-    // Handlers are subject to be modified
-    client->handlers = (struct ipc_handlers *) malloc(sizeof(struct ipc_handlers));
-    memset(client->handlers, 0, sizeof(struct ipc_handlers));
+    // Handlers can be modified
+    client->handlers = (struct ipc_client_handlers *) calloc(1, sizeof(struct ipc_client_handlers));
 
-    if (ipc_devices[device_index].handlers != 0)
-        memcpy(client->handlers, ipc_devices[device_index].handlers, sizeof(struct ipc_handlers));
+    if (ipc_devices[device_index].handlers != NULL)
+        memcpy(client->handlers, ipc_devices[device_index].handlers, sizeof(struct ipc_client_handlers));
 
+    goto complete;
+
+error:
+    if (client != NULL) {
+        free(client);
+        client = NULL;
+    }
+
+complete:
     return client;
 }
 
@@ -202,37 +205,11 @@ int ipc_client_destroy(struct ipc_client *client)
     return 0;
 }
 
-void ipc_client_log(struct ipc_client *client, const char *message, ...)
-{
-    char buffer[4096];
-    va_list args;
-
-    if (client == NULL || client->log_callback == NULL || message == NULL)
-        return;
-
-    va_start(args, message);
-    vsnprintf(buffer, 4096, message, args);
-    client->log_callback(client->log_data, buffer);
-    va_end(args);
-}
-
-int ipc_client_set_log_callback(struct ipc_client *client,
-    void (*log_callback)(void *log_data, const char *message), void *log_data)
-{
-    if (client == NULL)
-        return -1;
-
-    client->log_callback = log_callback;
-    client->log_data = log_data;
-
-    return 0;
-}
-
-int ipc_client_set_transport_handlers(struct ipc_client *client,
+int ipc_client_transport_handlers_register(struct ipc_client *client,
     int (*open)(void *transport_data, int type),
     int (*close)(void *transport_data),
-    int (*read)(void *transport_data, void *buffer, unsigned int length),
-    int (*write)(void *transport_data, void *buffer, unsigned int length),
+    int (*read)(void *transport_data, void *data, size_t size),
+    int (*write)(void *transport_data, const void *data, size_t size),
     int (*poll)(void *transport_data, struct timeval *timeout),
     void *transport_data)
 {
@@ -255,9 +232,8 @@ int ipc_client_set_transport_handlers(struct ipc_client *client,
     return 0;
 }
 
-int ipc_client_set_power_handlers(struct ipc_client *client,
-    int (*power_on)(void *power_data),
-    int (*power_off)(void *power_data),
+int ipc_client_power_handlers_register(struct ipc_client *client,
+    int (*power_on)(void *power_data), int (*power_off)(void *power_data),
     void *power_data)
 {
     if (client == NULL || client->handlers == NULL)
@@ -273,10 +249,9 @@ int ipc_client_set_power_handlers(struct ipc_client *client,
     return 0;
 }
 
-int ipc_client_set_gprs_handlers(struct ipc_client *client,
+int ipc_client_gprs_handlers_register(struct ipc_client *client,
     int (*gprs_activate)(void *gprs_data, int cid),
-    int (*gprs_deactivate)(void *gprs_data, int cid),
-    void *gprs_data)
+    int (*gprs_deactivate)(void *gprs_data, int cid), void *gprs_data)
 {
     if (client == NULL || client->handlers == NULL)
         return -1;
@@ -291,61 +266,70 @@ int ipc_client_set_gprs_handlers(struct ipc_client *client,
     return 0;
 }
 
-int ipc_client_bootstrap(struct ipc_client *client)
+void ipc_client_log(struct ipc_client *client, const char *message, ...)
 {
-    if (client == NULL || client->ops == NULL ||
-        client->ops->bootstrap == NULL)
-        return -1;
+    char buffer[4096];
+    va_list args;
 
-    return client->ops->bootstrap(client);
+    if (client == NULL || client->log_callback == NULL || message == NULL)
+        return;
+
+    va_start(args, message);
+    vsnprintf((char *) &buffer, sizeof(buffer), message, args);
+    client->log_callback(client->log_data, buffer);
+    va_end(args);
 }
 
-int ipc_client_send(struct ipc_client *client, const unsigned short command,
-    const char type, unsigned char *data, const int length, unsigned char mseq)
+int ipc_client_log_callback_register(struct ipc_client *client,
+    void (*log_callback)(void *log_data, const char *message), void *log_data)
 {
-    struct ipc_message_info request;
+    if (client == NULL)
+        return -1;
+
+    client->log_callback = log_callback;
+    client->log_data = log_data;
+
+    return 0;
+}
+
+int ipc_client_boot(struct ipc_client *client)
+{
+    if (client == NULL || client->ops == NULL || client->ops->boot == NULL)
+        return -1;
+
+    return client->ops->boot(client);
+}
+
+int ipc_client_send(struct ipc_client *client, unsigned char mseq,
+    unsigned short command, unsigned char type, const void *data, size_t size)
+{
+    struct ipc_message message;
 
     if (client == NULL || client->ops == NULL || client->ops->send == NULL)
         return -1;
 
-    request.mseq = mseq;
-    request.aseq = 0xff;
-    request.group = IPC_GROUP(command);
-    request.index = IPC_INDEX(command);
-    request.type = type;
-    request.length = length;
-    request.data = data;
+    memset(&message, 0, sizeof(message));
+    message.mseq = mseq;
+    message.aseq = 0xff;
+    message.command = command;
+    message.type = type;
+    message.data = (void *) data;
+    message.size = size;
 
-    return client->ops->send(client, &request);
+    return client->ops->send(client, &message);
 }
 
-int ipc_client_recv(struct ipc_client *client,
-    struct ipc_message_info *response)
+int ipc_client_recv(struct ipc_client *client, struct ipc_message *message)
 {
-    if (client == NULL || client->ops == NULL || client->ops->recv == NULL)
+    if (client == NULL || client->ops == NULL || client->ops->recv == NULL || message == NULL)
         return -1;
 
-    return client->ops->recv(client, response);
-}
-
-void ipc_client_response_free(struct ipc_client *client,
-    struct ipc_message_info *response)
-{
-    if (response == NULL)
-        return;
-
-    if (response->data != NULL && response->length > 0) {
-        free(response->data);
-        response->data = NULL;
-    }
-
-    memset(response, 0, sizeof(struct ipc_message_info));
+    return client->ops->recv(client, message);
 }
 
 int ipc_client_open(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->open == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->open == NULL)
         return -1;
 
     return client->handlers->open(client->handlers->transport_data, client->type);
@@ -353,8 +337,7 @@ int ipc_client_open(struct ipc_client *client)
 
 int ipc_client_close(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->close == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->close == NULL)
         return -1;
 
     return client->handlers->close(client->handlers->transport_data);
@@ -362,8 +345,7 @@ int ipc_client_close(struct ipc_client *client)
 
 int ipc_client_poll(struct ipc_client *client, struct timeval *timeout)
 {
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->poll == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->poll == NULL)
         return -1;
 
     return client->handlers->poll(client->handlers->transport_data, timeout);
@@ -371,8 +353,7 @@ int ipc_client_poll(struct ipc_client *client, struct timeval *timeout)
 
 int ipc_client_power_on(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->power_on == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->power_on == NULL)
         return -1;
 
     return client->handlers->power_on(client->handlers->power_data);
@@ -380,8 +361,7 @@ int ipc_client_power_on(struct ipc_client *client)
 
 int ipc_client_power_off(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->power_off == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->power_off == NULL)
         return -1;
 
     return client->handlers->power_off(client->handlers->power_data);
@@ -389,8 +369,7 @@ int ipc_client_power_off(struct ipc_client *client)
 
 int ipc_client_gprs_activate(struct ipc_client *client, int cid)
 {
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->gprs_activate == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->gprs_activate == NULL)
         return -1;
 
     return client->handlers->gprs_activate(client->handlers->gprs_data, cid);
@@ -398,8 +377,7 @@ int ipc_client_gprs_activate(struct ipc_client *client, int cid)
 
 int ipc_client_gprs_deactivate(struct ipc_client *client, int cid)
 {
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->gprs_deactivate == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->gprs_deactivate == NULL)
         return -1;
 
     return client->handlers->gprs_deactivate(client->handlers->gprs_data, cid);
@@ -407,28 +385,23 @@ int ipc_client_gprs_deactivate(struct ipc_client *client, int cid)
 
 int ipc_client_data_create(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->data_create == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->data_create == NULL)
         return -1;
 
-    return client->handlers->data_create(&client->handlers->transport_data,
-        &client->handlers->power_data, &client->handlers->power_data);
+    return client->handlers->data_create(&client->handlers->transport_data, &client->handlers->power_data, &client->handlers->power_data);
 }
 
 int ipc_client_data_destroy(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL ||
-        client->handlers->data_destroy == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->data_destroy == NULL)
         return -1;
 
-    return client->handlers->data_destroy(client->handlers->transport_data,
-        client->handlers->power_data, client->handlers->power_data);
+    return client->handlers->data_destroy(client->handlers->transport_data, client->handlers->power_data, client->handlers->power_data);
 }
 
 char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid)
 {
-    if (client == NULL || client->gprs_specs == NULL ||
-        client->gprs_specs->gprs_get_iface == NULL)
+    if (client == NULL || client->gprs_specs == NULL || client->gprs_specs->gprs_get_iface == NULL)
         return NULL;
 
     return client->gprs_specs->gprs_get_iface(cid);
@@ -437,8 +410,7 @@ char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid)
 int ipc_client_gprs_get_capabilities(struct ipc_client *client,
     struct ipc_client_gprs_capabilities *capabilities)
 {
-    if (client == NULL || client->gprs_specs == NULL ||
-        client->gprs_specs->gprs_get_capabilities == NULL)
+    if (client == NULL || client->gprs_specs == NULL || client->gprs_specs->gprs_get_capabilities == NULL)
         return -1;
 
     return client->gprs_specs->gprs_get_capabilities(capabilities);
@@ -446,9 +418,7 @@ int ipc_client_gprs_get_capabilities(struct ipc_client *client,
 
 char *ipc_client_nv_data_path(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->nv_data_specs == NULL ||
-        client->nv_data_specs->nv_data_path == NULL)
+    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_path == NULL)
         return NULL;
 
     return client->nv_data_specs->nv_data_path;
@@ -456,9 +426,7 @@ char *ipc_client_nv_data_path(struct ipc_client *client)
 
 char *ipc_client_nv_data_md5_path(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->nv_data_specs == NULL ||
-        client->nv_data_specs->nv_data_md5_path == NULL)
+    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_md5_path == NULL)
         return NULL;
 
     return client->nv_data_specs->nv_data_md5_path;
@@ -466,9 +434,7 @@ char *ipc_client_nv_data_md5_path(struct ipc_client *client)
 
 char *ipc_client_nv_data_backup_path(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->nv_data_specs == NULL ||
-        client->nv_data_specs->nv_data_backup_path == NULL)
+    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_backup_path == NULL)
         return NULL;
 
     return client->nv_data_specs->nv_data_backup_path;
@@ -476,9 +442,7 @@ char *ipc_client_nv_data_backup_path(struct ipc_client *client)
 
 char *ipc_client_nv_data_backup_md5_path(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->nv_data_specs == NULL ||
-        client->nv_data_specs->nv_data_backup_md5_path == NULL)
+    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_backup_md5_path == NULL)
         return NULL;
 
     return client->nv_data_specs->nv_data_backup_md5_path;
@@ -486,9 +450,7 @@ char *ipc_client_nv_data_backup_md5_path(struct ipc_client *client)
 
 char *ipc_client_nv_data_secret(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->nv_data_specs == NULL ||
-        client->nv_data_specs->nv_data_secret == NULL)
+    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_secret == NULL)
         return NULL;
 
     return client->nv_data_specs->nv_data_secret;
@@ -496,9 +458,7 @@ char *ipc_client_nv_data_secret(struct ipc_client *client)
 
 size_t ipc_client_nv_data_size(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->nv_data_specs == NULL ||
-        client->nv_data_specs->nv_data_size == 0)
+    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_size == 0)
         return 0;
 
     return client->nv_data_specs->nv_data_size;
@@ -506,9 +466,7 @@ size_t ipc_client_nv_data_size(struct ipc_client *client)
 
 size_t ipc_client_nv_data_chunk_size(struct ipc_client *client)
 {
-    if (client == NULL ||
-        client->nv_data_specs == NULL ||
-        client->nv_data_specs->nv_data_chunk_size == 0)
+    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_chunk_size == 0)
         return 0;
 
     return client->nv_data_specs->nv_data_chunk_size;

@@ -1,6 +1,6 @@
 # This file is part of libsamsung-ipc.
 #
-# Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
+# Copyright (C) 2011-2014 Paul Kocialkowski <contact@paulk.fr>
 #
 # libsamsung-ipc is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,19 +50,19 @@ endif
 LOCAL_SRC_FILES := \
 	samsung-ipc/ipc.c \
 	samsung-ipc/ipc_devices.c \
-	samsung-ipc/ipc_util.c \
+	samsung-ipc/ipc_utils.c \
 	samsung-ipc/devices/xmm6160/xmm6160.c \
 	samsung-ipc/devices/xmm6260/xmm6260.c \
 	samsung-ipc/devices/xmm6260/xmm6260_hsic.c \
 	samsung-ipc/devices/xmm6260/xmm6260_mipi.c \
 	samsung-ipc/devices/xmm6260/xmm6260_sec_modem.c \
-	samsung-ipc/devices/crespo/crespo_ipc.c \
-	samsung-ipc/devices/aries/aries_ipc.c \
-	samsung-ipc/devices/galaxys2/galaxys2_ipc.c \
-	samsung-ipc/devices/maguro/maguro_ipc.c \
-	samsung-ipc/devices/piranha/piranha_ipc.c \
-	samsung-ipc/devices/i9300/i9300_ipc.c \
-	samsung-ipc/devices/n7100/n7100_ipc.c \
+	samsung-ipc/devices/crespo/crespo.c \
+	samsung-ipc/devices/aries/aries.c \
+	samsung-ipc/devices/galaxys2/galaxys2.c \
+	samsung-ipc/devices/maguro/maguro.c \
+	samsung-ipc/devices/piranha/piranha.c \
+	samsung-ipc/devices/i9300/i9300.c \
+	samsung-ipc/devices/n7100/n7100.c \
 	samsung-ipc/utils.c \
 	samsung-ipc/call.c \
 	samsung-ipc/sms.c \

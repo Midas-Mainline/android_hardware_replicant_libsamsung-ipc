@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2011-2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2011-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,9 +37,9 @@
 #define XMM6160_NV_DATA_CHUNK_SIZE                              0x1000
 
 int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
-    void *psi_data, unsigned short psi_size);
+    const void *psi_data, unsigned short psi_size);
 int xmm6160_firmware_send(struct ipc_client *client, int device_fd,
-    void *device_address, void *firmware_data, int firmware_size);
+    void *device_address, const void *firmware_data, size_t firmware_size);
 int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
     void *device_address);
 

@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,41 +32,48 @@
 #include <samsung-ipc.h>
 #include "ipc.h"
 
-/* Log utils */
-const char *ipc_response_type_to_str(int type)
+const char *ipc_request_type_string(unsigned char type)
 {
-    switch (type) {
-        case IPC_TYPE_INDI:
-            return "INDI";
-        case IPC_TYPE_RESP:
-            return "RESP";
-        case IPC_TYPE_NOTI:
-            return "NOTI";
-        default:
-            return "UNKNOWN";
-    }
-}
+    static char type_string[5] = { 0 };
 
-const char *ipc_request_type_to_str(int type)
-{
     switch (type) {
         case IPC_TYPE_EXEC:
-            return "EXEC";
+            return "IPC_TYPE_EXEC";
         case IPC_TYPE_GET:
-            return "GET";
+            return "IPC_TYPE_GET";
         case IPC_TYPE_SET:
-            return "SET";
+            return "IPC_TYPE_SET";
         case IPC_TYPE_CFRM:
-            return "CFRM";
+            return "IPC_TYPE_CFRM";
         case IPC_TYPE_EVENT:
-            return "EVENT";
+            return "IPC_TYPE_EVENT";
         default:
-            return "UNKNOWN";
+            snprintf((char *) &type_string, sizeof(type_string), "0x%02x", type);
+            return type_string;
     }
 }
 
-const char *ipc_command_to_str(int command)
+const char *ipc_response_type_string(unsigned char type)
 {
+    static char type_string[5] = { 0 };
+
+    switch (type) {
+        case IPC_TYPE_INDI:
+            return "IPC_TYPE_INDI";
+        case IPC_TYPE_RESP:
+            return "IPC_TYPE_RESP";
+        case IPC_TYPE_NOTI:
+            return "IPC_TYPE_NOTI";
+        default:
+            snprintf((char *) &type_string, sizeof(type_string), "0x%02x", type);
+            return type_string;
+    }
+}
+
+const char *ipc_command_string(unsigned short command)
+{
+    static char command_string[7] = { 0 };
+
     switch (command) {
         case IPC_PWR_PHONE_PWR_UP:
             return "IPC_PWR_PHONE_PWR_UP";
@@ -333,11 +340,12 @@ const char *ipc_command_to_str(int command)
         case IPC_GEN_PHONE_RES:
             return "IPC_GEN_PHONE_RES";
         default:
-            return "UNKNOWN";
+            snprintf((char *) &command_string, sizeof(command_string), "0x%04x", command);
+            return command_string;
     }
 }
 
-void ipc_client_hex_dump(struct ipc_client *client, void *data, int size)
+void ipc_hex_dump(struct ipc_client *client, const void *data, size_t size)
 {
     /* dumps size bytes of *data to stdout. Looks like:
      * [0000] 75 6E 6B 6E 6F 77 6E 20
@@ -345,9 +353,9 @@ void ipc_client_hex_dump(struct ipc_client *client, void *data, int size)
      * (in a single line of course)
      */
 
-    unsigned char *p = data;
+    unsigned char *p = (unsigned char *) data;
     unsigned char c;
-    int n;
+    size_t n;
     char bytestr[4] = {0};
     char addrstr[10] = {0};
     char hexstr[ 16*3 + 5] = {0};
@@ -393,124 +401,131 @@ void ipc_client_hex_dump(struct ipc_client *client, void *data, int size)
     }
 }
 
-void ipc_client_log_recv(struct ipc_client *client,
-    struct ipc_message_info *response, const char *prefix)
+void ipc_client_log_recv(struct ipc_client *client, struct ipc_message *message,
+    const char *prefix)
 {
+    if (client == NULL || message == NULL || prefix == NULL)
+        return;
+
     switch (client->type) {
         case IPC_CLIENT_TYPE_FMT:
-            ipc_client_log(client, "%s: RECV FMT!", prefix);
-            ipc_client_log(client, "%s: Response: aseq=0x%02x, command=%s, type=%s, length=%d",
-                prefix, response->aseq, ipc_command_to_str(IPC_COMMAND(response)), ipc_response_type_to_str(response->type), response->length);
+            ipc_client_log(client, "%s: Received FMT message", prefix);
+            ipc_client_log(client, "%s: Message: aseq=0x%02x, command=%s, type=%s, size=%d", prefix, message->aseq, ipc_command_string(message->command), ipc_response_type_string(message->type), message->size);
 #ifdef DEBUG
-            if (response->length > 0) {
-                ipc_client_log(client, "==== FMT DATA DUMP ====");
-                ipc_client_hex_dump(client, (void *) response->data,
-                    response->length > 0x100 ? 0x100 : response->length);
-                ipc_client_log(client, "=======================");
+            if (message->size > 0) {
+                ipc_client_log(client, "=============================== FMT data dump ================================");
+                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
+                ipc_client_log(client, "==============================================================================");
             }
 #endif
             break;
         case IPC_CLIENT_TYPE_RFS:
-            ipc_client_log(client, "%s: RECV RFS!", prefix);
-            ipc_client_log(client, "%s: Response: aseq=0x%02x, command=%s, length=%d",
-                prefix, response->aseq, ipc_command_to_str(IPC_COMMAND(response)), response->length);
+            ipc_client_log(client, "%s: Received RFS message", prefix);
+            ipc_client_log(client, "%s: Message: aseq=0x%02x, command=%s, size=%d", prefix, message->aseq, ipc_command_string(message->command), message->size);
 #ifdef DEBUG
-            if (response->length > 0) {
-                ipc_client_log(client, "==== RFS DATA DUMP ====");
-                ipc_client_hex_dump(client, (void *) response->data,
-                    response->length > 0x100 ? 0x100 : response->length);
-                ipc_client_log(client, "=======================");
+            if (message->size > 0) {
+                ipc_client_log(client, "=============================== RFS data dump ================================");
+                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
+                ipc_client_log(client, "==============================================================================");
             }
 #endif
             break;
     }
 }
 
-void ipc_client_log_send(struct ipc_client *client,
-    struct ipc_message_info *request, const char *prefix)
+void ipc_client_log_send(struct ipc_client *client, struct ipc_message *message,
+    const char *prefix)
 {
+    if (client == NULL || message == NULL || prefix == NULL)
+        return;
+
     switch (client->type) {
         case IPC_CLIENT_TYPE_FMT:
-            ipc_client_log(client, "%s: SEND FMT!", prefix);
-            ipc_client_log(client, "%s: Request: mseq=0x%02x, command=%s, type=%s, length=%d",
-                prefix, request->mseq, ipc_command_to_str(IPC_COMMAND(request)), ipc_request_type_to_str(request->type), request->length);
+            ipc_client_log(client, "%s: Sent FMT message", prefix);
+            ipc_client_log(client, "%s: Message: mseq=0x%02x, command=%s, type=%s, size=%d", prefix, message->mseq, ipc_command_string(message->command), ipc_response_type_string(message->type), message->size);
 #ifdef DEBUG
-            if (request->length > 0) {
-                ipc_client_log(client, "==== FMT DATA DUMP ====");
-                ipc_client_hex_dump(client, (void *) request->data,
-                    request->length > 0x100 ? 0x100 : request->length);
-                ipc_client_log(client, "=======================");
+            if (message->size > 0) {
+                ipc_client_log(client, "=============================== FMT data dump ================================");
+                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
+                ipc_client_log(client, "==============================================================================");
             }
 #endif
             break;
         case IPC_CLIENT_TYPE_RFS:
-            ipc_client_log(client, "%s: SEND RFS!", prefix);
-            ipc_client_log(client, "%s: Request: mseq=0x%02x, command=%s, length=%d",
-                prefix, request->mseq, ipc_command_to_str(IPC_COMMAND(request)), request->length);
+            ipc_client_log(client, "%s: Sent RFS message", prefix);
+            ipc_client_log(client, "%s: Message: mseq=0x%02x, command=%s, size=%d", prefix, message->mseq, ipc_command_string(message->command), message->size);
 #ifdef DEBUG
-            if (request->length > 0) {
-                ipc_client_log(client, "==== RFS DATA DUMP ====");
-                ipc_client_hex_dump(client, (void *) request->data,
-                    request->length > 0x100 ? 0x100 : request->length);
-                ipc_client_log(client, "=======================");
+            if (message->size > 0) {
+                ipc_client_log(client, "=============================== RFS data dump ================================");
+                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
+                ipc_client_log(client, "==============================================================================");
             }
 #endif
             break;
     }
 }
 
-void ipc_fmt_header_fill(struct ipc_fmt_header *header, struct ipc_message_info *message)
+int ipc_fmt_header_setup(struct ipc_fmt_header *header,
+    const struct ipc_message *message)
 {
     if (header == NULL || message == NULL)
-        return;
+        return -1;
 
     memset(header, 0, sizeof(struct ipc_fmt_header));
     header->mseq = message->mseq;
     header->aseq = message->aseq;
-    header->group = message->group;
-    header->index = message->index;
+    header->group = IPC_GROUP(message->command);
+    header->index = IPC_INDEX(message->command);
     header->type = message->type;
-    header->length = message->length + sizeof(struct ipc_fmt_header);
+    header->length = message->size + sizeof(struct ipc_fmt_header);
+
+    return 0;
 }
 
-void ipc_fmt_message_fill(struct ipc_fmt_header *header, struct ipc_message_info *message)
+int ipc_fmt_message_setup(const struct ipc_fmt_header *header,
+    struct ipc_message *message)
 {
     if (header == NULL || message == NULL)
-        return;
+        return -1;
 
-    memset(message, 0, sizeof(struct ipc_message_info));
+    memset(message, 0, sizeof(struct ipc_message));
     message->mseq = header->mseq;
     message->aseq = header->aseq;
-    message->group = header->group;
-    message->index = header->index;
+    message->command = IPC_COMMAND(header->group, header->index);
     message->type = header->type;
-    message->cmd = IPC_COMMAND(message);
-    message->length = 0;
     message->data = NULL;
+    message->size = 0;
+
+    return 0;
 }
 
-void ipc_rfs_header_fill(struct ipc_rfs_header *header, struct ipc_message_info *message)
+int ipc_rfs_header_setup(struct ipc_rfs_header *header,
+    const struct ipc_message *message)
 {
     if (header == NULL || message == NULL)
-        return;
+        return -1;
 
     memset(header, 0, sizeof(struct ipc_rfs_header));
     header->id = message->mseq;
-    header->index = message->index;
-    header->length = message->length + sizeof(struct ipc_rfs_header);
+    header->index = IPC_INDEX(message->command);
+    header->length = message->size + sizeof(struct ipc_rfs_header);
+
+    return 0;
 }
 
-void ipc_rfs_message_fill(struct ipc_rfs_header *header, struct ipc_message_info *message)
+int ipc_rfs_message_setup(const struct ipc_rfs_header *header,
+    struct ipc_message *message)
 {
     if (header == NULL || message == NULL)
-        return;
+        return -1;
 
-    memset(message, 0, sizeof(struct ipc_message_info));
+    memset(message, 0, sizeof(struct ipc_message));
     message->aseq = header->id;
-    message->group = IPC_GROUP_RFS;
-    message->index = header->index;
-    message->length = 0;
+    message->command = IPC_COMMAND(IPC_GROUP_RFS, header->index);
     message->data = NULL;
+    message->size = 0;
+
+    return 0;
 }
 
 // vim:ts=4:sw=4:expandtab

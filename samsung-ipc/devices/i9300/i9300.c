@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,31 +29,30 @@
 #include "xmm6260.h"
 #include "xmm6260_hsic.h"
 #include "xmm6260_sec_modem.h"
-#include "n7100_ipc.h"
+#include "i9300.h"
 
-int n7100_ipc_bootstrap(struct ipc_client *client)
+int i9300_boot(struct ipc_client *client)
 {
     void *modem_image_data = NULL;
     int modem_image_fd = -1;
     int modem_boot_fd = -1;
     int modem_link_fd = -1;
-
     unsigned char *p;
     int rc;
 
     if (client == NULL)
         return -1;
 
-    ipc_client_log(client, "Starting n7100 modem bootstrap");
+    ipc_client_log(client, "Starting i9300 modem boot");
 
-    modem_image_fd = open(N7100_MODEM_IMAGE_DEVICE, O_RDONLY);
+    modem_image_fd = open(I9300_MODEM_IMAGE_DEVICE, O_RDONLY);
     if (modem_image_fd < 0) {
         ipc_client_log(client, "Opening modem image device failed");
         goto error;
     }
     ipc_client_log(client, "Opened modem image device");
 
-    modem_image_data = mmap(0, N7100_MODEM_IMAGE_SIZE, PROT_READ, MAP_SHARED, modem_image_fd, 0);
+    modem_image_data = mmap(0, I9300_MODEM_IMAGE_SIZE, PROT_READ, MAP_SHARED, modem_image_fd, 0);
     if (modem_image_data == NULL || modem_image_data == (void *) 0xffffffff) {
             ipc_client_log(client, "Mapping modem image data to memory failed");
             goto error;
@@ -97,18 +96,18 @@ int n7100_ipc_bootstrap(struct ipc_client *client)
     }
     ipc_client_log(client, "Waited for link connected");
 
-    p = (unsigned char *) modem_image_data + N7100_PSI_OFFSET;
+    p = (unsigned char *) modem_image_data + I9300_PSI_OFFSET;
 
-    rc = xmm6260_hsic_psi_send(client, modem_boot_fd, (void *) p, N7100_PSI_SIZE);
+    rc = xmm6260_hsic_psi_send(client, modem_boot_fd, (void *) p, I9300_PSI_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6260 HSIC PSI failed");
         goto error;
     }
     ipc_client_log(client, "Sent XMM6260 HSIC PSI");
 
-    p = (unsigned char *) modem_image_data + N7100_EBL_OFFSET;
+    p = (unsigned char *) modem_image_data + I9300_EBL_OFFSET;
 
-    rc = xmm6260_hsic_ebl_send(client, modem_boot_fd, (void *) p, N7100_EBL_SIZE);
+    rc = xmm6260_hsic_ebl_send(client, modem_boot_fd, (void *) p, I9300_EBL_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6260 HSIC EBL failed");
         goto error;
@@ -122,18 +121,18 @@ int n7100_ipc_bootstrap(struct ipc_client *client)
     }
     ipc_client_log(client, "Sent XMM6260 HSIC port config");
 
-    p = (unsigned char *) modem_image_data + N7100_SEC_START_OFFSET;
+    p = (unsigned char *) modem_image_data + I9300_SEC_START_OFFSET;
 
-    rc = xmm6260_hsic_sec_start_send(client, modem_boot_fd, (void *) p, N7100_SEC_START_SIZE);
+    rc = xmm6260_hsic_sec_start_send(client, modem_boot_fd, (void *) p, I9300_SEC_START_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6260 HSIC SEC start failed");
         goto error;
     }
     ipc_client_log(client, "Sent XMM6260 HSIC SEC start");
 
-    p = (unsigned char *) modem_image_data + N7100_FIRMWARE_OFFSET;
+    p = (unsigned char *) modem_image_data + I9300_FIRMWARE_OFFSET;
 
-    rc = xmm6260_hsic_firmware_send(client, modem_boot_fd, (void *) p, N7100_FIRMWARE_SIZE);
+    rc = xmm6260_hsic_firmware_send(client, modem_boot_fd, (void *) p, I9300_FIRMWARE_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM6260 HSIC firmware failed");
         goto error;
@@ -210,7 +209,7 @@ error:
 
 complete:
     if (modem_image_data != NULL)
-        munmap(modem_image_data, N7100_MODEM_IMAGE_SIZE);
+        munmap(modem_image_data, I9300_MODEM_IMAGE_SIZE);
 
     if (modem_image_fd >= 0)
         close(modem_image_fd);
@@ -224,106 +223,88 @@ complete:
     return rc;
 }
 
-
-int n7100_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
+int i9300_open(void *data, int type)
 {
-    return xmm6260_sec_modem_ipc_fmt_send(client, request);
-}
-
-int n7100_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *response)
-{
-    return xmm6260_sec_modem_ipc_fmt_recv(client, response);
-}
-
-int n7100_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *request)
-{
-    return xmm6260_sec_modem_ipc_rfs_send(client, request);
-}
-
-int n7100_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *response)
-{
-    return xmm6260_sec_modem_ipc_rfs_recv(client, response);
-}
-
-int n7100_ipc_open(void *data, int type)
-{
-    struct n7100_ipc_transport_data *transport_data;
+    struct i9300_transport_data *transport_data;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct n7100_ipc_transport_data *) data;
+    transport_data = (struct i9300_transport_data *) data;
 
-    transport_data->fd = xmm6260_sec_modem_ipc_open(type);
+    transport_data->fd = xmm6260_sec_modem_open(type);
     if (transport_data->fd < 0)
         return -1;
 
     return 0;
 }
 
-int n7100_ipc_close(void *data)
+int i9300_close(void *data)
 {
-    struct n7100_ipc_transport_data *transport_data;
+    struct i9300_transport_data *transport_data;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct n7100_ipc_transport_data *) data;
+    transport_data = (struct i9300_transport_data *) data;
 
-    xmm6260_sec_modem_ipc_close(transport_data->fd);
+    xmm6260_sec_modem_close(transport_data->fd);
     transport_data->fd = -1;
 
     return 0;
 }
 
-int n7100_ipc_read(void *data, void *buffer, unsigned int length)
+int i9300_read(void *data, void *buffer, size_t length)
 {
-    struct n7100_ipc_transport_data *transport_data;
+    struct i9300_transport_data *transport_data;
     int rc;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct n7100_ipc_transport_data *) data;
+    transport_data = (struct i9300_transport_data *) data;
 
-    rc = xmm6260_sec_modem_ipc_read(transport_data->fd, buffer, length);
+    rc = xmm6260_sec_modem_read(transport_data->fd, buffer, length);
+
     return rc;
 }
 
-int n7100_ipc_write(void *data, void *buffer, unsigned int length)
+int i9300_write(void *data, const void *buffer, size_t length)
 {
-    struct n7100_ipc_transport_data *transport_data;
+    struct i9300_transport_data *transport_data;
     int rc;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct n7100_ipc_transport_data *) data;
+    transport_data = (struct i9300_transport_data *) data;
 
-    rc = xmm6260_sec_modem_ipc_write(transport_data->fd, buffer, length);
+    rc = xmm6260_sec_modem_write(transport_data->fd, buffer, length);
+
     return rc;
 }
 
-int n7100_ipc_poll(void *data, struct timeval *timeout)
+int i9300_poll(void *data, struct timeval *timeout)
 {
-    struct n7100_ipc_transport_data *transport_data;
+    struct i9300_transport_data *transport_data;
     int rc;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct n7100_ipc_transport_data *) data;
+    transport_data = (struct i9300_transport_data *) data;
 
-    rc = xmm6260_sec_modem_ipc_poll(transport_data->fd, timeout);
+    rc = xmm6260_sec_modem_poll(transport_data->fd, timeout);
+
     return rc;
 }
 
-int n7100_ipc_power_on(void *data)
+int i9300_power_on(void *data)
 {
     return 0;
 }
 
-int n7100_ipc_power_off(void *data)
+int i9300_power_off(void *data)
 {
     int fd;
     int rc;
@@ -342,18 +323,18 @@ int n7100_ipc_power_off(void *data)
     return 0;
 }
 
-int n7100_ipc_data_create(void **transport_data, void **power_data, void **gprs_data)
+int i9300_data_create(void **transport_data, void **power_data,
+    void **gprs_data)
 {
     if (transport_data == NULL)
         return -1;
 
-    *transport_data = (void *) malloc(sizeof(struct n7100_ipc_transport_data));
-    memset(*transport_data, 0, sizeof(struct n7100_ipc_transport_data));
+    *transport_data = calloc(1, sizeof(struct i9300_transport_data));
 
     return 0;
 }
 
-int n7100_ipc_data_destroy(void *transport_data, void *power_data, void *gprs_data)
+int i9300_data_destroy(void *transport_data, void *power_data, void *gprs_data)
 {
     if (transport_data == NULL)
         return -1;
@@ -363,52 +344,41 @@ int n7100_ipc_data_destroy(void *transport_data, void *power_data, void *gprs_da
     return 0;
 }
 
-char *n7100_ipc_gprs_get_iface(int cid)
-{
-    return xmm6260_sec_modem_ipc_gprs_get_iface(cid);
-}
-
-
-int n7100_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
-{
-    return xmm6260_sec_modem_ipc_gprs_get_capabilities(capabilities);
-}
-
-struct ipc_ops n7100_ipc_fmt_ops = {
-    .bootstrap = n7100_ipc_bootstrap,
-    .send = n7100_ipc_fmt_send,
-    .recv = n7100_ipc_fmt_recv,
+struct ipc_client_ops i9300_fmt_ops = {
+    .boot = i9300_boot,
+    .send = xmm6260_sec_modem_fmt_send,
+    .recv = xmm6260_sec_modem_fmt_recv,
 };
 
-struct ipc_ops n7100_ipc_rfs_ops = {
-    .bootstrap = NULL,
-    .send = n7100_ipc_rfs_send,
-    .recv = n7100_ipc_rfs_recv,
+struct ipc_client_ops i9300_rfs_ops = {
+    .boot = NULL,
+    .send = xmm6260_sec_modem_rfs_send,
+    .recv = xmm6260_sec_modem_rfs_recv,
 };
 
-struct ipc_handlers n7100_ipc_handlers = {
-    .read = n7100_ipc_read,
-    .write = n7100_ipc_write,
-    .open = n7100_ipc_open,
-    .close = n7100_ipc_close,
-    .poll = n7100_ipc_poll,
+struct ipc_client_handlers i9300_handlers = {
+    .read = i9300_read,
+    .write = i9300_write,
+    .open = i9300_open,
+    .close = i9300_close,
+    .poll = i9300_poll,
     .transport_data = NULL,
-    .power_on = n7100_ipc_power_on,
-    .power_off = n7100_ipc_power_off,
+    .power_on = i9300_power_on,
+    .power_off = i9300_power_off,
     .power_data = NULL,
     .gprs_activate = NULL,
     .gprs_deactivate = NULL,
     .gprs_data = NULL,
-    .data_create = n7100_ipc_data_create,
-    .data_destroy = n7100_ipc_data_destroy,
+    .data_create = i9300_data_create,
+    .data_destroy = i9300_data_destroy,
 };
 
-struct ipc_gprs_specs n7100_ipc_gprs_specs = {
-    .gprs_get_iface = n7100_ipc_gprs_get_iface,
-    .gprs_get_capabilities = n7100_ipc_gprs_get_capabilities,
+struct ipc_client_gprs_specs i9300_gprs_specs = {
+    .gprs_get_iface = xmm6260_sec_modem_gprs_get_iface,
+    .gprs_get_capabilities = xmm6260_sec_modem_gprs_get_capabilities,
 };
 
-struct ipc_nv_data_specs n7100_ipc_nv_data_specs = {
+struct ipc_client_nv_data_specs i9300_nv_data_specs = {
     .nv_data_path = XMM6260_NV_DATA_PATH,
     .nv_data_md5_path = XMM6260_NV_DATA_MD5_PATH,
     .nv_data_backup_path = XMM6260_NV_DATA_BACKUP_PATH,

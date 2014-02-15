@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,19 +53,19 @@ struct xmm6260_mipi_command_footer {
 } __attribute__((packed));
 
 int xmm6260_mipi_psi_send(struct ipc_client *client, int device_fd,
-    void *psi_data, unsigned short psi_size);
+    const void *psi_data, unsigned short psi_size);
 int xmm6260_mipi_ebl_send(struct ipc_client *client, int device_fd,
-    void *ebl_data, int ebl_size);
+    const void *ebl_data, size_t ebl_size);
 
 int xmm6260_mipi_port_config_send(struct ipc_client *client, int device_fd);
 int xmm6260_mipi_sec_start_send(struct ipc_client *client, int device_fd,
-    void *sec_data, int sec_size);
+    const void *sec_data, size_t sec_size);
 int xmm6260_mipi_sec_end_send(struct ipc_client *client, int device_fd);
 int xmm6260_mipi_firmware_send(struct ipc_client *client, int device_fd,
-    void *firmware_data, int firmware_size);
+    const void *firmware_data, size_t firmware_size);
 int xmm6260_mipi_nv_data_send(struct ipc_client *client, int device_fd);
 int xmm6260_mipi_mps_data_send(struct ipc_client *client, int device_fd,
-    void *mps_data, int mps_size);
+    const void *mps_data, size_t mps_size);
 int xmm6260_mipi_hw_reset_send(struct ipc_client *client, int device_fd);
 
 #endif

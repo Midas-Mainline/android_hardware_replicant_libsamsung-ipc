@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __PIRANHA_IPC_H__
-#define __PIRANHA_IPC_H__
+#ifndef __PIRANHA_H__
+#define __PIRANHA_H__
 
 #define PIRANHA_MODEM_IMAGE_SIZE                                0x1400000
 #define PIRANHA_PSI_OFFSET                                      0x1000
@@ -34,16 +34,16 @@
 
 #define PIRANHA_MODEM_IMAGE_DEVICE              "/dev/block/mmcblk0p8"
 
-struct piranha_ipc_transport_data {
+struct piranha_transport_data {
     int fd;
 };
 
-extern struct ipc_ops piranha_ipc_fmt_ops;
-extern struct ipc_ops piranha_ipc_rfs_ops;
-extern struct ipc_handlers piranha_ipc_handlers;
-extern struct ipc_gprs_specs piranha_ipc_gprs_specs;
-extern struct ipc_nv_data_specs piranha_ipc_nv_data_specs;
-extern struct ipc_nv_data_specs piranha_ipc_nv_data_specs;
+extern struct ipc_client_ops piranha_fmt_ops;
+extern struct ipc_client_ops piranha_rfs_ops;
+extern struct ipc_client_handlers piranha_handlers;
+extern struct ipc_client_gprs_specs piranha_gprs_specs;
+extern struct ipc_client_nv_data_specs piranha_nv_data_specs;
+extern struct ipc_client_nv_data_specs piranha_nv_data_specs;
 
 #endif
 

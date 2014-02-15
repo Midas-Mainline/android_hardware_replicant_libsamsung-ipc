@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * Based on the incomplete C++ implementation which is:
  * Copyright (C) 2012 Sergey Gridasov <grindars@gmail.com>
@@ -37,7 +37,6 @@ int xmm6260_hsic_ack_read(int device_fd, unsigned short ack)
 {
     struct timeval timeout;
     fd_set fds;
-
     unsigned short value;
     int rc;
     int i;
@@ -66,20 +65,18 @@ int xmm6260_hsic_ack_read(int device_fd, unsigned short ack)
 }
 
 int xmm6260_hsic_psi_send(struct ipc_client *client, int device_fd,
-    void *psi_data, unsigned short psi_size)
+    const void *psi_data, unsigned short psi_size)
 {
     struct xmm6260_hsic_psi_header psi_header;
     char at[] = XMM6260_AT;
     unsigned char psi_ack;
     unsigned char chip_id;
     unsigned char psi_crc;
-
     struct timeval timeout;
     fd_set fds;
-    int wc;
-
+    size_t wc;
+    size_t length;
     unsigned char *p;
-    int length;
     int rc;
     int i;
 
@@ -98,7 +95,7 @@ int xmm6260_hsic_psi_send(struct ipc_client *client, int device_fd,
         timeout.tv_usec = 100000;
 
         rc = write(device_fd, at, length);
-        if (rc < length) {
+        if (rc < (int) length) {
             ipc_client_log(client, "Writing ATAT in ASCII failed");
             goto error;
         }
@@ -129,7 +126,7 @@ int xmm6260_hsic_psi_send(struct ipc_client *client, int device_fd,
 
     psi_ack = 0;
     rc = read(device_fd, &psi_ack, sizeof(psi_ack));
-    if (rc < 0 || psi_ack != XMM6260_HSIC_BOOT0_ACK) {
+    if (rc <= 0 || psi_ack != XMM6260_HSIC_BOOT0_ACK) {
         ipc_client_log(client, "Reading boot ACK failed");
         goto error;
     }
@@ -142,7 +139,7 @@ int xmm6260_hsic_psi_send(struct ipc_client *client, int device_fd,
 
     chip_id = 0;
     rc = read(device_fd, &chip_id, sizeof(chip_id));
-    if (rc < 0) {
+    if (rc <= 0) {
         ipc_client_log(client, "Reading chip id failed");
         goto error;
     }
@@ -164,7 +161,7 @@ int xmm6260_hsic_psi_send(struct ipc_client *client, int device_fd,
     wc = 0;
     while (wc < psi_size) {
         rc = write(device_fd, (void *) p, psi_size - wc);
-        if (rc < 0) {
+        if (rc <= 0) {
             ipc_client_log(client, "Writing PSI failed");
             goto error;
         }
@@ -234,25 +231,23 @@ complete:
 }
 
 int xmm6260_hsic_ebl_send(struct ipc_client *client, int device_fd,
-    void *ebl_data, int ebl_size)
+    const void *ebl_data, size_t ebl_size)
 {
     unsigned char ebl_crc;
-
-    int chunk;
-    int count;
-    int wc;
-
+    size_t chunk;
+    size_t count;
+    size_t wc;
+    size_t size;
     unsigned char *p;
-    int length;
     int rc;
 
-    if (client == NULL || device_fd < 0 || ebl_data == NULL || ebl_size <= 0)
+    if (client == NULL || device_fd < 0 || ebl_data == NULL || ebl_size == 0)
         return -1;
 
-    length = sizeof(ebl_size);
+    size = sizeof(ebl_size);
 
-    rc = write(device_fd, &ebl_size, length);
-    if (rc < length) {
+    rc = write(device_fd, &ebl_size, size);
+    if (rc < (int) size) {
         ipc_client_log(client, "Writing EBL size failed");
         goto error;
     }
@@ -272,7 +267,7 @@ int xmm6260_hsic_ebl_send(struct ipc_client *client, int device_fd,
         count = chunk < ebl_size - wc ? chunk : ebl_size - wc;
 
         rc = write(device_fd, (void *) p, count);
-        if (rc < 0) {
+        if (rc <= 0) {
             ipc_client_log(client, "Writing EBL failed");
             goto error;
         }
@@ -309,20 +304,18 @@ complete:
 }
 
 int xmm6260_hsic_command_send(int device_fd, unsigned short code,
-    void *data, int size, int command_data_size, int ack)
+    const void *data, size_t size, size_t command_data_size, int ack)
 {
     struct xmm6260_hsic_command_header header;
     void *buffer = NULL;
-    int length;
-
+    size_t length;
     struct timeval timeout;
     fd_set fds;
-
     unsigned char *p;
     int rc;
     int i;
 
-    if (device_fd < 0 || data == NULL || size <= 0 || command_data_size < size)
+    if (device_fd < 0 || data == NULL || size == 0 || command_data_size == 0 || command_data_size < size)
         return -1;
 
     header.checksum = (size & 0xffff) + code;
@@ -331,11 +324,11 @@ int xmm6260_hsic_command_send(int device_fd, unsigned short code,
 
     p = (unsigned char *) data;
 
-    for (i = 0; i < size; i++)
+    for (i = 0; i < (int) size; i++)
         header.checksum += *p++;
 
     length = command_data_size + sizeof(header);
-    buffer = malloc(length);
+    buffer = calloc(1, length);
 
     memset(buffer, 0, length);
     p = (unsigned char *) buffer;
@@ -344,7 +337,7 @@ int xmm6260_hsic_command_send(int device_fd, unsigned short code,
     memcpy(p, data, size);
 
     rc = write(device_fd, buffer, length);
-    if (rc < length)
+    if (rc < (int) length)
         goto error;
 
     if (!ack) {
@@ -373,7 +366,7 @@ int xmm6260_hsic_command_send(int device_fd, unsigned short code,
         goto error;
 
     rc = read(device_fd, buffer, command_data_size);
-    if (rc < command_data_size)
+    if (rc < (int) command_data_size)
         goto error;
 
     if (header.code != code)
@@ -392,16 +385,16 @@ complete:
     return rc;
 }
 
-int xmm6260_hsic_modem_data_send(int device_fd, void *data, int size, int address)
+int xmm6260_hsic_modem_data_send(int device_fd, const void *data, size_t size,
+    int address)
 {
-    int chunk;
-    int count;
-    int c;
-
+    size_t chunk;
+    size_t count;
+    size_t c;
     unsigned char *p;
     int rc;
 
-    if (device_fd < 0 || data == NULL || size <= 0)
+    if (device_fd < 0 || data == NULL || size == 0)
         return -1;
 
     rc = xmm6260_hsic_command_send(device_fd, XMM6260_COMMAND_FLASH_SET_ADDRESS, &address, sizeof(address), XMM6260_HSIC_FLASH_SET_ADDRESS_SIZE, 1);
@@ -436,11 +429,9 @@ complete:
 int xmm6260_hsic_port_config_send(struct ipc_client *client, int device_fd)
 {
     void *buffer = NULL;
-    int length;
-
+    size_t length;
     struct timeval timeout;
     fd_set fds;
-
     int rc;
 
     if (client == NULL || device_fd < 0)
@@ -457,14 +448,14 @@ int xmm6260_hsic_port_config_send(struct ipc_client *client, int device_fd)
         goto error;
 
     length = XMM6260_HSIC_PORT_CONFIG_SIZE;
-    buffer = malloc(length);
+    buffer = calloc(1, length);
 
     rc = select(device_fd + 1, &fds, NULL, NULL, &timeout);
     if (rc <= 0)
         goto error;
 
     rc = read(device_fd, buffer, length);
-    if (rc < length) {
+    if (rc < (int) length) {
         ipc_client_log(client, "Reading port config failed");
         goto error;
     }
@@ -490,11 +481,11 @@ complete:
 }
 
 int xmm6260_hsic_sec_start_send(struct ipc_client *client, int device_fd,
-    void *sec_data, int sec_size)
+    const void *sec_data, size_t sec_size)
 {
     int rc;
 
-    if (client == NULL || device_fd < 0 || sec_data == NULL || sec_size <= 0)
+    if (client == NULL || device_fd < 0 || sec_data == NULL || sec_size == 0)
         return -1;
 
     rc = xmm6260_hsic_command_send(device_fd, XMM6260_COMMAND_SEC_START, sec_data, sec_size, XMM6260_HSIC_SEC_START_SIZE, 1);
@@ -507,7 +498,7 @@ int xmm6260_hsic_sec_start_send(struct ipc_client *client, int device_fd,
 int xmm6260_hsic_sec_end_send(struct ipc_client *client, int device_fd)
 {
     unsigned short sec_data;
-    int sec_size;
+    size_t sec_size;
     int rc;
 
     if (client == NULL || device_fd < 0)
@@ -524,11 +515,11 @@ int xmm6260_hsic_sec_end_send(struct ipc_client *client, int device_fd)
 }
 
 int xmm6260_hsic_firmware_send(struct ipc_client *client, int device_fd,
-    void *firmware_data, int firmware_size)
+    const void *firmware_data, size_t firmware_size)
 {
     int rc;
 
-    if (client == NULL || device_fd < 0 || firmware_data == NULL || firmware_size <= 0)
+    if (client == NULL || device_fd < 0 || firmware_data == NULL || firmware_size == 0)
         return -1;
 
     rc = xmm6260_hsic_modem_data_send(device_fd, firmware_data, firmware_size, XMM6260_FIRMWARE_ADDRESS);
@@ -541,13 +532,15 @@ int xmm6260_hsic_firmware_send(struct ipc_client *client, int device_fd,
 int xmm6260_hsic_nv_data_send(struct ipc_client *client, int device_fd)
 {
     void *nv_data = NULL;
-    int nv_size;
+    size_t nv_size;
     int rc;
 
     if (client == NULL || device_fd < 0)
         return -1;
 
     nv_size = ipc_client_nv_data_size(client);
+    if (nv_size == 0)
+        return -1;
 
     nv_data = ipc_nv_data_load(client);
     if (nv_data == NULL) {

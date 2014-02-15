@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,21 +29,20 @@
 #include "xmm6260.h"
 #include "xmm6260_mipi.h"
 #include "xmm6260_sec_modem.h"
-#include "piranha_ipc.h"
+#include "piranha.h"
 
-int piranha_ipc_bootstrap(struct ipc_client *client)
+int piranha_boot(struct ipc_client *client)
 {
     void *modem_image_data = NULL;
     int modem_image_fd = -1;
     int modem_boot_fd = -1;
-
     unsigned char *p;
     int rc;
 
     if (client == NULL)
         return -1;
 
-    ipc_client_log(client, "Starting piranha modem bootstrap");
+    ipc_client_log(client, "Starting piranha modem boot");
 
     modem_image_fd = open(PIRANHA_MODEM_IMAGE_DEVICE, O_RDONLY);
     if (modem_image_fd < 0) {
@@ -172,105 +171,88 @@ complete:
     return rc;
 }
 
-int piranha_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
+int piranha_open(void *data, int type)
 {
-    return xmm6260_sec_modem_ipc_fmt_send(client, request);
-}
-
-int piranha_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *response)
-{
-    return xmm6260_sec_modem_ipc_fmt_recv(client, response);
-}
-
-int piranha_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *request)
-{
-    return xmm6260_sec_modem_ipc_rfs_send(client, request);
-}
-
-int piranha_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *response)
-{
-    return xmm6260_sec_modem_ipc_rfs_recv(client, response);
-}
-
-int piranha_ipc_open(void *data, int type)
-{
-    struct piranha_ipc_transport_data *transport_data;
+    struct piranha_transport_data *transport_data;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct piranha_ipc_transport_data *) data;
+    transport_data = (struct piranha_transport_data *) data;
 
-    transport_data->fd = xmm6260_sec_modem_ipc_open(type);
+    transport_data->fd = xmm6260_sec_modem_open(type);
     if (transport_data->fd < 0)
         return -1;
 
     return 0;
 }
 
-int piranha_ipc_close(void *data)
+int piranha_close(void *data)
 {
-    struct piranha_ipc_transport_data *transport_data;
+    struct piranha_transport_data *transport_data;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct piranha_ipc_transport_data *) data;
+    transport_data = (struct piranha_transport_data *) data;
 
-    xmm6260_sec_modem_ipc_close(transport_data->fd);
+    xmm6260_sec_modem_close(transport_data->fd);
     transport_data->fd = -1;
 
     return 0;
 }
 
-int piranha_ipc_read(void *data, void *buffer, unsigned int length)
+int piranha_read(void *data, void *buffer, size_t length)
 {
-    struct piranha_ipc_transport_data *transport_data;
+    struct piranha_transport_data *transport_data;
     int rc;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct piranha_ipc_transport_data *) data;
+    transport_data = (struct piranha_transport_data *) data;
 
-    rc = xmm6260_sec_modem_ipc_read(transport_data->fd, buffer, length);
+    rc = xmm6260_sec_modem_read(transport_data->fd, buffer, length);
+
     return rc;
 }
 
-int piranha_ipc_write(void *data, void *buffer, unsigned int length)
+int piranha_write(void *data, const void *buffer, size_t length)
 {
-    struct piranha_ipc_transport_data *transport_data;
+    struct piranha_transport_data *transport_data;
     int rc;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct piranha_ipc_transport_data *) data;
+    transport_data = (struct piranha_transport_data *) data;
 
-    rc = xmm6260_sec_modem_ipc_write(transport_data->fd, buffer, length);
+    rc = xmm6260_sec_modem_write(transport_data->fd, buffer, length);
+
     return rc;
 }
 
-int piranha_ipc_poll(void *data, struct timeval *timeout)
+int piranha_poll(void *data, struct timeval *timeout)
 {
-    struct piranha_ipc_transport_data *transport_data;
+    struct piranha_transport_data *transport_data;
     int rc;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct piranha_ipc_transport_data *) data;
+    transport_data = (struct piranha_transport_data *) data;
 
-    rc = xmm6260_sec_modem_ipc_poll(transport_data->fd, timeout);
+    rc = xmm6260_sec_modem_poll(transport_data->fd, timeout);
+
     return rc;
 }
 
-int piranha_ipc_power_on(void *data)
+int piranha_power_on(void *data)
 {
     return 0;
 }
 
-int piranha_ipc_power_off(void *data)
+int piranha_power_off(void *data)
 {
     int fd;
     int rc;
@@ -289,18 +271,19 @@ int piranha_ipc_power_off(void *data)
     return 0;
 }
 
-int piranha_ipc_data_create(void **transport_data, void **power_data, void **gprs_data)
+int piranha_data_create(void **transport_data, void **power_data,
+    void **gprs_data)
 {
     if (transport_data == NULL)
         return -1;
 
-    *transport_data = (void *) malloc(sizeof(struct piranha_ipc_transport_data));
-    memset(*transport_data, 0, sizeof(struct piranha_ipc_transport_data));
+    *transport_data = calloc(1, sizeof(struct piranha_transport_data));
 
     return 0;
 }
 
-int piranha_ipc_data_destroy(void *transport_data, void *power_data, void *gprs_data)
+int piranha_data_destroy(void *transport_data, void *power_data,
+    void *gprs_data)
 {
     if (transport_data == NULL)
         return -1;
@@ -310,52 +293,41 @@ int piranha_ipc_data_destroy(void *transport_data, void *power_data, void *gprs_
     return 0;
 }
 
-char *piranha_ipc_gprs_get_iface(int cid)
-{
-    return xmm6260_sec_modem_ipc_gprs_get_iface(cid);
-}
-
-
-int piranha_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
-{
-    return xmm6260_sec_modem_ipc_gprs_get_capabilities(capabilities);
-}
-
-struct ipc_ops piranha_ipc_fmt_ops = {
-    .bootstrap = piranha_ipc_bootstrap,
-    .send = piranha_ipc_fmt_send,
-    .recv = piranha_ipc_fmt_recv,
+struct ipc_client_ops piranha_fmt_ops = {
+    .boot = piranha_boot,
+    .send = xmm6260_sec_modem_fmt_send,
+    .recv = xmm6260_sec_modem_fmt_recv,
 };
 
-struct ipc_ops piranha_ipc_rfs_ops = {
-    .bootstrap = NULL,
-    .send = piranha_ipc_rfs_send,
-    .recv = piranha_ipc_rfs_recv,
+struct ipc_client_ops piranha_rfs_ops = {
+    .boot = NULL,
+    .send = xmm6260_sec_modem_rfs_send,
+    .recv = xmm6260_sec_modem_rfs_recv,
 };
 
-struct ipc_handlers piranha_ipc_handlers = {
-    .read = piranha_ipc_read,
-    .write = piranha_ipc_write,
-    .open = piranha_ipc_open,
-    .close = piranha_ipc_close,
-    .poll = piranha_ipc_poll,
+struct ipc_client_handlers piranha_handlers = {
+    .read = piranha_read,
+    .write = piranha_write,
+    .open = piranha_open,
+    .close = piranha_close,
+    .poll = piranha_poll,
     .transport_data = NULL,
-    .power_on = piranha_ipc_power_on,
-    .power_off = piranha_ipc_power_off,
+    .power_on = piranha_power_on,
+    .power_off = piranha_power_off,
     .power_data = NULL,
     .gprs_activate = NULL,
     .gprs_deactivate = NULL,
     .gprs_data = NULL,
-    .data_create = piranha_ipc_data_create,
-    .data_destroy = piranha_ipc_data_destroy,
+    .data_create = piranha_data_create,
+    .data_destroy = piranha_data_destroy,
 };
 
-struct ipc_gprs_specs piranha_ipc_gprs_specs = {
-    .gprs_get_iface = piranha_ipc_gprs_get_iface,
-    .gprs_get_capabilities = piranha_ipc_gprs_get_capabilities,
+struct ipc_client_gprs_specs piranha_gprs_specs = {
+    .gprs_get_iface = xmm6260_sec_modem_gprs_get_iface,
+    .gprs_get_capabilities = xmm6260_sec_modem_gprs_get_capabilities,
 };
 
-struct ipc_nv_data_specs piranha_ipc_nv_data_specs = {
+struct ipc_client_nv_data_specs piranha_nv_data_specs = {
     .nv_data_path = XMM6260_NV_DATA_PATH,
     .nv_data_md5_path = XMM6260_NV_DATA_MD5_PATH,
     .nv_data_backup_path = XMM6260_NV_DATA_BACKUP_PATH,

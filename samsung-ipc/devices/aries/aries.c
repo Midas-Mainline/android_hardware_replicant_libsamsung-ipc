@@ -38,22 +38,19 @@
 #include "phonet.h"
 
 #include "xmm6160.h"
-#include "aries_ipc.h"
+#include "aries.h"
 
-int aries_ipc_bootstrap(struct ipc_client *client)
+int aries_boot(struct ipc_client *client)
 {
     void *modem_image_data = NULL;
     void *onedram_address = NULL;
     unsigned int onedram_init;
     unsigned int onedram_magic;
     unsigned int onedram_deinit;
-
     int onedram_fd = -1;
     int serial_fd = -1;
-
     struct timeval timeout;
     fd_set fds;
-
     unsigned char *p;
     unsigned char *pp;
     int rc;
@@ -62,7 +59,7 @@ int aries_ipc_bootstrap(struct ipc_client *client)
     if (client == NULL || client->handlers == NULL || client->handlers->power_on == NULL || client->handlers->power_off == NULL)
         return -1;
 
-    ipc_client_log(client, "Starting aries modem bootstrap");
+    ipc_client_log(client, "Starting aries modem boot");
 
     modem_image_data = file_data_read(ARIES_MODEM_IMAGE_DEVICE, ARIES_MODEM_IMAGE_SIZE, 0x1000, 0);
     if (modem_image_data == NULL) {
@@ -239,31 +236,32 @@ complete:
     return rc;
 }
 
-int aries_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
+int aries_fmt_send(struct ipc_client *client, struct ipc_message *message)
 {
     struct ipc_fmt_header header;
-    void *buffer = NULL;
+    void *buffer;
+    size_t length;
+    size_t count = 0;
+    size_t chunk;
     unsigned char *p;
-    int length = 0;
-    int count = 0;
-    int chunk;
     int rc;
 
-    if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || request == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || message == NULL)
         return -1;
 
-    ipc_fmt_header_fill(&header, request);
+    ipc_fmt_header_setup(&header, message);
 
     length = header.length;
-    buffer = malloc(header.length);
+    buffer = calloc(1, length);
 
     memcpy(buffer, &header, sizeof(struct ipc_fmt_header));
-    if (request->data != NULL && request->length > 0) {
+
+    if (message->data != NULL && message->size > 0) {
         p = (unsigned char *) buffer + sizeof(header);
-        memcpy(p, request->data, request->length);
+        memcpy(p, message->data, message->size);
     }
 
-    ipc_client_log_send(client, request, __func__);
+    ipc_client_log_send(client, message, __func__);
 
     p = (unsigned char *) buffer;
 
@@ -272,7 +270,7 @@ int aries_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *reque
 
         rc = client->handlers->write(client->handlers->transport_data, p, chunk);
         if (rc < 0) {
-            ipc_client_log(client, "Writing FMT data to the modem failed");
+            ipc_client_log(client, "Writing FMT data failed");
             goto error;
         }
 
@@ -293,52 +291,52 @@ complete:
     return rc;
 }
 
-int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *response)
+int aries_fmt_recv(struct ipc_client *client, struct ipc_message *message)
 {
     struct ipc_fmt_header *header;
-    void *buffer = NULL;
+    void *buffer;
+    size_t length;
+    size_t count = 0;
+    size_t chunk;
     unsigned char *p;
-    int length = 0;
-    int count = 0;
-    int chunk;
     int rc;
 
-    if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || response == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || message == NULL)
         return -1;
 
     length = ARIES_BUFFER_LENGTH;
-    buffer = malloc(length);
+    buffer = calloc(1, length);
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
     if (rc < (int) sizeof(struct ipc_fmt_header)) {
-        ipc_client_log(client, "Reading FMT header from the modem failed");
+        ipc_client_log(client, "Reading FMT header failed");
         goto error;
     }
 
     header = (struct ipc_fmt_header *) buffer;
 
-    ipc_fmt_message_fill(header, response);
+    ipc_fmt_message_setup(header, message);
 
     length = header->length - sizeof(struct ipc_fmt_header);
     if (length > 0) {
-        response->length = length;
-        response->data = malloc(length);
+        message->size = length;
+        message->data = calloc(1, length);
 
         count = rc - sizeof(struct ipc_fmt_header);
         if (count > 0) {
             p = (unsigned char *) buffer + sizeof(struct ipc_fmt_header);
-            memcpy(response->data, p, count);
+            memcpy(message->data, p, count);
         }
     }
 
-    p = (unsigned char *) response->data + count;
+    p = (unsigned char *) message->data + count;
 
     while (count < length) {
         chunk = length - count < ARIES_BUFFER_LENGTH ? length - count : ARIES_BUFFER_LENGTH;
 
         rc = client->handlers->read(client->handlers->transport_data, p, chunk);
         if (rc < 0) {
-            ipc_client_log(client, "Reading FMT data from the modem failed");
+            ipc_client_log(client, "Reading FMT data failed");
             goto error;
         }
 
@@ -346,7 +344,7 @@ int aries_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *respo
         p += rc;
     }
 
-    ipc_client_log_recv(client, response, __func__);
+    ipc_client_log_recv(client, message, __func__);
 
     rc = 0;
     goto complete;
@@ -361,31 +359,31 @@ complete:
     return rc;
 }
 
-int aries_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *request)
+int aries_rfs_send(struct ipc_client *client, struct ipc_message *message)
 {
     struct ipc_rfs_header header;
-    void *buffer = NULL;
+    void *buffer;
+    size_t length;
+    size_t count = 0;
+    size_t chunk;
     unsigned char *p;
-    int length = 0;
-    int count = 0;
-    int chunk;
     int rc;
 
-    if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || request == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->write == NULL || message == NULL)
         return -1;
 
-    ipc_rfs_header_fill(&header, request);
+    ipc_rfs_header_setup(&header, message);
 
     length = header.length;
-    buffer = malloc(length);
+    buffer = calloc(1, length);
 
     memcpy(buffer, &header, sizeof(header));
-    if (request->data != NULL && request->length > 0) {
+    if (message->data != NULL && message->size > 0) {
         p = (unsigned char *) buffer + sizeof(header);
-        memcpy(p, request->data, request->length);
+        memcpy(p, message->data, message->size);
     }
 
-    ipc_client_log_send(client, request, __func__);
+    ipc_client_log_send(client, message, __func__);
 
     p = (unsigned char *) buffer;
 
@@ -394,7 +392,7 @@ int aries_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *reque
 
         rc = client->handlers->write(client->handlers->transport_data, p, chunk);
         if (rc < 0) {
-            ipc_client_log(client, "Writing RFS data to the modem failed");
+            ipc_client_log(client, "Writing RFS data failed");
             goto error;
         }
 
@@ -415,52 +413,52 @@ complete:
     return rc;
 }
 
-int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *response)
+int aries_rfs_recv(struct ipc_client *client, struct ipc_message *message)
 {
     struct ipc_rfs_header *header;
-    void *buffer = NULL;
+    void *buffer;
+    size_t length;
+    size_t count = 0;
+    size_t chunk;
     unsigned char *p;
-    int length = 0;
-    int count = 0;
-    int chunk;
     int rc;
 
-    if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || response == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || message == NULL)
         return -1;
 
     length = ARIES_BUFFER_LENGTH;
-    buffer = malloc(length);
+    buffer = calloc(1, length);
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
     if (rc < (int) sizeof(struct ipc_rfs_header)) {
-        ipc_client_log(client, "Reading RFS header from the modem failed");
+        ipc_client_log(client, "Reading RFS header failed");
         goto error;
     }
 
     header = (struct ipc_rfs_header *) buffer;
 
-    ipc_rfs_message_fill(header, response);
+    ipc_rfs_message_setup(header, message);
 
     length = header->length - sizeof(struct ipc_rfs_header);
     if (length > 0) {
-        response->length = length;
-        response->data = malloc(length);
+        message->size = length;
+        message->data = calloc(1, length);
 
         count = rc - sizeof(struct ipc_rfs_header);
         if (count > 0) {
             p = (unsigned char *) buffer + sizeof(struct ipc_rfs_header);
-            memcpy(response->data, p, count);
+            memcpy(message->data, p, count);
         }
     }
 
-    p = (unsigned char *) response->data + count;
+    p = (unsigned char *) message->data + count;
 
     while (count < length) {
         chunk = length - count < ARIES_BUFFER_LENGTH ? length - count : ARIES_BUFFER_LENGTH;
 
         rc = client->handlers->read(client->handlers->transport_data, p, chunk);
         if (rc < 0) {
-            ipc_client_log(client, "Reading RFS data from the modem failed");
+            ipc_client_log(client, "Reading RFS data failed");
             goto error;
         }
 
@@ -468,7 +466,7 @@ int aries_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *respo
         p += rc;
     }
 
-    ipc_client_log_recv(client, response, __func__);
+    ipc_client_log_recv(client, message, __func__);
 
     rc = 0;
     goto complete;
@@ -483,23 +481,21 @@ complete:
     return rc;
 }
 
-int aries_ipc_open(void *data, int type)
+int aries_open(void *data, int type)
 {
-    struct aries_ipc_transport_data *transport_data;
+    struct aries_transport_data *transport_data;
     struct sockaddr_pn *spn;
     struct ifreq ifr;
-
     int reuse;
     int socket_rfs_magic;
-
     int fd;
     int rc;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct aries_ipc_transport_data *) data;
-    memset(data, 0, sizeof(struct aries_ipc_transport_data));
+    transport_data = (struct aries_transport_data *) data;
+    memset(data, 0, sizeof(struct aries_transport_data));
 
     spn = &transport_data->spn;
 
@@ -558,15 +554,15 @@ int aries_ipc_open(void *data, int type)
     return 0;
 }
 
-int aries_ipc_close(void *data)
+int aries_close(void *data)
 {
-    struct aries_ipc_transport_data *transport_data;
+    struct aries_transport_data *transport_data;
     int fd;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct aries_ipc_transport_data *) data;
+    transport_data = (struct aries_transport_data *) data;
 
     fd = transport_data->fd;
     if (fd < 0)
@@ -578,9 +574,9 @@ int aries_ipc_close(void *data)
     return 0;
 }
 
-int aries_ipc_read(void *data, void *buffer, unsigned int length)
+int aries_read(void *data, void *buffer, size_t length)
 {
-    struct aries_ipc_transport_data *transport_data;
+    struct aries_transport_data *transport_data;
     int spn_size;
     int fd;
     int rc;
@@ -588,7 +584,7 @@ int aries_ipc_read(void *data, void *buffer, unsigned int length)
     if (data == NULL || buffer == NULL || length == 0)
         return -1;
 
-    transport_data = (struct aries_ipc_transport_data *) data;
+    transport_data = (struct aries_transport_data *) data;
 
     fd = transport_data->fd;
     if (fd < 0)
@@ -596,13 +592,13 @@ int aries_ipc_read(void *data, void *buffer, unsigned int length)
 
     spn_size = sizeof(struct sockaddr_pn);
 
-    rc = recvfrom(fd, buffer, length, 0, (const struct sockaddr *) &transport_data->spn, &spn_size);
+    rc = recvfrom(fd, buffer, length, 0, (struct sockaddr *) &transport_data->spn, &spn_size);
     return rc;
 }
 
-int aries_ipc_write(void *data, void *buffer, unsigned int length)
+int aries_write(void *data, const void *buffer, size_t length)
 {
-    struct aries_ipc_transport_data *transport_data;
+    struct aries_transport_data *transport_data;
     int spn_size;
     int fd;
     int rc;
@@ -610,7 +606,7 @@ int aries_ipc_write(void *data, void *buffer, unsigned int length)
     if (data == NULL || buffer == NULL || length == 0)
         return -1;
 
-    transport_data = (struct aries_ipc_transport_data *) data;
+    transport_data = (struct aries_transport_data *) data;
 
     fd = transport_data->fd;
     if (fd < 0)
@@ -622,9 +618,9 @@ int aries_ipc_write(void *data, void *buffer, unsigned int length)
     return rc;
 }
 
-int aries_ipc_poll(void *data, struct timeval *timeout)
+int aries_poll(void *data, struct timeval *timeout)
 {
-    struct aries_ipc_transport_data *transport_data;
+    struct aries_transport_data *transport_data;
     fd_set fds;
     int fd;
     int rc;
@@ -632,7 +628,7 @@ int aries_ipc_poll(void *data, struct timeval *timeout)
     if (data == NULL)
         return -1;
 
-    transport_data = (struct aries_ipc_transport_data *) data;
+    transport_data = (struct aries_transport_data *) data;
 
     fd = transport_data->fd;
     if (fd < 0)
@@ -645,7 +641,7 @@ int aries_ipc_poll(void *data, struct timeval *timeout)
     return rc;
 }
 
-int aries_ipc_power_on(void *data)
+int aries_power_on(void *data)
 {
     char buffer[] = "on\n";
     int value;
@@ -666,7 +662,7 @@ int aries_ipc_power_on(void *data)
     return 0;
 }
 
-int aries_ipc_power_off(void *data)
+int aries_power_off(void *data)
 {
     char buffer[] = "off\n";
     int value;
@@ -687,18 +683,18 @@ int aries_ipc_power_off(void *data)
     return 0;
 }
 
-int aries_ipc_data_create(void **transport_data, void **power_data, void **gprs_data)
+int aries_data_create(void **transport_data, void **power_data,
+    void **gprs_data)
 {
     if (transport_data == NULL)
         return -1;
 
-    *transport_data = (void *) malloc(sizeof(struct aries_ipc_transport_data));
-    memset(*transport_data, 0, sizeof(struct aries_ipc_transport_data));
+    *transport_data = calloc(1, sizeof(struct aries_transport_data));
 
     return 0;
 }
 
-int aries_ipc_data_destroy(void *transport_data, void *power_data, void *gprs_data)
+int aries_data_destroy(void *transport_data, void *power_data, void *gprs_data)
 {
     if (transport_data == NULL)
         return -1;
@@ -708,7 +704,7 @@ int aries_ipc_data_destroy(void *transport_data, void *power_data, void *gprs_da
     return 0;
 }
 
-int aries_ipc_gprs_activate(void *data, int cid)
+int aries_gprs_activate(void *data, int cid)
 {
     int rc;
 
@@ -719,7 +715,7 @@ int aries_ipc_gprs_activate(void *data, int cid)
     return 0;
 }
 
-int aries_ipc_gprs_deactivate(void *data, int cid)
+int aries_gprs_deactivate(void *data, int cid)
 {
     int rc;
 
@@ -730,10 +726,10 @@ int aries_ipc_gprs_deactivate(void *data, int cid)
     return 0;
 }
 
-char *aries_ipc_gprs_get_iface(int cid)
+char *aries_gprs_get_iface(int cid)
 {
-    struct ifreq ifr;
     char *iface = NULL;
+    struct ifreq ifr;
     int fd;
     int rc;
     int i;
@@ -758,52 +754,51 @@ char *aries_ipc_gprs_get_iface(int cid)
     return NULL;
 }
 
-int aries_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
+int aries_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
 {
     if (capabilities == NULL)
         return -1;
 
-    capabilities->port_list = 1;
-    capabilities->cid_max = ARIES_GPRS_IFACE_COUNT;
+    capabilities->cid_count = ARIES_GPRS_IFACE_COUNT;
 
     return 0;
 }
 
-struct ipc_ops aries_ipc_fmt_ops = {
-    .bootstrap = aries_ipc_bootstrap,
-    .send = aries_ipc_fmt_send,
-    .recv = aries_ipc_fmt_recv,
+struct ipc_client_ops aries_fmt_ops = {
+    .boot = aries_boot,
+    .send = aries_fmt_send,
+    .recv = aries_fmt_recv,
 };
 
-struct ipc_ops aries_ipc_rfs_ops = {
-    .bootstrap = NULL,
-    .send = aries_ipc_rfs_send,
-    .recv = aries_ipc_rfs_recv,
+struct ipc_client_ops aries_rfs_ops = {
+    .boot = NULL,
+    .send = aries_rfs_send,
+    .recv = aries_rfs_recv,
 };
 
-struct ipc_handlers aries_ipc_handlers = {
-    .open = aries_ipc_open,
-    .close = aries_ipc_close,
-    .read = aries_ipc_read,
-    .write = aries_ipc_write,
-    .poll = aries_ipc_poll,
+struct ipc_client_handlers aries_handlers = {
+    .open = aries_open,
+    .close = aries_close,
+    .read = aries_read,
+    .write = aries_write,
+    .poll = aries_poll,
     .transport_data = NULL,
-    .power_on = aries_ipc_power_on,
-    .power_off = aries_ipc_power_off,
+    .power_on = aries_power_on,
+    .power_off = aries_power_off,
     .power_data = NULL,
-    .gprs_activate = aries_ipc_gprs_activate,
-    .gprs_deactivate = aries_ipc_gprs_deactivate,
+    .gprs_activate = aries_gprs_activate,
+    .gprs_deactivate = aries_gprs_deactivate,
     .gprs_data = NULL,
-    .data_create = aries_ipc_data_create,
-    .data_destroy = aries_ipc_data_destroy,
+    .data_create = aries_data_create,
+    .data_destroy = aries_data_destroy,
 };
 
-struct ipc_gprs_specs aries_ipc_gprs_specs = {
-    .gprs_get_iface = aries_ipc_gprs_get_iface,
-    .gprs_get_capabilities = aries_ipc_gprs_get_capabilities,
+struct ipc_client_gprs_specs aries_gprs_specs = {
+    .gprs_get_iface = aries_gprs_get_iface,
+    .gprs_get_capabilities = aries_gprs_get_capabilities,
 };
 
-struct ipc_nv_data_specs aries_ipc_nv_data_specs = {
+struct ipc_client_nv_data_specs aries_nv_data_specs = {
     .nv_data_path = XMM6160_NV_DATA_PATH,
     .nv_data_md5_path = XMM6160_NV_DATA_MD5_PATH,
     .nv_data_backup_path = XMM6160_NV_DATA_BACKUP_PATH,

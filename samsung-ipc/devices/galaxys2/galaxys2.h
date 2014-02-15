@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GALAXYS2_IPC_H__
-#define __GALAXYS2_IPC_H__
+#ifndef __GALAXYS2_H__
+#define __GALAXYS2_H__
 
 #define GALAXYS2_MODEM_IMAGE_SIZE                               0x1000000
 #define GALAXYS2_PSI_OFFSET                                     0
@@ -34,15 +34,15 @@
 
 #define GALAXYS2_MODEM_IMAGE_DEVICE             "/dev/block/mmcblk0p8"
 
-struct galaxys2_ipc_transport_data {
+struct galaxys2_transport_data {
     int fd;
 };
 
-extern struct ipc_ops galaxys2_ipc_fmt_ops;
-extern struct ipc_ops galaxys2_ipc_rfs_ops;
-extern struct ipc_handlers galaxys2_ipc_handlers;
-extern struct ipc_gprs_specs galaxys2_ipc_gprs_specs;
-extern struct ipc_nv_data_specs galaxys2_ipc_nv_data_specs;
+extern struct ipc_client_ops galaxys2_fmt_ops;
+extern struct ipc_client_ops galaxys2_rfs_ops;
+extern struct ipc_client_handlers galaxys2_handlers;
+extern struct ipc_client_gprs_specs galaxys2_gprs_specs;
+extern struct ipc_client_nv_data_specs galaxys2_nv_data_specs;
 
 #endif
 

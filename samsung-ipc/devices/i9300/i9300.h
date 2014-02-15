@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __I9300_IPC_H__
-#define __I9300_IPC_H__
+#ifndef __I9300_H__
+#define __I9300_H__
 
 #define I9300_MODEM_IMAGE_SIZE                               0x1000000
 #define I9300_PSI_OFFSET                                     0x1000
@@ -34,15 +34,15 @@
 
 #define I9300_MODEM_IMAGE_DEVICE             "/dev/block/mmcblk0p7"
 
-struct i9300_ipc_transport_data {
+struct i9300_transport_data {
     int fd;
 };
 
-extern struct ipc_ops i9300_ipc_fmt_ops;
-extern struct ipc_ops i9300_ipc_rfs_ops;
-extern struct ipc_handlers i9300_ipc_handlers;
-extern struct ipc_gprs_specs i9300_ipc_gprs_specs;
-extern struct ipc_nv_data_specs i9300_ipc_nv_data_specs;
+extern struct ipc_client_ops i9300_fmt_ops;
+extern struct ipc_client_ops i9300_rfs_ops;
+extern struct ipc_client_handlers i9300_handlers;
+extern struct ipc_client_gprs_specs i9300_gprs_specs;
+extern struct ipc_client_nv_data_specs i9300_nv_data_specs;
 
 #endif
 

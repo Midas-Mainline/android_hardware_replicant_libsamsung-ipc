@@ -2,6 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2010-2011 Joerie de Gram <j.de.gram@gmail.com>
+ * Copyright (C) 2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,9 +67,9 @@
  * Macros
  */
 
-#define IPC_COMMAND(f)                          ((f->group << 8) | f->index)
-#define IPC_GROUP(m)                            (m >> 8)
-#define IPC_INDEX(m)                            (m & 0xff)
+#define IPC_COMMAND(group, index)               ((group << 8) | index)
+#define IPC_GROUP(command)                      (command >> 8)
+#define IPC_INDEX(command)                      (command & 0xff)
 
 /*
  * Structures

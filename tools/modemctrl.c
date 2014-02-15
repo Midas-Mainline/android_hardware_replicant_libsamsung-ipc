@@ -62,25 +62,25 @@ int seq_get(void)
 void modem_snd_no_mic_mute(struct ipc_client *client)
 {
     uint8_t data = 0;
-    ipc_client_send(client, IPC_SND_MIC_MUTE_CTRL, IPC_TYPE_SET, (void *) &data, 1, seq_get());
+    ipc_client_send(client, seq_get(), IPC_SND_MIC_MUTE_CTRL, IPC_TYPE_SET, (void *) &data, 1);
 }
 
 void modem_snd_clock_ctrl(struct ipc_client *client)
 {
     uint8_t data = 0x01;
-    ipc_client_send(client, IPC_SND_CLOCK_CTRL, IPC_TYPE_EXEC, (void *) &data, 1, seq_get());
+    ipc_client_send(client, seq_get(), IPC_SND_CLOCK_CTRL, IPC_TYPE_EXEC, (void *) &data, 1);
 }
 
 void modem_snd_spkr_volume_ctrl(struct ipc_client *client)
 {
     uint16_t data = 0x0411;
-    ipc_client_send(client, IPC_SND_SPKR_VOLUME_CTRL, IPC_TYPE_SET, (void *) &data, 2, seq_get());
+    ipc_client_send(client, seq_get(), IPC_SND_SPKR_VOLUME_CTRL, IPC_TYPE_SET, (void *) &data, 2);
 }
 
 void modem_snd_audio_path_ctrl(struct ipc_client *client)
 {
     uint8_t data = 0x01;
-    ipc_client_send(client, IPC_SND_AUDIO_PATH_CTRL, IPC_TYPE_SET, (void *) &data, 1, seq_get());
+    ipc_client_send(client, seq_get(), IPC_SND_AUDIO_PATH_CTRL, IPC_TYPE_SET, (void *) &data, 1);
 }
 
 
@@ -99,7 +99,7 @@ void modem_exec_call_out(struct ipc_client *client, char *num)
     call_out.prefix=IPC_CALL_PREFIX_NONE; //0x21;//IPC_CALL_PREFIX_NONE;
     memcpy(call_out.number, num, call_out.number_length);
 
-    ipc_client_send(client, IPC_CALL_OUTGOING, IPC_TYPE_EXEC, (void *) &call_out, sizeof(struct ipc_call_outgoing_data), seq_get());
+    ipc_client_send(client, seq_get(), IPC_CALL_OUTGOING, IPC_TYPE_EXEC, (void *) &call_out, sizeof(struct ipc_call_outgoing_data));
 
     out_call = 1;
 
@@ -112,14 +112,14 @@ void modem_exec_call_answer(struct ipc_client *client)
 {
     modem_snd_clock_ctrl(client);
 
-    ipc_client_send(client, IPC_CALL_ANSWER, IPC_TYPE_EXEC, NULL, 0, seq_get());
+    ipc_client_send(client, seq_get(), IPC_CALL_ANSWER, IPC_TYPE_EXEC, NULL, 0);
 
     modem_snd_no_mic_mute(client);
 }
 
 void modem_get_call_list(struct ipc_client *client)
 {
-    ipc_client_send(client, IPC_CALL_LIST, IPC_TYPE_GET, NULL, 0, seq_get());
+    ipc_client_send(client, seq_get(), IPC_CALL_LIST, IPC_TYPE_GET, NULL, 0);
 
     modem_snd_no_mic_mute(client);
 }
@@ -127,12 +127,12 @@ void modem_get_call_list(struct ipc_client *client)
 void modem_exec_power_normal(struct ipc_client *client)
 {
     uint16_t data = 0x0202;
-    ipc_client_send(client, IPC_PWR_PHONE_STATE, IPC_TYPE_EXEC, (void *) &data, sizeof(data), seq_get());
+    ipc_client_send(client, seq_get(), IPC_PWR_PHONE_STATE, IPC_TYPE_EXEC, (void *) &data, sizeof(data));
 }
 
 void modem_set_sms_device_ready(struct ipc_client *client)
 {
-    ipc_client_send(client, IPC_SMS_DEVICE_READY, IPC_TYPE_SET, NULL, 0, seq_get());
+    ipc_client_send(client, seq_get(), IPC_SMS_DEVICE_READY, IPC_TYPE_SET, NULL, 0);
 }
 
 void modem_set_sec_pin_status(struct ipc_client *client, char *pin1, char *pin2)
@@ -142,17 +142,17 @@ void modem_set_sec_pin_status(struct ipc_client *client, char *pin1, char *pin2)
     printf("[I] Sending PIN1 unlock request\n");
 
     ipc_sec_pin_status_setup(&pin_status, IPC_SEC_PIN_TYPE_PIN1, pin1, pin2);
-    ipc_client_send(client, IPC_SEC_PIN_STATUS, IPC_TYPE_SET, (void *) &pin_status, sizeof(pin_status), seq_get());
+    ipc_client_send(client, seq_get(), IPC_SEC_PIN_STATUS, IPC_TYPE_SET, (void *) &pin_status, sizeof(pin_status));
 }
 
-void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp)
+void modem_response_sec(struct ipc_client *client, struct ipc_message *resp)
 {
     struct ipc_sec_pin_status_response_data *sim_status;
     unsigned char type;
     int status;
     char *data;
 
-    switch(IPC_COMMAND(resp))
+    switch(resp->command)
     {
         case IPC_SEC_PIN_STATUS :
             sim_status = (struct ipc_sec_pin_status_response_data *)resp->data;
@@ -208,9 +208,9 @@ void modem_response_sec(struct ipc_client *client, struct ipc_message_info *resp
     }
 }
 
-void modem_response_sms(struct ipc_client *client, struct ipc_message_info *resp)
+void modem_response_sms(struct ipc_client *client, struct ipc_message *resp)
 {
-    switch(IPC_COMMAND(resp))
+    switch(resp->command)
     {
         case IPC_SMS_DEVICE_READY:
             if(state ==  MODEM_STATE_LPM)
@@ -227,11 +227,11 @@ void modem_response_sms(struct ipc_client *client, struct ipc_message_info *resp
     }
 }
 
-void modem_response_call(struct ipc_client *client, struct ipc_message_info *resp)
+void modem_response_call(struct ipc_client *client, struct ipc_message *resp)
 {
     struct ipc_call_status_data *stat;
 
-    switch(IPC_COMMAND(resp))
+    switch(resp->command)
     {
         case IPC_CALL_LIST:
 /*
@@ -276,11 +276,11 @@ void modem_response_call(struct ipc_client *client, struct ipc_message_info *res
     }
 }
 
-void modem_response_pwr(struct ipc_client *client, struct ipc_message_info *resp)
+void modem_response_pwr(struct ipc_client *client, struct ipc_message *resp)
 {
     int state_n;
 
-    switch(IPC_COMMAND(resp))
+    switch(resp->command)
     {
         case IPC_PWR_PHONE_PWR_UP:
             printf("[2] Phone is powered up (LPM)!\n");
@@ -307,13 +307,13 @@ void modem_response_pwr(struct ipc_client *client, struct ipc_message_info *resp
     }
 }
 
-void modem_response_net(struct ipc_client *client, struct ipc_message_info *resp)
+void modem_response_net(struct ipc_client *client, struct ipc_message *resp)
 {
     struct ipc_net_regist_response_data *regi;
     struct ipc_net_plmn_entry *plmn;
     char mnc[6];
 
-    switch(IPC_COMMAND(resp))
+    switch(resp->command)
     {
         case IPC_NET_REGIST:
             regi = (struct ipc_net_regist_response_data *) resp->data;
@@ -325,7 +325,7 @@ void modem_response_net(struct ipc_client *client, struct ipc_message_info *resp
         break;
         case IPC_NET_SERVING_NETWORK:
 
-            memcpy(mnc, (char *)(resp->data + 3), 5);
+            memcpy(mnc, (char *)((char *) resp->data + 3), 5);
             mnc[5]=0;
             printf("[6] Registered with network! Got PLMN (Mobile Network Code): '%s'\n", mnc);
 /*
@@ -340,9 +340,9 @@ void modem_response_net(struct ipc_client *client, struct ipc_message_info *resp
     }
 }
 
-void modem_response_handle(struct ipc_client *client, struct ipc_message_info *resp)
+void modem_response_handle(struct ipc_client *client, struct ipc_message *resp)
 {
-    switch(resp->group)
+    switch(IPC_GROUP(resp->command))
     {
         case IPC_GROUP_NET:
             modem_response_net(client, resp);
@@ -369,7 +369,7 @@ void modem_response_handle(struct ipc_client *client, struct ipc_message_info *r
 
 int modem_read_loop(struct ipc_client *client)
 {
-    struct ipc_message_info resp;
+    struct ipc_message resp;
     int rc;
 
     memset(&resp, 0, sizeof(resp));
@@ -431,7 +431,7 @@ int modem_start(struct ipc_client *client)
     int rc = -1;
 
     ipc_client_data_create(client);
-    ipc_client_bootstrap(client);
+    ipc_client_boot(client);
 
     usleep(300);
 
@@ -458,8 +458,8 @@ void print_help()
 {
     printf("usage: modemctrl <command>\n");
     printf("commands:\n");
-    printf("\tstart                 bootstrap modem and start read loop\n");
-    printf("\tbootstrap             bootstrap modem only\n");
+    printf("\tstart                 boot modem and start read loop\n");
+    printf("\tboot                  boot modem only\n");
     printf("\tpower-on              power on the modem\n");
     printf("\tpower-off             power off the modem\n");
     printf("arguments:\n");
@@ -523,8 +523,8 @@ int main(int argc, char *argv[])
     }
 
     if (debug == 0)
-        ipc_client_set_log_callback(client_fmt, modem_log_handler_quiet, NULL);
-    else ipc_client_set_log_callback(client_fmt, modem_log_handler, NULL);
+        ipc_client_log_callback_register(client_fmt, modem_log_handler_quiet, NULL);
+    else ipc_client_log_callback_register(client_fmt, modem_log_handler, NULL);
 
     while(opt_i < argc) {
         if(strncmp(argv[optind], "power-on", 8) == 0) {
@@ -535,8 +535,8 @@ int main(int argc, char *argv[])
             if (ipc_client_power_off(client_fmt) < 0)
                 printf("[E] Something went wrong while powering modem off\n");
             goto modem_quit;
-        } else if (strncmp(argv[optind], "bootstrap", 9) == 0) {
-            ipc_client_bootstrap(client_fmt);
+        } else if (strncmp(argv[optind], "boot", 9) == 0) {
+            ipc_client_boot(client_fmt);
         } else if(strncmp(argv[optind], "start", 5) == 0) {
             printf("[0] Starting modem on FMT client\n");
             rc = modem_start(client_fmt);

@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,18 +23,18 @@
 
 #include "xmm6260.h"
 
-unsigned char xmm6260_crc_calculate(void *buffer, int length)
+unsigned char xmm6260_crc_calculate(const void *data, size_t size)
 {
     unsigned char crc;
     unsigned char *p;
 
-    if (buffer == NULL || length <= 0)
+    if (data == NULL || size == 0)
         return 0;
 
-    p = (unsigned char *) buffer;
+    p = (unsigned char *) data;
 
     crc = 0;
-    while (length--)
+    while (size--)
         crc ^= *p++;
 
     return crc;

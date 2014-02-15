@@ -2,7 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2012 Alexander Tarasikov <alexander.tarasikov@gmail.com>
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * Based on the incomplete C++ implementation which is:
  * Copyright (C) 2012 Sergey Gridasov <grindars@gmail.com>
@@ -33,12 +33,12 @@
 #include "xmm6260.h"
 #include "xmm6260_mipi.h"
 
-int xmm6260_mipi_crc_calculate(void *buffer, int length)
+int xmm6260_mipi_crc_calculate(const void *data, size_t size)
 {
     unsigned char crc;
     int mipi_crc;
 
-    crc = xmm6260_crc_calculate(buffer, length);
+    crc = xmm6260_crc_calculate(data, size);
     mipi_crc = (crc << 24) | 0xffffff;
 
     return mipi_crc;
@@ -48,7 +48,6 @@ int xmm6260_mipi_ack_read(int device_fd, unsigned short ack)
 {
     struct timeval timeout;
     fd_set fds;
-
     unsigned int value;
     int rc;
     int i;
@@ -77,18 +76,16 @@ int xmm6260_mipi_ack_read(int device_fd, unsigned short ack)
 }
 
 int xmm6260_mipi_psi_send(struct ipc_client *client, int device_fd,
-    void *psi_data, unsigned short psi_size)
+    const void *psi_data, unsigned short psi_size)
 {
     struct xmm6260_mipi_psi_header psi_header;
     char at[] = XMM6260_AT;
     int psi_crc;
-
     struct timeval timeout;
     fd_set fds;
-    int wc;
-
+    size_t wc;
+    size_t length;
     unsigned char *p;
-    int length;
     int rc;
     int i;
 
@@ -107,7 +104,7 @@ int xmm6260_mipi_psi_send(struct ipc_client *client, int device_fd,
         timeout.tv_usec = 100000;
 
         rc = write(device_fd, at, length);
-        if (rc < length) {
+        if (rc < (int) length) {
             ipc_client_log(client, "Writing ATAT in ASCII failed");
             goto error;
         }
@@ -147,7 +144,7 @@ int xmm6260_mipi_psi_send(struct ipc_client *client, int device_fd,
     wc = 0;
     while (wc < psi_size) {
         rc = write(device_fd, (void *) p, psi_size - wc);
-        if (rc < 0) {
+        if (rc <= 0) {
             ipc_client_log(client, "Writing PSI failed");
             goto error;
         }
@@ -184,20 +181,19 @@ complete:
 }
 
 int xmm6260_mipi_ebl_send(struct ipc_client *client, int device_fd,
-    void *ebl_data, int ebl_size)
+    const void *ebl_data, size_t ebl_size)
 {
     unsigned short boot_magic[4];
     unsigned char ebl_crc;
-
-    int chunk;
-    int count;
-    int wc;
-
+    size_t chunk;
+    size_t count;
+    size_t wc;
+    size_t size;
+    size_t length;
     unsigned char *p;
-    int length;
     int rc;
 
-    if (client == NULL || device_fd < 0 || ebl_data == NULL || ebl_size <= 0)
+    if (client == NULL || device_fd < 0 || ebl_data == NULL || ebl_size == 0)
         return -1;
 
     boot_magic[0] = 0;
@@ -214,7 +210,7 @@ int xmm6260_mipi_ebl_send(struct ipc_client *client, int device_fd,
     }
 
     rc = write(device_fd, &boot_magic, length);
-    if (rc < length) {
+    if (rc < (int) length) {
         ipc_client_log(client, "Writing boot magic failed");
         goto error;
     }
@@ -226,16 +222,16 @@ int xmm6260_mipi_ebl_send(struct ipc_client *client, int device_fd,
         goto error;
     }
 
-    length = sizeof(ebl_size);
+    size = sizeof(ebl_size);
 
-    rc = write(device_fd, &length, sizeof(length));
-    if (rc < (int) sizeof(length)) {
+    rc = write(device_fd, &size, sizeof(size));
+    if (rc < (int) sizeof(size)) {
         ipc_client_log(client, "Writing EBL size length failed");
         goto error;
     }
 
-    rc = write(device_fd, &ebl_size, length);
-    if (rc < length) {
+    rc = write(device_fd, &ebl_size, size);
+    if (rc < (int) size) {
         ipc_client_log(client, "Writing EBL size failed");
         goto error;
     }
@@ -249,8 +245,8 @@ int xmm6260_mipi_ebl_send(struct ipc_client *client, int device_fd,
 
     ebl_size++;
 
-    rc = write(device_fd, &ebl_size, length);
-    if (rc < length) {
+    rc = write(device_fd, &ebl_size, size);
+    if (rc < (int) size) {
         ipc_client_log(client, "Writing EBL size failed");
         goto error;
     }
@@ -265,7 +261,7 @@ int xmm6260_mipi_ebl_send(struct ipc_client *client, int device_fd,
         count = chunk < ebl_size - wc ? chunk : ebl_size - wc;
 
         rc = write(device_fd, (void *) p, count);
-        if (rc < 0) {
+        if (rc <= 0) {
             ipc_client_log(client, "Writing EBL failed");
             goto error;
         }
@@ -302,19 +298,17 @@ complete:
 }
 
 int xmm6260_mipi_command_send(int device_fd, unsigned short code,
-    void *data, int size, int ack, int short_footer)
+    const void *data, size_t size, int ack, int short_footer)
 {
     struct xmm6260_mipi_command_header header;
     struct xmm6260_mipi_command_footer footer;
-    int footer_size;
     void *buffer = NULL;
-    int length;
-
+    size_t length;
+    size_t footer_length;
     struct timeval timeout;
     fd_set fds;
-    int chunk;
-    int c;
-
+    size_t chunk;
+    size_t c;
     unsigned char *p;
     int rc;
     int i;
@@ -333,25 +327,25 @@ int xmm6260_mipi_command_send(int device_fd, unsigned short code,
 
     p = (unsigned char *) data;
 
-    for (i = 0; i < size; i++)
+    for (i = 0; i < (int) size; i++)
         footer.checksum += *p++;
 
-    footer_size = sizeof(footer);
+    footer_length = sizeof(footer);
     if (short_footer)
-        footer_size -= sizeof(short);
+        footer_length -= sizeof(short);
 
-    length = sizeof(header) + size + footer_size;
-    buffer = malloc(length);
+    length = sizeof(header) + size + footer_length;
+    buffer = calloc(1, length);
 
     p = (unsigned char *) buffer;
     memcpy(p, &header, sizeof(header));
     p += sizeof(header);
     memcpy(p, data, size);
     p += size;
-    memcpy(p, &footer, footer_size);
+    memcpy(p, &footer, footer_length);
 
     rc = write(device_fd, buffer, length);
-    if (rc < length)
+    if (rc < (int) length)
         goto error;
 
     free(buffer);
@@ -383,7 +377,7 @@ int xmm6260_mipi_command_send(int device_fd, unsigned short code,
     if (length < (int) sizeof(buffer))
         goto error;
 
-    buffer = malloc(length);
+    buffer = calloc(1, length);
 
     p = (unsigned char *) buffer;
     memcpy(p, &length, sizeof(length));
@@ -397,7 +391,7 @@ int xmm6260_mipi_command_send(int device_fd, unsigned short code,
             goto error;
 
         rc = read(device_fd, (void *) p, chunk);
-        if (rc < chunk)
+        if (rc < (int) chunk)
             goto error;
 
         p += rc;
@@ -421,16 +415,16 @@ complete:
     return rc;
 }
 
-int xmm6260_mipi_modem_data_send(int device_fd, void *data, int size, int address)
+int xmm6260_mipi_modem_data_send(int device_fd, const void *data, size_t size,
+    int address)
 {
-    int chunk;
-    int count;
-    int c;
-
+    size_t chunk;
+    size_t count;
+    size_t c;
     unsigned char *p;
     int rc;
 
-    if (device_fd < 0 || data == NULL || size <= 0)
+    if (device_fd < 0 || data == NULL || size == 0)
         return -1;
 
     rc = xmm6260_mipi_command_send(device_fd, XMM6260_COMMAND_FLASH_SET_ADDRESS, &address, sizeof(address), 1, 0);
@@ -465,14 +459,12 @@ complete:
 int xmm6260_mipi_port_config_send(struct ipc_client *client, int device_fd)
 {
     void *buffer = NULL;
-    int length;
-
+    size_t length;
     struct timeval timeout;
     fd_set fds;
-    int chunk;
-    int count;
-    int c;
-
+    size_t chunk;
+    size_t count;
+    size_t c;
     unsigned char *p;
     int rc;
 
@@ -490,13 +482,13 @@ int xmm6260_mipi_port_config_send(struct ipc_client *client, int device_fd)
         goto error;
 
     rc = read(device_fd, &length, sizeof(length));
-    if (rc < (int) sizeof(length) || length <= 0) {
+    if (rc < (int) sizeof(length) || length == 0) {
         ipc_client_log(client, "Reading port config length failed");
         goto error;
     }
     ipc_client_log(client, "Read port config length (0x%x)", length);
 
-    buffer = malloc(length);
+    buffer = calloc(1, length);
 
     p = (unsigned char *) buffer;
 
@@ -510,7 +502,7 @@ int xmm6260_mipi_port_config_send(struct ipc_client *client, int device_fd)
             goto error;
 
         rc = read(device_fd, p, count);
-        if (rc < count) {
+        if (rc < (int) count) {
             ipc_client_log(client, "Reading port config failed");
             goto error;
         }
@@ -540,11 +532,11 @@ complete:
 }
 
 int xmm6260_mipi_sec_start_send(struct ipc_client *client, int device_fd,
-    void *sec_data, int sec_size)
+    const void *sec_data, size_t sec_size)
 {
     int rc;
 
-    if (client == NULL || device_fd < 0 || sec_data == NULL || sec_size <= 0)
+    if (client == NULL || device_fd < 0 || sec_data == NULL || sec_size == 0)
         return -1;
 
     rc = xmm6260_mipi_command_send(device_fd, XMM6260_COMMAND_SEC_START, sec_data, sec_size, 1, 0);
@@ -557,7 +549,7 @@ int xmm6260_mipi_sec_start_send(struct ipc_client *client, int device_fd,
 int xmm6260_mipi_sec_end_send(struct ipc_client *client, int device_fd)
 {
     unsigned short sec_data;
-    int sec_size;
+    size_t sec_size;
     int rc;
 
     if (client == NULL || device_fd < 0)
@@ -574,11 +566,11 @@ int xmm6260_mipi_sec_end_send(struct ipc_client *client, int device_fd)
 }
 
 int xmm6260_mipi_firmware_send(struct ipc_client *client, int device_fd,
-    void *firmware_data, int firmware_size)
+    const void *firmware_data, size_t firmware_size)
 {
     int rc;
 
-    if (client == NULL || device_fd < 0 || firmware_data == NULL || firmware_size <= 0)
+    if (client == NULL || device_fd < 0 || firmware_data == NULL || firmware_size == 0)
         return -1;
 
     rc = xmm6260_mipi_modem_data_send(device_fd, firmware_data, firmware_size, XMM6260_FIRMWARE_ADDRESS);
@@ -591,13 +583,15 @@ int xmm6260_mipi_firmware_send(struct ipc_client *client, int device_fd,
 int xmm6260_mipi_nv_data_send(struct ipc_client *client, int device_fd)
 {
     void *nv_data = NULL;
-    int nv_size;
+    size_t nv_size;
     int rc;
 
     if (client == NULL || device_fd < 0)
         return -1;
 
     nv_size = ipc_client_nv_data_size(client);
+    if (nv_size == 0)
+        return -1;
 
     nv_data = ipc_nv_data_load(client);
     if (nv_data == NULL) {
@@ -624,11 +618,11 @@ complete:
 }
 
 int xmm6260_mipi_mps_data_send(struct ipc_client *client, int device_fd,
-    void *mps_data, int mps_size)
+    const void *mps_data, size_t mps_size)
 {
     int rc;
 
-    if (client == NULL || device_fd < 0 || mps_data == NULL || mps_size <= 0)
+    if (client == NULL || device_fd < 0 || mps_data == NULL || mps_size == 0)
         return -1;
 
     rc = xmm6260_mipi_modem_data_send(device_fd, mps_data, mps_size, XMM6260_MPS_DATA_ADDRESS);
@@ -641,7 +635,7 @@ int xmm6260_mipi_mps_data_send(struct ipc_client *client, int device_fd,
 int xmm6260_mipi_hw_reset_send(struct ipc_client *client, int device_fd)
 {
     unsigned int hw_reset_data;
-    int hw_reset_size;
+    size_t hw_reset_size;
     int rc;
 
     if (client == NULL || device_fd < 0)

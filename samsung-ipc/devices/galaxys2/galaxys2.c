@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,22 +29,21 @@
 #include "xmm6260.h"
 #include "xmm6260_hsic.h"
 #include "xmm6260_sec_modem.h"
-#include "galaxys2_ipc.h"
+#include "galaxys2.h"
 
-int galaxys2_ipc_bootstrap(struct ipc_client *client)
+int galaxys2_boot(struct ipc_client *client)
 {
     void *modem_image_data = NULL;
     int modem_image_fd = -1;
     int modem_boot_fd = -1;
     int modem_link_fd = -1;
-
     unsigned char *p;
     int rc;
 
     if (client == NULL)
         return -1;
 
-    ipc_client_log(client, "Starting galaxys2 modem bootstrap");
+    ipc_client_log(client, "Starting galaxys2 modem boot");
 
     modem_image_fd = open(GALAXYS2_MODEM_IMAGE_DEVICE, O_RDONLY);
     if (modem_image_fd < 0) {
@@ -230,106 +229,88 @@ complete:
     return rc;
 }
 
-
-int galaxys2_ipc_fmt_send(struct ipc_client *client, struct ipc_message_info *request)
+int galaxys2_open(void *data, int type)
 {
-    return xmm6260_sec_modem_ipc_fmt_send(client, request);
-}
-
-int galaxys2_ipc_fmt_recv(struct ipc_client *client, struct ipc_message_info *response)
-{
-    return xmm6260_sec_modem_ipc_fmt_recv(client, response);
-}
-
-int galaxys2_ipc_rfs_send(struct ipc_client *client, struct ipc_message_info *request)
-{
-    return xmm6260_sec_modem_ipc_rfs_send(client, request);
-}
-
-int galaxys2_ipc_rfs_recv(struct ipc_client *client, struct ipc_message_info *response)
-{
-    return xmm6260_sec_modem_ipc_rfs_recv(client, response);
-}
-
-int galaxys2_ipc_open(void *data, int type)
-{
-    struct galaxys2_ipc_transport_data *transport_data;
+    struct galaxys2_transport_data *transport_data;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct galaxys2_ipc_transport_data *) data;
+    transport_data = (struct galaxys2_transport_data *) data;
 
-    transport_data->fd = xmm6260_sec_modem_ipc_open(type);
+    transport_data->fd = xmm6260_sec_modem_open(type);
     if (transport_data->fd < 0)
         return -1;
 
     return 0;
 }
 
-int galaxys2_ipc_close(void *data)
+int galaxys2_close(void *data)
 {
-    struct galaxys2_ipc_transport_data *transport_data;
+    struct galaxys2_transport_data *transport_data;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct galaxys2_ipc_transport_data *) data;
+    transport_data = (struct galaxys2_transport_data *) data;
 
-    xmm6260_sec_modem_ipc_close(transport_data->fd);
+    xmm6260_sec_modem_close(transport_data->fd);
     transport_data->fd = -1;
 
     return 0;
 }
 
-int galaxys2_ipc_read(void *data, void *buffer, unsigned int length)
+int galaxys2_read(void *data, void *buffer, size_t length)
 {
-    struct galaxys2_ipc_transport_data *transport_data;
+    struct galaxys2_transport_data *transport_data;
     int rc;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct galaxys2_ipc_transport_data *) data;
+    transport_data = (struct galaxys2_transport_data *) data;
 
-    rc = xmm6260_sec_modem_ipc_read(transport_data->fd, buffer, length);
+    rc = xmm6260_sec_modem_read(transport_data->fd, buffer, length);
+
     return rc;
 }
 
-int galaxys2_ipc_write(void *data, void *buffer, unsigned int length)
+int galaxys2_write(void *data, const void *buffer, size_t length)
 {
-    struct galaxys2_ipc_transport_data *transport_data;
+    struct galaxys2_transport_data *transport_data;
     int rc;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct galaxys2_ipc_transport_data *) data;
+    transport_data = (struct galaxys2_transport_data *) data;
 
-    rc = xmm6260_sec_modem_ipc_write(transport_data->fd, buffer, length);
+    rc = xmm6260_sec_modem_write(transport_data->fd, buffer, length);
+
     return rc;
 }
 
-int galaxys2_ipc_poll(void *data, struct timeval *timeout)
+int galaxys2_poll(void *data, struct timeval *timeout)
 {
-    struct galaxys2_ipc_transport_data *transport_data;
+    struct galaxys2_transport_data *transport_data;
     int rc;
 
     if (data == NULL)
         return -1;
 
-    transport_data = (struct galaxys2_ipc_transport_data *) data;
+    transport_data = (struct galaxys2_transport_data *) data;
 
-    rc = xmm6260_sec_modem_ipc_poll(transport_data->fd, timeout);
+    rc = xmm6260_sec_modem_poll(transport_data->fd, timeout);
+
     return rc;
 }
 
-int galaxys2_ipc_power_on(void *data)
+int galaxys2_power_on(void *data)
 {
     return 0;
 }
 
-int galaxys2_ipc_power_off(void *data)
+int galaxys2_power_off(void *data)
 {
     int fd;
     int rc;
@@ -348,18 +329,19 @@ int galaxys2_ipc_power_off(void *data)
     return 0;
 }
 
-int galaxys2_ipc_data_create(void **transport_data, void **power_data, void **gprs_data)
+int galaxys2_data_create(void **transport_data, void **power_data,
+    void **gprs_data)
 {
     if (transport_data == NULL)
         return -1;
 
-    *transport_data = (void *) malloc(sizeof(struct galaxys2_ipc_transport_data));
-    memset(*transport_data, 0, sizeof(struct galaxys2_ipc_transport_data));
+    *transport_data = calloc(1, sizeof(struct galaxys2_transport_data));
 
     return 0;
 }
 
-int galaxys2_ipc_data_destroy(void *transport_data, void *power_data, void *gprs_data)
+int galaxys2_data_destroy(void *transport_data, void *power_data,
+    void *gprs_data)
 {
     if (transport_data == NULL)
         return -1;
@@ -369,52 +351,41 @@ int galaxys2_ipc_data_destroy(void *transport_data, void *power_data, void *gprs
     return 0;
 }
 
-char *galaxys2_ipc_gprs_get_iface(int cid)
-{
-    return xmm6260_sec_modem_ipc_gprs_get_iface(cid);
-}
-
-
-int galaxys2_ipc_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
-{
-    return xmm6260_sec_modem_ipc_gprs_get_capabilities(capabilities);
-}
-
-struct ipc_ops galaxys2_ipc_fmt_ops = {
-    .bootstrap = galaxys2_ipc_bootstrap,
-    .send = galaxys2_ipc_fmt_send,
-    .recv = galaxys2_ipc_fmt_recv,
+struct ipc_client_ops galaxys2_fmt_ops = {
+    .boot = galaxys2_boot,
+    .send = xmm6260_sec_modem_fmt_send,
+    .recv = xmm6260_sec_modem_fmt_recv,
 };
 
-struct ipc_ops galaxys2_ipc_rfs_ops = {
-    .bootstrap = NULL,
-    .send = galaxys2_ipc_rfs_send,
-    .recv = galaxys2_ipc_rfs_recv,
+struct ipc_client_ops galaxys2_rfs_ops = {
+    .boot = NULL,
+    .send = xmm6260_sec_modem_rfs_send,
+    .recv = xmm6260_sec_modem_rfs_recv,
 };
 
-struct ipc_handlers galaxys2_ipc_handlers = {
-    .read = galaxys2_ipc_read,
-    .write = galaxys2_ipc_write,
-    .open = galaxys2_ipc_open,
-    .close = galaxys2_ipc_close,
-    .poll = galaxys2_ipc_poll,
+struct ipc_client_handlers galaxys2_handlers = {
+    .read = galaxys2_read,
+    .write = galaxys2_write,
+    .open = galaxys2_open,
+    .close = galaxys2_close,
+    .poll = galaxys2_poll,
     .transport_data = NULL,
-    .power_on = galaxys2_ipc_power_on,
-    .power_off = galaxys2_ipc_power_off,
+    .power_on = galaxys2_power_on,
+    .power_off = galaxys2_power_off,
     .power_data = NULL,
     .gprs_activate = NULL,
     .gprs_deactivate = NULL,
     .gprs_data = NULL,
-    .data_create = galaxys2_ipc_data_create,
-    .data_destroy = galaxys2_ipc_data_destroy,
+    .data_create = galaxys2_data_create,
+    .data_destroy = galaxys2_data_destroy,
 };
 
-struct ipc_gprs_specs galaxys2_ipc_gprs_specs = {
-    .gprs_get_iface = galaxys2_ipc_gprs_get_iface,
-    .gprs_get_capabilities = galaxys2_ipc_gprs_get_capabilities,
+struct ipc_client_gprs_specs galaxys2_gprs_specs = {
+    .gprs_get_iface = xmm6260_sec_modem_gprs_get_iface,
+    .gprs_get_capabilities = xmm6260_sec_modem_gprs_get_capabilities,
 };
 
-struct ipc_nv_data_specs galaxys2_ipc_nv_data_specs = {
+struct ipc_client_nv_data_specs galaxys2_nv_data_specs = {
     .nv_data_path = XMM6260_NV_DATA_PATH,
     .nv_data_md5_path = XMM6260_NV_DATA_MD5_PATH,
     .nv_data_backup_path = XMM6260_NV_DATA_BACKUP_PATH,

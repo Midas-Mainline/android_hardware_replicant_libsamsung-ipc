@@ -2,6 +2,7 @@
  * This file is part of libsamsung-ipc.
  *
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
+ * Copyright (C) 2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,19 +30,19 @@
  * Structures
  */
 
-struct ipc_ops {
-    int (*bootstrap)(struct ipc_client *client);
-    int (*send)(struct ipc_client *client, struct ipc_message_info *);
-    int (*recv)(struct ipc_client *client, struct ipc_message_info *);
+struct ipc_client_ops {
+    int (*boot)(struct ipc_client *client);
+    int (*send)(struct ipc_client *client, struct ipc_message *message);
+    int (*recv)(struct ipc_client *client, struct ipc_message *message);
 };
 
-struct ipc_handlers {
+struct ipc_client_handlers {
     /* Transport handlers */
     int (*open)(void *transport_data, int type);
     int (*close)(void *transport_data);
 
-    int (*read)(void *transport_data, void *buffer, unsigned int length);
-    int (*write)(void *transport_data, void *buffer, unsigned int length);
+    int (*read)(void *transport_data, void *buffer, size_t length);
+    int (*write)(void *transport_data, const void *buffer, size_t length);
     int (*poll)(void *transport_data, struct timeval *timeout);
 
     void *transport_data;
@@ -63,12 +64,12 @@ struct ipc_handlers {
     int (*data_destroy)(void *transport_data, void *power_data, void *gprs_data);
 };
 
-struct ipc_gprs_specs {
+struct ipc_client_gprs_specs {
     char *(*gprs_get_iface)(int cid);
     int (*gprs_get_capabilities)(struct ipc_client_gprs_capabilities *capabilities);
 };
 
-struct ipc_nv_data_specs {
+struct ipc_client_nv_data_specs {
     char *nv_data_path;
     char *nv_data_md5_path;
     char *nv_data_backup_path;
@@ -84,10 +85,10 @@ struct ipc_client {
     void (*log_callback)(void *log_data, const char *message);
     void *log_data;
 
-    struct ipc_ops *ops;
-    struct ipc_handlers *handlers;
-    struct ipc_gprs_specs *gprs_specs;
-    struct ipc_nv_data_specs *nv_data_specs;
+    struct ipc_client_ops *ops;
+    struct ipc_client_handlers *handlers;
+    struct ipc_client_gprs_specs *gprs_specs;
+    struct ipc_client_nv_data_specs *nv_data_specs;
 };
 
 /*

@@ -1,7 +1,7 @@
 /*
  * This file is part of libsamsung-ipc.
  *
- * Copyright (C) 2013 Paul Kocialkowski <contact@paulk.fr>
+ * Copyright (C) 2013-2014 Paul Kocialkowski <contact@paulk.fr>
  *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __MAGURO_IPC_H__
-#define __MAGURO_IPC_H__
+#ifndef __MAGURO_H__
+#define __MAGURO_H__
 
 #define MAGURO_MODEM_IMAGE_SIZE                                 0x1000000
 #define MAGURO_PSI_OFFSET                                       0
@@ -41,15 +41,15 @@
 #define MAGURO_NV_DATA_BACKUP_PATH              "/factory/.nv_data.bak"
 #define MAGURO_NV_DATA_BACKUP_MD5_PATH          "/factory/.nv_data.bak.md5"
 
-struct maguro_ipc_transport_data {
+struct maguro_transport_data {
     int fd;
 };
 
-extern struct ipc_ops maguro_ipc_fmt_ops;
-extern struct ipc_ops maguro_ipc_rfs_ops;
-extern struct ipc_handlers maguro_ipc_handlers;
-extern struct ipc_gprs_specs maguro_ipc_gprs_specs;
-extern struct ipc_nv_data_specs maguro_ipc_nv_data_specs;
+extern struct ipc_client_ops maguro_fmt_ops;
+extern struct ipc_client_ops maguro_rfs_ops;
+extern struct ipc_client_handlers maguro_handlers;
+extern struct ipc_client_gprs_specs maguro_gprs_specs;
+extern struct ipc_client_nv_data_specs maguro_nv_data_specs;
 
 #endif
 
