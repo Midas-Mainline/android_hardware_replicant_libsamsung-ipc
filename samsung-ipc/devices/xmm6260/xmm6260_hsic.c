@@ -547,28 +547,14 @@ int xmm6260_hsic_nv_data_send(struct ipc_client *client, int device_fd)
     if (client == NULL || device_fd < 0)
         return -1;
 
-    rc = nv_data_check(client);
-    if (rc < 0) {
-        ipc_client_log(client, "Checking nv_data failed");
-        goto error;
-    }
-    ipc_client_log(client, "Checked nv_data");
-
-    rc = nv_data_md5_check(client);
-    if (rc < 0) {
-        ipc_client_log(client, "Checking nv_data md5 failed");
-        goto error;
-    }
-    ipc_client_log(client, "Checked nv_data md5");
-
-    nv_data = file_data_read(ipc_client_nv_data_path(client), ipc_client_nv_data_size(client), ipc_client_nv_data_chunk_size(client), 0);
-    if (nv_data == NULL) {
-        ipc_client_log(client, "Reading nv_data failed");
-        goto error;
-    }
-    ipc_client_log(client, "Read nv_data");
-
     nv_size = ipc_client_nv_data_size(client);
+
+    nv_data = ipc_nv_data_load(client);
+    if (nv_data == NULL) {
+        ipc_client_log(client, "Loading nv_data failed");
+        goto error;
+    }
+    ipc_client_log(client, "Loaded nv_data");
 
     rc = xmm6260_hsic_modem_data_send(device_fd, nv_data, nv_size, XMM6260_NV_DATA_ADDRESS);
     if (rc < 0)

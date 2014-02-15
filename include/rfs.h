@@ -33,23 +33,23 @@
  * Structures
  */
 
-struct ipc_rfs_nv_read_item_data {
+struct ipc_rfs_nv_read_item_request_data {
     unsigned int offset;
     unsigned int length;
 } __attribute__((__packed__));
 
-struct ipc_rfs_nv_read_item_confirm_header {
+struct ipc_rfs_nv_read_item_response_header {
     unsigned char confirm;
     unsigned int offset;
     unsigned int length;
 } __attribute__((__packed__));
 
-struct ipc_rfs_nv_write_item_header {
+struct ipc_rfs_nv_write_item_request_header {
     unsigned int offset;
     unsigned int length;
 } __attribute__((__packed__));
 
-struct ipc_rfs_nv_write_item_confirm_data {
+struct ipc_rfs_nv_write_item_response_data {
     unsigned char confirm;
     unsigned int offset;
     unsigned int length;
@@ -59,21 +59,22 @@ struct ipc_rfs_nv_write_item_confirm_data {
  * Helpers
  */
 
-void md5hash2string(char *out, unsigned char *in);
-void nv_data_generate(struct ipc_client *client);
-void nv_data_md5_compute(void *data_p, int size, char *secret, void *hash);
-void nv_data_md5_generate(struct ipc_client *client);
-void nv_data_backup_create(struct ipc_client *client);
-void nv_data_backup_restore(struct ipc_client *client);
-int nv_data_check(struct ipc_client *client);
-int nv_data_md5_check(struct ipc_client *client);
-int nv_data_read(struct ipc_client *client, int offset, int length, char *buf);
-int nv_data_write(struct ipc_client *client, int offset, int length, char *buf);
-
-void ipc_rfs_send_io_confirm_for_nv_write_item(struct ipc_client *client,
-    struct ipc_message_info *info);
-void ipc_rfs_send_io_confirm_for_nv_read_item(struct ipc_client *client,
-    struct ipc_message_info *info);
+char *ipc_nv_data_md5_calculate(const char *path, const char *secret,
+    size_t size, size_t chunk_size);
+int ipc_nv_data_path_check(struct ipc_client *client);
+int ipc_nv_data_md5_path_check(struct ipc_client *client);
+int ipc_nv_data_backup_path_check(struct ipc_client *client);
+int ipc_nv_data_backup_md5_path_check(struct ipc_client *client);
+int ipc_nv_data_check(struct ipc_client *client);
+int ipc_nv_data_backup_check(struct ipc_client *client);
+int ipc_nv_data_backup(struct ipc_client *client);
+int ipc_nv_data_restore(struct ipc_client *client);
+void *ipc_nv_data_load(struct ipc_client *client);
+void *ipc_nv_data_read(struct ipc_client *client, size_t size, size_t offset);
+int ipc_nv_data_write(struct ipc_client *client, const void *data, size_t size,
+    size_t offset);
+void *ipc_rfs_nv_read_item_response_setup(const void *data, size_t size,
+    size_t offset);
 
 #endif
 
