@@ -7,11 +7,11 @@ SUBDIRS = \
 	$(NULL)
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = samsung-ipc-1.0.pc
+pkgconfig_DATA = samsung-ipc.pc
 
 EXTRA_DIST = \
 	MAINTAINERS \
-	samsung-ipc-1.0.pc \
+	samsung-ipc.pc \
 	$(NULL)
 
 MAINTAINERCLEANFILES = \

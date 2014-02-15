@@ -40,7 +40,7 @@ AM_CONDITIONAL( [WANT_DEBUG], [test x"$debug" = x"yes"])
 
 AC_CONFIG_FILES([
     Makefile
-    samsung-ipc-1.0.pc
+    samsung-ipc.pc
     include/Makefile
     samsung-ipc/Makefile
     tools/Makefile

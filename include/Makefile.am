@@ -1,6 +1,6 @@
 NULL =
 
-samsung_ipcincludedir = $(includedir)/samsung-ipc-1.0/
+samsung_ipcincludedir = $(includedir)/samsung-ipc/
 samsung_ipcinclude_HEADERS = \
 	samsung-ipc.h \
 	protocol.h \

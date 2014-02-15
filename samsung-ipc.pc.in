@@ -10,4 +10,4 @@ Description: Free software implementation of the Samsung IPC modem protocol, fou
 Version: @VERSION@
 Requires:
 Libs: -L${libdir} -lsamsung-ipc
-Cflags: -I${includedir}/samsung-ipc-1.0
+Cflags: -I${includedir}/samsung-ipc
