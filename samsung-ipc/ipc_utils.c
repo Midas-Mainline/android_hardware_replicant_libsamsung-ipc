@@ -442,7 +442,7 @@ void ipc_client_log_send(struct ipc_client *client, struct ipc_message *message,
     switch (client->type) {
         case IPC_CLIENT_TYPE_FMT:
             ipc_client_log(client, "%s: Sent FMT message", prefix);
-            ipc_client_log(client, "%s: Message: mseq=0x%02x, command=%s, type=%s, size=%d", prefix, message->mseq, ipc_command_string(message->command), ipc_response_type_string(message->type), message->size);
+            ipc_client_log(client, "%s: Message: mseq=0x%02x, command=%s, type=%s, size=%d", prefix, message->mseq, ipc_command_string(message->command), ipc_request_type_string(message->type), message->size);
 #ifdef DEBUG
             if (message->size > 0) {
                 ipc_client_log(client, "=============================== FMT data dump ================================");
