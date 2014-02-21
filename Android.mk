@@ -104,3 +104,17 @@ LOCAL_MODULE := ipc-modem
 LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_EXECUTABLE)
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := tools/ipc-test.c
+
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+
+LOCAL_STATIC_LIBRARIES := libsamsung-ipc
+LOCAL_SHARED_LIBRARIES := libutils
+
+LOCAL_MODULE := ipc-test
+LOCAL_MODULE_TAGS := optional
+
+include $(BUILD_EXECUTABLE)
