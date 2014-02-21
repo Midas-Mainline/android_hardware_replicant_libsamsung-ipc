@@ -456,7 +456,7 @@ int modem_stop(struct ipc_client *client)
 
 void print_help()
 {
-    printf("usage: modemctrl <command>\n");
+    printf("usage: ipc-modem <command>\n");
     printf("commands:\n");
     printf("\tstart                 boot modem and start read loop\n");
     printf("\tboot                  boot modem only\n");

@@ -5,9 +5,9 @@ AM_CFLAGS = \
 	$(NULL)
 
 bin_PROGRAMS = \
-	modemctrl \
+	ipc-modem \
 	$(NULL)
 
-modemctrl_SOURCES = modemctrl.c
-modemctrl_LDADD = $(top_builddir)/samsung-ipc/libsamsung-ipc.la
-modemctrl_LDFLAGS =
+ipc_modem_SOURCES = ipc-modem.c
+ipc_modem_LDADD = $(top_builddir)/samsung-ipc/libsamsung-ipc.la
+ipc_modem_LDFLAGS =
