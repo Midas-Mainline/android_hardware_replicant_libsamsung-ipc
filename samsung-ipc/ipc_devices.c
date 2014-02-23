@@ -136,6 +136,7 @@ struct ipc_device_desc ipc_devices[] = {
     },
 };
 
-int ipc_devices_count = sizeof(ipc_devices) / sizeof(struct ipc_device_desc);
+unsigned int ipc_devices_count = sizeof(ipc_devices) /
+    sizeof(struct ipc_device_desc);
 
 // vim:ts=4:sw=4:expandtab

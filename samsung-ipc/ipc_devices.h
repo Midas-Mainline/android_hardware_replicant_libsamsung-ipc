@@ -44,7 +44,7 @@ struct ipc_device_desc {
 };
 
 extern struct ipc_device_desc ipc_devices[];
-extern int ipc_devices_count;
+extern unsigned int ipc_devices_count;
 
 #endif
 

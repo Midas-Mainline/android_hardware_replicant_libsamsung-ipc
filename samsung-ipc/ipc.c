@@ -104,7 +104,7 @@ int ipc_device_detect(void)
     kernel_version = strdup(utsname.release);
 #endif
 
-    for (i = 0; i < ipc_devices_count; i++) {
+    for (i = 0; i < (int) ipc_devices_count; i++) {
         // Eliminate index if the name doesn't match
         if (name != NULL && ipc_devices[i].name != NULL && strcmp(name, ipc_devices[i].name) != 0)
             continue;
@@ -147,13 +147,18 @@ complete:
 struct ipc_client *ipc_client_create(int type)
 {
     struct ipc_client *client = NULL;
-    int device_index;
+    unsigned int device_index;
+    int rc;
 
     if (type < 0 || type > IPC_CLIENT_TYPE_RFS)
         return NULL;
 
-    device_index = ipc_device_detect();
-    if (device_index < 0 || device_index > ipc_devices_count)
+    rc = ipc_device_detect();
+    if (rc < 0)
+        goto error;
+
+    device_index = (unsigned int) rc;
+    if (device_index > ipc_devices_count)
         goto error;
 
     client = (struct ipc_client *) calloc(1, sizeof(struct ipc_client));
