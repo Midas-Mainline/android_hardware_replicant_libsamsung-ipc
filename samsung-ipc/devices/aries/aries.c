@@ -593,6 +593,7 @@ int aries_read(void *data, void *buffer, size_t length)
     spn_size = sizeof(struct sockaddr_pn);
 
     rc = recvfrom(fd, buffer, length, 0, (struct sockaddr *) &transport_data->spn, &spn_size);
+
     return rc;
 }
 
@@ -615,6 +616,7 @@ int aries_write(void *data, const void *buffer, size_t length)
     spn_size = sizeof(struct sockaddr_pn);
 
     rc = sendto(fd, buffer, length, 0, (const struct sockaddr *) &transport_data->spn, spn_size);
+
     return rc;
 }
 
@@ -638,6 +640,7 @@ int aries_poll(void *data, struct timeval *timeout)
     FD_SET(fd, &fds);
 
     rc = select(fd + 1, &fds, NULL, NULL, timeout);
+
     return rc;
 }
 
