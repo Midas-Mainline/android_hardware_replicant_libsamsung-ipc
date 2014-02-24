@@ -401,38 +401,6 @@ void ipc_hex_dump(struct ipc_client *client, const void *data, size_t size)
     }
 }
 
-void ipc_client_log_recv(struct ipc_client *client, struct ipc_message *message,
-    const char *prefix)
-{
-    if (client == NULL || message == NULL || prefix == NULL)
-        return;
-
-    switch (client->type) {
-        case IPC_CLIENT_TYPE_FMT:
-            ipc_client_log(client, "%s: Received FMT message", prefix);
-            ipc_client_log(client, "%s: Message: aseq=0x%02x, command=%s, type=%s, size=%d", prefix, message->aseq, ipc_command_string(message->command), ipc_response_type_string(message->type), message->size);
-#ifdef DEBUG
-            if (message->size > 0) {
-                ipc_client_log(client, "=============================== FMT data dump ================================");
-                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
-                ipc_client_log(client, "==============================================================================");
-            }
-#endif
-            break;
-        case IPC_CLIENT_TYPE_RFS:
-            ipc_client_log(client, "%s: Received RFS message", prefix);
-            ipc_client_log(client, "%s: Message: aseq=0x%02x, command=%s, size=%d", prefix, message->aseq, ipc_command_string(message->command), message->size);
-#ifdef DEBUG
-            if (message->size > 0) {
-                ipc_client_log(client, "=============================== RFS data dump ================================");
-                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
-                ipc_client_log(client, "==============================================================================");
-            }
-#endif
-            break;
-    }
-}
-
 void ipc_client_log_send(struct ipc_client *client, struct ipc_message *message,
     const char *prefix)
 {
@@ -454,6 +422,38 @@ void ipc_client_log_send(struct ipc_client *client, struct ipc_message *message,
         case IPC_CLIENT_TYPE_RFS:
             ipc_client_log(client, "%s: Sent RFS message", prefix);
             ipc_client_log(client, "%s: Message: mseq=0x%02x, command=%s, size=%d", prefix, message->mseq, ipc_command_string(message->command), message->size);
+#ifdef DEBUG
+            if (message->size > 0) {
+                ipc_client_log(client, "=============================== RFS data dump ================================");
+                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
+                ipc_client_log(client, "==============================================================================");
+            }
+#endif
+            break;
+    }
+}
+
+void ipc_client_log_recv(struct ipc_client *client, struct ipc_message *message,
+    const char *prefix)
+{
+    if (client == NULL || message == NULL || prefix == NULL)
+        return;
+
+    switch (client->type) {
+        case IPC_CLIENT_TYPE_FMT:
+            ipc_client_log(client, "%s: Received FMT message", prefix);
+            ipc_client_log(client, "%s: Message: aseq=0x%02x, command=%s, type=%s, size=%d", prefix, message->aseq, ipc_command_string(message->command), ipc_response_type_string(message->type), message->size);
+#ifdef DEBUG
+            if (message->size > 0) {
+                ipc_client_log(client, "=============================== FMT data dump ================================");
+                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
+                ipc_client_log(client, "==============================================================================");
+            }
+#endif
+            break;
+        case IPC_CLIENT_TYPE_RFS:
+            ipc_client_log(client, "%s: Received RFS message", prefix);
+            ipc_client_log(client, "%s: Message: aseq=0x%02x, command=%s, size=%d", prefix, message->aseq, ipc_command_string(message->command), message->size);
 #ifdef DEBUG
             if (message->size > 0) {
                 ipc_client_log(client, "=============================== RFS data dump ================================");
