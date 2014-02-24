@@ -24,7 +24,7 @@
 #define __SAMSUNG_IPC_PROTOCOL_H__
 
 /*
- * Commands
+ * Types
  */
 
 /* Requests */
