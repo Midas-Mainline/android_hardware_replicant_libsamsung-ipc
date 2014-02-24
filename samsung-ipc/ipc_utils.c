@@ -472,12 +472,12 @@ int ipc_fmt_header_setup(struct ipc_fmt_header *header,
         return -1;
 
     memset(header, 0, sizeof(struct ipc_fmt_header));
+    header->length = message->size + sizeof(struct ipc_fmt_header);
     header->mseq = message->mseq;
     header->aseq = message->aseq;
     header->group = IPC_GROUP(message->command);
     header->index = IPC_INDEX(message->command);
     header->type = message->type;
-    header->length = message->size + sizeof(struct ipc_fmt_header);
 
     return 0;
 }
@@ -506,9 +506,9 @@ int ipc_rfs_header_setup(struct ipc_rfs_header *header,
         return -1;
 
     memset(header, 0, sizeof(struct ipc_rfs_header));
+    header->length = message->size + sizeof(struct ipc_rfs_header);
     header->id = message->mseq;
     header->index = IPC_INDEX(message->command);
-    header->length = message->size + sizeof(struct ipc_rfs_header);
 
     return 0;
 }
