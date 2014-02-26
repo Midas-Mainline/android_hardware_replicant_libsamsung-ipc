@@ -577,7 +577,7 @@ void *ipc_nv_data_read(struct ipc_client *client, size_t size, size_t offset)
         return NULL;
     }
 
-    data = file_data_read(path, size, chunk_size, offset);
+    data = file_data_read(path, size, chunk_size > size ? size : chunk_size, offset);
     if (data == NULL) {
         ipc_client_log(client, "Reading nv_data failed");
         return NULL;
@@ -613,7 +613,7 @@ int ipc_nv_data_write(struct ipc_client *client, const void *data, size_t size,
         goto error;
     }
 
-    rc = file_data_write(path, data, size, chunk_size, offset);
+    rc = file_data_write(path, data, size, chunk_size > size ? size : chunk_size, offset);
     if (rc < 0) {
         ipc_client_log(client, "Writing nv_data failed");
         goto error;
