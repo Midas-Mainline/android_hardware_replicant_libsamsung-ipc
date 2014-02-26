@@ -80,7 +80,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/samsung-ipc/devices/xmm6260/ \
 	external/openssl/include
 
-LOCAL_CFLAGS += \
+LOCAL_CFLAGS := \
 	-DIPC_DEVICE_NAME=\"$(ipc_device_name)\" \
 	-DDEBUG
 
