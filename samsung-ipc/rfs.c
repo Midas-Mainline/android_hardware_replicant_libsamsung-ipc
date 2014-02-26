@@ -30,8 +30,8 @@
 
 #include <samsung-ipc.h>
 
-#include "ipc.h"
-#include "utils.h"
+#include <ipc.h>
+#include <utils.h>
 
 char *ipc_nv_data_md5_calculate(const char *path, const char *secret,
     size_t size, size_t chunk_size)

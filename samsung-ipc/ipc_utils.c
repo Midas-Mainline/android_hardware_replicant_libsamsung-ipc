@@ -30,7 +30,7 @@
 #include <asm/types.h>
 
 #include <samsung-ipc.h>
-#include "ipc.h"
+#include <ipc.h>
 
 const char *ipc_request_type_string(unsigned char type)
 {
