@@ -40,8 +40,23 @@
  * Values
  */
 
-#define IPC_PWR_PHONE_STATE_LPM                                 0x0001
-#define IPC_PWR_PHONE_STATE_NORMAL                              0x0202
+#define IPC_PWR_PHONE_STATE_REQUEST_LPM                         0x0001
+#define IPC_PWR_PHONE_STATE_REQUEST_NORMAL                      0x0202
+
+#define IPC_PWR_PHONE_STATE_RESPONSE_LPM                        0x01
+#define IPC_PWR_PHONE_STATE_RESPONSE_NORMAL                     0x02
+
+/*
+ * Structures
+ */
+
+struct ipc_pwr_phone_state_request_data {
+    unsigned short state; // IPC_PWR_PHONE_REQUEST_STATE
+} __attribute__((__packed__));
+
+struct ipc_pwr_phone_state_response_data {
+    unsigned char state; // IPC_PWR_PHONE_RESPONSE_STATE
+} __attribute__((__packed__));
 
 #endif
 
