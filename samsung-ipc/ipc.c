@@ -45,9 +45,9 @@ int ipc_device_detect(void)
 {
     char buffer[4096] = { 0 };
     struct utsname utsname;
+    char *name = NULL;
     char *board_name = NULL;
     char *kernel_version = NULL;
-    char *name = NULL;
     char *line, *p, *c;
     int index = -1;
     int fd = -1;
@@ -104,7 +104,14 @@ int ipc_device_detect(void)
     kernel_version = strdup(utsname.release);
 #endif
 
+    if (name == NULL && board_name == NULL)
+        goto error;
+
     for (i = 0; i < (int) ipc_devices_count; i++) {
+        // Eliminate index if neither name nor board name can be checked
+        if (ipc_devices[i].name == NULL && ipc_devices[i].board_name == NULL)
+            continue;
+
         // Eliminate index if the name doesn't match
         if (name != NULL && ipc_devices[i].name != NULL && strcmp(name, ipc_devices[i].name) != 0)
             continue;
@@ -132,6 +139,9 @@ error:
     index = -1;
 
 complete:
+    if (name != NULL)
+        free(name);
+
     if (board_name != NULL)
         free(board_name);
 
