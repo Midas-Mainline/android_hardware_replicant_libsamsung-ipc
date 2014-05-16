@@ -17,7 +17,7 @@
 #define __MODEM_IF_H__
 
 enum modem_t {
-	IMC_XMM6260,
+	IMC_XMM626,
 	IMC_XMM6262,
 	VIA_CBP71,
 	VIA_CBP72,

@@ -29,7 +29,7 @@ enum {
 /* each pipe has 2 ep for in/out */
 #define LINKPM_DEV_NUM	(IF_USB_DEVNUM_MAX * 2)
 /******************/
-/* xmm6260 specific */
+/* xmm626 specific */
 
 #define IOCTL_LINK_CONTROL_ENABLE	_IO('o', 0x30)
 #define IOCTL_LINK_CONTROL_ACTIVE	_IO('o', 0x31)
@@ -37,7 +37,7 @@ enum {
 #define IOCTL_LINK_CONNECTED		_IO('o', 0x33)
 #define IOCTL_LINK_SET_BIAS_CLEAR	_IO('o', 0x34)
 
-/* VID,PID for IMC - XMM6260, XMM6262*/
+/* VID,PID for IMC - XMM626, XMM6262*/
 #define IMC_BOOT_VID		0x058b
 #define IMC_BOOT_PID		0x0041
 #define IMC_MAIN_VID		0x1519

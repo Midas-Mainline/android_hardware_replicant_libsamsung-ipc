@@ -26,9 +26,9 @@
 #include <samsung-ipc.h>
 #include <ipc.h>
 
-#include "xmm6260.h"
-#include "xmm6260_hsic.h"
-#include "xmm6260_sec_modem.h"
+#include "xmm626.h"
+#include "xmm626_hsic.h"
+#include "xmm626_sec_modem.h"
 #include "n7100.h"
 
 int n7100_boot(struct ipc_client *client)
@@ -59,29 +59,29 @@ int n7100_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Mapped modem image data to memory");
 
-    modem_boot_fd = open(XMM6260_SEC_MODEM_BOOT0_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    modem_boot_fd = open(XMM626_SEC_MODEM_BOOT0_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (modem_boot_fd < 0) {
         ipc_client_log(client, "Opening modem boot device failed");
         goto error;
     }
     ipc_client_log(client, "Opened modem boot device");
 
-    modem_link_fd = open(XMM6260_SEC_MODEM_LINK_PM_DEVICE, O_RDWR);
+    modem_link_fd = open(XMM626_SEC_MODEM_LINK_PM_DEVICE, O_RDWR);
     if (modem_link_fd < 0) {
         ipc_client_log(client, "Opening modem link device failed");
         goto error;
     }
     ipc_client_log(client, "Opened modem link device");
 
-    rc = xmm6260_sec_modem_hci_power(0);
+    rc = xmm626_sec_modem_hci_power(0);
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem off failed");
         goto error;
     }
     ipc_client_log(client, "Turned the modem off");
 
-    rc = xmm6260_sec_modem_power(modem_boot_fd, 1);
-    rc |= xmm6260_sec_modem_hci_power(1);
+    rc = xmm626_sec_modem_power(modem_boot_fd, 1);
+    rc |= xmm626_sec_modem_hci_power(1);
 
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem on failed");
@@ -89,7 +89,7 @@ int n7100_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Turned the modem on");
 
-    rc = xmm6260_sec_modem_link_connected_wait(modem_link_fd);
+    rc = xmm626_sec_modem_link_connected_wait(modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for link connected failed");
         goto error;
@@ -98,101 +98,101 @@ int n7100_boot(struct ipc_client *client)
 
     p = (unsigned char *) modem_image_data + N7100_PSI_OFFSET;
 
-    rc = xmm6260_hsic_psi_send(client, modem_boot_fd, (void *) p, N7100_PSI_SIZE);
+    rc = xmm626_hsic_psi_send(client, modem_boot_fd, (void *) p, N7100_PSI_SIZE);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6260 HSIC PSI failed");
+        ipc_client_log(client, "Sending XMM626 HSIC PSI failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6260 HSIC PSI");
+    ipc_client_log(client, "Sent XMM626 HSIC PSI");
 
     p = (unsigned char *) modem_image_data + N7100_EBL_OFFSET;
 
-    rc = xmm6260_hsic_ebl_send(client, modem_boot_fd, (void *) p, N7100_EBL_SIZE);
+    rc = xmm626_hsic_ebl_send(client, modem_boot_fd, (void *) p, N7100_EBL_SIZE);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6260 HSIC EBL failed");
+        ipc_client_log(client, "Sending XMM626 HSIC EBL failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6260 HSIC EBL");
+    ipc_client_log(client, "Sent XMM626 HSIC EBL");
 
-    rc = xmm6260_hsic_port_config_send(client, modem_boot_fd);
+    rc = xmm626_hsic_port_config_send(client, modem_boot_fd);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6260 HSIC port config failed");
+        ipc_client_log(client, "Sending XMM626 HSIC port config failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6260 HSIC port config");
+    ipc_client_log(client, "Sent XMM626 HSIC port config");
 
     p = (unsigned char *) modem_image_data + N7100_SEC_START_OFFSET;
 
-    rc = xmm6260_hsic_sec_start_send(client, modem_boot_fd, (void *) p, N7100_SEC_START_SIZE);
+    rc = xmm626_hsic_sec_start_send(client, modem_boot_fd, (void *) p, N7100_SEC_START_SIZE);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6260 HSIC SEC start failed");
+        ipc_client_log(client, "Sending XMM626 HSIC SEC start failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6260 HSIC SEC start");
+    ipc_client_log(client, "Sent XMM626 HSIC SEC start");
 
     p = (unsigned char *) modem_image_data + N7100_FIRMWARE_OFFSET;
 
-    rc = xmm6260_hsic_firmware_send(client, modem_boot_fd, (void *) p, N7100_FIRMWARE_SIZE);
+    rc = xmm626_hsic_firmware_send(client, modem_boot_fd, (void *) p, N7100_FIRMWARE_SIZE);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6260 HSIC firmware failed");
+        ipc_client_log(client, "Sending XMM626 HSIC firmware failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6260 HSIC firmware");
+    ipc_client_log(client, "Sent XMM626 HSIC firmware");
 
-    rc = xmm6260_hsic_nv_data_send(client, modem_boot_fd);
+    rc = xmm626_hsic_nv_data_send(client, modem_boot_fd);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6260 HSIC nv_data failed");
+        ipc_client_log(client, "Sending XMM626 HSIC nv_data failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6260 HSIC nv_data");
+    ipc_client_log(client, "Sent XMM626 HSIC nv_data");
 
-    rc = xmm6260_hsic_sec_end_send(client, modem_boot_fd);
+    rc = xmm626_hsic_sec_end_send(client, modem_boot_fd);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6260 HSIC SEC end failed");
+        ipc_client_log(client, "Sending XMM626 HSIC SEC end failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6260 HSIC SEC end");
+    ipc_client_log(client, "Sent XMM626 HSIC SEC end");
 
-    rc = xmm6260_hsic_hw_reset_send(client, modem_boot_fd);
+    rc = xmm626_hsic_hw_reset_send(client, modem_boot_fd);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6260 HSIC HW reset failed");
+        ipc_client_log(client, "Sending XMM626 HSIC HW reset failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6260 HSIC HW reset");
+    ipc_client_log(client, "Sent XMM626 HSIC HW reset");
 
     usleep(300000);
 
-    rc = xmm6260_sec_modem_link_get_hostwake_wait(modem_link_fd);
+    rc = xmm626_sec_modem_link_get_hostwake_wait(modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for host wake failed");
     }
 
-    rc = xmm6260_sec_modem_link_control_enable(modem_link_fd, 0);
-    rc |= xmm6260_sec_modem_hci_power(0);
-    rc |= xmm6260_sec_modem_link_control_active(modem_link_fd, 0);
+    rc = xmm626_sec_modem_link_control_enable(modem_link_fd, 0);
+    rc |= xmm626_sec_modem_hci_power(0);
+    rc |= xmm626_sec_modem_link_control_active(modem_link_fd, 0);
 
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem off failed");
         goto error;
     }
 
-    rc = xmm6260_sec_modem_link_get_hostwake_wait(modem_link_fd);
+    rc = xmm626_sec_modem_link_get_hostwake_wait(modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for host wake failed");
         goto error;
     }
     ipc_client_log(client, "Waited for host wake");
 
-    rc = xmm6260_sec_modem_link_control_enable(modem_link_fd, 1);
-    rc |= xmm6260_sec_modem_hci_power(1);
-    rc |= xmm6260_sec_modem_link_control_active(modem_link_fd, 1);
+    rc = xmm626_sec_modem_link_control_enable(modem_link_fd, 1);
+    rc |= xmm626_sec_modem_hci_power(1);
+    rc |= xmm626_sec_modem_link_control_active(modem_link_fd, 1);
 
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem on failed");
         goto error;
     }
 
-    rc = xmm6260_sec_modem_link_connected_wait(modem_link_fd);
+    rc = xmm626_sec_modem_link_connected_wait(modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for link connected failed");
         goto error;
@@ -232,7 +232,7 @@ int n7100_open(void *data, int type)
 
     transport_data = (struct n7100_transport_data *) data;
 
-    transport_data->fd = xmm6260_sec_modem_open(type);
+    transport_data->fd = xmm626_sec_modem_open(type);
     if (transport_data->fd < 0)
         return -1;
 
@@ -248,7 +248,7 @@ int n7100_close(void *data)
 
     transport_data = (struct n7100_transport_data *) data;
 
-    xmm6260_sec_modem_close(transport_data->fd);
+    xmm626_sec_modem_close(transport_data->fd);
     transport_data->fd = -1;
 
     return 0;
@@ -264,7 +264,7 @@ int n7100_read(void *data, void *buffer, size_t length)
 
     transport_data = (struct n7100_transport_data *) data;
 
-    rc = xmm6260_sec_modem_read(transport_data->fd, buffer, length);
+    rc = xmm626_sec_modem_read(transport_data->fd, buffer, length);
 
     return rc;
 }
@@ -279,7 +279,7 @@ int n7100_write(void *data, const void *buffer, size_t length)
 
     transport_data = (struct n7100_transport_data *) data;
 
-    rc = xmm6260_sec_modem_write(transport_data->fd, buffer, length);
+    rc = xmm626_sec_modem_write(transport_data->fd, buffer, length);
 
     return rc;
 }
@@ -294,7 +294,7 @@ int n7100_poll(void *data, struct timeval *timeout)
 
     transport_data = (struct n7100_transport_data *) data;
 
-    rc = xmm6260_sec_modem_poll(transport_data->fd, timeout);
+    rc = xmm626_sec_modem_poll(transport_data->fd, timeout);
 
     return rc;
 }
@@ -309,11 +309,11 @@ int n7100_power_off(void *data)
     int fd;
     int rc;
 
-    fd = open(XMM6260_SEC_MODEM_BOOT0_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    fd = open(XMM626_SEC_MODEM_BOOT0_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (fd < 0)
         return -1;
 
-    rc = xmm6260_sec_modem_power(fd, 0);
+    rc = xmm626_sec_modem_power(fd, 0);
 
     close(fd);
 
@@ -347,14 +347,14 @@ int n7100_data_destroy(void *transport_data, void *power_data,
 
 struct ipc_client_ops n7100_fmt_ops = {
     .boot = n7100_boot,
-    .send = xmm6260_sec_modem_fmt_send,
-    .recv = xmm6260_sec_modem_fmt_recv,
+    .send = xmm626_sec_modem_fmt_send,
+    .recv = xmm626_sec_modem_fmt_recv,
 };
 
 struct ipc_client_ops n7100_rfs_ops = {
     .boot = NULL,
-    .send = xmm6260_sec_modem_rfs_send,
-    .recv = xmm6260_sec_modem_rfs_recv,
+    .send = xmm626_sec_modem_rfs_send,
+    .recv = xmm626_sec_modem_rfs_recv,
 };
 
 struct ipc_client_handlers n7100_handlers = {
@@ -375,18 +375,18 @@ struct ipc_client_handlers n7100_handlers = {
 };
 
 struct ipc_client_gprs_specs n7100_gprs_specs = {
-    .gprs_get_iface = xmm6260_sec_modem_gprs_get_iface,
-    .gprs_get_capabilities = xmm6260_sec_modem_gprs_get_capabilities,
+    .gprs_get_iface = xmm626_sec_modem_gprs_get_iface,
+    .gprs_get_capabilities = xmm626_sec_modem_gprs_get_capabilities,
 };
 
 struct ipc_client_nv_data_specs n7100_nv_data_specs = {
-    .nv_data_path = XMM6260_NV_DATA_PATH,
-    .nv_data_md5_path = XMM6260_NV_DATA_MD5_PATH,
-    .nv_data_backup_path = XMM6260_NV_DATA_BACKUP_PATH,
-    .nv_data_backup_md5_path = XMM6260_NV_DATA_BACKUP_MD5_PATH,
-    .nv_data_secret = XMM6260_NV_DATA_SECRET,
-    .nv_data_size = XMM6260_NV_DATA_SIZE,
-    .nv_data_chunk_size = XMM6260_NV_DATA_CHUNK_SIZE,
+    .nv_data_path = XMM626_NV_DATA_PATH,
+    .nv_data_md5_path = XMM626_NV_DATA_MD5_PATH,
+    .nv_data_backup_path = XMM626_NV_DATA_BACKUP_PATH,
+    .nv_data_backup_md5_path = XMM626_NV_DATA_BACKUP_MD5_PATH,
+    .nv_data_secret = XMM626_NV_DATA_SECRET,
+    .nv_data_size = XMM626_NV_DATA_SIZE,
+    .nv_data_chunk_size = XMM626_NV_DATA_CHUNK_SIZE,
 };
 
 // vim:ts=4:sw=4:expandtab

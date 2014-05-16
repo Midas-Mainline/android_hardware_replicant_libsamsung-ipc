@@ -21,9 +21,9 @@
 #include <stdlib.h>
 #include <sys/ioctl.h>
 
-#include "xmm6260.h"
+#include "xmm626.h"
 
-unsigned char xmm6260_crc_calculate(const void *data, size_t size)
+unsigned char xmm626_crc_calculate(const void *data, size_t size)
 {
     unsigned char crc;
     unsigned char *p;

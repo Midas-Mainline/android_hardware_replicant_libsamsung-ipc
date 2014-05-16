@@ -37,7 +37,7 @@
 #include "onedram.h"
 #include "phonet.h"
 
-#include "xmm6160.h"
+#include "xmm616.h"
 #include "aries.h"
 
 int aries_boot(struct ipc_client *client)
@@ -109,12 +109,12 @@ int aries_boot(struct ipc_client *client)
 
     p = (unsigned char *) modem_image_data;
 
-    rc = xmm6160_psi_send(client, serial_fd, (void *) p, ARIES_PSI_SIZE);
+    rc = xmm616_psi_send(client, serial_fd, (void *) p, ARIES_PSI_SIZE);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6160 PSI failed");
+        ipc_client_log(client, "Sending XMM616 PSI failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6160 PSI");
+    ipc_client_log(client, "Sent XMM616 PSI");
 
     p += ARIES_PSI_SIZE;
 
@@ -156,21 +156,21 @@ int aries_boot(struct ipc_client *client)
 
     pp = (unsigned char *) onedram_address;
 
-    rc = xmm6160_firmware_send(client, -1, (void *) pp, (void *) p, ARIES_MODEM_IMAGE_SIZE - ARIES_PSI_SIZE);
+    rc = xmm616_firmware_send(client, -1, (void *) pp, (void *) p, ARIES_MODEM_IMAGE_SIZE - ARIES_PSI_SIZE);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6160 firmware failed");
+        ipc_client_log(client, "Sending XMM616 firmware failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6160 firmware");
+    ipc_client_log(client, "Sent XMM616 firmware");
 
     pp = (unsigned char *) onedram_address + ARIES_ONEDRAM_NV_DATA_OFFSET;
 
-    rc = xmm6160_nv_data_send(client, -1, pp);
+    rc = xmm616_nv_data_send(client, -1, pp);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6160 nv_data failed");
+        ipc_client_log(client, "Sending XMM616 nv_data failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6160 nv_data");
+    ipc_client_log(client, "Sent XMM616 nv_data");
 
     munmap(onedram_address, ARIES_ONEDRAM_MEMORY_SIZE);
     onedram_address = NULL;
@@ -802,13 +802,13 @@ struct ipc_client_gprs_specs aries_gprs_specs = {
 };
 
 struct ipc_client_nv_data_specs aries_nv_data_specs = {
-    .nv_data_path = XMM6160_NV_DATA_PATH,
-    .nv_data_md5_path = XMM6160_NV_DATA_MD5_PATH,
-    .nv_data_backup_path = XMM6160_NV_DATA_BACKUP_PATH,
-    .nv_data_backup_md5_path = XMM6160_NV_DATA_BACKUP_MD5_PATH,
-    .nv_data_secret = XMM6160_NV_DATA_SECRET,
-    .nv_data_size = XMM6160_NV_DATA_SIZE,
-    .nv_data_chunk_size = XMM6160_NV_DATA_CHUNK_SIZE,
+    .nv_data_path = XMM616_NV_DATA_PATH,
+    .nv_data_md5_path = XMM616_NV_DATA_MD5_PATH,
+    .nv_data_backup_path = XMM616_NV_DATA_BACKUP_PATH,
+    .nv_data_backup_md5_path = XMM616_NV_DATA_BACKUP_MD5_PATH,
+    .nv_data_secret = XMM616_NV_DATA_SECRET,
+    .nv_data_size = XMM616_NV_DATA_SIZE,
+    .nv_data_chunk_size = XMM616_NV_DATA_CHUNK_SIZE,
 };
 
 // vim:ts=4:sw=4:expandtab

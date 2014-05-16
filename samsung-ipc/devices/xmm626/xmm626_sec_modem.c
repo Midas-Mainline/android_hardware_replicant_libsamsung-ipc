@@ -34,10 +34,10 @@
 #include "modem_prj.h"
 #include "modem_link_device_hsic.h"
 
-#include "xmm6260.h"
-#include "xmm6260_sec_modem.h"
+#include "xmm626.h"
+#include "xmm626_sec_modem.h"
 
-int xmm6260_sec_modem_power(int device_fd, int power)
+int xmm626_sec_modem_power(int device_fd, int power)
 {
     int rc;
 
@@ -51,7 +51,7 @@ int xmm6260_sec_modem_power(int device_fd, int power)
     return 0;
 }
 
-int xmm6260_sec_modem_boot_power(int device_fd, int power)
+int xmm626_sec_modem_boot_power(int device_fd, int power)
 {
     int rc;
 
@@ -65,7 +65,7 @@ int xmm6260_sec_modem_boot_power(int device_fd, int power)
     return 0;
 }
 
-int xmm6260_sec_modem_status_online_wait(int device_fd)
+int xmm626_sec_modem_status_online_wait(int device_fd)
 {
     int status;
     int i;
@@ -85,15 +85,15 @@ int xmm6260_sec_modem_status_online_wait(int device_fd)
     return -1;
 }
 
-int xmm6260_sec_modem_hci_power(int power)
+int xmm626_sec_modem_hci_power(int power)
 {
     int ehci_rc, ohci_rc;
 
-    ehci_rc = sysfs_value_write(XMM6260_SEC_MODEM_EHCI_POWER_SYSFS, !!power);
+    ehci_rc = sysfs_value_write(XMM626_SEC_MODEM_EHCI_POWER_SYSFS, !!power);
     if (ehci_rc >= 0)
         usleep(50000);
 
-    ohci_rc = sysfs_value_write(XMM6260_SEC_MODEM_OHCI_POWER_SYSFS, !!power);
+    ohci_rc = sysfs_value_write(XMM626_SEC_MODEM_OHCI_POWER_SYSFS, !!power);
     if (ohci_rc >= 0)
         usleep(50000);
 
@@ -103,7 +103,7 @@ int xmm6260_sec_modem_hci_power(int power)
     return 0;
 }
 
-int xmm6260_sec_modem_link_control_enable(int device_fd, int enable)
+int xmm626_sec_modem_link_control_enable(int device_fd, int enable)
 {
     int rc;
 
@@ -117,7 +117,7 @@ int xmm6260_sec_modem_link_control_enable(int device_fd, int enable)
     return 0;
 }
 
-int xmm6260_sec_modem_link_control_active(int device_fd, int active)
+int xmm626_sec_modem_link_control_active(int device_fd, int active)
 {
     int rc;
 
@@ -131,7 +131,7 @@ int xmm6260_sec_modem_link_control_active(int device_fd, int active)
     return 0;
 }
 
-int xmm6260_sec_modem_link_connected_wait(int device_fd)
+int xmm626_sec_modem_link_connected_wait(int device_fd)
 {
     int status;
     int i;
@@ -151,7 +151,7 @@ int xmm6260_sec_modem_link_connected_wait(int device_fd)
     return -1;
 }
 
-int xmm6260_sec_modem_link_get_hostwake_wait(int device_fd)
+int xmm626_sec_modem_link_get_hostwake_wait(int device_fd)
 {
     int status;
     int i;
@@ -171,7 +171,7 @@ int xmm6260_sec_modem_link_get_hostwake_wait(int device_fd)
     return -1;
 }
 
-int xmm6260_sec_modem_fmt_send(struct ipc_client *client,
+int xmm626_sec_modem_fmt_send(struct ipc_client *client,
     struct ipc_message *message)
 {
     struct ipc_fmt_header header;
@@ -222,7 +222,7 @@ complete:
     return rc;
 }
 
-int xmm6260_sec_modem_fmt_recv(struct ipc_client *client,
+int xmm626_sec_modem_fmt_recv(struct ipc_client *client,
     struct ipc_message *message)
 {
     struct ipc_fmt_header *header;
@@ -235,7 +235,7 @@ int xmm6260_sec_modem_fmt_recv(struct ipc_client *client,
     if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || message == NULL)
         return -1;
 
-    length = XMM6260_DATA_SIZE;
+    length = XMM626_DATA_SIZE;
     buffer = calloc(1, length);
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
@@ -287,7 +287,7 @@ complete:
     return rc;
 }
 
-int xmm6260_sec_modem_rfs_send(struct ipc_client *client,
+int xmm626_sec_modem_rfs_send(struct ipc_client *client,
     struct ipc_message *message)
 {
     struct ipc_rfs_header header;
@@ -338,7 +338,7 @@ complete:
     return rc;
 }
 
-int xmm6260_sec_modem_rfs_recv(struct ipc_client *client,
+int xmm626_sec_modem_rfs_recv(struct ipc_client *client,
     struct ipc_message *message)
 {
     struct ipc_rfs_header *header;
@@ -351,7 +351,7 @@ int xmm6260_sec_modem_rfs_recv(struct ipc_client *client,
     if (client == NULL || client->handlers == NULL || client->handlers->read == NULL || message == NULL)
         return -1;
 
-    length = XMM6260_DATA_SIZE;
+    length = XMM626_DATA_SIZE;
     buffer = calloc(1, length);
 
     rc = client->handlers->read(client->handlers->transport_data, buffer, length);
@@ -403,16 +403,16 @@ complete:
     return rc;
 }
 
-int xmm6260_sec_modem_open(int type)
+int xmm626_sec_modem_open(int type)
 {
     int fd;
 
     switch (type) {
         case IPC_CLIENT_TYPE_FMT:
-            fd = open(XMM6260_SEC_MODEM_IPC0_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+            fd = open(XMM626_SEC_MODEM_IPC0_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
             break;
         case IPC_CLIENT_TYPE_RFS:
-            fd = open(XMM6260_SEC_MODEM_RFS0_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+            fd = open(XMM626_SEC_MODEM_RFS0_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
             break;
         default:
             return -1;
@@ -421,7 +421,7 @@ int xmm6260_sec_modem_open(int type)
     return fd;
 }
 
-int xmm6260_sec_modem_close(int fd)
+int xmm626_sec_modem_close(int fd)
 {
     if (fd < 0)
         return -1;
@@ -431,7 +431,7 @@ int xmm6260_sec_modem_close(int fd)
     return 0;
 }
 
-int xmm6260_sec_modem_read(int fd, void *buffer, size_t length)
+int xmm626_sec_modem_read(int fd, void *buffer, size_t length)
 {
     int rc;
 
@@ -443,7 +443,7 @@ int xmm6260_sec_modem_read(int fd, void *buffer, size_t length)
     return rc;
 }
 
-int xmm6260_sec_modem_write(int fd, const void *buffer, size_t length)
+int xmm626_sec_modem_write(int fd, const void *buffer, size_t length)
 {
     int rc;
 
@@ -455,7 +455,7 @@ int xmm6260_sec_modem_write(int fd, const void *buffer, size_t length)
     return rc;
 }
 
-int xmm6260_sec_modem_poll(int fd, struct timeval *timeout)
+int xmm626_sec_modem_poll(int fd, struct timeval *timeout)
 {
     fd_set fds;
     int rc;
@@ -477,24 +477,24 @@ int xmm6260_sec_modem_poll(int fd, struct timeval *timeout)
     return rc;
 }
 
-char *xmm6260_sec_modem_gprs_get_iface(int cid)
+char *xmm626_sec_modem_gprs_get_iface(int cid)
 {
     char *iface = NULL;
 
-    if (cid > XMM6260_SEC_MODEM_GPRS_IFACE_COUNT)
+    if (cid > XMM626_SEC_MODEM_GPRS_IFACE_COUNT)
         return NULL;
 
-    asprintf(&iface, "%s%d", XMM6260_SEC_MODEM_GPRS_IFACE_PREFIX, cid - 1);
+    asprintf(&iface, "%s%d", XMM626_SEC_MODEM_GPRS_IFACE_PREFIX, cid - 1);
 
     return iface;
 }
 
-int xmm6260_sec_modem_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
+int xmm626_sec_modem_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
 {
     if (capabilities == NULL)
         return -1;
 
-    capabilities->cid_count = XMM6260_SEC_MODEM_GPRS_IFACE_COUNT;
+    capabilities->cid_count = XMM626_SEC_MODEM_GPRS_IFACE_COUNT;
 
     return 0;
 }

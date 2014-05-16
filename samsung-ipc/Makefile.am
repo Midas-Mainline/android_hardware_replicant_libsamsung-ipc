@@ -3,8 +3,8 @@ NULL =
 AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/samsung-ipc \
-	-I$(top_srcdir)/samsung-ipc/devices/xmm6160 \
-	-I$(top_srcdir)/samsung-ipc/devices/xmm6260 \
+	-I$(top_srcdir)/samsung-ipc/devices/xmm616 \
+	-I$(top_srcdir)/samsung-ipc/devices/xmm626 \
 	$(OPENSSL_CFLAGS) \
 	$(NULL)
 
@@ -22,19 +22,19 @@ libsamsung_ipc_la_SOURCES = \
 	ipc_devices.c \
 	ipc_devices.h \
 	ipc_utils.c \
-	devices/xmm6160/xmm6160.c \
-	devices/xmm6160/xmm6160.h \
-	devices/xmm6260/xmm6260.c \
-	devices/xmm6260/xmm6260.h \
-	devices/xmm6260/xmm6260_hsic.c \
-	devices/xmm6260/xmm6260_hsic.h \
-	devices/xmm6260/xmm6260_mipi.c \
-	devices/xmm6260/xmm6260_mipi.h \
-	devices/xmm6260/xmm6260_sec_modem.c \
-	devices/xmm6260/xmm6260_sec_modem.h \
-	devices/xmm6260/modem.h \
-	devices/xmm6260/modem_link_device_hsic.h \
-	devices/xmm6260/modem_prj.h \
+	devices/xmm616/xmm616.c \
+	devices/xmm616/xmm616.h \
+	devices/xmm626/xmm626.c \
+	devices/xmm626/xmm626.h \
+	devices/xmm626/xmm626_hsic.c \
+	devices/xmm626/xmm626_hsic.h \
+	devices/xmm626/xmm626_mipi.c \
+	devices/xmm626/xmm626_mipi.h \
+	devices/xmm626/xmm626_sec_modem.c \
+	devices/xmm626/xmm626_sec_modem.h \
+	devices/xmm626/modem.h \
+	devices/xmm626/modem_link_device_hsic.h \
+	devices/xmm626/modem_prj.h \
 	devices/crespo/crespo.c \
 	devices/crespo/crespo.h \
 	devices/crespo/crespo_modem_ctl.h \

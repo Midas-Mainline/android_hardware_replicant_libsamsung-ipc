@@ -27,12 +27,12 @@
 #include <samsung-ipc.h>
 #include <utils.h>
 
-#include "xmm6160.h"
+#include "xmm616.h"
 
-int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
+int xmm616_psi_send(struct ipc_client *client, int serial_fd,
     const void *psi_data, unsigned short psi_size)
 {
-    char at[] = XMM6160_AT;
+    char at[] = XMM616_AT;
     unsigned char version;
     unsigned char info;
     unsigned char psi_magic;
@@ -58,7 +58,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     tcsetattr(serial_fd, TCSANOW, &termios);
 
     length = strlen(at);
-    for (i = 0; i < XMM6160_AT_COUNT; i++) {
+    for (i = 0; i < XMM616_AT_COUNT; i++) {
         rc = write(serial_fd, at, length);
         if (rc < (int) length) {
             ipc_client_log(client, "Writing AT in ASCII failed");
@@ -79,7 +79,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
         goto error;
     }
 
-    if (version != XMM6160_BOOTCORE_VERSION) {
+    if (version != XMM616_BOOTCORE_VERSION) {
         ipc_client_log(client, "Read wrong bootcore version (0x%x)", version);
         goto error;
     }
@@ -93,7 +93,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
     }
     ipc_client_log(client, "Read info size (0x%x)", info);
 
-    psi_magic = XMM6160_PSI_MAGIC;
+    psi_magic = XMM616_PSI_MAGIC;
 
     rc = write(serial_fd, &psi_magic, sizeof(psi_magic));
     if (rc < (int) sizeof(psi_magic)) {
@@ -169,7 +169,7 @@ int xmm6160_psi_send(struct ipc_client *client, int serial_fd,
             ipc_client_log(client, "Reading PSI ACK failed");
             goto error;
         }
-    } while (psi_ack != XMM6160_PSI_ACK);
+    } while (psi_ack != XMM616_PSI_ACK);
     ipc_client_log(client, "Read PSI ACK (0x%x)", psi_ack);
 
     rc = 0;
@@ -182,7 +182,7 @@ complete:
     return rc;
 }
 
-int xmm6160_firmware_send(struct ipc_client *client, int device_fd,
+int xmm616_firmware_send(struct ipc_client *client, int device_fd,
     void *device_address, const void *firmware_data, size_t firmware_size)
 {
     size_t wc;
@@ -222,7 +222,7 @@ complete:
     return rc;
 }
 
-int xmm6160_nv_data_send(struct ipc_client *client, int device_fd,
+int xmm616_nv_data_send(struct ipc_client *client, int device_fd,
     void *device_address)
 {
     void *nv_data = NULL;

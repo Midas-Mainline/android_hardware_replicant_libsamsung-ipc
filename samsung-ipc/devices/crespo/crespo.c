@@ -33,7 +33,7 @@
 
 #include "crespo_modem_ctl.h"
 
-#include "xmm6160.h"
+#include "xmm616.h"
 #include "crespo.h"
 
 int crespo_boot(struct ipc_client *client)
@@ -81,32 +81,32 @@ int crespo_boot(struct ipc_client *client)
 
     p = (unsigned char *) modem_image_data;
 
-    rc = xmm6160_psi_send(client, serial_fd, (void *) p, CRESPO_PSI_SIZE);
+    rc = xmm616_psi_send(client, serial_fd, (void *) p, CRESPO_PSI_SIZE);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6160 PSI failed");
+        ipc_client_log(client, "Sending XMM616 PSI failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6160 PSI");
+    ipc_client_log(client, "Sent XMM616 PSI");
 
     p += CRESPO_PSI_SIZE;
 
     lseek(modem_ctl_fd, 0, SEEK_SET);
 
-    rc = xmm6160_firmware_send(client, modem_ctl_fd, NULL, (void *) p, CRESPO_MODEM_IMAGE_SIZE - CRESPO_PSI_SIZE);
+    rc = xmm616_firmware_send(client, modem_ctl_fd, NULL, (void *) p, CRESPO_MODEM_IMAGE_SIZE - CRESPO_PSI_SIZE);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6160 firmware failed");
+        ipc_client_log(client, "Sending XMM616 firmware failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6160 firmware");
+    ipc_client_log(client, "Sent XMM616 firmware");
 
     lseek(modem_ctl_fd, CRESPO_MODEM_CTL_NV_DATA_OFFSET, SEEK_SET);
 
-    rc = xmm6160_nv_data_send(client, modem_ctl_fd, NULL);
+    rc = xmm616_nv_data_send(client, modem_ctl_fd, NULL);
     if (rc < 0) {
-        ipc_client_log(client, "Sending XMM6160 nv_data failed");
+        ipc_client_log(client, "Sending XMM616 nv_data failed");
         goto error;
     }
-    ipc_client_log(client, "Sent XMM6160 nv_data");
+    ipc_client_log(client, "Sent XMM616 nv_data");
 
     rc = 0;
     goto complete;
@@ -552,13 +552,13 @@ struct ipc_client_gprs_specs crespo_gprs_specs = {
 };
 
 struct ipc_client_nv_data_specs crespo_nv_data_specs = {
-    .nv_data_path = XMM6160_NV_DATA_PATH,
-    .nv_data_md5_path = XMM6160_NV_DATA_MD5_PATH,
-    .nv_data_backup_path = XMM6160_NV_DATA_BACKUP_PATH,
-    .nv_data_backup_md5_path = XMM6160_NV_DATA_BACKUP_MD5_PATH,
-    .nv_data_secret = XMM6160_NV_DATA_SECRET,
-    .nv_data_size = XMM6160_NV_DATA_SIZE,
-    .nv_data_chunk_size = XMM6160_NV_DATA_CHUNK_SIZE,
+    .nv_data_path = XMM616_NV_DATA_PATH,
+    .nv_data_md5_path = XMM616_NV_DATA_MD5_PATH,
+    .nv_data_backup_path = XMM616_NV_DATA_BACKUP_PATH,
+    .nv_data_backup_md5_path = XMM616_NV_DATA_BACKUP_MD5_PATH,
+    .nv_data_secret = XMM616_NV_DATA_SECRET,
+    .nv_data_size = XMM616_NV_DATA_SIZE,
+    .nv_data_chunk_size = XMM616_NV_DATA_CHUNK_SIZE,
 };
 
 // vim:ts=4:sw=4:expandtab
