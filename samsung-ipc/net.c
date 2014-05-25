@@ -41,11 +41,11 @@ int ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel_request_data *data,
         if (plmn_length > sizeof(data->plmn))
             plmn_length = sizeof(data->plmn);
 
-        strncpy((char *) data->plmn, plmn, plmn_length);
+        memcpy((void *) data->plmn, (void *) plmn, plmn_length);
 
         // If there are less (5 is the usual case) PLMN bytes, fill the rest with '#'
         if (plmn_length < sizeof(data->plmn))
-            memset(data->plmn + plmn_length, '#', sizeof(data->plmn) - plmn_length);
+            memset((void *) ((unsigned char *) data->plmn + plmn_length), '#', sizeof(data->plmn) - plmn_length);
 
         data->act = act;
     }
