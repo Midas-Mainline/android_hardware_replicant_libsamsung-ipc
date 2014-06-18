@@ -40,6 +40,7 @@ int ipc_sec_pin_status_setup(struct ipc_sec_pin_status_request_data *data,
         if (pin1_length > sizeof(data->pin1))
             pin1_length = sizeof(data->pin1);
 
+        data->pin1_length = (unsigned char) pin1_length;
         strncpy((char *) data->pin1, pin1, pin1_length);
     }
 
@@ -48,6 +49,7 @@ int ipc_sec_pin_status_setup(struct ipc_sec_pin_status_request_data *data,
         if (pin2_length > sizeof(data->pin2))
             pin2_length = sizeof(data->pin2);
 
+        data->pin2_length = (unsigned char) pin2_length;
         strncpy((char *) data->pin2, pin2, pin2_length);
     }
 
