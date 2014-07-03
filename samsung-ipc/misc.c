@@ -23,6 +23,17 @@
 
 #include <samsung-ipc.h>
 
+int ipc_misc_me_version_setup(struct ipc_misc_me_version_request_data *data)
+{
+    if (data == NULL)
+        return -1;
+
+    memset(data, 0, sizeof(struct ipc_misc_me_version_request_data));
+    data->magic = 0xff;
+
+    return 0;
+}
+
 char *ipc_misc_me_imsi_imsi_extract(const void *data, size_t size)
 {
     struct ipc_misc_me_imsi_header *header;
@@ -43,6 +54,24 @@ char *ipc_misc_me_imsi_imsi_extract(const void *data, size_t size)
     imsi[header->length] = '\0';
 
     return imsi;
+}
+
+char *ipc_misc_me_sn_extract(const struct ipc_misc_me_sn_response_data *data)
+{
+    char *string;
+    size_t length;
+
+    if (data == NULL || data->length > sizeof(data->data))
+        return NULL;
+
+    length = data->length + sizeof(char);
+
+    string = (char *) calloc(1, length);
+
+    strncpy(string, (char *) &data->data, data->length);
+    string[data->length] = '\0';
+
+    return string;
 }
 
 // vim:ts=4:sw=4:expandtab

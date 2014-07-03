@@ -47,7 +47,11 @@
  * Structures
  */
 
-struct ipc_misc_me_version_data {
+struct ipc_misc_me_version_request_data {
+    unsigned char magic;
+} __attribute__((__packed__));
+
+struct ipc_misc_me_version_response_data {
     unsigned char unknown;
     char software_version[32];
     char hardware_version[32];
@@ -59,8 +63,12 @@ struct ipc_misc_me_imsi_header {
     unsigned char length;
 } __attribute__((__packed__));
 
-struct ipc_misc_me_sn_data {
-    unsigned char type; // IPC_MISC_ME_SN_SERIAL_NUM
+struct ipc_misc_me_sn_request_data {
+    unsigned char type; // IPC_MISC_ME_SN_SERIAL
+} __attribute__((__packed__));
+
+struct ipc_misc_me_sn_response_data {
+    unsigned char type; // IPC_MISC_ME_SN_SERIAL
     unsigned char length;
     char data[32];
 } __attribute__((__packed__));
@@ -77,7 +85,9 @@ struct ipc_misc_time_info_data {
  * Helpers
  */
 
+int ipc_misc_me_version_setup(struct ipc_misc_me_version_request_data *data);
 char *ipc_misc_me_imsi_imsi_extract(const void *data, size_t size);
+char *ipc_misc_me_sn_extract(const struct ipc_misc_me_sn_response_data *data);
 
 #endif
 
