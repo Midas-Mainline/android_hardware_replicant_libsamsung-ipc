@@ -97,8 +97,8 @@ int ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *data,
 
     if (password_old != NULL) {
         password_old_length = strlen(password_old);
-        if (password_old_length > sizeof(data->password_old_length))
-            password_old_length = sizeof(data->password_old_length);
+        if (password_old_length > sizeof(data->password_old))
+            password_old_length = sizeof(data->password_old);
 
         data->password_old_length = (unsigned char) password_old_length;
         strncpy((char *) data->password_old, password_old, password_old_length);
@@ -108,8 +108,8 @@ int ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *data,
 
     if (password_new != NULL) {
         password_new_length = strlen(password_new);
-        if (password_new_length > sizeof(data->password_new_length))
-            password_new_length = sizeof(data->password_new_length);
+        if (password_new_length > sizeof(data->password_new))
+            password_new_length = sizeof(data->password_new);
 
         data->password_new_length = (unsigned char) password_new_length;
         strncpy((char *) data->password_new, password_new, password_new_length);
