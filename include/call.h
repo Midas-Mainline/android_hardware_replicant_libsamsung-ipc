@@ -114,9 +114,9 @@ struct ipc_call_list_entry {
     unsigned char id;
     unsigned char term; // IPC_CALL_TERM
     unsigned char status; // IPC_CALL_LIST_ENTRY_STATUS
-    unsigned char unknown2;
+    unsigned char mpty;
     unsigned char number_length;
-    unsigned char unknown3;
+    unsigned char unknown2;
 } __attribute__((__packed__));
 
 struct ipc_call_burst_dtmf_header {
