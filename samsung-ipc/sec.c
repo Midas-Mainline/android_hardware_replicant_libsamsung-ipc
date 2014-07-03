@@ -92,6 +92,7 @@ int ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *data,
     if (data == NULL)
         return -1;
 
+    memset(data, 0, sizeof(struct ipc_sec_change_locking_pw_data));
     data->facility_type = facility_type;
 
     if (password_old != NULL) {
