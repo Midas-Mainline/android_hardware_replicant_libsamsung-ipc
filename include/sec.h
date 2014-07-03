@@ -127,7 +127,7 @@ struct ipc_sec_change_locking_pw_data {
     unsigned char password_new[39];
 }  __attribute__((__packed__));
 
-struct ipc_sec_rsim_access_request_data {
+struct ipc_sec_rsim_access_request_header {
     unsigned char command; // IPC_SEC_RSIM_COMMAND
     unsigned short file_id;
     unsigned char p1, p2, p3;
@@ -146,7 +146,7 @@ struct ipc_sec_rsim_access_usim_response_header {
 	unsigned char length;
 } __attribute__((__packed__));
 
-struct ipc_sec_sim_icc_type {
+struct ipc_sec_sim_icc_type_data {
     unsigned char type; // IPC_SEC_SIM_CARD_TYPE
 } __attribute__((__packed__));
 
@@ -173,7 +173,6 @@ int ipc_sec_phone_lock_request_set_setup(struct ipc_sec_phone_lock_request_set_d
 int ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *data,
     unsigned char facility_type, const char *password_old,
     const char *password_new);
-void *ipc_sec_rsim_access_file_data_extract(const void *data, size_t size);
 int ipc_sec_lock_infomation_setup(struct ipc_sec_lock_infomation_request_data *data,
     unsigned char type);
 
