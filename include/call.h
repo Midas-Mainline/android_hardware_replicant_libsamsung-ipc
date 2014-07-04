@@ -72,8 +72,8 @@
 #define IPC_CALL_LIST_ENTRY_STATUS_INCOMING                     0x05
 #define IPC_CALL_LIST_ENTRY_STATUS_WAITING                      0x06
 
-#define IPC_CALL_DTMF_STATE_START                               0x01
-#define IPC_CALL_DTMF_STATE_STOP                                0x02
+#define IPC_CALL_DTMF_STATUS_START                              0x01
+#define IPC_CALL_DTMF_STATUS_STOP                               0x02
 
 /*
  * Structures
@@ -119,18 +119,22 @@ struct ipc_call_list_entry {
     unsigned char unknown2;
 } __attribute__((__packed__));
 
-struct ipc_call_burst_dtmf_header {
+struct ipc_call_burst_dtmf_request_header {
     unsigned char count;
 } __attribute__((__packed__));
 
-struct ipc_call_burst_dtmf_entry {
-    unsigned char state;
-    unsigned char tone;
+struct ipc_call_burst_dtmf_request_entry {
+    unsigned char status; // IPC_CALL_DTMF_STATUS
+    char tone;
+} __attribute__((__packed__));
+
+struct ipc_call_burst_dtmf_response_data {
+    unsigned char unknown;
 } __attribute__((__packed__));
 
 struct ipc_call_cont_dtmf_data {
-    unsigned char state;
-    unsigned char tone;
+    unsigned char status; // IPC_CALL_DTMF_STATUS
+    char tone;
 } __attribute__((__packed__));
 
 /*
@@ -144,7 +148,7 @@ unsigned char ipc_call_list_count_extract(const void *data, size_t size);
 struct ipc_call_list_entry *ipc_call_list_entry_extract(const void *data,
     size_t size, unsigned int index);
 char *ipc_call_list_entry_number_extract(const struct ipc_call_list_entry *entry);
-void *ipc_call_burst_dtmf_setup(const struct ipc_call_burst_dtmf_entry *entries,
+void *ipc_call_burst_dtmf_setup(const struct ipc_call_burst_dtmf_request_entry *entries,
     unsigned char count);
 
 #endif
