@@ -58,8 +58,20 @@
  */
 
 struct ipc_snd_spkr_volume_ctrl_data {
-    unsigned char type;
+    unsigned char type; // IPC_SND_VOLUME_TYPE
     unsigned char volume;
+} __attribute__((__packed__));
+
+struct ipc_snd_mic_mute_ctrl_data {
+    unsigned char mute;
+} __attribute__((__packed__));
+
+struct ipc_snd_audio_path_ctrl_data {
+    unsigned char path; // IPC_SND_AUDIO_PATH
+} __attribute__((__packed__));
+
+struct ipc_snd_clock_ctrl_data {
+    unsigned char sync;
 } __attribute__((__packed__));
 
 #endif
