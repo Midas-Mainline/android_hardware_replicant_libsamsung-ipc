@@ -120,13 +120,13 @@ int xmm626_hsic_psi_send(struct ipc_client *client, int device_fd,
 
     rc = select(device_fd + 1, &fds, NULL, NULL, &timeout);
     if (rc <= 0) {
-        ipc_client_log(client, "Reading chip id failed");
+        ipc_client_log(client, "Reading boot ACK failed");
         goto error;
     }
 
     psi_ack = 0;
     rc = read(device_fd, &psi_ack, sizeof(psi_ack));
-    if (rc <= 0 || psi_ack != XMM626_HSIC_BOOT0_ACK) {
+    if (rc < (int) sizeof(psi_ack)) {
         ipc_client_log(client, "Reading boot ACK failed");
         goto error;
     }
@@ -139,7 +139,7 @@ int xmm626_hsic_psi_send(struct ipc_client *client, int device_fd,
 
     chip_id = 0;
     rc = read(device_fd, &chip_id, sizeof(chip_id));
-    if (rc <= 0) {
+    if (rc < (int) sizeof(chip_id)) {
         ipc_client_log(client, "Reading chip id failed");
         goto error;
     }
@@ -206,7 +206,7 @@ int xmm626_hsic_psi_send(struct ipc_client *client, int device_fd,
         }
 
         rc = read(device_fd, &psi_ack, sizeof(psi_ack));
-        if (rc < (int) sizeof(psi_ack) || psi_ack != XMM626_HSIC_PSI_CRC_ACK) {
+        if (rc < (int) sizeof(psi_ack)) {
             ipc_client_log(client, "Reading PSI CRC ACK failed");
             goto error;
         }
