@@ -32,6 +32,14 @@
 #include <samsung-ipc.h>
 #include <ipc.h>
 
+int ipc_seq_valid(unsigned char seq)
+{
+    if (seq == 0x00 || seq == 0xff)
+        return 0;
+    else
+        return 1;
+}
+
 const char *ipc_request_type_string(unsigned char type)
 {
     static char type_string[5] = { 0 };

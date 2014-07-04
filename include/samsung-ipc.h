@@ -108,6 +108,8 @@ char *ipc_client_nv_data_secret(struct ipc_client *client);
 size_t ipc_client_nv_data_size(struct ipc_client *client);
 size_t ipc_client_nv_data_chunk_size(struct ipc_client *client);
 
+int ipc_seq_valid(unsigned char seq);
+
 const char *ipc_request_type_string(unsigned char type);
 const char *ipc_response_type_string(unsigned char type);
 const char *ipc_command_string(unsigned short command);
