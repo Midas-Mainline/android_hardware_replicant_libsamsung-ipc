@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include <samsung-ipc.h>
+#include <utils.h>
 
 void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
     const char *smsc, const char *pdu)
@@ -56,6 +57,26 @@ void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
     p += strlen(pdu);
 
     return data;
+}
+
+char *ipc_sms_incoming_msg_pdu_extract(const void *data, size_t size)
+{
+    struct ipc_sms_incoming_msg_header *header;
+    char *string;
+    void *pdu;
+
+    if (data == NULL || size < sizeof(struct ipc_sms_incoming_msg_header))
+        return NULL;
+
+    header = (struct ipc_sms_incoming_msg_header *) data;
+    if (header->length == 0 || header->length > size - sizeof(struct ipc_sms_incoming_msg_header))
+        return NULL;
+
+    pdu = (void *) ((unsigned char *) data + sizeof(struct ipc_sms_incoming_msg_header));
+
+    string = data2string(pdu, header->length);
+
+    return string;
 }
 
 // vim:ts=4:sw=4:expandtab

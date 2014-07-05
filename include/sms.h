@@ -92,28 +92,6 @@ struct ipc_sms_incoming_msg_header {
     unsigned char length;
 } __attribute__((__packed__));
 
-struct ipc_sms_deliver_report_request_data {
-    unsigned char type; // IPC_SMS_TYPE
-    unsigned short ack; // IPC_SMS_ACK
-    unsigned char id;
-    unsigned char unknown;
-} __attribute__((__packed__));
-
-struct ipc_sms_deliver_report_response_data {
-    unsigned short ack; // IPC_SMS_ACK
-} __attribute__((__packed__));
-
-struct ipc_sms_del_msg_request_data {
-    unsigned char magic;
-    unsigned short index;
-} __attribute__((__packed__));
-
-struct ipc_sms_del_msg_response_data {
-    unsigned char magic;
-    unsigned short error;
-    unsigned short index;
-} __attribute__((__packed__));
-
 struct ipc_sms_save_msg_request_data {
     unsigned char magic;
     unsigned short index;
@@ -127,12 +105,39 @@ struct ipc_sms_save_msg_response_data {
     unsigned short index;
 } __attribute__((__packed__));
 
+struct ipc_sms_del_msg_request_data {
+    unsigned char magic;
+    unsigned short index;
+} __attribute__((__packed__));
+
+struct ipc_sms_del_msg_response_data {
+    unsigned char magic;
+    unsigned short error;
+    unsigned short index;
+} __attribute__((__packed__));
+
+struct ipc_sms_deliver_report_request_data {
+    unsigned char type; // IPC_SMS_TYPE
+    unsigned short ack; // IPC_SMS_ACK
+    unsigned char id;
+    unsigned char unknown;
+} __attribute__((__packed__));
+
+struct ipc_sms_deliver_report_response_data {
+    unsigned short ack; // IPC_SMS_ACK
+} __attribute__((__packed__));
+
+struct ipc_sms_svc_center_addr_header {
+    unsigned char length;
+} __attribute__((__packed__));
+
 /*
  * Helpers
  */
 
 void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
     const char *smsc, const char *pdu);
+char *ipc_sms_incoming_msg_pdu_extract(const void *data, size_t size);
 
 #endif
 
