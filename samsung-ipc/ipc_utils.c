@@ -485,6 +485,7 @@ void ipc_client_log_send(struct ipc_client *client, struct ipc_message *message,
 
     switch (client->type) {
         case IPC_CLIENT_TYPE_FMT:
+            ipc_client_log(client, "\n");
             ipc_client_log(client, "%s: Sent FMT message", prefix);
             ipc_client_log(client, "%s: Message: mseq=0x%02x, command=%s, type=%s, size=%d", prefix, message->mseq, ipc_command_string(message->command), ipc_request_type_string(message->type), message->size);
 #ifdef DEBUG
@@ -496,6 +497,7 @@ void ipc_client_log_send(struct ipc_client *client, struct ipc_message *message,
 #endif
             break;
         case IPC_CLIENT_TYPE_RFS:
+            ipc_client_log(client, "\n");
             ipc_client_log(client, "%s: Sent RFS message", prefix);
             ipc_client_log(client, "%s: Message: mseq=0x%02x, command=%s, size=%d", prefix, message->mseq, ipc_command_string(message->command), message->size);
 #ifdef DEBUG
@@ -517,6 +519,7 @@ void ipc_client_log_recv(struct ipc_client *client, struct ipc_message *message,
 
     switch (client->type) {
         case IPC_CLIENT_TYPE_FMT:
+            ipc_client_log(client, "\n");
             ipc_client_log(client, "%s: Received FMT message", prefix);
             ipc_client_log(client, "%s: Message: aseq=0x%02x, command=%s, type=%s, size=%d", prefix, message->aseq, ipc_command_string(message->command), ipc_response_type_string(message->type), message->size);
 #ifdef DEBUG
@@ -528,6 +531,7 @@ void ipc_client_log_recv(struct ipc_client *client, struct ipc_message *message,
 #endif
             break;
         case IPC_CLIENT_TYPE_RFS:
+            ipc_client_log(client, "\n");
             ipc_client_log(client, "%s: Received RFS message", prefix);
             ipc_client_log(client, "%s: Message: aseq=0x%02x, command=%s, size=%d", prefix, message->aseq, ipc_command_string(message->command), message->size);
 #ifdef DEBUG
