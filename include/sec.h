@@ -173,6 +173,8 @@ int ipc_sec_phone_lock_request_set_setup(struct ipc_sec_phone_lock_request_set_d
 int ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *data,
     unsigned char facility_type, const char *password_old,
     const char *password_new);
+void *ipc_sec_rsim_access_setup(struct ipc_sec_rsim_access_request_header *header,
+    const void *sim_io_data, size_t sim_io_size);
 int ipc_sec_lock_infomation_setup(struct ipc_sec_lock_infomation_request_data *data,
     unsigned char type);
 

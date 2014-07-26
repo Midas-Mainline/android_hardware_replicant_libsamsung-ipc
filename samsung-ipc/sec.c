@@ -120,6 +120,36 @@ int ipc_sec_change_locking_pw_setup(struct ipc_sec_change_locking_pw_data *data,
     return 0;
 }
 
+void *ipc_sec_rsim_access_setup(struct ipc_sec_rsim_access_request_header *header,
+    const void *sim_io_data, size_t sim_io_size)
+{
+    void *data;
+    size_t size;
+    unsigned char *p;
+
+    if (header == NULL)
+        return NULL;
+
+    if (sim_io_data == NULL)
+        sim_io_size = 0;
+
+    size = sizeof(struct ipc_sec_rsim_access_request_header) + sim_io_size;
+
+    data = calloc(1, size);
+
+    p = (unsigned char *) data;
+
+    memcpy(p, header, sizeof(struct ipc_sec_rsim_access_request_header));
+    p += sizeof(struct ipc_sec_rsim_access_request_header);
+
+    if (sim_io_data != NULL && sim_io_size > 0) {
+        memcpy(p, sim_io_data, sim_io_size);
+        p += sim_io_size;
+    }
+
+    return data;
+}
+
 int ipc_sec_lock_infomation_setup(struct ipc_sec_lock_infomation_request_data *data,
     unsigned char type)
 {
