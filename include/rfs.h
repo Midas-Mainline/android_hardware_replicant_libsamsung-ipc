@@ -70,11 +70,12 @@ int ipc_nv_data_backup_check(struct ipc_client *client);
 int ipc_nv_data_backup(struct ipc_client *client);
 int ipc_nv_data_restore(struct ipc_client *client);
 void *ipc_nv_data_load(struct ipc_client *client);
-void *ipc_nv_data_read(struct ipc_client *client, size_t size, size_t offset);
+void *ipc_nv_data_read(struct ipc_client *client, size_t size,
+    unsigned int offset);
 int ipc_nv_data_write(struct ipc_client *client, const void *data, size_t size,
-    size_t offset);
+    unsigned int offset);
 void *ipc_rfs_nv_read_item_response_setup(const void *data, size_t size,
-    size_t offset);
+    unsigned int offset);
 
 #endif
 

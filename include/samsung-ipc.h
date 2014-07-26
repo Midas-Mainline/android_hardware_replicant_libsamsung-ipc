@@ -130,9 +130,9 @@ int ipc_rfs_message_setup(const struct ipc_rfs_header *header,
     struct ipc_message *message);
 
 void *file_data_read(const char *path, size_t size, size_t chunk_size,
-    size_t offset);
+    unsigned int offset);
 int file_data_write(const char *path, const void *data, size_t size,
-    size_t chunk_size, size_t offset);
+    size_t chunk_size, unsigned int offset);
 int network_iface_up(const char *iface, int domain, int type);
 int network_iface_down(const char *iface, int domain, int type);
 int sysfs_value_read(const char *path);

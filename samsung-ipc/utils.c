@@ -33,7 +33,7 @@
 
 
 void *file_data_read(const char *path, size_t size, size_t chunk_size,
-    size_t offset)
+    unsigned int offset)
 {
     void *data = NULL;
     int fd = -1;
@@ -83,7 +83,7 @@ complete:
 }
 
 int file_data_write(const char *path, const void *data, size_t size,
-    size_t chunk_size, size_t offset)
+    size_t chunk_size, unsigned int offset)
 {
     int fd = -1;
     size_t count;

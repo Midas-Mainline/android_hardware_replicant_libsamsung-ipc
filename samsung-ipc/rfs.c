@@ -555,7 +555,8 @@ void *ipc_nv_data_load(struct ipc_client *client)
     return data;
 }
 
-void *ipc_nv_data_read(struct ipc_client *client, size_t size, size_t offset)
+void *ipc_nv_data_read(struct ipc_client *client, size_t size,
+    unsigned int offset)
 {
     void *data;
     char *path;
@@ -586,7 +587,7 @@ void *ipc_nv_data_read(struct ipc_client *client, size_t size, size_t offset)
 }
 
 int ipc_nv_data_write(struct ipc_client *client, const void *data, size_t size,
-    size_t offset)
+    unsigned int offset)
 {
     char *path;
     char *md5_path;
@@ -656,7 +657,7 @@ complete:
 }
 
 void *ipc_rfs_nv_read_item_response_setup(const void *data, size_t size,
-    size_t offset)
+    unsigned int offset)
 {
     struct ipc_rfs_nv_read_item_response_header *header;
     void *buffer;
@@ -678,7 +679,7 @@ void *ipc_rfs_nv_read_item_response_setup(const void *data, size_t size,
 
     header = (struct ipc_rfs_nv_read_item_response_header *) buffer;
     header->confirm = confirm;
-    header->offset = (unsigned int) offset;
+    header->offset = offset;
     header->length = (unsigned int) size;
 
     if (data != NULL && size > 0) {

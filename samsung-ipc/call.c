@@ -65,7 +65,7 @@ struct ipc_call_list_entry *ipc_call_list_entry_extract(const void *data,
     struct ipc_call_list_entry *entry = NULL;
     unsigned char count;
     unsigned char i;
-    size_t offset;
+    unsigned int offset;
 
     if (data == NULL)
         return NULL;
