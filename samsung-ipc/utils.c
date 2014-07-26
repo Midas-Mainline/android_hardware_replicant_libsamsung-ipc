@@ -331,6 +331,18 @@ complete:
     return rc;
 }
 
+size_t data2string_length(const void *data, size_t size)
+{
+    size_t length;
+
+    if (data == NULL || size == 0)
+        return 0;
+
+    length = size * 2 + 1;
+
+    return length;
+}
+
 char *data2string(const void *data, size_t size)
 {
     char *string;
@@ -341,7 +353,10 @@ char *data2string(const void *data, size_t size)
     if (data == NULL || size == 0)
         return NULL;
 
-    length = size * 2 + 1;
+    length = data2string_length(data, size);
+    if (length == 0)
+        return NULL;
+
     string = (char *) calloc(1, length);
 
     p = string;
@@ -354,7 +369,27 @@ char *data2string(const void *data, size_t size)
     return string;
 }
 
-void *string2data(const char *string, size_t *size_p)
+size_t string2data_size(const char *string)
+{
+    size_t length;
+    size_t size;
+
+    if (string == NULL)
+        return 0;
+
+    length = strlen(string);
+    if (length == 0)
+        return 0;
+
+    if (length % 2 == 0)
+        size = length / 2;
+    else
+        size = (length - (length % 2)) / 2 + 1;
+
+    return size;
+}
+
+void *string2data(const char *string)
 {
     void *data;
     size_t size;
@@ -372,13 +407,14 @@ void *string2data(const char *string, size_t *size_p)
     if (length == 0)
         return NULL;
 
-    if (length % 2 == 0) {
-        size = length / 2;
+    if (length % 2 == 0)
         shift = 0;
-    } else {
-        size = (length - (length % 2)) / 2 + 1;
+    else
         shift = 1;
-    }
+
+    size = string2data_size(string);
+    if (size == 0)
+        return NULL;
 
     data = calloc(1, size);
 
@@ -396,9 +432,6 @@ void *string2data(const char *string, size_t *size_p)
 
         shift++;
     }
-
-    if (size_p != NULL)
-        *size_p = size;
 
     return data;
 }

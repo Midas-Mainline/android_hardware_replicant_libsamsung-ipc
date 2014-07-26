@@ -139,8 +139,10 @@ int sysfs_value_read(const char *path);
 int sysfs_value_write(const char *path, int value);
 char *sysfs_string_read(const char *path, size_t length);
 int sysfs_string_write(const char *path, const char *buffer, size_t length);
+size_t data2string_length(const void *data, size_t size);
 char *data2string(const void *data, size_t size);
-void *string2data(const char *string, size_t *size_p);
+size_t string2data_size(const char *string);
+void *string2data(const char *string);
 
 /*
  * Samsung-IPC protocol
