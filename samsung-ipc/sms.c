@@ -25,21 +25,21 @@
 #include <utils.h>
 
 void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
-    const char *smsc, const char *pdu)
+    const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size)
 {
     void *data;
     size_t size;
     unsigned char smsc_length;
     unsigned char *p;
 
-    if (header == NULL || smsc == NULL || pdu == NULL)
-        return NULL;
+	if (header == NULL || smsc == NULL || smsc_size == 0 || pdu == NULL || pdu_size == 0)
+		return NULL;
 
-    smsc_length = (unsigned char) strlen(smsc);
+    smsc_length = (unsigned char) smsc_size;
 
-    size = sizeof(struct ipc_sms_send_msg_request_header) + sizeof(smsc_length) + strlen(smsc) + strlen(pdu);
-    header->length = (unsigned char) size;
+    header->length = (unsigned char) (sizeof(smsc_length) + smsc_size + pdu_size);
 
+    size = sizeof(struct ipc_sms_send_msg_request_header) + sizeof(smsc_length) + smsc_size + pdu_size;
     data = calloc(1, size);
 
     p = (unsigned char *) data;
@@ -50,11 +50,11 @@ void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
     memcpy(p, &smsc_length, sizeof(smsc_length));
     p += sizeof(smsc_length);
 
-    memcpy(p, smsc, smsc_length);
-    p += smsc_length;
+    memcpy(p, smsc, smsc_size);
+    p += smsc_size;
 
-    memcpy(p, pdu, strlen(pdu));
-    p += strlen(pdu);
+    memcpy(p, pdu, pdu_size);
+    p += pdu_size;
 
     return data;
 }
@@ -77,6 +77,59 @@ char *ipc_sms_incoming_msg_pdu_extract(const void *data, size_t size)
     string = data2string(pdu, header->length);
 
     return string;
+}
+
+void *ipc_sms_save_msg_setup(struct ipc_sms_save_msg_request_header *header,
+    const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size)
+{
+    void *data;
+    size_t size;
+    unsigned char smsc_length;
+    unsigned char *p;
+
+    if (header == NULL || pdu == NULL || pdu_size == 0)
+        return NULL;
+
+    if (smsc == NULL)
+        smsc_size = 0;
+
+    smsc_length = (unsigned char) smsc_size;
+
+    header->magic = 2;
+    header->index = 12 - 1,
+    header->length = (unsigned char) (sizeof(smsc_length) + smsc_size + pdu_size);
+
+    size = sizeof(struct ipc_sms_save_msg_request_header) + sizeof(smsc_length) + smsc_size + pdu_size;
+    data = calloc(1, size);
+
+    p = (unsigned char *) data;
+
+    memcpy(p, header, sizeof(struct ipc_sms_save_msg_request_header));
+    p += sizeof(struct ipc_sms_save_msg_request_header);
+
+    memcpy(p, &smsc_length, sizeof(smsc_length));
+    p += sizeof(smsc_length);
+
+    memcpy(p, smsc, smsc_size);
+    p += smsc_size;
+
+    memcpy(p, pdu, pdu_size);
+    p += pdu_size;
+
+    return data;
+}
+
+int ipc_sms_del_msg_setup(struct ipc_sms_del_msg_request_data *data,
+    unsigned short index)
+{
+   if (data == NULL)
+        return -1;
+
+    memset(data, 0, sizeof(struct ipc_sms_del_msg_request_data));
+    data->magic = 2;
+    data->index = index;
+
+    return 0;
 }
 
 // vim:ts=4:sw=4:expandtab

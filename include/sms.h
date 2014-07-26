@@ -92,7 +92,7 @@ struct ipc_sms_incoming_msg_header {
     unsigned char length;
 } __attribute__((__packed__));
 
-struct ipc_sms_save_msg_request_data {
+struct ipc_sms_save_msg_request_header {
     unsigned char magic;
     unsigned short index;
     unsigned char status; // IPC_SMS_STATUS
@@ -136,8 +136,12 @@ struct ipc_sms_svc_center_addr_header {
  */
 
 void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
-    const char *smsc, const char *pdu);
+    const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size);
 char *ipc_sms_incoming_msg_pdu_extract(const void *data, size_t size);
+void *ipc_sms_save_msg_setup(struct ipc_sms_save_msg_request_header *header,
+    const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size);
+int ipc_sms_del_msg_setup(struct ipc_sms_del_msg_request_data *data,
+    unsigned short index);
 
 #endif
 
