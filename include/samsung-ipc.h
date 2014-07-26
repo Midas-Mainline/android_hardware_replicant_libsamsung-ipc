@@ -114,7 +114,7 @@ const char *ipc_request_type_string(unsigned char type);
 const char *ipc_response_type_string(unsigned char type);
 const char *ipc_command_string(unsigned short command);
 
-void ipc_hex_dump(struct ipc_client *client, const void *data, size_t size);
+int ipc_data_dump(struct ipc_client *client, const void *data, size_t size);
 void ipc_client_log_send(struct ipc_client *client, struct ipc_message *message,
     const char *prefix);
 void ipc_client_log_recv(struct ipc_client *client, struct ipc_message *message,

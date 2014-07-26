@@ -36,8 +36,8 @@ int ipc_seq_valid(unsigned char seq)
 {
     if (seq == 0x00 || seq == 0xff)
         return 0;
-    else
-        return 1;
+
+    return 1;
 }
 
 const char *ipc_request_type_string(unsigned char type)
@@ -353,60 +353,128 @@ const char *ipc_command_string(unsigned short command)
     }
 }
 
-void ipc_hex_dump(struct ipc_client *client, const void *data, size_t size)
+int ipc_data_dump(struct ipc_client *client, const void *data, size_t size)
 {
-    /* dumps size bytes of *data to stdout. Looks like:
-     * [0000] 75 6E 6B 6E 6F 77 6E 20
-     *                  30 FF 00 00 00 00 39 00 unknown 0.....9.
-     * (in a single line of course)
-     */
+    unsigned int cols = 8;
+    unsigned int cols_count = 2;
+    int spacer;
+    char string[81];
+    size_t length;
+    char *print;
+    unsigned char *p;
+    unsigned int offset;
+    unsigned int rollback;
+    unsigned int i, j, k;
+    int rc;
 
-    unsigned char *p = (unsigned char *) data;
-    unsigned char c;
-    size_t n;
-    char bytestr[4] = {0};
-    char addrstr[10] = {0};
-    char hexstr[ 16*3 + 5] = {0};
-    char charstr[16*1 + 5] = {0};
-    for (n=1;n<=size;n++) {
-        if (n%16 == 1) {
-            /* store address for this line */
-            unsigned int end = 0, start = 0;
-            end = *((unsigned int*) p);
-            start = *((unsigned int*) data);
-            snprintf(addrstr, sizeof(addrstr), "%.4x", end - start);
+    if (data == NULL || size == 0)
+        return -1;
+
+    // spacer = string length - offset print length - data print length - ascii print length
+    spacer = (sizeof(string) - 1) - 6 - (3 * cols * cols_count - 1 + (cols_count - 1)) - (cols * cols_count + cols_count - 1);
+
+    // Need 3 spacers
+    spacer /= 3;
+
+    if (spacer <= 0)
+        return -1;
+
+    p = (unsigned char *) data;
+    offset = 0;
+
+    while (offset < size) {
+        rollback = 0;
+
+        print = (char *) &string;
+        length = sizeof(string);
+
+        // Offset print
+
+        rc = snprintf(print, length, "[%04x]", offset);
+        print += rc;
+        length -= rc;
+
+        // Spacer print
+
+        for (i = 0; i < (unsigned int) spacer; i++) {
+            *print++ = ' ';
+            length--;
         }
 
-        c = *p;
-        if (isalnum(c) == 0) {
-            c = '.';
+        // Data print
+
+        for (i = 0; i < cols_count; i++) {
+            for (j = 0; j < cols; j++) {
+                if (offset < size) {
+                    rc = snprintf(print, length, "%02X", *p);
+                    print += rc;
+                    length -= rc;
+
+                    p++;
+                    offset++;
+                    rollback++;
+                } else {
+                    for (k = 0; k < 2; k++) {
+                        *print++ = ' ';
+                        length--;
+                    }
+                }
+
+                if (j != (cols - 1)) {
+                    *print++ = ' ';
+                    length--;
+                }
+            }
+
+            if (i != (cols_count - 1)) {
+                for (k = 0; k < 2; k++) {
+                    *print++ = ' ';
+                    length--;
+                }
+            }
         }
 
-        /* store hex str (for left side) */
-        snprintf(bytestr, sizeof(bytestr), "%02X ", *p);
-        strncat(hexstr, bytestr, sizeof(hexstr)-strlen(hexstr)-1);
+        // Spacer print
 
-        /* store char str (for right side) */
-        snprintf(bytestr, sizeof(bytestr), "%c", c);
-        strncat(charstr, bytestr, sizeof(charstr)-strlen(charstr)-1);
-
-        if (n%16 == 0) {
-            /* line completed */
-            ipc_client_log(client, "[%4.4s]   %-50.50s  %s", addrstr, hexstr, charstr);
-            hexstr[0] = 0;
-            charstr[0] = 0;
-        } else if (n%8 == 0) {
-            /* half line: add whitespaces */
-            strncat(hexstr, "  ", sizeof(hexstr)-strlen(hexstr)-1);
-            strncat(charstr, " ", sizeof(charstr)-strlen(charstr)-1);
+        for (i = 0; i < (unsigned int) spacer; i++) {
+            *print++ = ' ';
+            length--;
         }
-        p++; /* next byte */
+
+        // ASCII print
+
+        p -= rollback;
+        offset -= rollback;
+
+        for (i = 0; i < cols_count; i++) {
+            for (j = 0; j < cols; j++) {
+                if (offset < size) {
+                    if (isascii(*p) && isprint(*p))
+                        *print = *p;
+                    else
+                        *print = '.';
+
+                    print++;
+                    length--;
+
+                    p++;
+                    offset++;
+                    rollback++;
+                }
+            }
+
+            if (i != (cols_count - 1) && offset < size) {
+                *print++ = ' ';
+                length--;
+            }
+        }
+
+        *print = '\0';
+
+        ipc_client_log(client, string);
     }
 
-    if (strlen(hexstr) > 0) {
-        /* print rest of buffer if not empty */
-        ipc_client_log(client, "[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
-    }
+    return 0;
 }
 
 void ipc_client_log_send(struct ipc_client *client, struct ipc_message *message,
@@ -421,9 +489,9 @@ void ipc_client_log_send(struct ipc_client *client, struct ipc_message *message,
             ipc_client_log(client, "%s: Message: mseq=0x%02x, command=%s, type=%s, size=%d", prefix, message->mseq, ipc_command_string(message->command), ipc_request_type_string(message->type), message->size);
 #ifdef DEBUG
             if (message->size > 0) {
-                ipc_client_log(client, "=============================== FMT data dump ================================");
-                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
-                ipc_client_log(client, "==============================================================================");
+                ipc_client_log(client, "================================= IPC FMT data =================================");
+                ipc_data_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
+                ipc_client_log(client, "================================================================================");
             }
 #endif
             break;
@@ -432,9 +500,9 @@ void ipc_client_log_send(struct ipc_client *client, struct ipc_message *message,
             ipc_client_log(client, "%s: Message: mseq=0x%02x, command=%s, size=%d", prefix, message->mseq, ipc_command_string(message->command), message->size);
 #ifdef DEBUG
             if (message->size > 0) {
-                ipc_client_log(client, "=============================== RFS data dump ================================");
-                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
-                ipc_client_log(client, "==============================================================================");
+                ipc_client_log(client, "================================= IPC RFS data =================================");
+                ipc_data_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
+                ipc_client_log(client, "================================================================================");
             }
 #endif
             break;
@@ -453,9 +521,9 @@ void ipc_client_log_recv(struct ipc_client *client, struct ipc_message *message,
             ipc_client_log(client, "%s: Message: aseq=0x%02x, command=%s, type=%s, size=%d", prefix, message->aseq, ipc_command_string(message->command), ipc_response_type_string(message->type), message->size);
 #ifdef DEBUG
             if (message->size > 0) {
-                ipc_client_log(client, "=============================== FMT data dump ================================");
-                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
-                ipc_client_log(client, "==============================================================================");
+                ipc_client_log(client, "================================= IPC FMT data =================================");
+                ipc_data_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
+                ipc_client_log(client, "================================================================================");
             }
 #endif
             break;
@@ -464,9 +532,9 @@ void ipc_client_log_recv(struct ipc_client *client, struct ipc_message *message,
             ipc_client_log(client, "%s: Message: aseq=0x%02x, command=%s, size=%d", prefix, message->aseq, ipc_command_string(message->command), message->size);
 #ifdef DEBUG
             if (message->size > 0) {
-                ipc_client_log(client, "=============================== RFS data dump ================================");
-                ipc_hex_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
-                ipc_client_log(client, "==============================================================================");
+                ipc_client_log(client, "================================= IPC RFS data =================================");
+                ipc_data_dump(client, (void *) message->data, message->size > 0x100 ? 0x100 : message->size);
+                ipc_client_log(client, "================================================================================");
             }
 #endif
             break;
