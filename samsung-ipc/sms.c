@@ -109,8 +109,10 @@ void *ipc_sms_save_msg_setup(struct ipc_sms_save_msg_request_header *header,
     memcpy(p, &smsc_length, sizeof(smsc_length));
     p += sizeof(smsc_length);
 
-    memcpy(p, smsc, smsc_size);
-    p += smsc_size;
+    if (smsc != NULL && smsc_size > 0) {
+        memcpy(p, smsc, smsc_size);
+        p += smsc_size;
+    }
 
     memcpy(p, pdu, pdu_size);
     p += pdu_size;
