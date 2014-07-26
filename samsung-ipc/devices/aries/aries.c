@@ -32,7 +32,6 @@
 
 #include <samsung-ipc.h>
 #include <ipc.h>
-#include <utils.h>
 
 #include "onedram.h"
 #include "phonet.h"

@@ -31,7 +31,6 @@
 #include <linux/netlink.h>
 #include <net/if.h>
 
-#include <utils.h>
 
 void *file_data_read(const char *path, size_t size, size_t chunk_size,
     size_t offset)

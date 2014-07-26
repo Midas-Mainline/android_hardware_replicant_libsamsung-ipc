@@ -22,7 +22,6 @@
 #include <string.h>
 
 #include <samsung-ipc.h>
-#include <utils.h>
 
 void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
     const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size)

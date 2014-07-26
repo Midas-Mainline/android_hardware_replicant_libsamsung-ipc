@@ -53,7 +53,6 @@ libsamsung_ipc_la_SOURCES = \
 	devices/n7100/n7100.c \
 	devices/n7100/n7100.h \
 	utils.c \
-	utils.h \
 	call.c \
 	sms.c \
 	sec.c \

@@ -28,7 +28,6 @@
 #include <sys/select.h>
 
 #include <samsung-ipc.h>
-#include <utils.h>
 
 #include "xmm626.h"
 #include "xmm626_hsic.h"

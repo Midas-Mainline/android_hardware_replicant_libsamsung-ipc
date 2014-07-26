@@ -129,6 +129,19 @@ int ipc_rfs_header_setup(struct ipc_rfs_header *header,
 int ipc_rfs_message_setup(const struct ipc_rfs_header *header,
     struct ipc_message *message);
 
+void *file_data_read(const char *path, size_t size, size_t chunk_size,
+    size_t offset);
+int file_data_write(const char *path, const void *data, size_t size,
+    size_t chunk_size, size_t offset);
+int network_iface_up(const char *iface, int domain, int type);
+int network_iface_down(const char *iface, int domain, int type);
+int sysfs_value_read(const char *path);
+int sysfs_value_write(const char *path, int value);
+char *sysfs_string_read(const char *path, size_t length);
+int sysfs_string_write(const char *path, const char *buffer, size_t length);
+char *data2string(const void *data, size_t size);
+void *string2data(const char *string, size_t *size_p);
+
 /*
  * Samsung-IPC protocol
  */

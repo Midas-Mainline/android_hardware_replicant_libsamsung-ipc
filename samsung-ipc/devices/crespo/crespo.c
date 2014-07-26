@@ -29,7 +29,6 @@
 
 #include <samsung-ipc.h>
 #include <ipc.h>
-#include <utils.h>
 
 #include "crespo_modem_ctl.h"
 
