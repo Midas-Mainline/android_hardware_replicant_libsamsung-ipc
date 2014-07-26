@@ -89,7 +89,7 @@
 struct ipc_svc_enter_data {
     unsigned char mode; // IPC_SVC_MODE
     unsigned char type; // IPC_SVC_TYPE
-    unsigned char unknown;
+    unsigned char magic;
 } __attribute__((__packed__));
 
 struct ipc_svc_end_data {
@@ -109,7 +109,7 @@ struct ipc_svc_display_screen_header {
     unsigned char count;
 } __attribute__((__packed__));
 
-struct ipc_svc_display_screen_data {
+struct ipc_svc_display_screen_entry {
     unsigned short index;
     char line[32];
 } __attribute__((__packed__));
@@ -117,6 +117,16 @@ struct ipc_svc_display_screen_data {
 struct ipc_svc_change_svc_mode_data {
     unsigned char mode; // IPC_SVC_MODE
 } __attribute__((__packed__));
+
+/*
+ * Helpers
+ */
+
+int ipc_svc_enter_setup(struct ipc_svc_enter_data *data,
+    unsigned char mode, unsigned char type);
+unsigned char ipc_svc_display_screen_count_extract(const void *data, size_t size);
+struct ipc_svc_display_screen_entry *ipc_svc_display_screen_extract(const void *data,
+    size_t size, unsigned int index);
 
 #endif
 

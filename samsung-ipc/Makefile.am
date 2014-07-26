@@ -58,6 +58,7 @@ libsamsung_ipc_la_SOURCES = \
 	sec.c \
 	net.c \
 	misc.c \
+	svc.c \
 	gprs.c \
 	rfs.c \
 	gen.c \

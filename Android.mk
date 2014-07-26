@@ -69,6 +69,7 @@ LOCAL_SRC_FILES := \
 	samsung-ipc/sec.c \
 	samsung-ipc/net.c \
 	samsung-ipc/misc.c \
+	samsung-ipc/svc.c \
 	samsung-ipc/gprs.c \
 	samsung-ipc/rfs.c \
 	samsung-ipc/gen.c

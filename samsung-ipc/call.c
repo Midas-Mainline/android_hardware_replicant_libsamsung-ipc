@@ -71,7 +71,7 @@ struct ipc_call_list_entry *ipc_call_list_entry_extract(const void *data,
         return NULL;
 
     count = ipc_call_list_count_extract(data, size);
-    if (count == 0)
+    if (count == 0 || index >= count)
         return NULL;
 
     offset = sizeof(struct ipc_call_list_header);
