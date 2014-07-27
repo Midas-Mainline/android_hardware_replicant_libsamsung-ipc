@@ -55,7 +55,7 @@ int xmm626_sec_modem_read(int fd, void *buffer, size_t length);
 int xmm626_sec_modem_write(int fd, const void *buffer, size_t length);
 int xmm626_sec_modem_poll(int fd, struct timeval *timeout);
 
-char *xmm626_sec_modem_gprs_get_iface(int cid);
+char *xmm626_sec_modem_gprs_get_iface(unsigned int cid);
 int xmm626_sec_modem_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities);
 
 #endif

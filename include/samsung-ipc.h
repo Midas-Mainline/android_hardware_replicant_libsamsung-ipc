@@ -51,7 +51,7 @@ struct ipc_message {
 };
 
 struct ipc_client_gprs_capabilities {
-    int cid_count;
+    unsigned int cid_count;
 };
 
 /*
@@ -74,8 +74,8 @@ int ipc_client_power_handlers_register(struct ipc_client *client,
     int (*power_on)(void *power_data), int (*power_off)(void *power_data),
     void *power_data);
 int ipc_client_gprs_handlers_register(struct ipc_client *client,
-    int (*gprs_activate)(void *gprs_data, int cid),
-    int (*gprs_deactivate)(void *gprs_data, int cid), void *gprs_data);
+    int (*gprs_activate)(void *gprs_data, unsigned int cid),
+    int (*gprs_deactivate)(void *gprs_data, unsigned int cid), void *gprs_data);
 
 void ipc_client_log(struct ipc_client *client, const char *message, ...);
 int ipc_client_log_callback_register(struct ipc_client *client,
@@ -91,12 +91,12 @@ int ipc_client_close(struct ipc_client *client);
 int ipc_client_poll(struct ipc_client *client, struct timeval *timeout);
 int ipc_client_power_on(struct ipc_client *client);
 int ipc_client_power_off(struct ipc_client *client);
-int ipc_client_gprs_activate(struct ipc_client *client, int cid);
-int ipc_client_gprs_deactivate(struct ipc_client *client, int cid);
+int ipc_client_gprs_activate(struct ipc_client *client, unsigned int cid);
+int ipc_client_gprs_deactivate(struct ipc_client *client, unsigned int cid);
 int ipc_client_data_create(struct ipc_client *client);
 int ipc_client_data_destroy(struct ipc_client *client);
 
-char *ipc_client_gprs_get_iface(struct ipc_client *client, int cid);
+char *ipc_client_gprs_get_iface(struct ipc_client *client, unsigned int cid);
 int ipc_client_gprs_get_capabilities(struct ipc_client *client,
     struct ipc_client_gprs_capabilities *capabilities);
 

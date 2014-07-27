@@ -706,7 +706,7 @@ int aries_data_destroy(void *transport_data, void *power_data, void *gprs_data)
     return 0;
 }
 
-int aries_gprs_activate(void *data, int cid)
+int aries_gprs_activate(void *data, unsigned int cid)
 {
     int rc;
 
@@ -717,7 +717,7 @@ int aries_gprs_activate(void *data, int cid)
     return 0;
 }
 
-int aries_gprs_deactivate(void *data, int cid)
+int aries_gprs_deactivate(void *data, unsigned int cid)
 {
     int rc;
 
@@ -728,7 +728,7 @@ int aries_gprs_deactivate(void *data, int cid)
     return 0;
 }
 
-char *aries_gprs_get_iface(int cid)
+char *aries_gprs_get_iface(unsigned int cid)
 {
     char *iface = NULL;
     struct ifreq ifr;

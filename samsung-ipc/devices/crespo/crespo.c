@@ -470,7 +470,7 @@ int crespo_data_destroy(void *transport_data, void *power_data, void *gprs_data)
     return 0;
 }
 
-char *crespo_gprs_get_iface_single(int cid)
+char *crespo_gprs_get_iface_single(unsigned int cid)
 {
     char *iface = NULL;
 
@@ -489,7 +489,7 @@ int crespo_gprs_get_capabilities_single(struct ipc_client_gprs_capabilities *cap
     return 0;
 }
 
-char *crespo_gprs_get_iface(int cid)
+char *crespo_gprs_get_iface(unsigned int cid)
 {
     char *iface = NULL;
 

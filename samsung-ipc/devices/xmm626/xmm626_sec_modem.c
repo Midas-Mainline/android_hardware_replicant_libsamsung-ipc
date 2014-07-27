@@ -476,7 +476,7 @@ int xmm626_sec_modem_poll(int fd, struct timeval *timeout)
     return rc;
 }
 
-char *xmm626_sec_modem_gprs_get_iface(int cid)
+char *xmm626_sec_modem_gprs_get_iface(unsigned int cid)
 {
     char *iface = NULL;
 

@@ -54,8 +54,8 @@ struct ipc_client_handlers {
     void *power_data;
 
     /* GPRS handlers */
-    int (*gprs_activate)(void *gprs_data, int cid);
-    int (*gprs_deactivate)(void *gprs_data, int cid);
+    int (*gprs_activate)(void *gprs_data, unsigned int cid);
+    int (*gprs_deactivate)(void *gprs_data, unsigned int cid);
 
     void *gprs_data;
 
@@ -65,7 +65,7 @@ struct ipc_client_handlers {
 };
 
 struct ipc_client_gprs_specs {
-    char *(*gprs_get_iface)(int cid);
+    char *(*gprs_get_iface)(unsigned int cid);
     int (*gprs_get_capabilities)(struct ipc_client_gprs_capabilities *capabilities);
 };
 
