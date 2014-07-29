@@ -304,6 +304,16 @@ int maguro_power_off(void *data)
     return 0;
 }
 
+int maguro_gprs_activate(void *data, unsigned int cid)
+{
+    return 0;
+}
+
+int maguro_gprs_deactivate(void *data, unsigned int cid)
+{
+    return 0;
+}
+
 int maguro_data_create(void **transport_data, void **power_data,
     void **gprs_data)
 {
@@ -348,8 +358,8 @@ struct ipc_client_handlers maguro_handlers = {
     .power_on = maguro_power_on,
     .power_off = maguro_power_off,
     .power_data = NULL,
-    .gprs_activate = NULL,
-    .gprs_deactivate = NULL,
+    .gprs_activate = maguro_gprs_activate,
+    .gprs_deactivate = maguro_gprs_deactivate,
     .gprs_data = NULL,
     .data_create = maguro_data_create,
     .data_destroy = maguro_data_destroy,

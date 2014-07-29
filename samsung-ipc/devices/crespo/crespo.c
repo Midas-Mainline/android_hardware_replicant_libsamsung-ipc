@@ -470,6 +470,16 @@ int crespo_data_destroy(void *transport_data, void *power_data, void *gprs_data)
     return 0;
 }
 
+int crespo_gprs_activate(void *data, unsigned int cid)
+{
+    return 0;
+}
+
+int crespo_gprs_deactivate(void *data, unsigned int cid)
+{
+    return 0;
+}
+
 char *crespo_gprs_get_iface_single(unsigned int cid)
 {
     char *iface = NULL;
@@ -533,8 +543,8 @@ struct ipc_client_handlers crespo_handlers = {
     .power_on = crespo_power_on,
     .power_off = crespo_power_off,
     .power_data = NULL,
-    .gprs_activate = NULL,
-    .gprs_deactivate = NULL,
+    .gprs_activate = crespo_gprs_activate,
+    .gprs_deactivate = crespo_gprs_deactivate,
     .gprs_data = NULL,
     .data_create = crespo_data_create,
     .data_destroy = crespo_data_destroy,

@@ -323,6 +323,16 @@ int i9300_power_off(void *data)
     return 0;
 }
 
+int i9300_gprs_activate(void *data, unsigned int cid)
+{
+    return 0;
+}
+
+int i9300_gprs_deactivate(void *data, unsigned int cid)
+{
+    return 0;
+}
+
 int i9300_data_create(void **transport_data, void **power_data,
     void **gprs_data)
 {
@@ -366,8 +376,8 @@ struct ipc_client_handlers i9300_handlers = {
     .power_on = i9300_power_on,
     .power_off = i9300_power_off,
     .power_data = NULL,
-    .gprs_activate = NULL,
-    .gprs_deactivate = NULL,
+    .gprs_activate = i9300_gprs_activate,
+    .gprs_deactivate = i9300_gprs_deactivate,
     .gprs_data = NULL,
     .data_create = i9300_data_create,
     .data_destroy = i9300_data_destroy,

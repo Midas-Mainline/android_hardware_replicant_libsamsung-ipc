@@ -329,6 +329,16 @@ int galaxys2_power_off(void *data)
     return 0;
 }
 
+int galaxys2_gprs_activate(void *data, unsigned int cid)
+{
+    return 0;
+}
+
+int galaxys2_gprs_deactivate(void *data, unsigned int cid)
+{
+    return 0;
+}
+
 int galaxys2_data_create(void **transport_data, void **power_data,
     void **gprs_data)
 {
@@ -373,8 +383,8 @@ struct ipc_client_handlers galaxys2_handlers = {
     .power_on = galaxys2_power_on,
     .power_off = galaxys2_power_off,
     .power_data = NULL,
-    .gprs_activate = NULL,
-    .gprs_deactivate = NULL,
+    .gprs_activate = galaxys2_gprs_activate,
+    .gprs_deactivate = galaxys2_gprs_deactivate,
     .gprs_data = NULL,
     .data_create = galaxys2_data_create,
     .data_destroy = galaxys2_data_destroy,

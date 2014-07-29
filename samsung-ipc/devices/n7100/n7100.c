@@ -323,6 +323,16 @@ int n7100_power_off(void *data)
     return 0;
 }
 
+int n7100_gprs_activate(void *data, unsigned int cid)
+{
+    return 0;
+}
+
+int n7100_gprs_deactivate(void *data, unsigned int cid)
+{
+    return 0;
+}
+
 int n7100_data_create(void **transport_data, void **power_data,
     void **gprs_data)
 {
@@ -367,8 +377,8 @@ struct ipc_client_handlers n7100_handlers = {
     .power_on = n7100_power_on,
     .power_off = n7100_power_off,
     .power_data = NULL,
-    .gprs_activate = NULL,
-    .gprs_deactivate = NULL,
+    .gprs_activate = n7100_gprs_activate,
+    .gprs_deactivate = n7100_gprs_deactivate,
     .gprs_data = NULL,
     .data_create = n7100_data_create,
     .data_destroy = n7100_data_destroy,
