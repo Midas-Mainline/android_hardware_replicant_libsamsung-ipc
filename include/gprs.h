@@ -4,6 +4,9 @@
  * Copyright (C) 2011 Simon Busch <morphis@gravedo.de>
  * Copyright (C) 2011-2014 Paul Kocialkowski <contact@paulk.fr>
  *
+ * Based on Tizen libslp-tapi:
+ * Copyright (C) 2011 Samsung Electronics Co., Ltd.
+ *
  * libsamsung-ipc is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
@@ -53,16 +56,31 @@
 #define IPC_GPRS_STATUS_ENABLED                                 0x01
 #define IPC_GPRS_STATUS_DISABLED                                0x03
 
-#define IPC_GPRS_FAIL_CAUSE_INSUFFICIENT_RESOURCES              0x0004
-#define IPC_GPRS_FAIL_CAUSE_MISSING_UKNOWN_APN                  0x0005
-#define IPC_GPRS_FAIL_CAUSE_UNKNOWN_PDP_ADDRESS_TYPE            0x0006
-#define IPC_GPRS_FAIL_CAUSE_USER_AUTHENTICATION                 0x0007
-#define IPC_GPRS_FAIL_CAUSE_ACTIVATION_REJECT_GGSN              0x0008
-#define IPC_GPRS_FAIL_CAUSE_ACTIVATION_REJECT_UNSPECIFIED       0x0009
-#define IPC_GPRS_FAIL_CAUSE_SERVICE_OPTION_NOT_SUPPORTED        0x000A
-#define IPC_GPRS_FAIL_CAUSE_SERVICE_OPTION_NOT_SUBSCRIBED       0x000B
-#define IPC_GPRS_FAIL_CAUSE_SERVICE_OPTION_OUT_OF_ORDER         0x000C
-#define IPC_GPRS_FAIL_CAUSE_NSAPI_IN_USE                        0x000D
+#define IPC_GPRS_FAIL_CAUSE_NONE                                0x0000
+#define IPC_GPRS_FAIL_CAUSE_REL_BY_USER                         0x0001
+#define IPC_GPRS_FAIL_CAUSE_REGULAR_DEACTIVATION                0x0002
+#define IPC_GPRS_FAIL_CAUSE_LLC_SNDCP                           0x0003
+#define IPC_GPRS_FAIL_CAUSE_INSUFFICIENT_RESOURCE               0x0004
+#define IPC_GPRS_FAIL_CAUSE_UNKNOWN_APN                         0x0005
+#define IPC_GPRS_FAIL_CAUSE_UNKNOWN_PDP_ADDRESS                 0x0006
+#define IPC_GPRS_FAIL_CAUSE_USER_AUTH_FAILED                    0x0007
+#define IPC_GPRS_FAIL_CAUSE_ACT_REJ_GGSN                        0x0008
+#define IPC_GPRS_FAIL_CAUSE_ACT_REJ_UNSPECIFIED                 0x0009
+#define IPC_GPRS_FAIL_CAUSE_SVC_OPTION_NOT_SUPPORTED            0x000A
+#define IPC_GPRS_FAIL_CAUSE_SVC_NOT_SUBSCRIBED                  0x000B
+#define IPC_GPRS_FAIL_CAUSE_SVC_OPT_OUT_ORDER                   0x000C
+#define IPC_GPRS_FAIL_CAUSE_NSAPI_USED                          0x000D
+#define IPC_GPRS_FAIL_CAUSE_QOS_NOT_ACCEPTED                    0x000E
+#define IPC_GPRS_FAIL_CAUSE_NETWORK_FAILURE                     0x000F
+#define IPC_GPRS_FAIL_CAUSE_REACT_REQUIRED                      0x0010
+#define IPC_GPRS_FAIL_CAUSE_FEATURE_NOT_SUPPORTED               0x0011
+#define IPC_GPRS_FAIL_CAUSE_TFT_FILTER_ERROR                    0x0012
+#define IPC_GPRS_FAIL_CAUSE_UNKOWN_PDP_CONTEXT                  0x0013
+#define IPC_GPRS_FAIL_CAUSE_INVALID_MSG                         0x0014
+#define IPC_GPRS_FAIL_CAUSE_PROTOCOL_ERROR                      0x0015
+#define IPC_GPRS_FAIL_CAUSE_MOBILE_FAILURE_ERROR                0x0016
+#define IPC_GPRS_FAIL_CAUSE_TIMEOUT_ERROR                       0x0017
+#define IPC_GPRS_FAIL_CAUSE_UNKNOWN_ERROR                       0x0018
 
 /*
  * Structures
