@@ -52,10 +52,6 @@
  * Values
  */
 
-#define IPC_GPRS_STATUS_NOT_ENABLED                             0x00
-#define IPC_GPRS_STATUS_ENABLED                                 0x01
-#define IPC_GPRS_STATUS_DISABLED                                0x03
-
 #define IPC_GPRS_FAIL_CAUSE_NONE                                0x0000
 #define IPC_GPRS_FAIL_CAUSE_REL_BY_USER                         0x0001
 #define IPC_GPRS_FAIL_CAUSE_REGULAR_DEACTIVATION                0x0002
@@ -82,6 +78,14 @@
 #define IPC_GPRS_FAIL_CAUSE_TIMEOUT_ERROR                       0x0017
 #define IPC_GPRS_FAIL_CAUSE_UNKNOWN_ERROR                       0x0018
 
+#define IPC_GPRS_HSDPA_STATUS_NONE                              0x00
+#define IPC_GPRS_HSDPA_STATUS_HSDPA                             0x01
+#define IPC_GPRS_HSDPA_STATUS_HSPAP                             0x02
+
+#define IPC_GPRS_STATUS_NOT_ENABLED                             0x00
+#define IPC_GPRS_STATUS_ENABLED                                 0x01
+#define IPC_GPRS_STATUS_DISABLED                                0x03
+
 /*
  * Structures
  */
@@ -91,6 +95,11 @@ struct ipc_gprs_define_pdp_context_data {
     unsigned char cid;
     unsigned char magic;
     unsigned char apn[124];
+} __attribute__((__packed__));
+
+struct ipc_gprs_ps_data {
+    unsigned char cid;
+    unsigned char attached;
 } __attribute__((__packed__));
 
 struct ipc_gprs_pdp_context_request_set_data {
@@ -105,18 +114,18 @@ struct ipc_gprs_pdp_context_request_set_data {
 
 struct ipc_gprs_pdp_context_request_get_entry {
     unsigned char cid;
-    unsigned char status; // IPC_GPRS_STATUS
+    unsigned char active;
 } __attribute__((__packed__));
 
 struct ipc_gprs_pdp_context_request_get_data {
-    unsigned char unknown;
+    unsigned char active_count;
     struct ipc_gprs_pdp_context_request_get_entry entries[3];
 } __attribute__((__packed__));
 
 struct ipc_gprs_ip_configuration_data {
     unsigned char cid;
     unsigned char field_flag;
-    unsigned char unknown1;
+    unsigned char fail_cause; // IPC_GPRS_FAIL_CAUSE
     unsigned char ip[4];
     unsigned char dns1[4];
     unsigned char dns2[4];
@@ -126,7 +135,7 @@ struct ipc_gprs_ip_configuration_data {
 } __attribute__((__packed__));
 
 struct ipc_gprs_hsdpa_status_data {
-    unsigned char status;
+    unsigned char status; // IPC_GPRS_HSDPA_STATUS
 } __attribute__((__packed__));
 
 struct ipc_gprs_current_session_data_counter_data {
@@ -137,8 +146,9 @@ struct ipc_gprs_current_session_data_counter_data {
 
 struct ipc_gprs_call_status_data {
     unsigned char cid;
-    unsigned char status;
-    unsigned short fail_cause; // IPC_GPRS_FAIL_CAUSE
+    unsigned char status; // IPC_GPRS_STATUS
+    unsigned char fail_cause; // IPC_GPRS_FAIL_CAUSE
+    unsigned char external;
 } __attribute__((__packed__));
 
 struct ipc_gprs_port_list_data {
