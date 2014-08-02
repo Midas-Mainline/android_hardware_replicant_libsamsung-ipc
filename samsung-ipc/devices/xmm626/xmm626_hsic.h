@@ -21,22 +21,22 @@
 #ifndef __XMM626_HSIC_H__
 #define __XMM626_HSIC_H__
 
-#define XMM626_HSIC_BOOT0_ACK                                  0xF0
-#define XMM626_HSIC_PSI_UNKNOWN_COUNT                          22
-#define XMM626_HSIC_PSI_CRC_ACK                                0x01
-#define XMM626_HSIC_PSI_CRC_ACK_COUNT                          2
-#define XMM626_HSIC_PSI_ACK                                    0xAA00
-#define XMM626_HSIC_EBL_SIZE_ACK                               0xCCCC
-#define XMM626_HSIC_EBL_ACK                                    0xA551
-#define XMM626_HSIC_EBL_CHUNK                                  0x4000
-#define XMM626_HSIC_PORT_CONFIG_SIZE                           0x4C
-#define XMM626_HSIC_SET_PORT_CONFIG_SIZE                       0x800
-#define XMM626_HSIC_SEC_START_SIZE                             0x4000
-#define XMM626_HSIC_SEC_END_SIZE                               0x4000
-#define XMM626_HSIC_HW_RESET_SIZE                              0x4000
-#define XMM626_HSIC_FLASH_SET_ADDRESS_SIZE                     0x4000
-#define XMM626_HSIC_FLASH_WRITE_BLOCK_SIZE                     0x4000
-#define XMM626_HSIC_MODEM_DATA_CHUNK                           0x4000
+#define XMM626_HSIC_BOOT0_ACK                                   0xF0
+#define XMM626_HSIC_PSI_UNKNOWN_COUNT                           22
+#define XMM626_HSIC_PSI_CRC_ACK                                 0x01
+#define XMM626_HSIC_PSI_CRC_ACK_COUNT                           2
+#define XMM626_HSIC_PSI_ACK                                     0xAA00
+#define XMM626_HSIC_EBL_SIZE_ACK                                0xCCCC
+#define XMM626_HSIC_EBL_ACK                                     0xA551
+#define XMM626_HSIC_EBL_CHUNK                                   0x4000
+#define XMM626_HSIC_PORT_CONFIG_SIZE                            0x4C
+#define XMM626_HSIC_SET_PORT_CONFIG_SIZE                        0x800
+#define XMM626_HSIC_SEC_START_SIZE                              0x4000
+#define XMM626_HSIC_SEC_END_SIZE                                0x4000
+#define XMM626_HSIC_HW_RESET_SIZE                               0x4000
+#define XMM626_HSIC_FLASH_SET_ADDRESS_SIZE                      0x4000
+#define XMM626_HSIC_FLASH_WRITE_BLOCK_SIZE                      0x4000
+#define XMM626_HSIC_MODEM_DATA_CHUNK                            0x4000
 
 struct xmm626_hsic_psi_header {
     unsigned char magic;

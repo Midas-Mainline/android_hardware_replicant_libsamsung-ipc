@@ -20,18 +20,16 @@
 #ifndef __XMM626_SEC_MODEM_H__
 #define __XMM626_SEC_MODEM_H__
 
-#define XMM626_SEC_MODEM_BUFFER_SIZE_MAX                        0x80000
+#define XMM626_SEC_MODEM_BOOT0_DEVICE           "/dev/umts_boot0"
+#define XMM626_SEC_MODEM_BOOT1_DEVICE           "/dev/umts_boot1"
+#define XMM626_SEC_MODEM_IPC0_DEVICE            "/dev/umts_ipc0"
+#define XMM626_SEC_MODEM_RFS0_DEVICE            "/dev/umts_rfs0"
+#define XMM626_SEC_MODEM_LINK_PM_DEVICE         "/dev/link_pm"
+#define XMM626_SEC_MODEM_EHCI_POWER_SYSFS       "/sys/devices/platform/s5p-ehci/ehci_power"
+#define XMM626_SEC_MODEM_OHCI_POWER_SYSFS       "/sys/devices/platform/s5p-ohci/ohci_power"
 
-#define XMM626_SEC_MODEM_BOOT0_DEVICE          "/dev/umts_boot0"
-#define XMM626_SEC_MODEM_BOOT1_DEVICE          "/dev/umts_boot1"
-#define XMM626_SEC_MODEM_IPC0_DEVICE           "/dev/umts_ipc0"
-#define XMM626_SEC_MODEM_RFS0_DEVICE           "/dev/umts_rfs0"
-#define XMM626_SEC_MODEM_LINK_PM_DEVICE        "/dev/link_pm"
-#define XMM626_SEC_MODEM_EHCI_POWER_SYSFS      "/sys/devices/platform/s5p-ehci/ehci_power"
-#define XMM626_SEC_MODEM_OHCI_POWER_SYSFS      "/sys/devices/platform/s5p-ohci/ohci_power"
-
-#define XMM626_SEC_MODEM_GPRS_IFACE_PREFIX     "rmnet"
-#define XMM626_SEC_MODEM_GPRS_IFACE_COUNT                      3
+#define XMM626_SEC_MODEM_GPRS_IFACE_PREFIX      "rmnet"
+#define XMM626_SEC_MODEM_GPRS_IFACE_COUNT                       3
 
 int xmm626_sec_modem_power(int device_fd, int power);
 int xmm626_sec_modem_boot_power(int device_fd, int power);

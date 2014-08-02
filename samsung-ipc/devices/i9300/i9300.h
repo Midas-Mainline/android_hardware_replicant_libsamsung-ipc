@@ -20,19 +20,19 @@
 #ifndef __I9300_H__
 #define __I9300_H__
 
-#define I9300_MODEM_IMAGE_SIZE                               0x1000000
-#define I9300_PSI_OFFSET                                     0x1000
-#define I9300_PSI_SIZE                                       0xE000
-#define I9300_EBL_OFFSET                                     0xF000
-#define I9300_EBL_SIZE                                       0x19000
-#define I9300_SEC_START_OFFSET                               0x9FF800
-#define I9300_SEC_START_SIZE                                 0x800
-#define I9300_FIRMWARE_OFFSET                                0x28000
-#define I9300_FIRMWARE_SIZE                                  0x9D7800
-#define I9300_NV_DATA_OFFSET                                 0xA00000
-#define I9300_NV_DATA_SIZE                                   0x200000
+#define I9300_MODEM_IMAGE_SIZE                                  0x1000000
+#define I9300_PSI_OFFSET                                        0x1000
+#define I9300_PSI_SIZE                                          0xE000
+#define I9300_EBL_OFFSET                                        0xF000
+#define I9300_EBL_SIZE                                          0x19000
+#define I9300_SEC_START_OFFSET                                  0x9FF800
+#define I9300_SEC_START_SIZE                                    0x800
+#define I9300_FIRMWARE_OFFSET                                   0x28000
+#define I9300_FIRMWARE_SIZE                                     0x9D7800
+#define I9300_NV_DATA_OFFSET                                    0xA00000
+#define I9300_NV_DATA_SIZE                                      0x200000
 
-#define I9300_MODEM_IMAGE_DEVICE             "/dev/block/mmcblk0p7"
+#define I9300_MODEM_IMAGE_DEVICE                "/dev/block/mmcblk0p7"
 
 struct i9300_transport_data {
     int fd;

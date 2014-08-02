@@ -21,17 +21,17 @@
 #ifndef __XMM626_MIPI_H__
 #define __XMM626_MIPI_H__
 
-#define XMM626_MIPI_BOOT0_ACK                                  0xFFFF
-#define XMM626_MIPI_BOOT1_MAGIC                                0x02
-#define XMM626_MIPI_BOOT1_ACK                                  0xAA00
-#define XMM626_MIPI_PSI_ACK                                    0xDD01
-#define XMM626_MIPI_EBL_SIZE_ACK                               0xCCCC
-#define XMM626_MIPI_EBL_ACK                                    0xA551
-#define XMM626_MIPI_EBL_CHUNK                                  0xDFC
-#define XMM626_MIPI_MODEM_DATA_CHUNK                           0xDF2
-#define XMM626_MIPI_COMMAND_HEADER_MAGIC                       0x02
-#define XMM626_MIPI_COMMAND_FOOTER_MAGIC                       0x03
-#define XMM626_MIPI_COMMAND_FOOTER_UNKNOWN                     0xEAEA
+#define XMM626_MIPI_BOOT0_ACK                                   0xFFFF
+#define XMM626_MIPI_BOOT1_MAGIC                                 0x02
+#define XMM626_MIPI_BOOT1_ACK                                   0xAA00
+#define XMM626_MIPI_PSI_ACK                                     0xDD01
+#define XMM626_MIPI_EBL_SIZE_ACK                                0xCCCC
+#define XMM626_MIPI_EBL_ACK                                     0xA551
+#define XMM626_MIPI_EBL_CHUNK                                   0xDFC
+#define XMM626_MIPI_MODEM_DATA_CHUNK                            0xDF2
+#define XMM626_MIPI_COMMAND_HEADER_MAGIC                        0x02
+#define XMM626_MIPI_COMMAND_FOOTER_MAGIC                        0x03
+#define XMM626_MIPI_COMMAND_FOOTER_UNKNOWN                      0xEAEA
 
 struct xmm626_mipi_psi_header {
     unsigned char padding;

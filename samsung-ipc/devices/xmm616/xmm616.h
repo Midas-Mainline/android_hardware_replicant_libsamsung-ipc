@@ -22,19 +22,19 @@
 #ifndef __XMM616_H__
 #define __XMM616_H__
 
-#define XMM616_AT                              "AT"
-#define XMM616_AT_COUNT                                        20
-#define XMM616_PSI_MAGIC                                       0x30
-#define XMM616_PSI_ACK                                         0x01
-#define XMM616_BOOTCORE_VERSION                                0xF0
+#define XMM616_AT                               "AT"
+#define XMM616_AT_COUNT                                         20
+#define XMM616_PSI_MAGIC                                        0x30
+#define XMM616_PSI_ACK                                          0x01
+#define XMM616_BOOTCORE_VERSION                                 0xF0
 
-#define XMM616_NV_DATA_PATH                    "/efs/nv_data.bin"
-#define XMM616_NV_DATA_MD5_PATH                "/efs/nv_data.bin.md5"
-#define XMM616_NV_DATA_BACKUP_PATH             "/efs/.nv_data.bak"
-#define XMM616_NV_DATA_BACKUP_MD5_PATH         "/efs/.nv_data.bak.md5"
-#define XMM616_NV_DATA_SECRET                  "Samsung_Android_RIL"
-#define XMM616_NV_DATA_SIZE                                    0x200000
-#define XMM616_NV_DATA_CHUNK_SIZE                              0x1000
+#define XMM616_NV_DATA_PATH                     "/efs/nv_data.bin"
+#define XMM616_NV_DATA_MD5_PATH                 "/efs/nv_data.bin.md5"
+#define XMM616_NV_DATA_BACKUP_PATH              "/efs/.nv_data.bak"
+#define XMM616_NV_DATA_BACKUP_MD5_PATH          "/efs/.nv_data.bak.md5"
+#define XMM616_NV_DATA_SECRET                   "Samsung_Android_RIL"
+#define XMM616_NV_DATA_SIZE                                     0x200000
+#define XMM616_NV_DATA_CHUNK_SIZE                               0x1000
 
 int xmm616_psi_send(struct ipc_client *client, int serial_fd,
     const void *psi_data, unsigned short psi_size);
