@@ -106,6 +106,19 @@ char *ipc_call_list_entry_number_extract(const struct ipc_call_list_entry *entry
     return number;
 }
 
+size_t ipc_call_burst_dtmf_size_setup(const struct ipc_call_burst_dtmf_request_entry *entries,
+    unsigned char count)
+{
+    size_t size;
+
+    if (entries == NULL)
+        return 0;
+
+    size = sizeof(struct ipc_call_burst_dtmf_request_header) + count * sizeof(struct ipc_call_burst_dtmf_request_entry);
+
+    return size;
+}
+
 void *ipc_call_burst_dtmf_setup(const struct ipc_call_burst_dtmf_request_entry *entries,
     unsigned char count)
 {
@@ -116,7 +129,9 @@ void *ipc_call_burst_dtmf_setup(const struct ipc_call_burst_dtmf_request_entry *
     if (entries == NULL)
         return NULL;
 
-    size = sizeof(struct ipc_call_burst_dtmf_request_header) + count * sizeof(struct ipc_call_burst_dtmf_request_entry);
+    size = ipc_call_burst_dtmf_size_setup(entries, count);
+    if (size == 0)
+        return NULL;
 
     data = calloc(1, size);
 

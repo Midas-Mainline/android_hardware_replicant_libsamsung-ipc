@@ -148,6 +148,8 @@ unsigned char ipc_call_list_count_extract(const void *data, size_t size);
 struct ipc_call_list_entry *ipc_call_list_entry_extract(const void *data,
     size_t size, unsigned int index);
 char *ipc_call_list_entry_number_extract(const struct ipc_call_list_entry *entry);
+size_t ipc_call_burst_dtmf_size_setup(const struct ipc_call_burst_dtmf_request_entry *entries,
+    unsigned char count);
 void *ipc_call_burst_dtmf_setup(const struct ipc_call_burst_dtmf_request_entry *entries,
     unsigned char count);
 
