@@ -74,6 +74,7 @@ void *ipc_nv_data_read(struct ipc_client *client, size_t size,
     unsigned int offset);
 int ipc_nv_data_write(struct ipc_client *client, const void *data, size_t size,
     unsigned int offset);
+size_t ipc_rfs_nv_data_item_response_size_setup(const void *data, size_t size);
 void *ipc_rfs_nv_read_item_response_setup(const void *data, size_t size,
     unsigned int offset);
 

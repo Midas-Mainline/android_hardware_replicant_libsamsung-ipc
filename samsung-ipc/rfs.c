@@ -656,6 +656,18 @@ complete:
     return rc;
 }
 
+size_t ipc_rfs_nv_data_item_response_size_setup(const void *data, size_t size)
+{
+    size_t length;
+
+    if (data == NULL)
+        size = 0;
+
+    length = sizeof(struct ipc_rfs_nv_read_item_response_header) + size;
+
+    return length;
+}
+
 void *ipc_rfs_nv_read_item_response_setup(const void *data, size_t size,
     unsigned int offset)
 {
@@ -665,14 +677,16 @@ void *ipc_rfs_nv_read_item_response_setup(const void *data, size_t size,
     unsigned char confirm;
     unsigned char *p;
 
-    if (data != NULL && size > 0) {
-        length = sizeof(struct ipc_rfs_nv_read_item_response_header) + size;
-        confirm = 1;
-    } else {
-        length = sizeof(struct ipc_rfs_nv_read_item_response_header);
+    length = ipc_rfs_nv_data_item_response_size_setup(data, size);
+    if (length == 0)
+        return NULL;
+
+    if (data == NULL || size == 0) {
         size = 0;
         offset = 0;
         confirm = 0;
+    } else {
+        confirm = 1;
     }
 
     buffer = calloc(1, length);
