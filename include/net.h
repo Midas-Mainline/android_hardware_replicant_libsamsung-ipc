@@ -64,6 +64,9 @@
 #define IPC_NET_PLMN_STATUS_CURRENT                             0x03
 #define IPC_NET_PLMN_STATUS_FORBIDDEN                           0x04
 
+#define IPC_NET_PLMN_TYPE_EMERGENCY                             0x01
+#define IPC_NET_PLMN_TYPE_NORMAL                                0x04
+
 #define IPC_NET_SERVICE_DOMAIN_GSM                              0x02
 #define IPC_NET_SERVICE_DOMAIN_GPRS                             0x03
 
@@ -101,7 +104,7 @@ struct ipc_net_plmn_list_header {
 struct ipc_net_plmn_list_entry {
     unsigned char status; // IPC_NET_PLMN_STATUS
     char plmn[6];
-    unsigned char type;
+    unsigned char type; // IPC_NET_PLMN_TYPE
     unsigned char unknown[2];
 } __attribute__((__packed__));
 
@@ -132,6 +135,9 @@ int ipc_net_plmn_sel_setup(struct ipc_net_plmn_sel_request_data *data,
     unsigned char mode_sel, const char *plmn, unsigned char act);
 int ipc_net_regist_setup(struct ipc_net_regist_request_data *data,
     unsigned char domain);
+unsigned char ipc_net_plmn_list_count_extract(const void *data, size_t size);
+struct ipc_net_plmn_list_entry *ipc_net_plmn_list_entry_extract(const void *data,
+    size_t size, unsigned int index);
 
 #endif
 
