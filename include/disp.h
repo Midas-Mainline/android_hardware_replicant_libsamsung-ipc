@@ -32,14 +32,28 @@
 #define IPC_DISP_RSSI_INFO                                      0x0706
 
 /*
+ * Values
+ */
+
+
+#define IPC_DISP_ICON_INFO_FLAG_RSSI                            0x01
+#define IPC_DISP_ICON_INFO_FLAG_BATTERY                         0x02
+#define IPC_DISP_ICON_INFO_FLAG_HDR_RSSI                        0x03
+#define IPC_DISP_ICON_INFO_FLAG_ALL                             0xFF
+
+/*
  * Structures
  */
 
-struct ipc_disp_icon_info_data {
+struct ipc_disp_icon_info_response_data {
+    unsigned char flags; // IPC_DISP_ICON_INFO_FLAG
     unsigned char rssi;
-    unsigned char bars;
-    unsigned char act;
-    unsigned char reg;
+    unsigned char hdr_rssi;
+    unsigned char battery;
+} __attribute__((__packed__));
+
+struct ipc_disp_icon_info_request_data {
+    unsigned char flags; // IPC_DISP_ICON_INFO_FLAG
 } __attribute__((__packed__));
 
 struct ipc_disp_rssi_info_data {
