@@ -20,6 +20,8 @@
 #ifndef __XMM626_SEC_MODEM_H__
 #define __XMM626_SEC_MODEM_H__
 
+#define XMM626_SEC_MODEM_BUFFER_SIZE_MAX                        0x80000
+
 #define XMM626_SEC_MODEM_BOOT0_DEVICE          "/dev/umts_boot0"
 #define XMM626_SEC_MODEM_BOOT1_DEVICE          "/dev/umts_boot1"
 #define XMM626_SEC_MODEM_IPC0_DEVICE           "/dev/umts_ipc0"

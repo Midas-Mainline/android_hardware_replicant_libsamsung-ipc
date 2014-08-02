@@ -180,7 +180,7 @@ int crespo_fmt_recv(struct ipc_client *client, struct ipc_message *message)
     mio.data = calloc(1, mio.size);
 
     rc = client->handlers->read(client->handlers->transport_data, &mio, sizeof(struct modem_io) + mio.size);
-    if (rc < 0 || mio.data == NULL || mio.size < sizeof(struct ipc_fmt_header)) {
+    if (rc < 0 || mio.data == NULL || mio.size < sizeof(struct ipc_fmt_header) || mio.size > CRESPO_BUFFER_LENGTH) {
         ipc_client_log(client, "Reading FMT data failed");
         goto error;
     }
@@ -264,7 +264,7 @@ int crespo_rfs_recv(struct ipc_client *client, struct ipc_message *message)
     mio.data = calloc(1, mio.size);
 
     rc = client->handlers->read(client->handlers->transport_data, &mio, sizeof(struct modem_io) + mio.size);
-    if (rc < 0 || mio.data == NULL || mio.size <= 0) {
+    if (rc < 0 || mio.data == NULL || mio.size <= 0 || mio.size > CRESPO_BUFFER_LENGTH) {
         ipc_client_log(client, "Reading RFS data failed");
         goto error;
     }

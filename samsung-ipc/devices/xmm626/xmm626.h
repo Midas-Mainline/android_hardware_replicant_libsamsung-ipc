@@ -26,6 +26,7 @@
 #define XMM626_SEC_END_MAGIC                                   0x0000
 #define XMM626_HW_RESET_MAGIC                                  0x111001
 #define XMM626_DATA_SIZE                                       0x1000
+#define XMM626_DATA_SIZE_LIMIT                                 0x80000
 
 #define XMM626_COMMAND_SET_PORT_CONFIG                         0x86
 #define XMM626_COMMAND_SEC_START                               0x204

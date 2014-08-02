@@ -435,6 +435,10 @@ int aries_rfs_recv(struct ipc_client *client, struct ipc_message *message)
     }
 
     header = (struct ipc_rfs_header *) buffer;
+    if (header->length > ARIES_DATA_SIZE_LIMIT) {
+        ipc_client_log(client, "Invalid RFS header length: %u", header->length);
+        goto error;
+    }
 
     ipc_rfs_message_setup(header, message);
 
