@@ -23,6 +23,19 @@
 
 #include <samsung-ipc.h>
 
+size_t ipc_sms_send_msg_size_setup(struct ipc_sms_send_msg_request_header *header,
+    const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size)
+{
+    size_t size;
+
+	if (header == NULL || smsc == NULL || smsc_size == 0 || pdu == NULL || pdu_size == 0)
+		return 0;
+
+    size = sizeof(struct ipc_sms_send_msg_request_header) + sizeof(unsigned char) + smsc_size + pdu_size;
+
+    return size;
+}
+
 void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
     const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size)
 {
@@ -36,9 +49,12 @@ void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
 
     smsc_length = (unsigned char) smsc_size;
 
-    header->length = (unsigned char) (sizeof(smsc_length) + smsc_size + pdu_size);
+    header->length = (unsigned char) (sizeof(unsigned char) + smsc_size + pdu_size);
 
-    size = sizeof(struct ipc_sms_send_msg_request_header) + sizeof(smsc_length) + smsc_size + pdu_size;
+    size = ipc_sms_send_msg_size_setup(header, smsc, smsc_size, pdu, pdu_size);
+    if (size == 0)
+        return NULL;
+
     data = calloc(1, size);
 
     p = (unsigned char *) data;
@@ -58,10 +74,20 @@ void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
     return data;
 }
 
-char *ipc_sms_incoming_msg_pdu_extract(const void *data, size_t size)
+size_t ipc_sms_incoming_msg_pdu_size_extract(const void *data, size_t size)
 {
     struct ipc_sms_incoming_msg_header *header;
-    char *string;
+
+    header = (struct ipc_sms_incoming_msg_header *) data;
+    if (header->length == 0 || header->length > size - sizeof(struct ipc_sms_incoming_msg_header))
+        return 0;
+
+    return (size_t) header->length;
+}
+
+void *ipc_sms_incoming_msg_pdu_extract(const void *data, size_t size)
+{
+    struct ipc_sms_incoming_msg_header *header;
     void *pdu;
 
     if (data == NULL || size < sizeof(struct ipc_sms_incoming_msg_header))
@@ -73,9 +99,23 @@ char *ipc_sms_incoming_msg_pdu_extract(const void *data, size_t size)
 
     pdu = (void *) ((unsigned char *) data + sizeof(struct ipc_sms_incoming_msg_header));
 
-    string = data2string(pdu, header->length);
+    return pdu;
+}
 
-    return string;
+size_t ipc_sms_save_msg_size_setup(struct ipc_sms_save_msg_request_header *header,
+    const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size)
+{
+    size_t size;
+
+    if (header == NULL || pdu == NULL || pdu_size == 0)
+        return 0;
+
+    if (smsc == NULL)
+        smsc_size = 0;
+
+    size = sizeof(struct ipc_sms_save_msg_request_header) + sizeof(unsigned char) + smsc_size + pdu_size;
+
+    return size;
 }
 
 void *ipc_sms_save_msg_setup(struct ipc_sms_save_msg_request_header *header,
@@ -96,9 +136,12 @@ void *ipc_sms_save_msg_setup(struct ipc_sms_save_msg_request_header *header,
 
     header->magic = 2;
     header->index = 12 - 1,
-    header->length = (unsigned char) (sizeof(smsc_length) + smsc_size + pdu_size);
+    header->length = (unsigned char) (sizeof(unsigned char) + smsc_size + pdu_size);
 
-    size = sizeof(struct ipc_sms_save_msg_request_header) + sizeof(smsc_length) + smsc_size + pdu_size;
+    size = ipc_sms_save_msg_size_setup(header, smsc, smsc_size, pdu, pdu_size);
+    if (size == 0)
+        return NULL;
+
     data = calloc(1, size);
 
     p = (unsigned char *) data;

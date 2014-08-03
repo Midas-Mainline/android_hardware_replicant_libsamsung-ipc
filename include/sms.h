@@ -135,9 +135,14 @@ struct ipc_sms_svc_center_addr_header {
  * Helpers
  */
 
+size_t ipc_sms_send_msg_size_setup(struct ipc_sms_send_msg_request_header *header,
+    const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size);
 void *ipc_sms_send_msg_setup(struct ipc_sms_send_msg_request_header *header,
     const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size);
-char *ipc_sms_incoming_msg_pdu_extract(const void *data, size_t size);
+size_t ipc_sms_incoming_msg_pdu_size_extract(const void *data, size_t size);
+void *ipc_sms_incoming_msg_pdu_extract(const void *data, size_t size);
+size_t ipc_sms_save_msg_size_setup(struct ipc_sms_save_msg_request_header *header,
+    const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size);
 void *ipc_sms_save_msg_setup(struct ipc_sms_save_msg_request_header *header,
     const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size);
 int ipc_sms_del_msg_setup(struct ipc_sms_del_msg_request_data *data,
