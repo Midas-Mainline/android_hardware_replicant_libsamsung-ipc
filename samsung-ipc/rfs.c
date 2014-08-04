@@ -656,54 +656,75 @@ complete:
     return rc;
 }
 
-size_t ipc_rfs_nv_data_item_response_size_setup(const void *data, size_t size)
+size_t ipc_rfs_nv_data_item_size_setup(struct ipc_rfs_nv_read_item_response_header *header,
+    const void *nv_data, size_t nv_size)
 {
-    size_t length;
+    size_t size;
 
-    if (data == NULL)
-        size = 0;
+    if (header == NULL || nv_data == NULL || nv_size == 0)
+        return 0;
 
-    length = sizeof(struct ipc_rfs_nv_read_item_response_header) + size;
+    size = sizeof(struct ipc_rfs_nv_read_item_response_header) + size;
 
-    return length;
+    return size;
 }
 
-void *ipc_rfs_nv_read_item_response_setup(const void *data, size_t size,
-    unsigned int offset)
+void *ipc_rfs_nv_read_item_setup(struct ipc_rfs_nv_read_item_response_header *header,
+    const void *nv_data, size_t nv_size)
 {
-    struct ipc_rfs_nv_read_item_response_header *header;
-    void *buffer;
-    size_t length;
-    unsigned char confirm;
+    void *data;
+    size_t size;
     unsigned char *p;
 
-    length = ipc_rfs_nv_data_item_response_size_setup(data, size);
-    if (length == 0)
+    if (header == NULL || nv_data == NULL || nv_size == 0)
         return NULL;
 
-    if (data == NULL || size == 0) {
-        size = 0;
-        offset = 0;
-        confirm = 0;
-    } else {
-        confirm = 1;
-    }
+    size = ipc_rfs_nv_data_item_size_setup(header, nv_data, nv_size);
+    if (size == 0)
+        return NULL;
 
-    buffer = calloc(1, length);
+    data = calloc(1, size);
 
-    header = (struct ipc_rfs_nv_read_item_response_header *) buffer;
-    header->confirm = confirm;
-    header->offset = offset;
-    header->length = (unsigned int) size;
+    p = (unsigned char *) data;
 
-    if (data != NULL && size > 0) {
-        p = (unsigned char *) buffer;
-        p += sizeof(struct ipc_rfs_nv_read_item_response_header);
+    memcpy(p, header, sizeof(struct ipc_rfs_nv_read_item_response_header));
+    p += sizeof(struct ipc_rfs_nv_read_item_response_header);
 
-        memcpy(p, data, size);
-    }
+    memcpy(p, nv_data, nv_size);
+    p += nv_size;
 
-    return buffer;
+    return data;
+}
+
+size_t ipc_rfs_nv_write_item_size_extract(const void *data, size_t size)
+{
+    struct ipc_rfs_nv_write_item_request_header *header;
+
+    if (data == NULL || size < sizeof(struct ipc_rfs_nv_write_item_request_header))
+        return 0;
+
+    header = (struct ipc_rfs_nv_write_item_request_header *) data;
+    if (header->length == 0 || header->length > size - sizeof(struct ipc_rfs_nv_write_item_request_header))
+        return 0;
+
+    return header->length;
+}
+
+void *ipc_rfs_nv_write_item_extract(const void *data, size_t size)
+{
+    struct ipc_rfs_nv_write_item_request_header *header;
+    void *nv_data;
+
+    if (data == NULL || size < sizeof(struct ipc_rfs_nv_write_item_request_header))
+        return NULL;
+
+    header = (struct ipc_rfs_nv_write_item_request_header *) data;
+    if (header->length == 0 || header->length > size - sizeof(struct ipc_rfs_nv_write_item_request_header))
+        return NULL;
+
+    nv_data = (void *) ((unsigned char *) data + sizeof(struct ipc_rfs_nv_write_item_request_header));
+
+    return nv_data;
 }
 
 // vim:ts=4:sw=4:expandtab
