@@ -180,6 +180,9 @@ size_t ipc_sms_svc_center_addr_smsc_size_extract(const void *data, size_t size)
 {
     struct ipc_sms_svc_center_addr_header *header;
 
+    if (data == NULL || size < sizeof(struct ipc_sms_svc_center_addr_header))
+        return 0;
+
     header = (struct ipc_sms_svc_center_addr_header *) data;
     if (header->length == 0 || header->length > size - sizeof(struct ipc_sms_svc_center_addr_header))
         return 0;
@@ -191,6 +194,9 @@ void *ipc_sms_svc_center_addr_smsc_extract(const void *data, size_t size)
 {
     struct ipc_sms_svc_center_addr_header *header;
     void *smsc;
+
+    if (data == NULL || size < sizeof(struct ipc_sms_svc_center_addr_header))
+        return NULL;
 
     header = (struct ipc_sms_svc_center_addr_header *) data;
     if (header->length == 0 || header->length > size - sizeof(struct ipc_sms_svc_center_addr_header))
