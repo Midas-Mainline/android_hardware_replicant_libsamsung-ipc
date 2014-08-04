@@ -147,6 +147,8 @@ void *ipc_sms_save_msg_setup(struct ipc_sms_save_msg_request_header *header,
     const void *smsc, size_t smsc_size, const void *pdu, size_t pdu_size);
 int ipc_sms_del_msg_setup(struct ipc_sms_del_msg_request_data *data,
     unsigned short index);
+size_t ipc_sms_svc_center_addr_smsc_size_extract(const void *data, size_t size);
+void *ipc_sms_svc_center_addr_smsc_extract(const void *data, size_t size);
 
 #endif
 

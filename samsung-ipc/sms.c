@@ -176,4 +176,29 @@ int ipc_sms_del_msg_setup(struct ipc_sms_del_msg_request_data *data,
     return 0;
 }
 
+size_t ipc_sms_svc_center_addr_smsc_size_extract(const void *data, size_t size)
+{
+    struct ipc_sms_svc_center_addr_header *header;
+
+    header = (struct ipc_sms_svc_center_addr_header *) data;
+    if (header->length == 0 || header->length > size - sizeof(struct ipc_sms_svc_center_addr_header))
+        return 0;
+
+    return (size_t) header->length;
+}
+
+void *ipc_sms_svc_center_addr_smsc_extract(const void *data, size_t size)
+{
+    struct ipc_sms_svc_center_addr_header *header;
+    void *smsc;
+
+    header = (struct ipc_sms_svc_center_addr_header *) data;
+    if (header->length == 0 || header->length > size - sizeof(struct ipc_sms_svc_center_addr_header))
+        return NULL;
+
+    smsc = (void *) ((unsigned char *) data + sizeof(struct ipc_sms_svc_center_addr_header));
+
+    return smsc;
+}
+
 // vim:ts=4:sw=4:expandtab
