@@ -168,6 +168,37 @@ void *ipc_sec_rsim_access_setup(struct ipc_sec_rsim_access_request_header *heade
     return data;
 }
 
+size_t ipc_sec_rsim_access_size_extract(const void *data, size_t size)
+{
+    struct ipc_sec_rsim_access_response_header *header;
+
+    if (data == NULL || size < sizeof(struct ipc_sec_rsim_access_response_header))
+        return 0;
+
+    header = (struct ipc_sec_rsim_access_response_header *) data;
+    if (header->length == 0 || header->length > size - sizeof(struct ipc_sec_rsim_access_response_header))
+        return 0;
+
+    return (size_t) header->length;
+}
+
+void *ipc_sec_rsim_access_extract(const void *data, size_t size)
+{
+    struct ipc_sec_rsim_access_response_header *header;
+    void *rsim_data;
+
+    if (data == NULL || size < sizeof(struct ipc_sec_rsim_access_response_header))
+        return NULL;
+
+    header = (struct ipc_sec_rsim_access_response_header *) data;
+    if (header->length == 0 || header->length > size - sizeof(struct ipc_sec_rsim_access_response_header))
+        return NULL;
+
+    rsim_data = (void *) ((unsigned char *) data + sizeof(struct ipc_sec_rsim_access_response_header));
+
+    return rsim_data;
+}
+
 int ipc_sec_lock_infomation_setup(struct ipc_sec_lock_infomation_request_data *data,
     unsigned char type)
 {
