@@ -284,7 +284,7 @@ int i9300_write(void *data, const void *buffer, size_t length)
     return rc;
 }
 
-int i9300_poll(void *data, struct timeval *timeout)
+int i9300_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
 {
     struct i9300_transport_data *transport_data;
     int rc;
@@ -294,7 +294,7 @@ int i9300_poll(void *data, struct timeval *timeout)
 
     transport_data = (struct i9300_transport_data *) data;
 
-    rc = xmm626_sec_modem_poll(transport_data->fd, timeout);
+    rc = xmm626_sec_modem_poll(transport_data->fd, fds, timeout);
 
     return rc;
 }

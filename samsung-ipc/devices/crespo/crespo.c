@@ -388,11 +388,14 @@ int crespo_write(void *data, const void *buffer, size_t length)
     return 0;
 }
 
-int crespo_poll(void *data, struct timeval *timeout)
+int crespo_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
 {
     struct crespo_transport_data *transport_data;
-    fd_set fds;
+    fd_set set;
     int fd;
+    int fd_max;
+    unsigned int i;
+    unsigned int count;
     int rc;
 
     if (data == NULL)
@@ -404,10 +407,37 @@ int crespo_poll(void *data, struct timeval *timeout)
     if (fd < 0)
         return -1;
 
-    FD_ZERO(&fds);
-    FD_SET(fd, &fds);
+    FD_ZERO(&set);
+    FD_SET(fd, &set);
 
-    rc = select(fd + 1, &fds, NULL, NULL, timeout);
+    fd_max = fd;
+
+    if (fds != NULL && fds->fds != NULL && fds->count > 0) {
+        for (i = 0; i < fds->count; i++) {
+            if (fds->fds[i] >= 0) {
+                FD_SET(fds->fds[i], &set);
+
+                if (fds->fds[i] > fd_max)
+                    fd_max = fds->fds[i];
+            }
+        }
+    }
+
+    rc = select(fd_max + 1, &set, NULL, NULL, timeout);
+
+    if (fds != NULL && fds->fds != NULL && fds->count > 0) {
+        count = fds->count;
+
+        for (i = 0; i < fds->count; i++) {
+            if (!FD_ISSET(fds->fds[i], &set)) {
+                fds->fds[i] = -1;
+                count--;
+            }
+        }
+
+        fds->count = count;
+    }
+
     return rc;
 }
 

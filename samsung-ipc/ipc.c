@@ -225,7 +225,7 @@ int ipc_client_transport_handlers_register(struct ipc_client *client,
     int (*close)(void *transport_data),
     int (*read)(void *transport_data, void *data, size_t size),
     int (*write)(void *transport_data, const void *data, size_t size),
-    int (*poll)(void *transport_data, struct timeval *timeout),
+    int (*poll)(void *transport_data, struct ipc_poll_fds *fds, struct timeval *timeout),
     void *transport_data)
 {
     if (client == NULL || client->handlers == NULL)
@@ -358,12 +358,12 @@ int ipc_client_close(struct ipc_client *client)
     return client->handlers->close(client->handlers->transport_data);
 }
 
-int ipc_client_poll(struct ipc_client *client, struct timeval *timeout)
+int ipc_client_poll(struct ipc_client *client, struct ipc_poll_fds *fds, struct timeval *timeout)
 {
     if (client == NULL || client->handlers == NULL || client->handlers->poll == NULL)
         return -1;
 
-    return client->handlers->poll(client->handlers->transport_data, timeout);
+    return client->handlers->poll(client->handlers->transport_data, fds, timeout);
 }
 
 int ipc_client_power_on(struct ipc_client *client)

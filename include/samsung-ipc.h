@@ -54,6 +54,11 @@ struct ipc_client_gprs_capabilities {
     unsigned int cid_count;
 };
 
+struct ipc_poll_fds {
+    int *fds;
+    unsigned int count;
+};
+
 /*
  * Helpers
  */
@@ -68,7 +73,7 @@ int ipc_client_transport_handlers_register(struct ipc_client *client,
     int (*close)(void *transport_data),
     int (*read)(void *transport_data, void *data, size_t size),
     int (*write)(void *transport_data, const void *data, size_t size),
-    int (*poll)(void *transport_data, struct timeval *timeout),
+    int (*poll)(void *transport_data, struct ipc_poll_fds *fds, struct timeval *timeout),
     void *transport_data);
 int ipc_client_power_handlers_register(struct ipc_client *client,
     int (*power_on)(void *power_data), int (*power_off)(void *power_data),
@@ -88,7 +93,7 @@ int ipc_client_recv(struct ipc_client *client, struct ipc_message *message);
 
 int ipc_client_open(struct ipc_client *client);
 int ipc_client_close(struct ipc_client *client);
-int ipc_client_poll(struct ipc_client *client, struct timeval *timeout);
+int ipc_client_poll(struct ipc_client *client, struct ipc_poll_fds *fds, struct timeval *timeout);
 int ipc_client_power_on(struct ipc_client *client);
 int ipc_client_power_off(struct ipc_client *client);
 int ipc_client_gprs_activate(struct ipc_client *client, unsigned int cid);
