@@ -436,9 +436,14 @@ int xmm626_sec_modem_close(int fd)
 
 int xmm626_sec_modem_read(int fd, void *buffer, size_t length)
 {
+    int status;
     int rc;
 
     if (fd < 0 || buffer == NULL || length <= 0)
+        return -1;
+
+    status = ioctl(fd, IOCTL_MODEM_STATUS, 0);
+    if (status != STATE_ONLINE && status != STATE_BOOTING)
         return -1;
 
     rc = read(fd, buffer, length);
@@ -448,9 +453,14 @@ int xmm626_sec_modem_read(int fd, void *buffer, size_t length)
 
 int xmm626_sec_modem_write(int fd, const void *buffer, size_t length)
 {
+    int status;
     int rc;
 
     if (fd < 0 || buffer == NULL || length <= 0)
+        return -1;
+
+    status = ioctl(fd, IOCTL_MODEM_STATUS, 0);
+    if (status != STATE_ONLINE && status != STATE_BOOTING)
         return -1;
 
     rc = write(fd, buffer, length);
@@ -460,9 +470,9 @@ int xmm626_sec_modem_write(int fd, const void *buffer, size_t length)
 
 int xmm626_sec_modem_poll(int fd, struct timeval *timeout)
 {
+    int status;
     fd_set fds;
     int rc;
-    int status;
 
     if (fd < 0)
         return -1;
@@ -474,7 +484,7 @@ int xmm626_sec_modem_poll(int fd, struct timeval *timeout)
     if (FD_ISSET(fd, &fds)) {
         status = ioctl(fd, IOCTL_MODEM_STATUS, 0);
         if (status != STATE_ONLINE && status != STATE_BOOTING)
-            return 0;
+            return -1;
     }
 
     return rc;
