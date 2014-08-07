@@ -1,3 +1,124 @@
+Version 0.3.0
+=====================
+
+5333aed External fds polling support
+ffda67f xmm626: Check modem status on read and write
+6f0dca4 sec: RSIM access extract helper
+43f51e0 rfs: Proper helpers
+688d331 sms: Arguments check
+d0de45e sms: SVC center addr extract helper
+c48926e sms: Size function for helpers that return data with non-explicit size
+5e4cb30 sec: Size function for helpers that return data with non-explicit size
+7d2ebf4 rfs: Size function for helpers that return data with non-explicit size
+056cf38 net: PLMN list extract helpers, PLMN type
+50be557 devices: Proper alignment (12 and 16 tabs of 4 spaces)
+9c72075 devices: Size limit when reading RFS data
+5bd35c7 call: Size function for helpers that return data with non-explicit size
+bb5f109 disp: Proper icon info structure and flags
+a96ecf4 gprs: Various bits and updates
+8d0b0f6 Missing gprs_activate/deactivate handlers definitions
+a7ae739 gprs: Fail causes import from Tizen
+394133a GPRS cid count is unsigned integer
+dbcd5f7 svc: Helpers
+2cdecfa Offset is unsigned int
+74e32c0 ipc_utils: New line before printing I/O debug
+1c4d4f7 sec: RSIM access helper
+873093a sms: Only copy when there is actual data
+379045e utils: Dedicated function for length/size
+bfb20b0 utils: Shared libraries don't allow for internal functions
+9691203 Data dump function replacement
+285ef23 sms: Save/del msg helpers, send msg correction
+c0eabb6 sms: Headers sort, pdu extract helper
+87fdd4b xmm626: HSIC ACKs are not reliable
+ca19c4c snd: Proper missing structures
+8cc083b ipc_utils: Utility to check whether a seq is valid
+d2ba034 call: DTMF status over state, burst response
+bf452ca call: Turns out mpty was not a typo for empty
+e4acdd0 misc: IPC_MISC_ME_VERSION request data and new helpers
+960d41a sec: Maximum password size is not so much the size of the size element
+c9ec8b0 sec: Cleanup memory before use
+1b0e45e sec: Proper prefixes and unused function removal
+daf8241 sec: Actually copy the PIN lengths
+5da6fcc net: Proper PLMN copy, without null terminating byte
+b3b4263 net: PLMN is always 6 bytes
+e201a04 net: Correct enumeration
+2384bd8 Generic xmm616 and xmm626 names
+1294c5f ipc: Carefully check for name or board name when detecting device
+eb927f9 pwr: Proper request/response values and structures
+db9cb92 rfs: Chunk size is not always greater than size
+9dca176 Global include path
+443e2a5 Android.mk: Override LOCAL_CFLAGS
+72df76b protocol: Commands and types are not the same
+e8f642a aries: Minor coding style correction
+c97e785 ipc_utils: Correct enumaration for headers
+738b07d ipc_utils: Enumerate send first, then recv
+121ae6d ipc_devices: Proper type for count and index
+420519c tools: ipc-test test program, for various purposes
+33246c7 tools: modemctrl tool rename, in favor of ipc-modem
+ebe96b1 ipc_utils: Request type string when sending
+583f877 libsamsung-ipc is maintained by the Replicant project
+a0332b5 Version-independent pkgconfig rules
+ff8032e Deprecated and unmaintained vapi removal
+0056452 ipc: Consistent coding style and major cleanup
+ec82c3a rfs: Consistent coding style, cleanup and fresh new implementation
+39ac0d2 utils: Files rename, new functions, proper types and few other cleanups
+60e9429 rfs: Proper type for size definitions
+e306f89 rfs: Proper IPC functions for nv_data specs, without generic fallback values
+5482a77 Extract in helpers naming
+828f125 Consistent coding style in helpers
+6cb0b59 Prefer official Samsung IPC protocol names
+ffc71f0 devices folder instead of device, for better consistency
+190984f Unified description of libsamsung-ipc
+20e1ea0 Correct enumeration of files and devices
+0b3a6b4 Follow consistent coding style in headers
+b2aaec5 device: Buffer has length and tail is footer
+da32427 Types are not commands
+71d0585 Good-looking copyright blocks, with the right order in copyright lines
+977dcde Android.mk cleanup
+7d78922 ipc_util: Print messages lengths
+adc29ca aries: Read and write data in proper buffer-sized chunks
+55e8de1 Samsung Galaxy Note 2 N7100 support
+f8bc990 Device detection mechanism improvments and more constitant devices naming
+0c33d96 sms: Save/del structures and related values
+736c6de svc: Relevant messages and structures definitions
+35f39ed Samsung Galaxy Note support
+43bd2e4 misc.h: tz, dl and dv values are explicitly signed
+b1feb0a Samsung Galaxy S3 (galaxys3) support
+63a33bd xmm6260: Correct SEC modem ohci sysfs path
+3b05565 ipc devices: Include structures definitions from devices headers
+026a7f4 Rename ipc_header to ipc_fmt_header, add ipc_rfs_header and utility functions
+d1e05cf util: Rename block_size to chunk
+25d384a Remove file read functions from ipc_util
+91c54ac rfs.c: Fix coding style and compilation warnings
+b3a8843 ipc.c: Check heandlers data create/destroy pointers
+250ba51 aries: Minor coding-style-related changes
+4527698 crespo: Minor coding-style-related changes
+58bedbd xmm6160: Minor coding-style-related changes
+10eb92c Major rework of xmm6260 common code (MIPI and HSIC) and xmm6260 devices code
+eb9cffa xmm6160: Rename modem_image to firmware to avoid confusion
+a795a6f xmm6160: Explicit PSI data argument name
+293c867 xmm6160: Use device-specific sizes and offsets
+a058b95 Prefix per-device headers definitions with the device name
+c79aeaf Split aries and crespo common code to xmm6160, along with major code rework
+1edc56a New utilities (not exposed by the API) for various I/O and ipc fill functions
+a81f656 ipc util: Do not use strdup, to avoid memory leak
+ddf605b More cosmetics on headers
+c99663f Get rid of wakelocks, this should be dealt with on the upper layers
+b73c6cf Rework handlers and ipc functions for better consistency
+0916c68 rfs.c: Coding style cosmetics
+41cee84 ipc.c: Coding style cosmetics
+b63737e ipc_client_send: Single function with return code
+94826c5 rfs.h: Coding style
+44d464f Coding style: Move ; around in for statements
+30ba6fd Add newline and indentation on long functions names
+c9dfae7 Refactor code for consistent coding style and avoid using assert
+0e0c698 Renamed ipc_private.h to ipc.h
+b8eb72b modemctrl: Update Copyright block for better accuracy
+af49aa6 Moved radio.h and types.h to samsung-ipc.h (API) and protocol.h (IPC protocol).
+256df8e Drop (incomplete) support for Samsung H1
+9d1137d Drop support for the (incomplete) old protocol implementation used on H1.
+e207275 Update changelog for new release
+
 Version 0.2.0
 =====================
 
