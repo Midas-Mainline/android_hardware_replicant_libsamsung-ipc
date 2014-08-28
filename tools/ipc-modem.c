@@ -377,7 +377,7 @@ int modem_read_loop(struct ipc_client *client)
     while(1) {
         usleep(3000);
 
-        rc = ipc_client_poll(client, NULL);
+        rc = ipc_client_poll(client, NULL, NULL);
         if (rc < 0) {
             continue;
         }

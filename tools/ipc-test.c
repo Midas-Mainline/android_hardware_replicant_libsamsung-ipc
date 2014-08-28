@@ -91,7 +91,7 @@ int main(int args, char *argv[])
     }
 
     for (i = 0; i < 5; i++) {
-        rc = ipc_client_poll(client, NULL);
+        rc = ipc_client_poll(client, NULL, NULL);
         if (rc < 0) {
             printf("Polling failed\n");
             break;
