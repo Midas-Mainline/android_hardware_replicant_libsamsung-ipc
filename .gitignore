@@ -24,6 +24,7 @@ ltmain.sh
 ylwrap
 compile
 stamp-h1
+INSTALL
 
 *.pc
 build
