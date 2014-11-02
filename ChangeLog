@@ -1,3 +1,16 @@
+Version 0.3.1
+=====================
+
+f5d2c45 gitignore: Binaries from tools
+c42fbce svc: String header
+c608d70 Ignore the autotools INSTALL file
+68c86c0 Fix crash in modemctrl after a failed bootstrap
+08b6b29 Properly handle errors bootstrapping modem
+67fe181 Drop the INSTALL file and let autotools copy it in
+4cb70f7 tools: Autotools intermediates cleanup
+a6240be tools: Proper arguments to ipc_client_poll
+3189c67 libsamsung-ipc version 0.3.0
+
 Version 0.3.0
 =====================
 
