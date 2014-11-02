@@ -528,7 +528,7 @@ int main(int argc, char *argv[])
         ipc_client_log_callback_register(client_fmt, modem_log_handler_quiet, NULL);
     else ipc_client_log_callback_register(client_fmt, modem_log_handler, NULL);
 
-    while(opt_i < argc) {
+    while(optind < argc) {
         if(strncmp(argv[optind], "power-on", 8) == 0) {
             if (ipc_client_power_on(client_fmt) < 0)
                 printf("[E] Something went wrong while powering modem on\n");
