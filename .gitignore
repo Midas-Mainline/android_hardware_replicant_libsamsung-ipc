@@ -29,5 +29,5 @@ INSTALL
 *.pc
 build
 core
-modemctrl
-samsung_ipc_forward
+ipc-modem
+ipc-test
