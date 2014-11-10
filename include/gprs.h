@@ -108,7 +108,7 @@ struct ipc_gprs_pdp_context_request_set_data {
     unsigned char magic1[4];
     unsigned char username[32];
     unsigned char password[32];
-    unsigned char unknown1[32];
+    unsigned char unknown[32];
     unsigned char magic2;
 } __attribute__((__packed__));
 
@@ -131,7 +131,7 @@ struct ipc_gprs_ip_configuration_data {
     unsigned char dns2[4];
     unsigned char gateway[4];
     unsigned char subnet_mask[4];
-    unsigned char unknown2[4];
+    unsigned char unknown[4];
 } __attribute__((__packed__));
 
 struct ipc_gprs_hsdpa_status_data {
