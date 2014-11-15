@@ -358,7 +358,8 @@ int ipc_data_dump(struct ipc_client *client, const void *data, size_t size)
     unsigned int cols = 8;
     unsigned int cols_count = 2;
     int spacer;
-    char string[81];
+    char string[81] = { 0 };
+    char final[161] = { 0 };
     size_t length;
     char *print;
     unsigned char *p;
@@ -471,7 +472,18 @@ int ipc_data_dump(struct ipc_client *client, const void *data, size_t size)
 
         *print = '\0';
 
-        ipc_client_log(client, string);
+        // Escape string
+
+        j = 0;
+
+        for (i = 0; i < sizeof(string); i++) {
+            if (string[i] == '%')
+                final[j++] = string[i];
+
+            final[j++] = string[i];
+        }
+
+        ipc_client_log(client, final);
     }
 
     return 0;
