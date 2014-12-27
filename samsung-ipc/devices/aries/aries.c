@@ -764,29 +764,13 @@ int aries_gprs_deactivate(void *data, unsigned int cid)
 char *aries_gprs_get_iface(unsigned int cid)
 {
     char *iface = NULL;
-    struct ifreq ifr;
-    int fd;
-    int rc;
-    int i;
 
-    memset(&ifr, 0, sizeof(ifr));
-
-    fd = socket(AF_PHONET, SOCK_DGRAM, 0);
-    if (fd < 0)
+    if (cid > ARIES_GPRS_IFACE_COUNT)
         return NULL;
 
-    for (i = (ARIES_GPRS_IFACE_COUNT - 1); i >= 0; i--) {
-        sprintf(ifr.ifr_name, "%s%d", ARIES_GPRS_IFACE_PREFIX, i);
-        rc = ioctl(fd, SIOCGIFFLAGS, &ifr);
-        if (rc < 0 || ifr.ifr_flags & IFF_UP) {
-            continue;
-        } else {
-            asprintf(&iface, "%s%d", ARIES_GPRS_IFACE_PREFIX, i);
-            return iface;
-        }
-    }
+    asprintf(&iface, "%s%d", ARIES_GPRS_IFACE_PREFIX, cid - 1);
 
-    return NULL;
+    return iface;
 }
 
 int aries_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
