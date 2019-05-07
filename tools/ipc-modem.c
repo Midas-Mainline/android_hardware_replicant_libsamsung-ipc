@@ -276,7 +276,8 @@ void modem_response_call(struct ipc_client *client, struct ipc_message *resp)
     }
 }
 
-void modem_response_pwr(struct ipc_client *client, struct ipc_message *resp)
+void modem_response_pwr(__attribute__((unused)) struct ipc_client *client,
+			struct ipc_message *resp)
 {
     int state_n;
 
@@ -307,7 +308,8 @@ void modem_response_pwr(struct ipc_client *client, struct ipc_message *resp)
     }
 }
 
-void modem_response_net(struct ipc_client *client, struct ipc_message *resp)
+void modem_response_net(__attribute__((unused)) struct ipc_client *client,
+			struct ipc_message *resp)
 {
     struct ipc_net_regist_response_data *regi;
     struct ipc_net_plmn_entry *plmn;
@@ -397,7 +399,8 @@ int modem_read_loop(struct ipc_client *client)
     return 0;
 }
 
-void modem_log_handler(void *user_data, const char *msg)
+void modem_log_handler(__attribute__((unused)) void *user_data,
+		       const char *msg)
 {
     int i, l;
     char *message;
@@ -421,7 +424,8 @@ void modem_log_handler(void *user_data, const char *msg)
     free(message);
 }
 
-void modem_log_handler_quiet(void *user_data, const char *msg)
+void modem_log_handler_quiet(__attribute__((unused)) void *user_data,
+			     __attribute__((unused)) const char *msg)
 {
     return;
 }

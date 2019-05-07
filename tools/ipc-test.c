@@ -23,7 +23,8 @@
 
 #include <samsung-ipc.h>
 
-void log_callback(void *data, const char *message)
+void log_callback(__attribute__((unused)) void *data,
+		  const char *message)
 {
     char *buffer;
     size_t length;
@@ -47,7 +48,8 @@ void log_callback(void *data, const char *message)
     free(buffer);
 }
 
-int main(int args, char *argv[])
+int main(__attribute__((unused)) int args,
+	 __attribute__((unused)) char *argv[])
 {
     struct ipc_client *client = NULL;
     struct ipc_message message;
