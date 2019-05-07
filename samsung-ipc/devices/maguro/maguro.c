@@ -280,12 +280,12 @@ int maguro_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
     return rc;
 }
 
-int maguro_power_on(void *data)
+int maguro_power_on(__attribute__((unused)) void *data)
 {
     return 0;
 }
 
-int maguro_power_off(void *data)
+int maguro_power_off(__attribute__((unused)) void *data)
 {
     int fd;
     int rc;
@@ -304,18 +304,21 @@ int maguro_power_off(void *data)
     return 0;
 }
 
-int maguro_gprs_activate(void *data, unsigned int cid)
+int maguro_gprs_activate(__attribute__((unused)) void *data,
+			 __attribute__((unused)) unsigned int cid)
 {
     return 0;
 }
 
-int maguro_gprs_deactivate(void *data, unsigned int cid)
+int maguro_gprs_deactivate(__attribute__((unused)) void *data,
+			   __attribute__((unused)) unsigned int cid)
 {
     return 0;
 }
 
-int maguro_data_create(void **transport_data, void **power_data,
-    void **gprs_data)
+int maguro_data_create(void **transport_data,
+		       __attribute__((unused)) void **power_data,
+		       __attribute__((unused)) void **gprs_data)
 {
     if (transport_data == NULL)
         return -1;
@@ -325,8 +328,9 @@ int maguro_data_create(void **transport_data, void **power_data,
     return 0;
 }
 
-int maguro_data_destroy(void *transport_data, void *power_data,
-    void *gprs_data)
+int maguro_data_destroy(void *transport_data,
+			__attribute__((unused)) void *power_data,
+			__attribute__((unused)) void *gprs_data)
 {
     if (transport_data == NULL)
         return -1;
