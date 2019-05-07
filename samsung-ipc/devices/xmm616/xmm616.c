@@ -188,7 +188,6 @@ int xmm616_firmware_send(struct ipc_client *client, int device_fd,
     size_t wc;
     unsigned char *p;
     int rc;
-    int i;
 
     if (client == NULL || (device_fd < 0 && device_address == NULL) || firmware_data == NULL || firmware_size == 0)
         return -1;
