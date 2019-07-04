@@ -22,4 +22,6 @@ libsamsung_ipc_la_SOURCES += \
 	devices/n5100/n5100.h \
 	devices/herolte/herolte.c \
 	devices/herolte/herolte.h \
+	devices/generic/generic.c \
+	devices/generic/generic.h \
 	$(NULL)

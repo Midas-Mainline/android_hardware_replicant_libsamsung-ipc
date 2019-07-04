@@ -164,6 +164,16 @@ struct ipc_device_desc ipc_devices[] = {
 		.gprs_specs = &herolte_gprs_specs,
 		.nv_data_specs = &herolte_nv_data_specs,
 	},
+	{
+		.name = NULL,
+		.board_name = "samsung exynos (flattened device tree)",
+		.kernel_version = NULL,
+		.fmt_ops = &generic_fmt_ops,
+		.rfs_ops = &generic_rfs_ops,
+		.handlers = &generic_handlers,
+		.gprs_specs = &generic_gprs_specs,
+		.nv_data_specs = &generic_nv_data_specs,
+	},
 };
 
 unsigned int ipc_devices_count = sizeof(ipc_devices) /
