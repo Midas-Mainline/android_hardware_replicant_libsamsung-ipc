@@ -17,8 +17,6 @@
 
 LOCAL_PATH := $(call my-dir)
 
-include $(CLEAR_VARS)
-
 ifneq (,$(filter crespo,$(TARGET_DEVICE)))
 	ipc_device_name := crespo
 endif
@@ -51,7 +49,7 @@ ifneq (,$(filter n5100,$(TARGET_DEVICE)))
 	ipc_device_name := n5100
 endif
 
-LOCAL_SRC_FILES := \
+libsamsung_ipc_local_src_files := \
 	samsung-ipc/ipc.c \
 	samsung-ipc/ipc_devices.c \
 	samsung-ipc/ipc_utils.c \
@@ -79,25 +77,62 @@ LOCAL_SRC_FILES := \
 	samsung-ipc/rfs.c \
 	samsung-ipc/gen.c
 
-LOCAL_C_INCLUDES := \
+libsamsung_ipc_local_c_includes := \
 	$(LOCAL_PATH)/include \
 	$(LOCAL_PATH)/samsung-ipc \
 	$(LOCAL_PATH)/samsung-ipc/devices/xmm616/ \
 	$(LOCAL_PATH)/samsung-ipc/devices/xmm626/ \
 	external/openssl/include
 
-LOCAL_CFLAGS := \
+libsamsung_local_cflags := \
 	-DIPC_DEVICE_NAME=\"$(ipc_device_name)\" \
 	-DDEBUG
 
-LOCAL_SHARED_LIBRARIES := libutils libcrypto
+libsamsung_ipc_local_shared_libraries := \
+	libutils \
+	libcrypto
+
+############################################
+# Static library version of libsamsung-ipc #
+############################################
+include $(CLEAR_VARS)
 
 LOCAL_MODULE := libsamsung-ipc
 LOCAL_MODULE_TAGS := optional
 
+LOCAL_SRC_FILES := $(libsamsung_ipc_local_src_files)
+
+LOCAL_C_INCLUDES := $(libsamsung_ipc_local_c_includes)
+
+LOCAL_CFLAGS := $(libsamsung_local_cflags)
+LOCAL_SHARED_LIBRARIES := $(libsamsung_ipc_local_shared_libraries)
+
 include $(BUILD_STATIC_LIBRARY)
 
+############################################
+# Shared library version of libsamsung-ipc #
+############################################
 include $(CLEAR_VARS)
+
+LOCAL_MODULE := libsamsung-ipc
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_SRC_FILES := $(libsamsung_ipc_local_src_files)
+
+LOCAL_C_INCLUDES := $(libsamsung_ipc_local_c_includes)
+
+LOCAL_CFLAGS := $(libsamsung_local_cflags)
+LOCAL_SHARED_LIBRARIES := $(libsamsung_ipc_local_shared_libraries)
+
+include $(BUILD_SHARED_LIBRARY)
+
+##################
+# ipc-modem tool #
+##################
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := ipc-modem
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := tools/ipc-modem.c
 
@@ -106,12 +141,15 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
 LOCAL_STATIC_LIBRARIES := libsamsung-ipc
 LOCAL_SHARED_LIBRARIES := libutils
 
-LOCAL_MODULE := ipc-modem
-LOCAL_MODULE_TAGS := optional
-
 include $(BUILD_EXECUTABLE)
 
+#################
+# ipc-test tool #
+#################
 include $(CLEAR_VARS)
+
+LOCAL_MODULE := ipc-test
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := tools/ipc-test.c
 
@@ -119,8 +157,5 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
 
 LOCAL_STATIC_LIBRARIES := libsamsung-ipc
 LOCAL_SHARED_LIBRARIES := libutils
-
-LOCAL_MODULE := ipc-test
-LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_EXECUTABLE)
