@@ -74,7 +74,7 @@ int ipc_device_detect(void)
 
     line = strtok(buffer, "\n");
     while (line != NULL) {
-        if (strncmp(line, "Hardware", 8) == 8) {
+        if (strncmp(line, "Hardware", 8) == 0) {
             p = line + 11;
             c = p;
 
