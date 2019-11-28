@@ -39,7 +39,6 @@ char *ipc_nv_data_md5_calculate(const char *path, const char *secret,
     char *md5_string = NULL;
     unsigned char md5_hash[MD5_DIGEST_LENGTH] = { 0 };
     MD5_CTX ctx;
-    int rc;
 
     if (secret == NULL)
         return NULL;
