@@ -300,12 +300,12 @@ int n5100_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
     return rc;
 }
 
-int n5100_power_on(void *data)
+int n5100_power_on(__attribute__((unused)) void *data)
 {
     return 0;
 }
 
-int n5100_power_off(void *data)
+int n5100_power_off(__attribute__((unused)) void *data)
 {
     int fd;
     int rc;
@@ -324,18 +324,21 @@ int n5100_power_off(void *data)
     return 0;
 }
 
-int n5100_gprs_activate(void *data, unsigned int cid)
+int n5100_gprs_activate(__attribute__((unused)) void *data,
+			__attribute__((unused)) unsigned int cid)
 {
     return 0;
 }
 
-int n5100_gprs_deactivate(void *data, unsigned int cid)
+int n5100_gprs_deactivate(__attribute__((unused)) void *data,
+			  __attribute__((unused)) unsigned int cid)
 {
     return 0;
 }
 
-int n5100_data_create(void **transport_data, void **power_data,
-    void **gprs_data)
+int n5100_data_create(void **transport_data,
+		      __attribute__((unused)) void **power_data,
+		      __attribute__((unused)) void **gprs_data)
 {
     if (transport_data == NULL)
         return -1;
@@ -345,8 +348,9 @@ int n5100_data_create(void **transport_data, void **power_data,
     return 0;
 }
 
-int n5100_data_destroy(void *transport_data, void *power_data,
-    void *gprs_data)
+int n5100_data_destroy(void *transport_data,
+		       __attribute__((unused)) void *power_data,
+		       __attribute__((unused)) void *gprs_data)
 {
     if (transport_data == NULL)
         return -1;
