@@ -677,7 +677,7 @@ int aries_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
     return rc;
 }
 
-int aries_power_on(void *data)
+int aries_power_on(__attribute__((unused)) void *data)
 {
     char buffer[] = "on\n";
     int value;
@@ -698,7 +698,7 @@ int aries_power_on(void *data)
     return 0;
 }
 
-int aries_power_off(void *data)
+int aries_power_off(__attribute__((unused)) void *data)
 {
     char buffer[] = "off\n";
     int value;
@@ -719,8 +719,9 @@ int aries_power_off(void *data)
     return 0;
 }
 
-int aries_data_create(void **transport_data, void **power_data,
-    void **gprs_data)
+int aries_data_create(void **transport_data,
+		      __attribute__((unused)) void **power_data,
+		      __attribute__((unused)) void **gprs_data)
 {
     if (transport_data == NULL)
         return -1;
@@ -730,7 +731,9 @@ int aries_data_create(void **transport_data, void **power_data,
     return 0;
 }
 
-int aries_data_destroy(void *transport_data, void *power_data, void *gprs_data)
+int aries_data_destroy(void *transport_data,
+		       __attribute__((unused)) void *power_data,
+		       __attribute__((unused)) void *gprs_data)
 {
     if (transport_data == NULL)
         return -1;
@@ -740,7 +743,8 @@ int aries_data_destroy(void *transport_data, void *power_data, void *gprs_data)
     return 0;
 }
 
-int aries_gprs_activate(void *data, unsigned int cid)
+int aries_gprs_activate(__attribute__((unused)) void *data,
+			unsigned int cid)
 {
     int rc;
 
@@ -751,7 +755,8 @@ int aries_gprs_activate(void *data, unsigned int cid)
     return 0;
 }
 
-int aries_gprs_deactivate(void *data, unsigned int cid)
+int aries_gprs_deactivate(__attribute__((unused)) void *data,
+			  unsigned int cid)
 {
     int rc;
 
