@@ -149,8 +149,6 @@ void modem_response_sec(struct ipc_client *client, struct ipc_message *resp)
 {
     struct ipc_sec_pin_status_response_data *sim_status;
     unsigned char type;
-    int status;
-    char *data;
 
     switch(resp->command)
     {
@@ -312,7 +310,6 @@ void modem_response_net(__attribute__((unused)) struct ipc_client *client,
 			struct ipc_message *resp)
 {
     struct ipc_net_regist_response_data *regi;
-    struct ipc_net_plmn_entry *plmn;
     char mnc[6];
 
     switch(resp->command)

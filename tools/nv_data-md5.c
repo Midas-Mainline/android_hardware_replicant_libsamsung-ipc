@@ -35,7 +35,6 @@ int main(int argc, char *argv[])
     size_t chunk_size = NV_DATA_CHUNK_SIZE;
     char *md5_string = NULL;
     char *path;
-    int rc;
 
     if (argc < 2) {
         usage_print();
