@@ -64,44 +64,44 @@ int main(__attribute__((unused)) int args,
 
     rc = ipc_client_log_callback_register(client, log_callback, NULL);
     if (rc < 0) {
-        printf("Registering log callback failed\n");
+        printf("Registering log callback failed: error %d\n", rc);
         goto error;
     }
 
     rc = ipc_client_data_create(client);
     if (rc < 0) {
-        printf("Creating data failed\n");
+        printf("Creating data failed: error %d\n", rc);
         goto error;
     }
 
     rc = ipc_client_boot(client);
     if (rc < 0) {
-        printf("Booting failed\n");
+        printf("Booting failed: error %d\n", rc);
         goto error;
     }
 
     rc = ipc_client_power_on(client);
     if (rc < 0) {
-        printf("Powering on failed\n");
+        printf("Powering on failed: error %d\n", rc);
         goto error;
     }
 
     rc = ipc_client_open(client);
     if (rc < 0) {
-        printf("Opening failed\n");
+        printf("ipc_client_open failed: error %d\n", rc);
         goto error;
     }
 
     for (i = 0; i < 5; i++) {
         rc = ipc_client_poll(client, NULL, NULL);
         if (rc < 0) {
-            printf("Polling failed\n");
+            printf("Polling failed: error %d\n", rc);
             break;
         }
 
         rc = ipc_client_recv(client, &message);
         if (rc < 0) {
-            printf("Receiving failed\n");
+            printf("Receiving failed: error %d\n", rc);
             break;
         }
 
@@ -113,13 +113,13 @@ int main(__attribute__((unused)) int args,
 
     rc = ipc_client_close(client);
     if (rc < 0) {
-        printf("Closing failed\n");
+        printf("Closing failed: error %d\n", rc);
         goto error;
     }
 
     rc = ipc_client_power_off(client);
     if (rc < 0) {
-        printf("Powering on failed\n");
+        printf("Powering on failed: error %d\n", rc);
         goto error;
     }
 
