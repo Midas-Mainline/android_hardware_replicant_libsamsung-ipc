@@ -367,10 +367,23 @@ int ipc_client_recv(struct ipc_client *client, struct ipc_message *message)
 
 int ipc_client_open(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL || client->handlers->open == NULL)
+    if (client == NULL || client->handlers == NULL || client->handlers->open == NULL) {
+        if (client == NULL) {
+            ipc_client_log(client, "%s failed: client is NULL", __FUNCTION__);
+        }
+        if (client->handlers == NULL) {
+            ipc_client_log(client, "%s failed: client->handlers is NULL",
+                           __FUNCTION__);
+        }
+        if (client->handlers->open == NULL) {
+            ipc_client_log(client, "%s failed: client->handlers->open is NULL",
+                           __FUNCTION__);
+        }
         return -1;
+    }
 
-    return client->handlers->open(client->handlers->transport_data, client->type);
+    return client->handlers->open(client->handlers->transport_data,
+                                  client->type);
 }
 
 int ipc_client_close(struct ipc_client *client)
