@@ -32,9 +32,10 @@
 #include <linux/netlink.h>
 #include <net/if.h>
 
+#include <samsung-ipc.h>
 
-void *file_data_read(const char *path, size_t size, size_t chunk_size,
-    unsigned int offset)
+void *file_data_read(struct ipc_client *client, const char *path, size_t size,
+		     size_t chunk_size, unsigned int offset)
 {
     void *data = NULL;
     int fd = -1;
@@ -43,16 +44,34 @@ void *file_data_read(const char *path, size_t size, size_t chunk_size,
     unsigned char *p;
     int rc;
 
-    if (path == NULL || size == 0 || chunk_size == 0 || chunk_size > size)
-        return NULL;
+    if (path == NULL || size == 0 || chunk_size == 0 || chunk_size > size) {
+	    if (path == NULL) {
+		    ipc_client_log(client, "%s: Failed: path is NULL", __FUNCTION__);
+	    }
+	    if (size == 0) {
+		    ipc_client_log(client, "%s: Failed: size is 0", __FUNCTION__);
+	    }
+	    if (chunk_size == 0) {
+		    ipc_client_log(client, "%s: Failed: chunk_size is 0", __FUNCTION__);
+	    }
+	    if (chunk_size > size) {
+		    ipc_client_log(client, "%s: Failed: chunk_size > size ", __FUNCTION__);
+	    }
+
+	    return NULL;
+    }
 
     fd = open(path, O_RDONLY);
-    if (fd < 0)
-        goto error;
+    if (fd < 0) {
+	    ipc_client_log(client, "%s: Error: fd: %d ", __FUNCTION__, fd);
+	    goto error;
+    }
 
     seek = lseek(fd, (off_t) offset, SEEK_SET);
-    if (seek < (off_t) offset)
-        goto error;
+    if (seek < (off_t) offset) {
+	    ipc_client_log(client, "%s: Error: seek < (off_t) offset", __FUNCTION__);
+	    goto error;
+    }
 
     data = calloc(1, size);
 
@@ -61,8 +80,10 @@ void *file_data_read(const char *path, size_t size, size_t chunk_size,
     count = 0;
     while (count < size) {
         rc = read(fd, p, size - count > chunk_size ? chunk_size : size - count);
-        if (rc <= 0)
-            goto error;
+        if (rc <= 0) {
+		ipc_client_log(client, "%s: Error: rc < 0", __FUNCTION__);
+		goto error;
+	}
 
         p += rc;
         count += rc;
@@ -83,8 +104,9 @@ complete:
     return data;
 }
 
-int file_data_write(const char *path, const void *data, size_t size,
-    size_t chunk_size, unsigned int offset)
+int file_data_write(struct ipc_client *client, const char *path,
+                    const void *data, size_t size, size_t chunk_size,
+                    unsigned int offset)
 {
     int fd = -1;
     size_t count;
@@ -92,24 +114,44 @@ int file_data_write(const char *path, const void *data, size_t size,
     unsigned char *p;
     int rc;
 
-    if (path == NULL || data == NULL || size == 0 || chunk_size == 0 || chunk_size > size)
+    if (path == NULL || data == NULL || size == 0 || chunk_size == 0 || chunk_size > size) {
+        if (path == NULL) {
+            ipc_client_log(client, "%s failed: path is NULL", __FUNCTION__);
+        }
+        if (size == 0) {
+            ipc_client_log(client, "%s failed: size is 0", __FUNCTION__);
+        }
+        if (chunk_size == 0) {
+            ipc_client_log(client, "%s failed: chunk_size is 0", __FUNCTION__);
+        }
+        if (chunk_size > size) {
+            ipc_client_log(client, "%s failed: chunk_size > size",
+                           __FUNCTION__);
+        }
         return -1;
+    }
 
     fd = open(path, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if (fd < 0)
+    if (fd < 0) {
+        ipc_client_log(client, "%s: open failed with error %d", __FUNCTION__, fd);
         goto error;
+    }
 
     seek = lseek(fd, (off_t) offset, SEEK_SET);
-    if (seek < (off_t) offset)
+    if (seek < (off_t) offset) {
+        ipc_client_log(client, "%s failed: seek < (off_t) offset", __FUNCTION__);
         goto error;
+    }
 
     p = (unsigned char *) data;
 
     count = 0;
     while (count < size) {
         rc = write(fd, p, size - count > chunk_size ? chunk_size : size - count);
-        if (rc <= 0)
-            goto error;
+        if (rc <= 0) {
+                ipc_client_log(client, "%s: write failed with error %d", __FUNCTION__, rc);
+                goto error;
+        }
 
         p += rc;
         count += rc;

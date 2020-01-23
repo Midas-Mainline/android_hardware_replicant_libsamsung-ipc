@@ -140,7 +140,7 @@ int maguro_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Sent XMM626 MIPI nv_data");
 
-    mps_data = file_data_read(MAGURO_MPS_DATA_DEVICE, MAGURO_MPS_DATA_SIZE, MAGURO_MPS_DATA_SIZE, 0);
+    mps_data = file_data_read(client, MAGURO_MPS_DATA_DEVICE, MAGURO_MPS_DATA_SIZE, MAGURO_MPS_DATA_SIZE, 0);
     if (mps_data == NULL) {
         ipc_client_log(client, "Reading MPS data failed");
         goto error;

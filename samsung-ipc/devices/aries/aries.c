@@ -62,7 +62,7 @@ int aries_boot(struct ipc_client *client)
 
     ipc_client_log(client, "Starting aries modem boot");
 
-    modem_image_data = file_data_read(ARIES_MODEM_IMAGE_DEVICE, ARIES_MODEM_IMAGE_SIZE, 0x1000, 0);
+    modem_image_data = file_data_read(client, ARIES_MODEM_IMAGE_DEVICE, ARIES_MODEM_IMAGE_SIZE, 0x1000, 0);
     if (modem_image_data == NULL) {
         ipc_client_log(client, "Reading modem image data failed");
         goto error;

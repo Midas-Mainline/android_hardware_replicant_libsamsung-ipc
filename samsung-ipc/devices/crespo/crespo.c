@@ -50,7 +50,7 @@ int crespo_boot(struct ipc_client *client)
 
     ipc_client_log(client, "Starting crespo modem boot");
 
-    modem_image_data = file_data_read(CRESPO_MODEM_IMAGE_DEVICE, CRESPO_MODEM_IMAGE_SIZE, 0x1000, 0);
+    modem_image_data = file_data_read(client, CRESPO_MODEM_IMAGE_DEVICE, CRESPO_MODEM_IMAGE_SIZE, 0x1000, 0);
     if (modem_image_data == NULL) {
         ipc_client_log(client, "Reading modem image data failed");
         goto error;

@@ -46,7 +46,7 @@ char *ipc_nv_data_md5_calculate(struct ipc_client *client,
 	    return NULL;
     }
 
-    data = file_data_read(path, size, chunk_size, 0);
+    data = file_data_read(client, path, size, chunk_size, 0);
     if (data == NULL) {
 	    ipc_client_log(client, "%s failed: data is NULL",  __FUNCTION__);
 	    return NULL;
@@ -227,7 +227,7 @@ int ipc_nv_data_check(struct ipc_client *client)
 
     length = strlen(md5_string);
 
-    buffer = file_data_read(md5_path, length, length, 0);
+    buffer = file_data_read(client, md5_path, length, length, 0);
     if (buffer == NULL) {
         ipc_client_log(client, "Reading nv_data md5 failed");
         goto error;
@@ -306,7 +306,7 @@ int ipc_nv_data_backup_check(struct ipc_client *client)
 
     length = strlen(backup_md5_string);
 
-    buffer = file_data_read(backup_md5_path, length, length, 0);
+    buffer = file_data_read(client, backup_md5_path, length, length, 0);
     if (buffer == NULL) {
         ipc_client_log(client, "Reading nv_data backup md5 failed");
         goto error;
@@ -371,7 +371,7 @@ int ipc_nv_data_backup(struct ipc_client *client)
         goto error;
     }
 
-    data = file_data_read(path, size, chunk_size, 0);
+    data = file_data_read(client, path, size, chunk_size, 0);
     if (data == NULL) {
         ipc_client_log(client, "Reading nv_data failed");
         goto error;
@@ -389,7 +389,7 @@ int ipc_nv_data_backup(struct ipc_client *client)
     if (rc < 0)
         ipc_client_log(client, "Removing nv_data backup path failed");
 
-    rc = file_data_write(backup_path, data, size, chunk_size, 0);
+    rc = file_data_write(client, backup_path, data, size, chunk_size, 0);
     if (rc < 0) {
         ipc_client_log(client, "Writing nv_data backup failed");
         goto error;
@@ -399,7 +399,7 @@ int ipc_nv_data_backup(struct ipc_client *client)
     if (rc < 0)
         ipc_client_log(client, "Removing nv_data backup md5 path failed");
 
-    rc = file_data_write(backup_md5_path, md5_string, length, length, 0);
+    rc = file_data_write(client, backup_md5_path, md5_string, length, length, 0);
     if (rc < 0) {
         ipc_client_log(client, "Writing nv_data backup md5 failed");
         goto error;
@@ -455,7 +455,7 @@ int ipc_nv_data_restore(struct ipc_client *client)
         goto error;
     }
 
-    data = file_data_read(backup_path, size, chunk_size, 0);
+    data = file_data_read(client, backup_path, size, chunk_size, 0);
     if (data == NULL) {
         ipc_client_log(client, "Reading nv_data backup failed");
         goto error;
@@ -465,7 +465,7 @@ int ipc_nv_data_restore(struct ipc_client *client)
     if (rc < 0)
         ipc_client_log(client, "Removing nv_data path failed");
 
-    rc = file_data_write(path, data, size, chunk_size, 0);
+    rc = file_data_write(client, path, data, size, chunk_size, 0);
     if (rc < 0) {
         ipc_client_log(client, "Writing nv_data failed");
         goto error;
@@ -476,7 +476,7 @@ int ipc_nv_data_restore(struct ipc_client *client)
 
     length = 2 * sizeof(char) * MD5_DIGEST_LENGTH;
 
-    data = file_data_read(backup_md5_path, length, length, 0);
+    data = file_data_read(client, backup_md5_path, length, length, 0);
     if (data == NULL) {
         ipc_client_log(client, "Reading nv_data backup md5 failed");
         goto error;
@@ -486,7 +486,7 @@ int ipc_nv_data_restore(struct ipc_client *client)
     if (rc < 0)
         ipc_client_log(client, "Removing nv_data md5 path failed");
 
-    rc = file_data_write(md5_path, data, length, length, 0);
+    rc = file_data_write(client, md5_path, data, length, length, 0);
     if (rc < 0) {
         ipc_client_log(client, "Writing nv_data md5 failed");
         goto error;
@@ -550,7 +550,7 @@ void *ipc_nv_data_load(struct ipc_client *client)
             ipc_client_log(client, "Backing up nv_data failed");
     }
 
-    data = file_data_read(path, size, chunk_size, 0);
+    data = file_data_read(client, path, size, chunk_size, 0);
     if (data == NULL) {
         ipc_client_log(client, "Reading nv_data failed");
         return NULL;
@@ -581,7 +581,7 @@ void *ipc_nv_data_read(struct ipc_client *client, size_t size,
         return NULL;
     }
 
-    data = file_data_read(path, size, chunk_size > size ? size : chunk_size, offset);
+    data = file_data_read(client, path, size, chunk_size > size ? size : chunk_size, offset);
     if (data == NULL) {
         ipc_client_log(client, "Reading nv_data failed");
         return NULL;
@@ -617,7 +617,7 @@ int ipc_nv_data_write(struct ipc_client *client, const void *data, size_t size,
         goto error;
     }
 
-    rc = file_data_write(path, data, size, chunk_size > size ? size : chunk_size, offset);
+    rc = file_data_write(client, path, data, size, chunk_size > size ? size : chunk_size, offset);
     if (rc < 0) {
         ipc_client_log(client, "Writing nv_data failed");
         goto error;
@@ -641,7 +641,7 @@ int ipc_nv_data_write(struct ipc_client *client, const void *data, size_t size,
         goto error;
     }
 
-    rc = file_data_write(md5_path, md5_string, length, length, 0);
+    rc = file_data_write(client, md5_path, md5_string, length, length, 0);
     if (rc < 0) {
         ipc_client_log(client, "Writing nv_data md5 failed");
         goto error;
