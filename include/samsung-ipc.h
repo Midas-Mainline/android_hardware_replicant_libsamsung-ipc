@@ -30,6 +30,7 @@
 
 #define IPC_CLIENT_TYPE_FMT                                     0x00
 #define IPC_CLIENT_TYPE_RFS                                     0x01
+#define IPC_CLIENT_TYPE_DUMMY                                   0x02
 
 /*
  * Structures

@@ -153,7 +153,18 @@ complete:
     return index;
 }
 
-struct ipc_client *ipc_client_create(int type)
+
+static struct ipc_client *ipc_dummy_client_create(void)
+{
+    struct ipc_client *client = NULL;
+
+    client = (struct ipc_client *) calloc(1, sizeof(struct ipc_client));
+    client->type = IPC_CLIENT_TYPE_DUMMY;
+
+    return client;
+}
+
+static struct ipc_client *ipc_transport_client_create(int type)
 {
     struct ipc_client *client = NULL;
     unsigned int device_index;
@@ -203,6 +214,19 @@ error:
 
 complete:
     return client;
+}
+
+struct ipc_client *ipc_client_create(int type)
+{
+    switch (type) {
+        case IPC_CLIENT_TYPE_RFS:
+        case IPC_CLIENT_TYPE_FMT:
+            return ipc_transport_client_create(type);
+        case IPC_CLIENT_TYPE_DUMMY:
+            return ipc_dummy_client_create();
+        default:
+             return NULL;
+    }
 }
 
 int ipc_client_destroy(struct ipc_client *client)
