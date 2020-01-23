@@ -32,20 +32,25 @@
 
 #include <ipc.h>
 
-char *ipc_nv_data_md5_calculate(const char *path, const char *secret,
-    size_t size, size_t chunk_size)
+char *ipc_nv_data_md5_calculate(struct ipc_client *client,
+				const char *path, const char *secret,
+				size_t size, size_t chunk_size)
 {
     void *data = NULL;
     char *md5_string = NULL;
     unsigned char md5_hash[MD5_DIGEST_LENGTH] = { 0 };
     MD5_CTX ctx;
 
-    if (secret == NULL)
-        return NULL;
+    if (secret == NULL) {
+	    ipc_client_log(client, "%s: Failed: secret is NULL", __FUNCTION__);
+	    return NULL;
+    }
 
     data = file_data_read(path, size, chunk_size, 0);
-    if (data == NULL)
-        return NULL;
+    if (data == NULL) {
+	    ipc_client_log(client, "%s failed: data is NULL",  __FUNCTION__);
+	    return NULL;
+    }
 
     MD5_Init(&ctx);
     MD5_Update(&ctx, data, size);
@@ -213,7 +218,7 @@ int ipc_nv_data_check(struct ipc_client *client)
         goto error;
     }
 
-    md5_string = ipc_nv_data_md5_calculate(path, secret, size, chunk_size);
+    md5_string = ipc_nv_data_md5_calculate(client, path, secret, size, chunk_size);
     if (md5_string == NULL) {
         ipc_client_log(client, "Calculating nv_data md5 failed");
         goto error;
@@ -292,7 +297,7 @@ int ipc_nv_data_backup_check(struct ipc_client *client)
         goto error;
     }
 
-    backup_md5_string = ipc_nv_data_md5_calculate(backup_path, secret, size, chunk_size);
+    backup_md5_string = ipc_nv_data_md5_calculate(client, backup_path, secret, size, chunk_size);
     if (backup_md5_string == NULL) {
         ipc_client_log(client, "Calculating nv_data backup md5 failed");
         goto error;
@@ -372,7 +377,7 @@ int ipc_nv_data_backup(struct ipc_client *client)
         goto error;
     }
 
-    md5_string = ipc_nv_data_md5_calculate(path, secret, size, chunk_size);
+    md5_string = ipc_nv_data_md5_calculate(client, path, secret, size, chunk_size);
     if (md5_string == NULL) {
         ipc_client_log(client, "Calculating nv_data md5 failed");
         goto error;
@@ -622,7 +627,7 @@ int ipc_nv_data_write(struct ipc_client *client, const void *data, size_t size,
     if (size == 0)
         goto error;
 
-    md5_string = ipc_nv_data_md5_calculate(path, secret, size, chunk_size);
+    md5_string = ipc_nv_data_md5_calculate(client, path, secret, size, chunk_size);
     if (md5_string == NULL) {
         ipc_client_log(client, "Calculating nv_data md5 failed");
         goto error;

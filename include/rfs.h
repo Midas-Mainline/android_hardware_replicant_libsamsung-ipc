@@ -67,8 +67,9 @@ struct ipc_rfs_nv_write_item_response_data {
  * Helpers
  */
 
-char *ipc_nv_data_md5_calculate(const char *path, const char *secret,
-    size_t size, size_t chunk_size);
+char *ipc_nv_data_md5_calculate(struct ipc_client *client, const char *path,
+				const char *secret, size_t size,
+				size_t chunk_size);
 int ipc_nv_data_path_check(struct ipc_client *client);
 int ipc_nv_data_md5_path_check(struct ipc_client *client);
 int ipc_nv_data_backup_path_check(struct ipc_client *client);

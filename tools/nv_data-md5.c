@@ -43,7 +43,8 @@ int main(int argc, char *argv[])
 
     path = argv[1];
 
-    md5_string = ipc_nv_data_md5_calculate(path, secret, size, chunk_size);
+    md5_string = ipc_nv_data_md5_calculate(NULL, path, secret, size,
+                                           chunk_size);
     if (md5_string == NULL) {
         fprintf(stderr, "Calculating nv_data backup md5 failed\n");
         return 1;
