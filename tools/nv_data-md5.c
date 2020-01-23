@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("%s", md5_string);
+    printf("%s\n", md5_string);
 
     free(md5_string);
 
