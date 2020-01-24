@@ -53,11 +53,11 @@ libsamsung_ipc_local_src_files := \
 	samsung-ipc/ipc.c \
 	samsung-ipc/ipc_devices.c \
 	samsung-ipc/ipc_utils.c \
-	samsung-ipc/devices/xmm616/xmm616.c \
-	samsung-ipc/devices/xmm626/xmm626.c \
-	samsung-ipc/devices/xmm626/xmm626_hsic.c \
-	samsung-ipc/devices/xmm626/xmm626_mipi.c \
-	samsung-ipc/devices/xmm626/xmm626_sec_modem.c \
+	samsung-ipc/modems/xmm616/xmm616.c \
+	samsung-ipc/modems/xmm626/xmm626.c \
+	samsung-ipc/modems/xmm626/xmm626_hsic.c \
+	samsung-ipc/modems/xmm626/xmm626_mipi.c \
+	samsung-ipc/modems/xmm626/xmm626_sec_modem.c \
 	samsung-ipc/devices/crespo/crespo.c \
 	samsung-ipc/devices/aries/aries.c \
 	samsung-ipc/devices/galaxys2/galaxys2.c \
@@ -80,8 +80,8 @@ libsamsung_ipc_local_src_files := \
 libsamsung_ipc_local_c_includes := \
 	$(LOCAL_PATH)/include \
 	$(LOCAL_PATH)/samsung-ipc \
-	$(LOCAL_PATH)/samsung-ipc/devices/xmm616/ \
-	$(LOCAL_PATH)/samsung-ipc/devices/xmm626/ \
+	$(LOCAL_PATH)/samsung-ipc/modems/xmm616/ \
+	$(LOCAL_PATH)/samsung-ipc/modems/xmm626/ \
 	external/openssl/include
 
 libsamsung_local_cflags := \
