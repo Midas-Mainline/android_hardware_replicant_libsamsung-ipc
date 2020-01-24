@@ -3,6 +3,7 @@ NULL =
 AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/samsung-ipc \
+	-I$(top_srcdir)/samsung-ipc/devices \
 	-I$(top_srcdir)/samsung-ipc/modems/xmm616 \
 	-I$(top_srcdir)/samsung-ipc/modems/xmm626 \
 	$(OPENSSL_CFLAGS) \
@@ -19,8 +20,6 @@ lib_LTLIBRARIES = \
 libsamsung_ipc_la_SOURCES = \
 	ipc.c \
 	ipc.h \
-	ipc_devices.c \
-	ipc_devices.h \
 	ipc_utils.c \
 	modems/xmm616/xmm616.c \
 	modems/xmm616/xmm616.h \
@@ -35,6 +34,8 @@ libsamsung_ipc_la_SOURCES = \
 	modems/xmm626/modem.h \
 	modems/xmm626/modem_link_device_hsic.h \
 	modems/xmm626/modem_prj.h \
+	devices/ipc_devices.c \
+	devices/ipc_devices.h \
 	devices/crespo/crespo.c \
 	devices/crespo/crespo.h \
 	devices/crespo/crespo_modem_ctl.h \
