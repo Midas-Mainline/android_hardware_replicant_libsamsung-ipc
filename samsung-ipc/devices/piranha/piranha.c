@@ -67,14 +67,14 @@ int piranha_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Opened modem boot device");
 
-    rc = xmm626_sec_modem_power(modem_boot_fd, 0);
+    rc = xmm626_sec_modem_power(client, modem_boot_fd, 0);
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem off failed");
         goto error;
     }
     ipc_client_log(client, "Turned the modem off");
 
-    rc = xmm626_sec_modem_power(modem_boot_fd, 1);
+    rc = xmm626_sec_modem_power(client, modem_boot_fd, 1);
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem on failed");
         goto error;
@@ -270,7 +270,7 @@ int piranha_power_off(__attribute__((unused)) struct ipc_client *client,
     if (fd < 0)
         return -1;
 
-    rc = xmm626_sec_modem_power(fd, 0);
+    rc = xmm626_sec_modem_power(client, fd, 0);
 
     close(fd);
 

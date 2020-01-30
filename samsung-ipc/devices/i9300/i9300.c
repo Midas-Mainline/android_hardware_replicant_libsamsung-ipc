@@ -75,15 +75,15 @@ int i9300_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Opened modem link device");
 
-    rc = xmm626_sec_modem_hci_power(0);
+    rc = xmm626_sec_modem_hci_power(client, 0);
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem off failed");
         goto error;
     }
     ipc_client_log(client, "Turned the modem off");
 
-    rc = xmm626_sec_modem_power(modem_boot_fd, 1);
-    rc |= xmm626_sec_modem_hci_power(1);
+    rc = xmm626_sec_modem_power(client, modem_boot_fd, 1);
+    rc |= xmm626_sec_modem_hci_power(client, 1);
 
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem on failed");
@@ -91,7 +91,7 @@ int i9300_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Turned the modem on");
 
-    rc = xmm626_sec_modem_link_connected_wait(modem_link_fd);
+    rc = xmm626_sec_modem_link_connected_wait(client, modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for link connected failed");
         goto error;
@@ -168,37 +168,37 @@ int i9300_boot(struct ipc_client *client)
 
     usleep(300000);
 
-    rc = xmm626_sec_modem_link_get_hostwake_wait(modem_link_fd);
+    rc = xmm626_sec_modem_link_get_hostwake_wait(client, modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for host wake failed");
     }
 
-    rc = xmm626_sec_modem_link_control_enable(modem_link_fd, 0);
-    rc |= xmm626_sec_modem_hci_power(0);
-    rc |= xmm626_sec_modem_link_control_active(modem_link_fd, 0);
+    rc = xmm626_sec_modem_link_control_enable(client, modem_link_fd, 0);
+    rc |= xmm626_sec_modem_hci_power(client, 0);
+    rc |= xmm626_sec_modem_link_control_active(client, modem_link_fd, 0);
 
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem off failed");
         goto error;
     }
 
-    rc = xmm626_sec_modem_link_get_hostwake_wait(modem_link_fd);
+    rc = xmm626_sec_modem_link_get_hostwake_wait(client, modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for host wake failed");
         goto error;
     }
     ipc_client_log(client, "Waited for host wake");
 
-    rc = xmm626_sec_modem_link_control_enable(modem_link_fd, 1);
-    rc |= xmm626_sec_modem_hci_power(1);
-    rc |= xmm626_sec_modem_link_control_active(modem_link_fd, 1);
+    rc = xmm626_sec_modem_link_control_enable(client, modem_link_fd, 1);
+    rc |= xmm626_sec_modem_hci_power(client, 1);
+    rc |= xmm626_sec_modem_link_control_active(client, modem_link_fd, 1);
 
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem on failed");
         goto error;
     }
 
-    rc = xmm626_sec_modem_link_connected_wait(modem_link_fd);
+    rc = xmm626_sec_modem_link_connected_wait(client, modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for link connected failed");
         goto error;
@@ -321,7 +321,7 @@ int i9300_power_off(__attribute__((unused)) struct ipc_client *client,
     if (fd < 0)
         return -1;
 
-    rc = xmm626_sec_modem_power(fd, 0);
+    rc = xmm626_sec_modem_power(client, fd, 0);
 
     close(fd);
 

@@ -37,7 +37,8 @@
 #include "xmm626.h"
 #include "xmm626_sec_modem.h"
 
-int xmm626_sec_modem_power(int device_fd, int power)
+int xmm626_sec_modem_power(__attribute__((unused)) struct ipc_client *client,
+                           int device_fd, int power)
 {
     int rc;
 
@@ -51,7 +52,8 @@ int xmm626_sec_modem_power(int device_fd, int power)
     return 0;
 }
 
-int xmm626_sec_modem_boot_power(int device_fd, int power)
+int xmm626_sec_modem_boot_power(__attribute__((unused)) struct ipc_client *client,
+                                int device_fd, int power)
 {
     int rc;
 
@@ -66,7 +68,8 @@ int xmm626_sec_modem_boot_power(int device_fd, int power)
     return 0;
 }
 
-int xmm626_sec_modem_status_online_wait(int device_fd)
+int xmm626_sec_modem_status_online_wait(__attribute__((unused)) struct ipc_client *client,
+                                        int device_fd)
 {
     int status;
     int i;
@@ -86,7 +89,8 @@ int xmm626_sec_modem_status_online_wait(int device_fd)
     return -1;
 }
 
-int xmm626_sec_modem_hci_power(int power)
+int xmm626_sec_modem_hci_power(__attribute__((unused)) struct ipc_client *client,
+                               int power)
 {
     int ehci_rc, ohci_rc;
 
@@ -104,7 +108,8 @@ int xmm626_sec_modem_hci_power(int power)
     return 0;
 }
 
-int xmm626_sec_modem_link_control_enable(int device_fd, int enable)
+int xmm626_sec_modem_link_control_enable(__attribute__((unused)) struct ipc_client *client,
+                                         int device_fd, int enable)
 {
     int rc;
 
@@ -118,7 +123,8 @@ int xmm626_sec_modem_link_control_enable(int device_fd, int enable)
     return 0;
 }
 
-int xmm626_sec_modem_link_control_active(int device_fd, int active)
+int xmm626_sec_modem_link_control_active(__attribute__((unused)) struct ipc_client *client,
+                                         int device_fd, int active)
 {
     int rc;
 
@@ -132,7 +138,8 @@ int xmm626_sec_modem_link_control_active(int device_fd, int active)
     return 0;
 }
 
-int xmm626_sec_modem_link_connected_wait(int device_fd)
+int xmm626_sec_modem_link_connected_wait(__attribute__((unused)) struct ipc_client *client,
+                                         int device_fd)
 {
     int status;
     int i;
@@ -152,7 +159,8 @@ int xmm626_sec_modem_link_connected_wait(int device_fd)
     return -1;
 }
 
-int xmm626_sec_modem_link_get_hostwake_wait(int device_fd)
+int xmm626_sec_modem_link_get_hostwake_wait(__attribute__((unused)) struct ipc_client *client,
+                                            int device_fd)
 {
     int status;
     int i;

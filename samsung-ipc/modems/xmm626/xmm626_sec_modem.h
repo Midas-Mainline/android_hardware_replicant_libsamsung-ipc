@@ -31,14 +31,20 @@
 #define XMM626_SEC_MODEM_GPRS_IFACE_PREFIX      "rmnet"
 #define XMM626_SEC_MODEM_GPRS_IFACE_COUNT                       3
 
-int xmm626_sec_modem_power(int device_fd, int power);
-int xmm626_sec_modem_boot_power(int device_fd, int power);
-int xmm626_sec_modem_status_online_wait(int device_fd);
-int xmm626_sec_modem_hci_power(int power);
-int xmm626_sec_modem_link_control_enable(int device_fd, int enable);
-int xmm626_sec_modem_link_control_active(int device_fd, int active);
-int xmm626_sec_modem_link_connected_wait(int device_fd);
-int xmm626_sec_modem_link_get_hostwake_wait(int device_fd);
+int xmm626_sec_modem_power(struct ipc_client *client, int device_fd, int power);
+int xmm626_sec_modem_boot_power(struct ipc_client *client, int device_fd,
+    int power);
+int xmm626_sec_modem_status_online_wait(struct ipc_client *client,
+    int device_fd);
+int xmm626_sec_modem_hci_power(struct ipc_client *client, int power);
+int xmm626_sec_modem_link_control_enable(struct ipc_client *client,
+                                         int device_fd, int enable);
+int xmm626_sec_modem_link_control_active(struct ipc_client *client,
+                                         int device_fd, int active);
+int xmm626_sec_modem_link_connected_wait(struct ipc_client *client,
+                                         int device_fd);
+int xmm626_sec_modem_link_get_hostwake_wait(struct ipc_client *client,
+                                            int device_fd);
 
 int xmm626_sec_modem_fmt_send(struct ipc_client *client,
     struct ipc_message *message);
