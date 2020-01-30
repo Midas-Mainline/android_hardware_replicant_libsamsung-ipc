@@ -230,7 +230,8 @@ complete:
     return rc;
 }
 
-int n5100_open(void *data, int type)
+int n5100_open(__attribute__((unused)) struct ipc_client *client, void *data,
+               int type)
 {
     struct n5100_transport_data *transport_data;
 
@@ -246,7 +247,7 @@ int n5100_open(void *data, int type)
     return 0;
 }
 
-int n5100_close(void *data)
+int n5100_close(__attribute__((unused)) struct ipc_client *client, void *data)
 {
     struct n5100_transport_data *transport_data;
 
@@ -261,7 +262,8 @@ int n5100_close(void *data)
     return 0;
 }
 
-int n5100_read(void *data, void *buffer, size_t length)
+int n5100_read(__attribute__((unused)) struct ipc_client *client, void *data,
+               void *buffer, size_t length)
 {
     struct n5100_transport_data *transport_data;
     int rc;
@@ -276,7 +278,8 @@ int n5100_read(void *data, void *buffer, size_t length)
     return rc;
 }
 
-int n5100_write(void *data, const void *buffer, size_t length)
+int n5100_write(__attribute__((unused)) struct ipc_client *client, void *data,
+                const void *buffer, size_t length)
 {
     struct n5100_transport_data *transport_data;
     int rc;
@@ -291,7 +294,8 @@ int n5100_write(void *data, const void *buffer, size_t length)
     return rc;
 }
 
-int n5100_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
+int n5100_poll(__attribute__((unused)) struct ipc_client *client, void *data,
+               struct ipc_poll_fds *fds, struct timeval *timeout)
 {
     struct n5100_transport_data *transport_data;
     int rc;

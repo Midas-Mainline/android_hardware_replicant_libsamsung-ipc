@@ -70,11 +70,11 @@ struct ipc_client *ipc_client_create(int type);
 int ipc_client_destroy(struct ipc_client *client);
 
 int ipc_client_transport_handlers_register(struct ipc_client *client,
-    int (*open)(void *transport_data, int type),
-    int (*close)(void *transport_data),
-    int (*read)(void *transport_data, void *data, size_t size),
-    int (*write)(void *transport_data, const void *data, size_t size),
-    int (*poll)(void *transport_data, struct ipc_poll_fds *fds, struct timeval *timeout),
+    int (*open)(struct ipc_client *client, void *transport_data, int type),
+    int (*close)(struct ipc_client *client, void *transport_data),
+    int (*read)(struct ipc_client *client, void *transport_data, void *data, size_t size),
+    int (*write)(struct ipc_client *client, void *transport_data, const void *data, size_t size),
+    int (*poll)(struct ipc_client *client, void *transport_data, struct ipc_poll_fds *fds, struct timeval *timeout),
     void *transport_data);
 int ipc_client_power_handlers_register(struct ipc_client *client,
     int (*power_on)(struct ipc_client *client, void *power_data),

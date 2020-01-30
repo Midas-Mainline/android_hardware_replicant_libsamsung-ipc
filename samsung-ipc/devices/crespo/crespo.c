@@ -153,7 +153,7 @@ int crespo_fmt_send(struct ipc_client *client, struct ipc_message *message)
 
     ipc_client_log_send(client, message, __func__);
 
-    rc = client->handlers->write(client->handlers->transport_data,
+    rc = client->handlers->write(client, client->handlers->transport_data,
                                  (void *) &mio, sizeof(struct modem_io));
     if (rc < 0) {
         ipc_client_log(client, "Writing FMT data failed");
@@ -187,7 +187,7 @@ int crespo_fmt_recv(struct ipc_client *client, struct ipc_message *message)
     mio.size = CRESPO_BUFFER_LENGTH;
     mio.data = calloc(1, mio.size);
 
-    rc = client->handlers->read(client->handlers->transport_data, &mio,
+    rc = client->handlers->read(client, client->handlers->transport_data, &mio,
                                 sizeof(struct modem_io) + mio.size);
     if (rc < 0 || mio.data == NULL ||
         mio.size < sizeof(struct ipc_fmt_header) ||
@@ -247,7 +247,7 @@ int crespo_rfs_send(struct ipc_client *client, struct ipc_message *message)
 
     ipc_client_log_send(client, message, __func__);
 
-    rc = client->handlers->write(client->handlers->transport_data,
+    rc = client->handlers->write(client, client->handlers->transport_data,
                                  (void *) &mio, sizeof(struct modem_io));
     if (rc < 0) {
         ipc_client_log(client, "Writing RFS data failed");
@@ -280,7 +280,7 @@ int crespo_rfs_recv(struct ipc_client *client, struct ipc_message *message)
     mio.size = CRESPO_BUFFER_LENGTH;
     mio.data = calloc(1, mio.size);
 
-    rc = client->handlers->read(client->handlers->transport_data, &mio,
+    rc = client->handlers->read(client, client->handlers->transport_data, &mio,
                                 sizeof(struct modem_io) + mio.size);
     if (rc < 0 || mio.data == NULL || mio.size <= 0 ||
         mio.size > CRESPO_BUFFER_LENGTH) {
@@ -314,7 +314,8 @@ complete:
     return rc;
 }
 
-int crespo_open(void *data, int type)
+int crespo_open(__attribute__((unused)) struct ipc_client *client,
+                void *data, int type)
 {
     struct crespo_transport_data *transport_data;
     int fd;
@@ -343,7 +344,8 @@ int crespo_open(void *data, int type)
     return 0;
 }
 
-int crespo_close(void *data)
+int crespo_close(__attribute__((unused)) struct ipc_client *client,
+                 void *data)
 {
     struct crespo_transport_data *transport_data;
     int fd;
@@ -363,7 +365,8 @@ int crespo_close(void *data)
     return 0;
 }
 
-int crespo_read(void *data, void *buffer, size_t length)
+int crespo_read(__attribute__((unused)) struct ipc_client *client,
+                void *data, void *buffer, size_t length)
 {
     struct crespo_transport_data *transport_data;
     int fd;
@@ -385,7 +388,8 @@ int crespo_read(void *data, void *buffer, size_t length)
     return 0;
 }
 
-int crespo_write(void *data, const void *buffer, size_t length)
+int crespo_write(__attribute__((unused)) struct ipc_client *client, void *data,
+                 const void *buffer, size_t length)
 {
     struct crespo_transport_data *transport_data;
     int fd;
@@ -407,7 +411,8 @@ int crespo_write(void *data, const void *buffer, size_t length)
     return 0;
 }
 
-int crespo_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
+int crespo_poll(__attribute__((unused)) struct ipc_client *client, void *data,
+                struct ipc_poll_fds *fds, struct timeval *timeout)
 {
     struct crespo_transport_data *transport_data;
     fd_set set;

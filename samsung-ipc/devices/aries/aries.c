@@ -277,8 +277,8 @@ int aries_fmt_send(struct ipc_client *client, struct ipc_message *message)
         chunk = (length - count) < ARIES_BUFFER_LENGTH ?
           length - count : ARIES_BUFFER_LENGTH;
 
-        rc = client->handlers->write(client->handlers->transport_data, p,
-                                     chunk);
+        rc = client->handlers->write(client, client->handlers->transport_data,
+                                     p, chunk);
         if (rc < 0) {
             ipc_client_log(client, "Writing FMT data failed");
             goto error;
@@ -319,8 +319,8 @@ int aries_fmt_recv(struct ipc_client *client, struct ipc_message *message)
     length = ARIES_BUFFER_LENGTH;
     buffer = calloc(1, length);
 
-    rc = client->handlers->read(client->handlers->transport_data, buffer,
-                                length);
+    rc = client->handlers->read(client, client->handlers->transport_data,
+                                buffer, length);
     if (rc < (int) sizeof(struct ipc_fmt_header)) {
         ipc_client_log(client, "Reading FMT header failed");
         goto error;
@@ -348,7 +348,8 @@ int aries_fmt_recv(struct ipc_client *client, struct ipc_message *message)
         chunk = (length - count) < ARIES_BUFFER_LENGTH ?
           length - count : ARIES_BUFFER_LENGTH;
 
-        rc = client->handlers->read(client->handlers->transport_data, p, chunk);
+        rc = client->handlers->read(client, client->handlers->transport_data, p,
+                                    chunk);
         if (rc < 0) {
             ipc_client_log(client, "Reading FMT data failed");
             goto error;
@@ -407,7 +408,7 @@ int aries_rfs_send(struct ipc_client *client, struct ipc_message *message)
         chunk = (length - count) < ARIES_BUFFER_LENGTH ?
           length - count : ARIES_BUFFER_LENGTH;
 
-        rc = client->handlers->write(client->handlers->transport_data,
+        rc = client->handlers->write(client, client->handlers->transport_data,
                                      p, chunk);
         if (rc < 0) {
             ipc_client_log(client, "Writing RFS data failed");
@@ -449,8 +450,8 @@ int aries_rfs_recv(struct ipc_client *client, struct ipc_message *message)
     length = ARIES_BUFFER_LENGTH;
     buffer = calloc(1, length);
 
-    rc = client->handlers->read(client->handlers->transport_data, buffer,
-                                length);
+    rc = client->handlers->read(client, client->handlers->transport_data,
+                                buffer, length);
     if (rc < (int) sizeof(struct ipc_rfs_header)) {
         ipc_client_log(client, "Reading RFS header failed");
         goto error;
@@ -482,7 +483,8 @@ int aries_rfs_recv(struct ipc_client *client, struct ipc_message *message)
         chunk = (length - count) < ARIES_BUFFER_LENGTH ?
           length - count : ARIES_BUFFER_LENGTH;
 
-        rc = client->handlers->read(client->handlers->transport_data, p, chunk);
+        rc = client->handlers->read(client, client->handlers->transport_data, p,
+                                    chunk);
         if (rc < 0) {
             ipc_client_log(client, "Reading RFS data failed");
             goto error;
@@ -507,7 +509,8 @@ complete:
     return rc;
 }
 
-int aries_open(void *data, int type)
+int aries_open(__attribute__((unused)) struct ipc_client *client, void *data,
+               int type)
 {
     struct aries_transport_data *transport_data;
     struct sockaddr_pn *spn;
@@ -581,7 +584,7 @@ int aries_open(void *data, int type)
     return 0;
 }
 
-int aries_close(void *data)
+int aries_close(__attribute__((unused)) struct ipc_client *client, void *data)
 {
     struct aries_transport_data *transport_data;
     int fd;
@@ -601,7 +604,8 @@ int aries_close(void *data)
     return 0;
 }
 
-int aries_read(void *data, void *buffer, size_t length)
+int aries_read(__attribute__((unused)) struct ipc_client *client, void *data,
+               void *buffer, size_t length)
 {
     struct aries_transport_data *transport_data;
     int spn_size;
@@ -626,7 +630,8 @@ int aries_read(void *data, void *buffer, size_t length)
     return rc;
 }
 
-int aries_write(void *data, const void *buffer, size_t length)
+int aries_write(__attribute__((unused)) struct ipc_client *client,  void *data,
+                const void *buffer, size_t length)
 {
     struct aries_transport_data *transport_data;
     int spn_size;
@@ -650,7 +655,8 @@ int aries_write(void *data, const void *buffer, size_t length)
     return rc;
 }
 
-int aries_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
+int aries_poll(__attribute__((unused)) struct ipc_client *client, void *data,
+               struct ipc_poll_fds *fds, struct timeval *timeout)
 {
     struct aries_transport_data *transport_data;
     fd_set set;

@@ -38,13 +38,15 @@ struct ipc_client_ops {
 
 struct ipc_client_handlers {
     /* Transport handlers */
-    int (*open)(void *transport_data, int type);
-    int (*close)(void *transport_data);
+    int (*open)(struct ipc_client *client, void *transport_data, int type);
+    int (*close)(struct ipc_client *client, void *transport_data);
 
-    int (*read)(void *transport_data, void *buffer, size_t length);
-    int (*write)(void *transport_data, const void *buffer, size_t length);
-    int (*poll)(void *transport_data, struct ipc_poll_fds *fds,
-                struct timeval *timeout);
+    int (*read)(struct ipc_client *client, void *transport_data,
+                void *buffer, size_t length);
+    int (*write)(struct ipc_client *client, void *transport_data,
+                 const void *buffer, size_t length);
+    int (*poll)(struct ipc_client *client, void *transport_data,
+                struct ipc_poll_fds *fds, struct timeval *timeout);
 
     void *transport_data;
 

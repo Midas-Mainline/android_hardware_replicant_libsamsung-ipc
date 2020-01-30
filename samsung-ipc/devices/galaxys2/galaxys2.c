@@ -235,7 +235,8 @@ complete:
     return rc;
 }
 
-int galaxys2_open(void *data, int type)
+int galaxys2_open(__attribute__((unused)) struct ipc_client *client, void *data,
+                  int type)
 {
     struct galaxys2_transport_data *transport_data;
 
@@ -251,7 +252,8 @@ int galaxys2_open(void *data, int type)
     return 0;
 }
 
-int galaxys2_close(void *data)
+int galaxys2_close(__attribute__((unused)) struct ipc_client *client,
+                   void *data)
 {
     struct galaxys2_transport_data *transport_data;
 
@@ -266,7 +268,8 @@ int galaxys2_close(void *data)
     return 0;
 }
 
-int galaxys2_read(void *data, void *buffer, size_t length)
+int galaxys2_read(__attribute__((unused)) struct ipc_client *client, void *data,
+                  void *buffer, size_t length)
 {
     struct galaxys2_transport_data *transport_data;
     int rc;
@@ -281,7 +284,8 @@ int galaxys2_read(void *data, void *buffer, size_t length)
     return rc;
 }
 
-int galaxys2_write(void *data, const void *buffer, size_t length)
+int galaxys2_write(__attribute__((unused)) struct ipc_client *client,
+                   void *data, const void *buffer, size_t length)
 {
     struct galaxys2_transport_data *transport_data;
     int rc;
@@ -296,7 +300,8 @@ int galaxys2_write(void *data, const void *buffer, size_t length)
     return rc;
 }
 
-int galaxys2_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
+int galaxys2_poll(__attribute__((unused)) struct ipc_client *client, void *data,
+                  struct ipc_poll_fds *fds, struct timeval *timeout)
 {
     struct galaxys2_transport_data *transport_data;
     int rc;

@@ -178,7 +178,8 @@ complete:
     return rc;
 }
 
-int piranha_open(void *data, int type)
+int piranha_open(__attribute__((unused)) struct ipc_client *client, void *data,
+                 int type)
 {
     struct piranha_transport_data *transport_data;
 
@@ -194,7 +195,7 @@ int piranha_open(void *data, int type)
     return 0;
 }
 
-int piranha_close(void *data)
+int piranha_close(__attribute__((unused)) struct ipc_client *client, void *data)
 {
     struct piranha_transport_data *transport_data;
 
@@ -209,7 +210,8 @@ int piranha_close(void *data)
     return 0;
 }
 
-int piranha_read(void *data, void *buffer, size_t length)
+int piranha_read(__attribute__((unused)) struct ipc_client *client, void *data,
+                 void *buffer, size_t length)
 {
     struct piranha_transport_data *transport_data;
     int rc;
@@ -224,7 +226,8 @@ int piranha_read(void *data, void *buffer, size_t length)
     return rc;
 }
 
-int piranha_write(void *data, const void *buffer, size_t length)
+int piranha_write(__attribute__((unused)) struct ipc_client *client, void *data,
+                  const void *buffer, size_t length)
 {
     struct piranha_transport_data *transport_data;
     int rc;
@@ -239,7 +242,8 @@ int piranha_write(void *data, const void *buffer, size_t length)
     return rc;
 }
 
-int piranha_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
+int piranha_poll(__attribute__((unused)) struct ipc_client *client, void *data,
+                 struct ipc_poll_fds *fds, struct timeval *timeout)
 {
     struct piranha_transport_data *transport_data;
     int rc;

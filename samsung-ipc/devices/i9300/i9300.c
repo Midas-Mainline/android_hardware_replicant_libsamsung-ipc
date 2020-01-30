@@ -229,7 +229,8 @@ complete:
     return rc;
 }
 
-int i9300_open(void *data, int type)
+int i9300_open(__attribute__((unused)) struct ipc_client *client, void *data,
+               int type)
 {
     struct i9300_transport_data *transport_data;
 
@@ -245,7 +246,7 @@ int i9300_open(void *data, int type)
     return 0;
 }
 
-int i9300_close(void *data)
+int i9300_close(__attribute__((unused)) struct ipc_client *client, void *data)
 {
     struct i9300_transport_data *transport_data;
 
@@ -260,7 +261,8 @@ int i9300_close(void *data)
     return 0;
 }
 
-int i9300_read(void *data, void *buffer, size_t length)
+int i9300_read(__attribute__((unused)) struct ipc_client *client, void *data,
+               void *buffer, size_t length)
 {
     struct i9300_transport_data *transport_data;
     int rc;
@@ -275,7 +277,8 @@ int i9300_read(void *data, void *buffer, size_t length)
     return rc;
 }
 
-int i9300_write(void *data, const void *buffer, size_t length)
+int i9300_write(__attribute__((unused)) struct ipc_client *client, void *data,
+                const void *buffer, size_t length)
 {
     struct i9300_transport_data *transport_data;
     int rc;
@@ -290,7 +293,8 @@ int i9300_write(void *data, const void *buffer, size_t length)
     return rc;
 }
 
-int i9300_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
+int i9300_poll(__attribute__((unused)) struct ipc_client *client, void *data,
+               struct ipc_poll_fds *fds, struct timeval *timeout)
 {
     struct i9300_transport_data *transport_data;
     int rc;

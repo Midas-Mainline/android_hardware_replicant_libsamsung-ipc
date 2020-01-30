@@ -212,8 +212,7 @@ int xmm626_sec_modem_fmt_send(struct ipc_client *client,
 
     count = 0;
     while (count < length) {
-        rc = client->handlers->write(client->handlers->transport_data, p,
-                                     length - count);
+        rc = client->handlers->write(client, client->handlers->transport_data, p, length - count);
         if (rc <= 0) {
             ipc_client_log(client, "Writing FMT data failed");
             goto error;
@@ -254,8 +253,7 @@ int xmm626_sec_modem_fmt_recv(struct ipc_client *client,
     length = XMM626_DATA_SIZE;
     buffer = calloc(1, length);
 
-    rc = client->handlers->read(client->handlers->transport_data, buffer,
-                                length);
+    rc = client->handlers->read(client, client->handlers->transport_data, buffer, length);
     if (rc < (int) sizeof(struct ipc_fmt_header)) {
         ipc_client_log(client, "Reading FMT header failed");
         goto error;
@@ -279,7 +277,8 @@ int xmm626_sec_modem_fmt_recv(struct ipc_client *client,
         }
 
         while (count < message->size) {
-            rc = client->handlers->read(client->handlers->transport_data, p,
+            rc = client->handlers->read(client,
+                                        client->handlers->transport_data, p,
                                         message->size - count);
             if (rc <= 0) {
                 ipc_client_log(client, "Reading FMT data failed");
@@ -338,8 +337,8 @@ int xmm626_sec_modem_rfs_send(struct ipc_client *client,
 
     count = 0;
     while (count < length) {
-        rc = client->handlers->write(client->handlers->transport_data, p,
-                                     length - count);
+        rc = client->handlers->write(client, client->handlers->transport_data,
+                                     p, length - count);
         if (rc <= 0) {
             ipc_client_log(client, "Writing RFS data failed");
             goto error;
@@ -380,8 +379,8 @@ int xmm626_sec_modem_rfs_recv(struct ipc_client *client,
     length = XMM626_DATA_SIZE;
     buffer = calloc(1, length);
 
-    rc = client->handlers->read(client->handlers->transport_data, buffer,
-                                length);
+    rc = client->handlers->read(client, client->handlers->transport_data,
+                                buffer, length);
     if (rc < (int) sizeof(struct ipc_rfs_header)) {
         ipc_client_log(client, "Reading RFS header failed");
         goto error;
@@ -410,7 +409,8 @@ int xmm626_sec_modem_rfs_recv(struct ipc_client *client,
         }
 
         while (count < message->size) {
-            rc = client->handlers->read(client->handlers->transport_data, p,
+            rc = client->handlers->read(client,
+                                        client->handlers->transport_data, p,
                                         message->size - count);
             if (rc <= 0) {
                 ipc_client_log(client, "Reading RFS data failed");
