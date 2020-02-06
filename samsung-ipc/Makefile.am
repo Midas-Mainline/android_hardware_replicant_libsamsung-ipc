@@ -31,9 +31,9 @@ libsamsung_ipc_la_SOURCES = \
 	modems/xmm626/xmm626_mipi.h \
 	modems/xmm626/xmm626_sec_modem.c \
 	modems/xmm626/xmm626_sec_modem.h \
-	modems/xmm626/modem.h \
-	modems/xmm626/modem_link_device_hsic.h \
-	modems/xmm626/modem_prj.h \
+	modems/xmm626/xmm626_modem.h \
+	modems/xmm626/xmm626_modem_link_device_hsic.h \
+	modems/xmm626/xmm626_modem_prj.h \
 	devices/ipc_devices.c \
 	devices/ipc_devices.h \
 	devices/crespo/crespo.c \
