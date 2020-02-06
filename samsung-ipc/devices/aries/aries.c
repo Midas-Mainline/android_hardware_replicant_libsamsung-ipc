@@ -21,25 +21,24 @@
  */
 
 #define _GNU_SOURCE
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <stdbool.h>
-#include <string.h>
-#include <fcntl.h>
+#include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <net/if.h>
+#include <fcntl.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-#include <samsung-ipc.h>
 #include <ipc.h>
+#include <samsung-ipc.h>
 
+#include "aries.h"
 #include "onedram.h"
 #include "phonet.h"
-
 #include "xmm616.h"
-#include "aries.h"
 
 int aries_boot(struct ipc_client *client)
 {
