@@ -43,7 +43,8 @@ struct ipc_client_handlers {
 
     int (*read)(void *transport_data, void *buffer, size_t length);
     int (*write)(void *transport_data, const void *buffer, size_t length);
-    int (*poll)(void *transport_data, struct ipc_poll_fds *fds, struct timeval *timeout);
+    int (*poll)(void *transport_data, struct ipc_poll_fds *fds,
+                struct timeval *timeout);
 
     void *transport_data;
 
@@ -60,8 +61,10 @@ struct ipc_client_handlers {
     void *gprs_data;
 
     /* Data */
-    int (*data_create)(void **transport_data, void **power_data, void **gprs_data);
-    int (*data_destroy)(void *transport_data, void *power_data, void *gprs_data);
+    int (*data_create)(void **transport_data, void **power_data,
+                       void **gprs_data);
+    int (*data_destroy)(void *transport_data, void *power_data,
+                        void *gprs_data);
 };
 
 struct ipc_client_gprs_specs {
