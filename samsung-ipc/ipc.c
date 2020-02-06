@@ -75,7 +75,10 @@ int ipc_device_detect(void)
     line = strtok(buffer, "\n");
     while (line != NULL) {
         if (strncmp(line, "Hardware", 8) == 0) {
-            p = line + 11;
+            /* In arch/arm/kernel/setup.c, Linux does the following:
+             * seq_printf(m, "Hardware\t: %s\n", machine_name);
+             */
+            p = line + 8 + 3;
             c = p;
 
             while (*c != '\n' && *c != '\0') {
