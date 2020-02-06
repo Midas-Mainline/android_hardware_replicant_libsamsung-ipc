@@ -20,22 +20,21 @@
  */
 
 #define _GNU_SOURCE
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <stdbool.h>
-#include <string.h>
-#include <fcntl.h>
 #include <sys/ioctl.h>
+#include <fcntl.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-#include <samsung-ipc.h>
 #include <ipc.h>
+#include <samsung-ipc.h>
 
-#include "crespo_modem_ctl.h"
-
-#include "xmm616.h"
 #include "crespo.h"
+#include "crespo_modem_ctl.h"
+#include "xmm616.h"
 
 int crespo_boot(struct ipc_client *client)
 {
