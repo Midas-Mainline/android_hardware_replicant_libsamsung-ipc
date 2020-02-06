@@ -53,14 +53,16 @@ int n5100_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Opened modem image device");
 
-    modem_image_data = mmap(0, N5100_MODEM_IMAGE_SIZE, PROT_READ, MAP_SHARED, modem_image_fd, 0);
+    modem_image_data = mmap(0, N5100_MODEM_IMAGE_SIZE, PROT_READ, MAP_SHARED,
+                            modem_image_fd, 0);
     if (modem_image_data == NULL || modem_image_data == (void *) 0xffffffff) {
             ipc_client_log(client, "Mapping modem image data to memory failed");
             goto error;
     }
     ipc_client_log(client, "Mapped modem image data to memory");
 
-    modem_boot_fd = open(XMM626_SEC_MODEM_BOOT0_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    modem_boot_fd = open(XMM626_SEC_MODEM_BOOT0_DEVICE,
+                         O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (modem_boot_fd < 0) {
         ipc_client_log(client, "Opening modem boot device failed");
         goto error;
@@ -99,7 +101,8 @@ int n5100_boot(struct ipc_client *client)
 
     p = (unsigned char *) modem_image_data + N5100_PSI_OFFSET;
 
-    rc = xmm626_hsic_psi_send(client, modem_boot_fd, (void *) p, N5100_PSI_SIZE);
+    rc = xmm626_hsic_psi_send(client, modem_boot_fd, (void *) p,
+                              N5100_PSI_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM626 HSIC PSI failed");
         goto error;
@@ -108,7 +111,8 @@ int n5100_boot(struct ipc_client *client)
 
     p = (unsigned char *) modem_image_data + N5100_EBL_OFFSET;
 
-    rc = xmm626_hsic_ebl_send(client, modem_boot_fd, (void *) p, N5100_EBL_SIZE);
+    rc = xmm626_hsic_ebl_send(client, modem_boot_fd, (void *) p,
+                              N5100_EBL_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM626 HSIC EBL failed");
         goto error;
@@ -124,7 +128,8 @@ int n5100_boot(struct ipc_client *client)
 
     p = (unsigned char *) modem_image_data + N5100_SEC_START_OFFSET;
 
-    rc = xmm626_hsic_sec_start_send(client, modem_boot_fd, (void *) p, N5100_SEC_START_SIZE);
+    rc = xmm626_hsic_sec_start_send(client, modem_boot_fd, (void *) p,
+                                    N5100_SEC_START_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM626 HSIC SEC start failed");
         goto error;
@@ -133,7 +138,8 @@ int n5100_boot(struct ipc_client *client)
 
     p = (unsigned char *) modem_image_data + N5100_FIRMWARE_OFFSET;
 
-    rc = xmm626_hsic_firmware_send(client, modem_boot_fd, (void *) p, N5100_FIRMWARE_SIZE);
+    rc = xmm626_hsic_firmware_send(client, modem_boot_fd, (void *) p,
+                                   N5100_FIRMWARE_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM626 HSIC firmware failed");
         goto error;
@@ -325,20 +331,20 @@ int n5100_power_off(__attribute__((unused)) void *data)
 }
 
 int n5100_gprs_activate(__attribute__((unused)) void *data,
-			__attribute__((unused)) unsigned int cid)
+                        __attribute__((unused)) unsigned int cid)
 {
     return 0;
 }
 
 int n5100_gprs_deactivate(__attribute__((unused)) void *data,
-			  __attribute__((unused)) unsigned int cid)
+                          __attribute__((unused)) unsigned int cid)
 {
     return 0;
 }
 
 int n5100_data_create(void **transport_data,
-		      __attribute__((unused)) void **power_data,
-		      __attribute__((unused)) void **gprs_data)
+                      __attribute__((unused)) void **power_data,
+                      __attribute__((unused)) void **gprs_data)
 {
     if (transport_data == NULL)
         return -1;
@@ -349,8 +355,8 @@ int n5100_data_create(void **transport_data,
 }
 
 int n5100_data_destroy(void *transport_data,
-		       __attribute__((unused)) void *power_data,
-		       __attribute__((unused)) void *gprs_data)
+                       __attribute__((unused)) void *power_data,
+                       __attribute__((unused)) void *gprs_data)
 {
     if (transport_data == NULL)
         return -1;
