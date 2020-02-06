@@ -61,7 +61,7 @@ int ipc_device_detect(void)
 #ifdef IPC_DEVICE_BOARD_NAME
     board_name = strdup(IPC_DEVICE_BOARD_NAME);
 #else
-    // Read board name from cpuinfo
+    /* Read board name from cpuinfo */
 
     fd = open("/proc/cpuinfo", O_RDONLY);
     if (fd < 0)
@@ -111,28 +111,36 @@ int ipc_device_detect(void)
         goto error;
 
     for (i = 0; i < (int) ipc_devices_count; i++) {
-        // Eliminate index if neither name nor board name can be checked
+        /* Eliminate index if neither name nor board name can be checked */
         if (ipc_devices[i].name == NULL && ipc_devices[i].board_name == NULL)
             continue;
 
-        // Eliminate index if the name doesn't match
-        if (name != NULL && ipc_devices[i].name != NULL && strcmp(name, ipc_devices[i].name) != 0)
-            continue;
+        /* Eliminate index if the name doesn't match */
+        if (name != NULL && ipc_devices[i].name != NULL &&
+            strcmp(name, ipc_devices[i].name) != 0) {
+          continue;
+        }
 
-        // Eliminate index if the board name doesn't match
-        if (board_name != NULL && ipc_devices[i].board_name != NULL && strcmp(board_name, ipc_devices[i].board_name) != 0)
-            continue;
+        /* Eliminate index if the board name doesn't match */
+        if (board_name != NULL && ipc_devices[i].board_name != NULL &&
+            strcmp(board_name, ipc_devices[i].board_name) != 0) {
+          continue;
+        }
 
-        // Keep index but don't break yet since we may have a better match with kernel version
+        /* Keep index but don't break yet since we may have a better match with
+         * kernel version
+         */
         index = i;
 
         if (kernel_version == NULL || ipc_devices[i].kernel_version == NULL)
             continue;
 
-        if (kernel_version != NULL && ipc_devices[i].kernel_version != NULL && strcmp(kernel_version, ipc_devices[i].kernel_version) != 0)
-            continue;
+        if (kernel_version != NULL && ipc_devices[i].kernel_version != NULL &&
+            strcmp(kernel_version, ipc_devices[i].kernel_version) != 0) {
+          continue;
+        }
 
-        // Everything matches this particular index
+        /* Everything matches this particular index */
         break;
     }
 
@@ -199,11 +207,13 @@ static struct ipc_client *ipc_transport_client_create(int type)
     client->gprs_specs = ipc_devices[device_index].gprs_specs;
     client->nv_data_specs = ipc_devices[device_index].nv_data_specs;
 
-    // Handlers can be modified
-    client->handlers = (struct ipc_client_handlers *) calloc(1, sizeof(struct ipc_client_handlers));
+    /* Handlers can be modified */
+    client->handlers = (struct ipc_client_handlers *) calloc(1,
+                        sizeof(struct ipc_client_handlers));
 
     if (ipc_devices[device_index].handlers != NULL)
-        memcpy(client->handlers, ipc_devices[device_index].handlers, sizeof(struct ipc_client_handlers));
+        memcpy(client->handlers, ipc_devices[device_index].handlers,
+               sizeof(struct ipc_client_handlers));
 
     goto complete;
 
@@ -249,7 +259,8 @@ int ipc_client_transport_handlers_register(struct ipc_client *client,
     int (*close)(void *transport_data),
     int (*read)(void *transport_data, void *data, size_t size),
     int (*write)(void *transport_data, const void *data, size_t size),
-    int (*poll)(void *transport_data, struct ipc_poll_fds *fds, struct timeval *timeout),
+    int (*poll)(void *transport_data, struct ipc_poll_fds *fds,
+                struct timeval *timeout),
     void *transport_data)
 {
     if (client == NULL || client->handlers == NULL)
@@ -360,27 +371,30 @@ int ipc_client_send(struct ipc_client *client, unsigned char mseq,
 
 int ipc_client_recv(struct ipc_client *client, struct ipc_message *message)
 {
-    if (client == NULL || client->ops == NULL || client->ops->recv == NULL || message == NULL)
-        return -1;
+    if (client == NULL || client->ops == NULL || client->ops->recv == NULL ||
+        message == NULL) {
+      return -1;
+    }
 
     return client->ops->recv(client, message);
 }
 
 int ipc_client_open(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL || client->handlers->open == NULL) {
-        if (client == NULL) {
-            ipc_client_log(client, "%s failed: client is NULL", __FUNCTION__);
-        }
-        if (client->handlers == NULL) {
-            ipc_client_log(client, "%s failed: client->handlers is NULL",
-                           __FUNCTION__);
-        }
-        if (client->handlers->open == NULL) {
-            ipc_client_log(client, "%s failed: client->handlers->open is NULL",
-                           __FUNCTION__);
-        }
-        return -1;
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->open == NULL) {
+      if (client == NULL) {
+        ipc_client_log(client, "%s failed: client is NULL", __FUNCTION__);
+      }
+      if (client->handlers == NULL) {
+        ipc_client_log(client, "%s failed: client->handlers is NULL",
+                       __FUNCTION__);
+      }
+      if (client->handlers->open == NULL) {
+        ipc_client_log(client, "%s failed: client->handlers->open is NULL",
+                       __FUNCTION__);
+      }
+      return -1;
     }
 
     return client->handlers->open(client->handlers->transport_data,
@@ -389,72 +403,96 @@ int ipc_client_open(struct ipc_client *client)
 
 int ipc_client_close(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL || client->handlers->close == NULL)
-        return -1;
+  if (client == NULL || client->handlers == NULL ||
+      client->handlers->close == NULL) {
+    return -1;
+  }
 
     return client->handlers->close(client->handlers->transport_data);
 }
 
-int ipc_client_poll(struct ipc_client *client, struct ipc_poll_fds *fds, struct timeval *timeout)
+int ipc_client_poll(struct ipc_client *client, struct ipc_poll_fds *fds,
+                    struct timeval *timeout)
 {
-    if (client == NULL || client->handlers == NULL || client->handlers->poll == NULL)
-        return -1;
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->poll == NULL) {
+      return -1;
+    }
 
-    return client->handlers->poll(client->handlers->transport_data, fds, timeout);
+    return client->handlers->poll(client->handlers->transport_data, fds,
+                                  timeout);
 }
 
 int ipc_client_power_on(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL || client->handlers->power_on == NULL)
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->power_on == NULL) {
         return -1;
+    }
 
     return client->handlers->power_on(client->handlers->power_data);
 }
 
 int ipc_client_power_off(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL || client->handlers->power_off == NULL)
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->power_off == NULL) {
         return -1;
+    }
 
     return client->handlers->power_off(client->handlers->power_data);
 }
 
 int ipc_client_gprs_activate(struct ipc_client *client, unsigned int cid)
 {
-    if (client == NULL || client->handlers == NULL || client->handlers->gprs_activate == NULL)
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->gprs_activate == NULL) {
         return -1;
+    }
 
     return client->handlers->gprs_activate(client->handlers->gprs_data, cid);
 }
 
 int ipc_client_gprs_deactivate(struct ipc_client *client, unsigned int cid)
 {
-    if (client == NULL || client->handlers == NULL || client->handlers->gprs_deactivate == NULL)
-        return -1;
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->gprs_deactivate == NULL) {
+      return -1;
+    }
 
     return client->handlers->gprs_deactivate(client->handlers->gprs_data, cid);
 }
 
 int ipc_client_data_create(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL || client->handlers->data_create == NULL)
-        return -1;
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->data_create == NULL) {
+      return -1;
+    }
 
-    return client->handlers->data_create(&client->handlers->transport_data, &client->handlers->power_data, &client->handlers->power_data);
+    return client->handlers->data_create(&client->handlers->transport_data,
+                                         &client->handlers->power_data,
+                                         &client->handlers->power_data);
 }
 
 int ipc_client_data_destroy(struct ipc_client *client)
 {
-    if (client == NULL || client->handlers == NULL || client->handlers->data_destroy == NULL)
+    if (client == NULL || client->handlers == NULL ||
+        client->handlers->data_destroy == NULL) {
         return -1;
+    }
 
-    return client->handlers->data_destroy(client->handlers->transport_data, client->handlers->power_data, client->handlers->power_data);
+    return client->handlers->data_destroy(client->handlers->transport_data,
+                                          client->handlers->power_data,
+                                          client->handlers->power_data);
 }
 
 char *ipc_client_gprs_get_iface(struct ipc_client *client, unsigned int cid)
 {
-    if (client == NULL || client->gprs_specs == NULL || client->gprs_specs->gprs_get_iface == NULL)
-        return NULL;
+    if (client == NULL || client->gprs_specs == NULL ||
+        client->gprs_specs->gprs_get_iface == NULL) {
+      return NULL;
+    }
 
     return client->gprs_specs->gprs_get_iface(cid);
 }
@@ -462,64 +500,80 @@ char *ipc_client_gprs_get_iface(struct ipc_client *client, unsigned int cid)
 int ipc_client_gprs_get_capabilities(struct ipc_client *client,
     struct ipc_client_gprs_capabilities *capabilities)
 {
-    if (client == NULL || client->gprs_specs == NULL || client->gprs_specs->gprs_get_capabilities == NULL)
-        return -1;
+    if (client == NULL || client->gprs_specs == NULL ||
+        client->gprs_specs->gprs_get_capabilities == NULL) {
+      return -1;
+    }
 
     return client->gprs_specs->gprs_get_capabilities(capabilities);
 }
 
 char *ipc_client_nv_data_path(struct ipc_client *client)
 {
-    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_path == NULL)
-        return NULL;
+    if (client == NULL || client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_path == NULL) {
+      return NULL;
+    }
 
     return client->nv_data_specs->nv_data_path;
 }
 
 char *ipc_client_nv_data_md5_path(struct ipc_client *client)
 {
-    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_md5_path == NULL)
-        return NULL;
+    if (client == NULL || client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_md5_path == NULL) {
+      return NULL;
+    }
 
     return client->nv_data_specs->nv_data_md5_path;
 }
 
 char *ipc_client_nv_data_backup_path(struct ipc_client *client)
 {
-    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_backup_path == NULL)
-        return NULL;
+    if (client == NULL || client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_backup_path == NULL) {
+      return NULL;
+    }
 
     return client->nv_data_specs->nv_data_backup_path;
 }
 
 char *ipc_client_nv_data_backup_md5_path(struct ipc_client *client)
 {
-    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_backup_md5_path == NULL)
+    if (client == NULL || client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_backup_md5_path == NULL) {
         return NULL;
+    }
 
     return client->nv_data_specs->nv_data_backup_md5_path;
 }
 
 char *ipc_client_nv_data_secret(struct ipc_client *client)
 {
-    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_secret == NULL)
-        return NULL;
+    if (client == NULL || client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_secret == NULL) {
+      return NULL;
+    }
 
     return client->nv_data_specs->nv_data_secret;
 }
 
 size_t ipc_client_nv_data_size(struct ipc_client *client)
 {
-    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_size == 0)
+    if (client == NULL || client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_size == 0) {
         return 0;
+    }
 
     return client->nv_data_specs->nv_data_size;
 }
 
 size_t ipc_client_nv_data_chunk_size(struct ipc_client *client)
 {
-    if (client == NULL || client->nv_data_specs == NULL || client->nv_data_specs->nv_data_chunk_size == 0)
-        return 0;
+    if (client == NULL || client->nv_data_specs == NULL ||
+        client->nv_data_specs->nv_data_chunk_size == 0) {
+      return 0;
+    }
 
     return client->nv_data_specs->nv_data_chunk_size;
 }
