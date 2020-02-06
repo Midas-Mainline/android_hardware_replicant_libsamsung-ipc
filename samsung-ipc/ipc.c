@@ -70,7 +70,6 @@ int ipc_device_detect(void)
     length = read(fd, &buffer, sizeof(buffer));
 
     close(fd);
-    fd = -1;
 
     line = strtok(buffer, "\n");
     while (line != NULL) {
@@ -149,9 +148,6 @@ complete:
 
     if (kernel_version != NULL)
         free(kernel_version);
-
-    if (fd >= 0)
-        close(fd);
 
     return index;
 }
