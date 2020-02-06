@@ -19,7 +19,7 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <time.h>
+#include <sys/time.h>
 
 #ifndef __SAMSUNG_IPC_H__
 #define __SAMSUNG_IPC_H__
