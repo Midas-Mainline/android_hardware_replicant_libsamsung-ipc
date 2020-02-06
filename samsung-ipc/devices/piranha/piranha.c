@@ -51,14 +51,16 @@ int piranha_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Opened modem image device");
 
-    modem_image_data = mmap(0, PIRANHA_MODEM_IMAGE_SIZE, PROT_READ, MAP_SHARED, modem_image_fd, 0);
+    modem_image_data = mmap(0, PIRANHA_MODEM_IMAGE_SIZE, PROT_READ, MAP_SHARED,
+                            modem_image_fd, 0);
     if (modem_image_data == NULL || modem_image_data == (void *) 0xffffffff) {
             ipc_client_log(client, "Mapping modem image data to memory failed");
             goto error;
     }
     ipc_client_log(client, "Mapped modem image data to memory");
 
-    modem_boot_fd = open(XMM626_SEC_MODEM_BOOT0_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    modem_boot_fd = open(XMM626_SEC_MODEM_BOOT0_DEVICE,
+                         O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (modem_boot_fd < 0) {
         ipc_client_log(client, "Opening modem boot device failed");
         goto error;
@@ -81,7 +83,8 @@ int piranha_boot(struct ipc_client *client)
 
     p = (unsigned char *) modem_image_data + PIRANHA_PSI_OFFSET;
 
-    rc = xmm626_mipi_psi_send(client, modem_boot_fd, (void *) p, PIRANHA_PSI_SIZE);
+    rc = xmm626_mipi_psi_send(client, modem_boot_fd, (void *) p,
+                              PIRANHA_PSI_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM626 MIPI PSI failed");
         goto error;
@@ -90,7 +93,8 @@ int piranha_boot(struct ipc_client *client)
 
     close(modem_boot_fd);
 
-    modem_boot_fd = open(XMM626_SEC_MODEM_BOOT1_DEVICE, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    modem_boot_fd = open(XMM626_SEC_MODEM_BOOT1_DEVICE,
+                         O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (modem_boot_fd < 0) {
         ipc_client_log(client, "Opening modem boot device failed");
         goto error;
@@ -99,7 +103,8 @@ int piranha_boot(struct ipc_client *client)
 
     p = (unsigned char *) modem_image_data + PIRANHA_EBL_OFFSET;
 
-    rc = xmm626_mipi_ebl_send(client, modem_boot_fd, (void *) p, PIRANHA_EBL_SIZE);
+    rc = xmm626_mipi_ebl_send(client, modem_boot_fd, (void *) p,
+                              PIRANHA_EBL_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM626 MIPI EBL failed");
         goto error;
@@ -115,7 +120,8 @@ int piranha_boot(struct ipc_client *client)
 
     p = (unsigned char *) modem_image_data + PIRANHA_SEC_START_OFFSET;
 
-    rc = xmm626_mipi_sec_start_send(client, modem_boot_fd, (void *) p, PIRANHA_SEC_START_SIZE);
+    rc = xmm626_mipi_sec_start_send(client, modem_boot_fd, (void *) p,
+                                    PIRANHA_SEC_START_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM626 MIPI SEC start failed");
         goto error;
@@ -124,7 +130,8 @@ int piranha_boot(struct ipc_client *client)
 
     p = (unsigned char *) modem_image_data + PIRANHA_FIRMWARE_OFFSET;
 
-    rc = xmm626_mipi_firmware_send(client, modem_boot_fd, (void *) p, PIRANHA_FIRMWARE_SIZE);
+    rc = xmm626_mipi_firmware_send(client, modem_boot_fd, (void *) p,
+                                   PIRANHA_FIRMWARE_SIZE);
     if (rc < 0) {
         ipc_client_log(client, "Sending XMM626 MIPI firmware failed");
         goto error;
@@ -272,20 +279,20 @@ int piranha_power_off(__attribute__((unused)) void *data)
 }
 
 int piranha_gprs_activate(__attribute__((unused)) void *data,
-			  __attribute__((unused)) unsigned int cid)
+                          __attribute__((unused)) unsigned int cid)
 {
     return 0;
 }
 
 int piranha_gprs_deactivate(__attribute__((unused)) void *data,
-			    __attribute__((unused)) unsigned int cid)
+                            __attribute__((unused)) unsigned int cid)
 {
     return 0;
 }
 
 int piranha_data_create(void **transport_data,
-			__attribute__((unused)) void **power_data,
-			__attribute__((unused)) void **gprs_data)
+                        __attribute__((unused)) void **power_data,
+                        __attribute__((unused)) void **gprs_data)
 {
     if (transport_data == NULL)
         return -1;
@@ -296,8 +303,8 @@ int piranha_data_create(void **transport_data,
 }
 
 int piranha_data_destroy(void *transport_data,
-			 __attribute__((unused)) void *power_data,
-			 __attribute__((unused)) void *gprs_data)
+                         __attribute__((unused)) void *power_data,
+                         __attribute__((unused)) void *gprs_data)
 {
     if (transport_data == NULL)
         return -1;
