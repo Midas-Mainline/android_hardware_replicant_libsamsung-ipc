@@ -68,6 +68,8 @@ int ipc_device_detect(void)
         goto error;
 
     length = read(fd, &buffer, sizeof(buffer));
+    if (length == -1)
+      goto error;
 
     close(fd);
 
