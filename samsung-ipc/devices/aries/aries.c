@@ -620,7 +620,8 @@ int aries_read(void *data, void *buffer, size_t length)
     spn_size = sizeof(struct sockaddr_pn);
 
     rc = recvfrom(fd, buffer, length, 0,
-                  (struct sockaddr *) &transport_data->spn, &spn_size);
+                  (struct sockaddr *) &transport_data->spn,
+                  (socklen_t *) &spn_size);
 
     return rc;
 }
