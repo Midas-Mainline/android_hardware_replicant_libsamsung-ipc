@@ -17,19 +17,19 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <fcntl.h>
 #include <sys/mman.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-#include <samsung-ipc.h>
 #include <ipc.h>
+#include <samsung-ipc.h>
 
+#include "i9300.h"
 #include "xmm626.h"
 #include "xmm626_hsic.h"
 #include "xmm626_sec_modem.h"
-#include "i9300.h"
 
 int i9300_boot(struct ipc_client *client)
 {
