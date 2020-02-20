@@ -51,7 +51,7 @@ int ipc_device_detect(void)
     char *line, *p, *c;
     int index = -1;
     int fd = -1;
-    size_t length;
+    ssize_t length;
     int i;
 
 #ifdef IPC_DEVICE_NAME
