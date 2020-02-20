@@ -311,12 +311,14 @@ int galaxys2_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
     return rc;
 }
 
-int galaxys2_power_on(__attribute__((unused)) void *data)
+int galaxys2_power_on(__attribute__((unused)) struct ipc_client *client,
+                      __attribute__((unused)) void *data)
 {
     return 0;
 }
 
-int galaxys2_power_off(__attribute__((unused)) void *data)
+int galaxys2_power_off(__attribute__((unused)) struct ipc_client *client,
+                       __attribute__((unused)) void *data)
 {
     int fd;
     int rc;

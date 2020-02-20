@@ -77,7 +77,8 @@ int ipc_client_transport_handlers_register(struct ipc_client *client,
     int (*poll)(void *transport_data, struct ipc_poll_fds *fds, struct timeval *timeout),
     void *transport_data);
 int ipc_client_power_handlers_register(struct ipc_client *client,
-    int (*power_on)(void *power_data), int (*power_off)(void *power_data),
+    int (*power_on)(struct ipc_client *client, void *power_data),
+    int (*power_off)(struct ipc_client *client, void *power_data),
     void *power_data);
 int ipc_client_gprs_handlers_register(struct ipc_client *client,
     int (*gprs_activate)(void *gprs_data, unsigned int cid),

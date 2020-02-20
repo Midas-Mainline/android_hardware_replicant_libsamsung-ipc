@@ -289,12 +289,14 @@ int maguro_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
     return rc;
 }
 
-int maguro_power_on(__attribute__((unused)) void *data)
+int maguro_power_on(__attribute__((unused)) struct ipc_client *client,
+                    __attribute__((unused)) void *data)
 {
     return 0;
 }
 
-int maguro_power_off(__attribute__((unused)) void *data)
+int maguro_power_off(__attribute__((unused)) struct ipc_client *client,
+                      __attribute__((unused)) void *data)
 {
     int fd;
     int rc;

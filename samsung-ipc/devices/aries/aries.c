@@ -86,7 +86,7 @@ int aries_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Turned modem network iface down");
 
-    rc = client->handlers->power_on(client->handlers->power_data);
+    rc = client->handlers->power_on(client, client->handlers->power_data);
     if (rc < 0) {
         ipc_client_log(client, "Powering the modem off failed");
         goto error;
@@ -95,7 +95,7 @@ int aries_boot(struct ipc_client *client)
 
     usleep(1000);
 
-    rc = client->handlers->power_off(client->handlers->power_data);
+    rc = client->handlers->power_off(client, client->handlers->power_data);
     if (rc < 0) {
         ipc_client_log(client, "Powering the modem on failed");
         goto error;
@@ -703,7 +703,8 @@ int aries_poll(void *data, struct ipc_poll_fds *fds, struct timeval *timeout)
     return rc;
 }
 
-int aries_power_on(__attribute__((unused)) void *data)
+int aries_power_on(__attribute__((unused)) struct ipc_client *client,
+                   __attribute__((unused)) void *data)
 {
     char buffer[] = "on\n";
     int value;
@@ -725,7 +726,8 @@ int aries_power_on(__attribute__((unused)) void *data)
     return 0;
 }
 
-int aries_power_off(__attribute__((unused)) void *data)
+int aries_power_off(__attribute__((unused)) struct ipc_client *client,
+                    __attribute__((unused)) void *data)
 {
     char buffer[] = "off\n";
     int value;

@@ -49,8 +49,8 @@ struct ipc_client_handlers {
     void *transport_data;
 
     /* Power handlers */
-    int (*power_on)(void *power_data);
-    int (*power_off)(void *power_data);
+    int (*power_on)(struct ipc_client *client, void *power_data);
+    int (*power_off)(struct ipc_client *client, void *power_data);
 
     void *power_data;
 

@@ -283,7 +283,8 @@ int ipc_client_transport_handlers_register(struct ipc_client *client,
 }
 
 int ipc_client_power_handlers_register(struct ipc_client *client,
-    int (*power_on)(void *power_data), int (*power_off)(void *power_data),
+    int (*power_on)(struct ipc_client *client, void *power_data),
+    int (*power_off)(struct ipc_client *client, void *power_data),
     void *power_data)
 {
     if (client == NULL || client->handlers == NULL)
@@ -430,7 +431,7 @@ int ipc_client_power_on(struct ipc_client *client)
         return -1;
     }
 
-    return client->handlers->power_on(client->handlers->power_data);
+    return client->handlers->power_on(client, client->handlers->power_data);
 }
 
 int ipc_client_power_off(struct ipc_client *client)
@@ -440,7 +441,7 @@ int ipc_client_power_off(struct ipc_client *client)
         return -1;
     }
 
-    return client->handlers->power_off(client->handlers->power_data);
+    return client->handlers->power_off(client, client->handlers->power_data);
 }
 
 int ipc_client_gprs_activate(struct ipc_client *client, unsigned int cid)
