@@ -66,7 +66,7 @@ int ipc_nv_data_path_check(struct ipc_client *client)
 {
     struct stat st;
     char *path;
-    size_t size;
+    off_t size;
     int rc;
 
     if (client == NULL)
@@ -126,7 +126,7 @@ int ipc_nv_data_backup_path_check(struct ipc_client *client)
 {
     struct stat st;
     char *backup_path;
-    size_t size;
+    off_t size;
     int rc;
 
     if (client == NULL)
