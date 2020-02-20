@@ -55,12 +55,14 @@ int xmm626_sec_modem_rfs_send(struct ipc_client *client,
 int xmm626_sec_modem_rfs_recv(struct ipc_client *client,
     struct ipc_message *message);
 
-int xmm626_sec_modem_open(int type);
-int xmm626_sec_modem_close(int fd);
-int xmm626_sec_modem_read(int fd, void *buffer, size_t length);
-int xmm626_sec_modem_write(int fd, const void *buffer, size_t length);
-int xmm626_sec_modem_poll(int fd, struct ipc_poll_fds *fds,
-    struct timeval *timeout);
+int xmm626_sec_modem_open(struct ipc_client *client, int type);
+int xmm626_sec_modem_close(struct ipc_client *client, int fd);
+int xmm626_sec_modem_read(struct ipc_client *client, int fd, void *buffer,
+    size_t length);
+int xmm626_sec_modem_write(struct ipc_client *client, int fd,
+    const void *buffer, size_t length);
+int xmm626_sec_modem_poll(struct ipc_client *client, int fd,
+    struct ipc_poll_fds *fds, struct timeval *timeout);
 
 char *xmm626_sec_modem_gprs_get_iface(unsigned int cid);
 int xmm626_sec_modem_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities);

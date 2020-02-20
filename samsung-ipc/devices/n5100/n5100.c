@@ -240,7 +240,7 @@ int n5100_open(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct n5100_transport_data *) data;
 
-    transport_data->fd = xmm626_sec_modem_open(type);
+    transport_data->fd = xmm626_sec_modem_open(client, type);
     if (transport_data->fd < 0)
         return -1;
 
@@ -256,7 +256,7 @@ int n5100_close(__attribute__((unused)) struct ipc_client *client, void *data)
 
     transport_data = (struct n5100_transport_data *) data;
 
-    xmm626_sec_modem_close(transport_data->fd);
+    xmm626_sec_modem_close(client, transport_data->fd);
     transport_data->fd = -1;
 
     return 0;
@@ -273,7 +273,7 @@ int n5100_read(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct n5100_transport_data *) data;
 
-    rc = xmm626_sec_modem_read(transport_data->fd, buffer, length);
+    rc = xmm626_sec_modem_read(client, transport_data->fd, buffer, length);
 
     return rc;
 }
@@ -289,7 +289,7 @@ int n5100_write(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct n5100_transport_data *) data;
 
-    rc = xmm626_sec_modem_write(transport_data->fd, buffer, length);
+    rc = xmm626_sec_modem_write(client, transport_data->fd, buffer, length);
 
     return rc;
 }
@@ -305,7 +305,7 @@ int n5100_poll(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct n5100_transport_data *) data;
 
-    rc = xmm626_sec_modem_poll(transport_data->fd, fds, timeout);
+    rc = xmm626_sec_modem_poll(client, transport_data->fd, fds, timeout);
 
     return rc;
 }

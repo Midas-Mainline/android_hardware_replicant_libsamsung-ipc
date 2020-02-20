@@ -437,7 +437,8 @@ complete:
     return rc;
 }
 
-int xmm626_sec_modem_open(int type)
+int xmm626_sec_modem_open(__attribute__((unused)) struct ipc_client *client,
+                          int type)
 {
     int fd;
 
@@ -457,7 +458,8 @@ int xmm626_sec_modem_open(int type)
     return fd;
 }
 
-int xmm626_sec_modem_close(int fd)
+int xmm626_sec_modem_close(__attribute__((unused)) struct ipc_client *client,
+                           int fd)
 {
     if (fd < 0)
         return -1;
@@ -467,7 +469,8 @@ int xmm626_sec_modem_close(int fd)
     return 0;
 }
 
-int xmm626_sec_modem_read(int fd, void *buffer, size_t length)
+int xmm626_sec_modem_read(__attribute__((unused)) struct ipc_client *client,
+                          int fd, void *buffer, size_t length)
 {
     int status;
     int rc;
@@ -484,7 +487,8 @@ int xmm626_sec_modem_read(int fd, void *buffer, size_t length)
     return rc;
 }
 
-int xmm626_sec_modem_write(int fd, const void *buffer, size_t length)
+int xmm626_sec_modem_write(__attribute__((unused)) struct ipc_client *client,
+                           int fd, const void *buffer, size_t length)
 {
     int status;
     int rc;
@@ -501,8 +505,9 @@ int xmm626_sec_modem_write(int fd, const void *buffer, size_t length)
     return rc;
 }
 
-int xmm626_sec_modem_poll(int fd, struct ipc_poll_fds *fds,
-    struct timeval *timeout)
+int xmm626_sec_modem_poll(__attribute__((unused)) struct ipc_client *client,
+                          int fd, struct ipc_poll_fds *fds,
+                          struct timeval *timeout)
 {
     int status;
     fd_set set;
