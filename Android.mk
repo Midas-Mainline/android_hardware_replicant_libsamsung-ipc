@@ -55,8 +55,8 @@ libsamsung_ipc_local_src_files := \
 	samsung-ipc/modems/xmm616/xmm616.c \
 	samsung-ipc/modems/xmm626/xmm626.c \
 	samsung-ipc/modems/xmm626/xmm626_hsic.c \
+	samsung-ipc/modems/xmm626/xmm626_kernel_smdk4412.c \
 	samsung-ipc/modems/xmm626/xmm626_mipi.c \
-	samsung-ipc/modems/xmm626/xmm626_sec_modem.c \
 	samsung-ipc/devices/ipc_devices.c \
 	samsung-ipc/devices/crespo/crespo.c \
 	samsung-ipc/devices/aries/aries.c \

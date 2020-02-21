@@ -35,9 +35,9 @@
 #include "xmm626_modem_link_device_hsic.h"
 
 #include "xmm626.h"
-#include "xmm626_sec_modem.h"
+#include "xmm626_kernel_smdk4412.h"
 
-int xmm626_sec_modem_power(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_power(__attribute__((unused)) struct ipc_client *client,
                            int device_fd, int power)
 {
     int rc;
@@ -52,7 +52,7 @@ int xmm626_sec_modem_power(__attribute__((unused)) struct ipc_client *client,
     return 0;
 }
 
-int xmm626_sec_modem_boot_power(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_boot_power(__attribute__((unused)) struct ipc_client *client,
                                 int device_fd, int power)
 {
     int rc;
@@ -68,7 +68,7 @@ int xmm626_sec_modem_boot_power(__attribute__((unused)) struct ipc_client *clien
     return 0;
 }
 
-int xmm626_sec_modem_status_online_wait(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_status_online_wait(__attribute__((unused)) struct ipc_client *client,
                                         int device_fd)
 {
     int status;
@@ -89,7 +89,7 @@ int xmm626_sec_modem_status_online_wait(__attribute__((unused)) struct ipc_clien
     return -1;
 }
 
-int xmm626_sec_modem_hci_power(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_hci_power(__attribute__((unused)) struct ipc_client *client,
                                int power)
 {
     int ehci_rc, ohci_rc;
@@ -108,7 +108,7 @@ int xmm626_sec_modem_hci_power(__attribute__((unused)) struct ipc_client *client
     return 0;
 }
 
-int xmm626_sec_modem_link_control_enable(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_link_control_enable(__attribute__((unused)) struct ipc_client *client,
                                          int device_fd, int enable)
 {
     int rc;
@@ -123,7 +123,7 @@ int xmm626_sec_modem_link_control_enable(__attribute__((unused)) struct ipc_clie
     return 0;
 }
 
-int xmm626_sec_modem_link_control_active(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_link_control_active(__attribute__((unused)) struct ipc_client *client,
                                          int device_fd, int active)
 {
     int rc;
@@ -138,7 +138,7 @@ int xmm626_sec_modem_link_control_active(__attribute__((unused)) struct ipc_clie
     return 0;
 }
 
-int xmm626_sec_modem_link_connected_wait(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_link_connected_wait(__attribute__((unused)) struct ipc_client *client,
                                          int device_fd)
 {
     int status;
@@ -159,7 +159,7 @@ int xmm626_sec_modem_link_connected_wait(__attribute__((unused)) struct ipc_clie
     return -1;
 }
 
-int xmm626_sec_modem_link_get_hostwake_wait(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_link_get_hostwake_wait(__attribute__((unused)) struct ipc_client *client,
                                             int device_fd)
 {
     int status;
@@ -180,7 +180,7 @@ int xmm626_sec_modem_link_get_hostwake_wait(__attribute__((unused)) struct ipc_c
     return -1;
 }
 
-int xmm626_sec_modem_fmt_send(struct ipc_client *client,
+int xmm626_kernel_smdk4412_fmt_send(struct ipc_client *client,
     struct ipc_message *message)
 {
     struct ipc_fmt_header header;
@@ -235,7 +235,7 @@ complete:
     return rc;
 }
 
-int xmm626_sec_modem_fmt_recv(struct ipc_client *client,
+int xmm626_kernel_smdk4412_fmt_recv(struct ipc_client *client,
     struct ipc_message *message)
 {
     struct ipc_fmt_header *header;
@@ -305,7 +305,7 @@ complete:
     return rc;
 }
 
-int xmm626_sec_modem_rfs_send(struct ipc_client *client,
+int xmm626_kernel_smdk4412_rfs_send(struct ipc_client *client,
     struct ipc_message *message)
 {
     struct ipc_rfs_header header;
@@ -361,7 +361,7 @@ complete:
     return rc;
 }
 
-int xmm626_sec_modem_rfs_recv(struct ipc_client *client,
+int xmm626_kernel_smdk4412_rfs_recv(struct ipc_client *client,
     struct ipc_message *message)
 {
     struct ipc_rfs_header *header;
@@ -437,7 +437,7 @@ complete:
     return rc;
 }
 
-int xmm626_sec_modem_open(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_open(__attribute__((unused)) struct ipc_client *client,
                           int type)
 {
     int fd;
@@ -458,7 +458,7 @@ int xmm626_sec_modem_open(__attribute__((unused)) struct ipc_client *client,
     return fd;
 }
 
-int xmm626_sec_modem_close(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_close(__attribute__((unused)) struct ipc_client *client,
                            int fd)
 {
     if (fd < 0)
@@ -469,7 +469,7 @@ int xmm626_sec_modem_close(__attribute__((unused)) struct ipc_client *client,
     return 0;
 }
 
-int xmm626_sec_modem_read(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_read(__attribute__((unused)) struct ipc_client *client,
                           int fd, void *buffer, size_t length)
 {
     int status;
@@ -487,7 +487,7 @@ int xmm626_sec_modem_read(__attribute__((unused)) struct ipc_client *client,
     return rc;
 }
 
-int xmm626_sec_modem_write(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_write(__attribute__((unused)) struct ipc_client *client,
                            int fd, const void *buffer, size_t length)
 {
     int status;
@@ -505,7 +505,7 @@ int xmm626_sec_modem_write(__attribute__((unused)) struct ipc_client *client,
     return rc;
 }
 
-int xmm626_sec_modem_poll(__attribute__((unused)) struct ipc_client *client,
+int xmm626_kernel_smdk4412_poll(__attribute__((unused)) struct ipc_client *client,
                           int fd, struct ipc_poll_fds *fds,
                           struct timeval *timeout)
 {
@@ -559,7 +559,7 @@ int xmm626_sec_modem_poll(__attribute__((unused)) struct ipc_client *client,
     return rc;
 }
 
-char *xmm626_sec_modem_gprs_get_iface(unsigned int cid)
+char *xmm626_kernel_smdk4412_gprs_get_iface(unsigned int cid)
 {
     char *iface = NULL;
 
@@ -571,7 +571,7 @@ char *xmm626_sec_modem_gprs_get_iface(unsigned int cid)
     return iface;
 }
 
-int xmm626_sec_modem_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
+int xmm626_kernel_smdk4412_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
 {
     if (capabilities == NULL)
         return -1;

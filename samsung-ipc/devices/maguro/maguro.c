@@ -30,7 +30,7 @@
 #include "maguro.h"
 #include "xmm626.h"
 #include "xmm626_mipi.h"
-#include "xmm626_sec_modem.h"
+#include "xmm626_kernel_smdk4412.h"
 
 int maguro_boot(struct ipc_client *client)
 {
@@ -69,14 +69,14 @@ int maguro_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Opened modem boot device");
 
-    rc = xmm626_sec_modem_power(client, modem_boot_fd, 0);
+    rc = xmm626_kernel_smdk4412_power(client, modem_boot_fd, 0);
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem off failed");
         goto error;
     }
     ipc_client_log(client, "Turned the modem off");
 
-    rc = xmm626_sec_modem_power(client, modem_boot_fd, 1);
+    rc = xmm626_kernel_smdk4412_power(client, modem_boot_fd, 1);
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem on failed");
         goto error;
@@ -177,14 +177,14 @@ int maguro_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Sent XMM626 MIPI HW reset");
 
-    rc = xmm626_sec_modem_status_online_wait(client, modem_boot_fd);
+    rc = xmm626_kernel_smdk4412_status_online_wait(client, modem_boot_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for online status failed");
         goto error;
     }
     ipc_client_log(client, "Waited for online status");
 
-    rc = xmm626_sec_modem_boot_power(client, modem_boot_fd, 0);
+    rc = xmm626_kernel_smdk4412_boot_power(client, modem_boot_fd, 0);
     if (rc < 0) {
         ipc_client_log(client, "Turning modem boot off failed");
         goto error;
@@ -223,7 +223,7 @@ int maguro_open(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct maguro_transport_data *) data;
 
-    transport_data->fd = xmm626_sec_modem_open(client, type);
+    transport_data->fd = xmm626_kernel_smdk4412_open(client, type);
     if (transport_data->fd < 0)
         return -1;
 
@@ -239,7 +239,7 @@ int maguro_close(__attribute__((unused)) struct ipc_client *client, void *data)
 
     transport_data = (struct maguro_transport_data *) data;
 
-    xmm626_sec_modem_close(client, transport_data->fd);
+    xmm626_kernel_smdk4412_close(client, transport_data->fd);
     transport_data->fd = -1;
 
     return 0;
@@ -256,7 +256,7 @@ int maguro_read(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct maguro_transport_data *) data;
 
-    rc = xmm626_sec_modem_read(client, transport_data->fd, buffer, length);
+    rc = xmm626_kernel_smdk4412_read(client, transport_data->fd, buffer, length);
 
     return rc;
 }
@@ -272,7 +272,7 @@ int maguro_write(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct maguro_transport_data *) data;
 
-    rc = xmm626_sec_modem_write(client, transport_data->fd, buffer, length);
+    rc = xmm626_kernel_smdk4412_write(client, transport_data->fd, buffer, length);
 
     return rc;
 }
@@ -288,7 +288,7 @@ int maguro_poll(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct maguro_transport_data *) data;
 
-    rc = xmm626_sec_modem_poll(client, transport_data->fd, fds, timeout);
+    rc = xmm626_kernel_smdk4412_poll(client, transport_data->fd, fds, timeout);
 
     return rc;
 }
@@ -309,7 +309,7 @@ int maguro_power_off(__attribute__((unused)) struct ipc_client *client,
     if (fd < 0)
         return -1;
 
-    rc = xmm626_sec_modem_power(client, fd, 0);
+    rc = xmm626_kernel_smdk4412_power(client, fd, 0);
 
     close(fd);
 
@@ -357,14 +357,14 @@ int maguro_data_destroy(void *transport_data,
 
 struct ipc_client_ops maguro_fmt_ops = {
     .boot = maguro_boot,
-    .send = xmm626_sec_modem_fmt_send,
-    .recv = xmm626_sec_modem_fmt_recv,
+    .send = xmm626_kernel_smdk4412_fmt_send,
+    .recv = xmm626_kernel_smdk4412_fmt_recv,
 };
 
 struct ipc_client_ops maguro_rfs_ops = {
     .boot = NULL,
-    .send = xmm626_sec_modem_rfs_send,
-    .recv = xmm626_sec_modem_rfs_recv,
+    .send = xmm626_kernel_smdk4412_rfs_send,
+    .recv = xmm626_kernel_smdk4412_rfs_recv,
 };
 
 struct ipc_client_handlers maguro_handlers = {
@@ -385,8 +385,8 @@ struct ipc_client_handlers maguro_handlers = {
 };
 
 struct ipc_client_gprs_specs maguro_gprs_specs = {
-    .gprs_get_iface = xmm626_sec_modem_gprs_get_iface,
-    .gprs_get_capabilities = xmm626_sec_modem_gprs_get_capabilities,
+    .gprs_get_iface = xmm626_kernel_smdk4412_gprs_get_iface,
+    .gprs_get_capabilities = xmm626_kernel_smdk4412_gprs_get_capabilities,
 };
 
 struct ipc_client_nv_data_specs maguro_nv_data_specs = {

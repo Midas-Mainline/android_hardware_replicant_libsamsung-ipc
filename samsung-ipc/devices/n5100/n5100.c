@@ -30,7 +30,7 @@
 #include "n5100.h"
 #include "xmm626.h"
 #include "xmm626_hsic.h"
-#include "xmm626_sec_modem.h"
+#include "xmm626_kernel_smdk4412.h"
 
 int n5100_boot(struct ipc_client *client)
 {
@@ -76,15 +76,15 @@ int n5100_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Opened modem link device");
 
-    rc = xmm626_sec_modem_hci_power(client, 0);
+    rc = xmm626_kernel_smdk4412_hci_power(client, 0);
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem off failed");
         goto error;
     }
     ipc_client_log(client, "Turned the modem off");
 
-    rc = xmm626_sec_modem_power(client, modem_boot_fd, 1);
-    rc |= xmm626_sec_modem_hci_power(client, 1);
+    rc = xmm626_kernel_smdk4412_power(client, modem_boot_fd, 1);
+    rc |= xmm626_kernel_smdk4412_hci_power(client, 1);
 
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem on failed");
@@ -92,7 +92,7 @@ int n5100_boot(struct ipc_client *client)
     }
     ipc_client_log(client, "Turned the modem on");
 
-    rc = xmm626_sec_modem_link_connected_wait(client, modem_link_fd);
+    rc = xmm626_kernel_smdk4412_link_connected_wait(client, modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for link connected failed");
         goto error;
@@ -169,37 +169,37 @@ int n5100_boot(struct ipc_client *client)
 
     usleep(300000);
 
-    rc = xmm626_sec_modem_link_get_hostwake_wait(client, modem_link_fd);
+    rc = xmm626_kernel_smdk4412_link_get_hostwake_wait(client, modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for host wake failed");
     }
 
-    rc = xmm626_sec_modem_link_control_enable(client, modem_link_fd, 0);
-    rc |= xmm626_sec_modem_hci_power(client, 0);
-    rc |= xmm626_sec_modem_link_control_active(client, modem_link_fd, 0);
+    rc = xmm626_kernel_smdk4412_link_control_enable(client, modem_link_fd, 0);
+    rc |= xmm626_kernel_smdk4412_hci_power(client, 0);
+    rc |= xmm626_kernel_smdk4412_link_control_active(client, modem_link_fd, 0);
 
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem off failed");
         goto error;
     }
 
-    rc = xmm626_sec_modem_link_get_hostwake_wait(client, modem_link_fd);
+    rc = xmm626_kernel_smdk4412_link_get_hostwake_wait(client, modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for host wake failed");
         goto error;
     }
     ipc_client_log(client, "Waited for host wake");
 
-    rc = xmm626_sec_modem_link_control_enable(client, modem_link_fd, 1);
-    rc |= xmm626_sec_modem_hci_power(client, 1);
-    rc |= xmm626_sec_modem_link_control_active(client, modem_link_fd, 1);
+    rc = xmm626_kernel_smdk4412_link_control_enable(client, modem_link_fd, 1);
+    rc |= xmm626_kernel_smdk4412_hci_power(client, 1);
+    rc |= xmm626_kernel_smdk4412_link_control_active(client, modem_link_fd, 1);
 
     if (rc < 0) {
         ipc_client_log(client, "Turning the modem on failed");
         goto error;
     }
 
-    rc = xmm626_sec_modem_link_connected_wait(client, modem_link_fd);
+    rc = xmm626_kernel_smdk4412_link_connected_wait(client, modem_link_fd);
     if (rc < 0) {
         ipc_client_log(client, "Waiting for link connected failed");
         goto error;
@@ -240,7 +240,7 @@ int n5100_open(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct n5100_transport_data *) data;
 
-    transport_data->fd = xmm626_sec_modem_open(client, type);
+    transport_data->fd = xmm626_kernel_smdk4412_open(client, type);
     if (transport_data->fd < 0)
         return -1;
 
@@ -256,7 +256,7 @@ int n5100_close(__attribute__((unused)) struct ipc_client *client, void *data)
 
     transport_data = (struct n5100_transport_data *) data;
 
-    xmm626_sec_modem_close(client, transport_data->fd);
+    xmm626_kernel_smdk4412_close(client, transport_data->fd);
     transport_data->fd = -1;
 
     return 0;
@@ -273,7 +273,7 @@ int n5100_read(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct n5100_transport_data *) data;
 
-    rc = xmm626_sec_modem_read(client, transport_data->fd, buffer, length);
+    rc = xmm626_kernel_smdk4412_read(client, transport_data->fd, buffer, length);
 
     return rc;
 }
@@ -289,7 +289,7 @@ int n5100_write(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct n5100_transport_data *) data;
 
-    rc = xmm626_sec_modem_write(client, transport_data->fd, buffer, length);
+    rc = xmm626_kernel_smdk4412_write(client, transport_data->fd, buffer, length);
 
     return rc;
 }
@@ -305,7 +305,7 @@ int n5100_poll(__attribute__((unused)) struct ipc_client *client, void *data,
 
     transport_data = (struct n5100_transport_data *) data;
 
-    rc = xmm626_sec_modem_poll(client, transport_data->fd, fds, timeout);
+    rc = xmm626_kernel_smdk4412_poll(client, transport_data->fd, fds, timeout);
 
     return rc;
 }
@@ -326,7 +326,7 @@ int n5100_power_off(__attribute__((unused)) struct ipc_client *client,
     if (fd < 0)
         return -1;
 
-    rc = xmm626_sec_modem_power(client, fd, 0);
+    rc = xmm626_kernel_smdk4412_power(client, fd, 0);
 
     close(fd);
 
@@ -374,14 +374,14 @@ int n5100_data_destroy(void *transport_data,
 
 struct ipc_client_ops n5100_fmt_ops = {
     .boot = n5100_boot,
-    .send = xmm626_sec_modem_fmt_send,
-    .recv = xmm626_sec_modem_fmt_recv,
+    .send = xmm626_kernel_smdk4412_fmt_send,
+    .recv = xmm626_kernel_smdk4412_fmt_recv,
 };
 
 struct ipc_client_ops n5100_rfs_ops = {
     .boot = NULL,
-    .send = xmm626_sec_modem_rfs_send,
-    .recv = xmm626_sec_modem_rfs_recv,
+    .send = xmm626_kernel_smdk4412_rfs_send,
+    .recv = xmm626_kernel_smdk4412_rfs_recv,
 };
 
 struct ipc_client_handlers n5100_handlers = {
@@ -402,8 +402,8 @@ struct ipc_client_handlers n5100_handlers = {
 };
 
 struct ipc_client_gprs_specs n5100_gprs_specs = {
-    .gprs_get_iface = xmm626_sec_modem_gprs_get_iface,
-    .gprs_get_capabilities = xmm626_sec_modem_gprs_get_capabilities,
+    .gprs_get_iface = xmm626_kernel_smdk4412_gprs_get_iface,
+    .gprs_get_capabilities = xmm626_kernel_smdk4412_gprs_get_capabilities,
 };
 
 struct ipc_client_nv_data_specs n5100_nv_data_specs = {

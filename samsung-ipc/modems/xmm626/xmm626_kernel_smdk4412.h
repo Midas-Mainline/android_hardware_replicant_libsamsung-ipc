@@ -31,41 +31,41 @@
 #define XMM626_SEC_MODEM_GPRS_IFACE_PREFIX      "rmnet"
 #define XMM626_SEC_MODEM_GPRS_IFACE_COUNT                       3
 
-int xmm626_sec_modem_power(struct ipc_client *client, int device_fd, int power);
-int xmm626_sec_modem_boot_power(struct ipc_client *client, int device_fd,
+int xmm626_kernel_smdk4412_power(struct ipc_client *client, int device_fd, int power);
+int xmm626_kernel_smdk4412_boot_power(struct ipc_client *client, int device_fd,
     int power);
-int xmm626_sec_modem_status_online_wait(struct ipc_client *client,
+int xmm626_kernel_smdk4412_status_online_wait(struct ipc_client *client,
     int device_fd);
-int xmm626_sec_modem_hci_power(struct ipc_client *client, int power);
-int xmm626_sec_modem_link_control_enable(struct ipc_client *client,
+int xmm626_kernel_smdk4412_hci_power(struct ipc_client *client, int power);
+int xmm626_kernel_smdk4412_link_control_enable(struct ipc_client *client,
                                          int device_fd, int enable);
-int xmm626_sec_modem_link_control_active(struct ipc_client *client,
+int xmm626_kernel_smdk4412_link_control_active(struct ipc_client *client,
                                          int device_fd, int active);
-int xmm626_sec_modem_link_connected_wait(struct ipc_client *client,
+int xmm626_kernel_smdk4412_link_connected_wait(struct ipc_client *client,
                                          int device_fd);
-int xmm626_sec_modem_link_get_hostwake_wait(struct ipc_client *client,
+int xmm626_kernel_smdk4412_link_get_hostwake_wait(struct ipc_client *client,
                                             int device_fd);
 
-int xmm626_sec_modem_fmt_send(struct ipc_client *client,
+int xmm626_kernel_smdk4412_fmt_send(struct ipc_client *client,
     struct ipc_message *message);
-int xmm626_sec_modem_fmt_recv(struct ipc_client *client,
+int xmm626_kernel_smdk4412_fmt_recv(struct ipc_client *client,
     struct ipc_message *message);
-int xmm626_sec_modem_rfs_send(struct ipc_client *client,
+int xmm626_kernel_smdk4412_rfs_send(struct ipc_client *client,
     struct ipc_message *message);
-int xmm626_sec_modem_rfs_recv(struct ipc_client *client,
+int xmm626_kernel_smdk4412_rfs_recv(struct ipc_client *client,
     struct ipc_message *message);
 
-int xmm626_sec_modem_open(struct ipc_client *client, int type);
-int xmm626_sec_modem_close(struct ipc_client *client, int fd);
-int xmm626_sec_modem_read(struct ipc_client *client, int fd, void *buffer,
+int xmm626_kernel_smdk4412_open(struct ipc_client *client, int type);
+int xmm626_kernel_smdk4412_close(struct ipc_client *client, int fd);
+int xmm626_kernel_smdk4412_read(struct ipc_client *client, int fd, void *buffer,
     size_t length);
-int xmm626_sec_modem_write(struct ipc_client *client, int fd,
+int xmm626_kernel_smdk4412_write(struct ipc_client *client, int fd,
     const void *buffer, size_t length);
-int xmm626_sec_modem_poll(struct ipc_client *client, int fd,
+int xmm626_kernel_smdk4412_poll(struct ipc_client *client, int fd,
     struct ipc_poll_fds *fds, struct timeval *timeout);
 
-char *xmm626_sec_modem_gprs_get_iface(unsigned int cid);
-int xmm626_sec_modem_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities);
+char *xmm626_kernel_smdk4412_gprs_get_iface(unsigned int cid);
+int xmm626_kernel_smdk4412_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities);
 
 #endif
 
