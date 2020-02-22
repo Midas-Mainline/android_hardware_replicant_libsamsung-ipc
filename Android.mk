@@ -77,6 +77,29 @@ libsamsung_ipc_local_src_files := \
 	samsung-ipc/rfs.c \
 	samsung-ipc/gen.c
 
+libsamsung_ipc_local_copy_headers := \
+	include/call.h \
+	include/disp.h \
+	include/gen.h \
+	include/gprs.h \
+	include/imei.h \
+	include/misc.h \
+	include/net.h \
+	include/pb.h \
+	include/protocol.h \
+	include/pwr.h \
+	include/rfs.h \
+	include/samsung-ipc.h \
+	include/sat.h \
+	include/sec.h \
+	include/sms.h \
+	include/snd.h \
+	include/ss.h \
+	include/svc.h \
+
+local_export_c_include_dirs := \
+	$(TARGET_OUT_HEADERS)/libsamsung-ipc
+
 libsamsung_ipc_local_c_includes := \
 	$(LOCAL_PATH)/include \
 	$(LOCAL_PATH)/samsung-ipc \
@@ -108,6 +131,11 @@ LOCAL_C_INCLUDES := $(libsamsung_ipc_local_c_includes)
 LOCAL_CFLAGS := $(libsamsung_local_cflags)
 LOCAL_SHARED_LIBRARIES := $(libsamsung_ipc_local_shared_libraries)
 
+LOCAL_COPY_HEADERS_TO := libsamsung-ipc
+LOCAL_COPY_HEADERS := $(libsamsung_ipc_local_copy_headers)
+
+LOCAL_EXPORT_C_INCLUDE_DIRS := $(local_export_c_include_dirs)
+
 include $(BUILD_STATIC_LIBRARY)
 
 ############################################
@@ -124,6 +152,8 @@ LOCAL_C_INCLUDES := $(libsamsung_ipc_local_c_includes)
 
 LOCAL_CFLAGS := $(libsamsung_local_cflags)
 LOCAL_SHARED_LIBRARIES := $(libsamsung_ipc_local_shared_libraries)
+
+LOCAL_EXPORT_C_INCLUDE_DIRS := $(local_export_c_include_dirs)
 
 include $(BUILD_SHARED_LIBRARY)
 
