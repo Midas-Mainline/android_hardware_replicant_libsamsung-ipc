@@ -503,7 +503,7 @@ char *ipc_client_gprs_get_iface(struct ipc_client *client, unsigned int cid)
       return NULL;
     }
 
-    return client->gprs_specs->gprs_get_iface(cid);
+    return client->gprs_specs->gprs_get_iface(client, cid);
 }
 
 int ipc_client_gprs_get_capabilities(struct ipc_client *client,
@@ -514,7 +514,7 @@ int ipc_client_gprs_get_capabilities(struct ipc_client *client,
       return -1;
     }
 
-    return client->gprs_specs->gprs_get_capabilities(capabilities);
+    return client->gprs_specs->gprs_get_capabilities(client, capabilities);
 }
 
 char *ipc_client_nv_data_path(struct ipc_client *client)

@@ -64,8 +64,10 @@ int xmm626_kernel_smdk4412_write(struct ipc_client *client, int fd,
 int xmm626_kernel_smdk4412_poll(struct ipc_client *client, int fd,
     struct ipc_poll_fds *fds, struct timeval *timeout);
 
-char *xmm626_kernel_smdk4412_gprs_get_iface(unsigned int cid);
-int xmm626_kernel_smdk4412_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities);
+char *xmm626_kernel_smdk4412_gprs_get_iface(struct ipc_client *client,
+                                            unsigned int cid);
+int xmm626_kernel_smdk4412_gprs_get_capabilities(struct ipc_client *client,
+                                                 struct ipc_client_gprs_capabilities *capabilities);
 
 #endif
 

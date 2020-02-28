@@ -72,8 +72,9 @@ struct ipc_client_handlers {
 };
 
 struct ipc_client_gprs_specs {
-    char *(*gprs_get_iface)(unsigned int cid);
-    int (*gprs_get_capabilities)(struct ipc_client_gprs_capabilities *capabilities);
+    char *(*gprs_get_iface)(struct ipc_client *client, unsigned int cid);
+    int (*gprs_get_capabilities)(struct ipc_client *client,
+                                 struct ipc_client_gprs_capabilities *capabilities);
 };
 
 struct ipc_client_nv_data_specs {

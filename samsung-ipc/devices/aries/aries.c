@@ -805,7 +805,8 @@ int aries_gprs_deactivate(__attribute__((unused)) struct ipc_client *client,
     return 0;
 }
 
-char *aries_gprs_get_iface(unsigned int cid)
+char *aries_gprs_get_iface(__attribute__((unused)) struct ipc_client *client,
+                           unsigned int cid)
 {
     char *iface = NULL;
 
@@ -817,7 +818,8 @@ char *aries_gprs_get_iface(unsigned int cid)
     return iface;
 }
 
-int aries_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
+int aries_gprs_get_capabilities(__attribute__((unused)) struct ipc_client *client,
+                                struct ipc_client_gprs_capabilities *capabilities)
 {
     if (capabilities == NULL)
         return -1;

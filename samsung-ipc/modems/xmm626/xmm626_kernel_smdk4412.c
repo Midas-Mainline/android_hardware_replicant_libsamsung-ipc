@@ -559,7 +559,8 @@ int xmm626_kernel_smdk4412_poll(__attribute__((unused)) struct ipc_client *clien
     return rc;
 }
 
-char *xmm626_kernel_smdk4412_gprs_get_iface(unsigned int cid)
+char *xmm626_kernel_smdk4412_gprs_get_iface(__attribute__((unused)) struct ipc_client *client,
+                                            unsigned int cid)
 {
     char *iface = NULL;
 
@@ -571,7 +572,8 @@ char *xmm626_kernel_smdk4412_gprs_get_iface(unsigned int cid)
     return iface;
 }
 
-int xmm626_kernel_smdk4412_gprs_get_capabilities(struct ipc_client_gprs_capabilities *capabilities)
+int xmm626_kernel_smdk4412_gprs_get_capabilities(__attribute__((unused)) struct ipc_client *client,
+                                                 struct ipc_client_gprs_capabilities *capabilities)
 {
     if (capabilities == NULL)
         return -1;
