@@ -349,7 +349,8 @@ int i9300_gprs_deactivate(__attribute__((unused)) struct ipc_client *client,
     return 0;
 }
 
-int i9300_data_create(void **transport_data,
+int i9300_data_create(__attribute__((unused)) struct ipc_client *client,
+                      void **transport_data,
                       __attribute__((unused)) void **power_data,
                       __attribute__((unused)) void **gprs_data)
 {
@@ -361,7 +362,8 @@ int i9300_data_create(void **transport_data,
     return 0;
 }
 
-int i9300_data_destroy(void *transport_data,
+int i9300_data_destroy(__attribute__((unused)) struct ipc_client *client,
+                       void *transport_data,
                        __attribute__((unused)) void *power_data,
                        __attribute__((unused)) void *gprs_data)
 {

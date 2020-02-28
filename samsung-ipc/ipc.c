@@ -477,7 +477,8 @@ int ipc_client_data_create(struct ipc_client *client)
       return -1;
     }
 
-    return client->handlers->data_create(&client->handlers->transport_data,
+    return client->handlers->data_create(client,
+                                         &client->handlers->transport_data,
                                          &client->handlers->power_data,
                                          &client->handlers->power_data);
 }
@@ -489,7 +490,8 @@ int ipc_client_data_destroy(struct ipc_client *client)
         return -1;
     }
 
-    return client->handlers->data_destroy(client->handlers->transport_data,
+    return client->handlers->data_destroy(client,
+                                          client->handlers->transport_data,
                                           client->handlers->power_data,
                                           client->handlers->power_data);
 }

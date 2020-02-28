@@ -65,10 +65,10 @@ struct ipc_client_handlers {
     void *gprs_data;
 
     /* Data */
-    int (*data_create)(void **transport_data, void **power_data,
-                       void **gprs_data);
-    int (*data_destroy)(void *transport_data, void *power_data,
-                        void *gprs_data);
+    int (*data_create)(struct ipc_client *client, void **transport_data,
+                       void **power_data, void **gprs_data);
+    int (*data_destroy)(struct ipc_client *client, void *transport_data,
+                        void *power_data, void *gprs_data);
 };
 
 struct ipc_client_gprs_specs {
