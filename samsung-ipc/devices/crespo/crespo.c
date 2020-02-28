@@ -529,13 +529,15 @@ int crespo_data_destroy(void *transport_data,
     return 0;
 }
 
-int crespo_gprs_activate(__attribute__((unused)) void *data,
+int crespo_gprs_activate(__attribute__((unused)) struct ipc_client *client,
+                         __attribute__((unused)) void *data,
                          __attribute__((unused)) unsigned int cid)
 {
     return 0;
 }
 
-int crespo_gprs_deactivate(__attribute__((unused)) void *data,
+int crespo_gprs_deactivate(__attribute__((unused)) struct ipc_client *client,
+                           __attribute__((unused)) void *data,
                            __attribute__((unused)) unsigned int cid)
 {
     return 0;

@@ -779,8 +779,8 @@ int aries_data_destroy(void *transport_data,
     return 0;
 }
 
-int aries_gprs_activate(__attribute__((unused)) void *data,
-                        unsigned int cid)
+int aries_gprs_activate(__attribute__((unused)) struct ipc_client *client,
+                        __attribute__((unused)) void *data, unsigned int cid)
 {
     int rc;
 
@@ -791,8 +791,8 @@ int aries_gprs_activate(__attribute__((unused)) void *data,
     return 0;
 }
 
-int aries_gprs_deactivate(__attribute__((unused)) void *data,
-                          unsigned int cid)
+int aries_gprs_deactivate(__attribute__((unused)) struct ipc_client *client,
+                          __attribute__((unused)) void *data, unsigned int cid)
 {
     int rc;
 

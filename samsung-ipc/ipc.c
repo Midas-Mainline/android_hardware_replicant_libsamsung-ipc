@@ -303,8 +303,10 @@ int ipc_client_power_handlers_register(struct ipc_client *client,
 }
 
 int ipc_client_gprs_handlers_register(struct ipc_client *client,
-    int (*gprs_activate)(void *gprs_data, unsigned int cid),
-    int (*gprs_deactivate)(void *gprs_data, unsigned int cid), void *gprs_data)
+    int (*gprs_activate)(struct ipc_client *client, void *gprs_data,
+                         unsigned int cid),
+    int (*gprs_deactivate)(struct ipc_client *client, void *gprs_data,
+                           unsigned int cid), void *gprs_data)
 {
     if (client == NULL || client->handlers == NULL)
         return -1;
@@ -453,7 +455,8 @@ int ipc_client_gprs_activate(struct ipc_client *client, unsigned int cid)
         return -1;
     }
 
-    return client->handlers->gprs_activate(client->handlers->gprs_data, cid);
+    return client->handlers->gprs_activate(client, client->handlers->gprs_data,
+                                           cid);
 }
 
 int ipc_client_gprs_deactivate(struct ipc_client *client, unsigned int cid)
@@ -463,7 +466,8 @@ int ipc_client_gprs_deactivate(struct ipc_client *client, unsigned int cid)
       return -1;
     }
 
-    return client->handlers->gprs_deactivate(client->handlers->gprs_data, cid);
+    return client->handlers->gprs_deactivate(client,
+                                             client->handlers->gprs_data, cid);
 }
 
 int ipc_client_data_create(struct ipc_client *client)

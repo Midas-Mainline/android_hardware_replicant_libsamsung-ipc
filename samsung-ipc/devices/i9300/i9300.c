@@ -335,13 +335,15 @@ int i9300_power_off(__attribute__((unused)) struct ipc_client *client,
     return 0;
 }
 
-int i9300_gprs_activate(__attribute__((unused)) void *data,
+int i9300_gprs_activate(__attribute__((unused)) struct ipc_client *client,
+                        __attribute__((unused)) void *data,
                         __attribute__((unused)) unsigned int cid)
 {
     return 0;
 }
 
-int i9300_gprs_deactivate(__attribute__((unused)) void *data,
+int i9300_gprs_deactivate(__attribute__((unused)) struct ipc_client *client,
+                          __attribute__((unused)) void *data,
                           __attribute__((unused)) unsigned int cid)
 {
     return 0;

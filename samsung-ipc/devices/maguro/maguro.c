@@ -319,13 +319,15 @@ int maguro_power_off(__attribute__((unused)) struct ipc_client *client,
     return 0;
 }
 
-int maguro_gprs_activate(__attribute__((unused)) void *data,
+int maguro_gprs_activate(__attribute__((unused)) struct ipc_client *client,
+                         __attribute__((unused)) void *data,
                          __attribute__((unused)) unsigned int cid)
 {
     return 0;
 }
 
-int maguro_gprs_deactivate(__attribute__((unused)) void *data,
+int maguro_gprs_deactivate(__attribute__((unused)) struct ipc_client *client,
+                           __attribute__((unused)) void *data,
                            __attribute__((unused)) unsigned int cid)
 {
     return 0;
