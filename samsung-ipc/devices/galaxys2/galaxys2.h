@@ -20,22 +20,22 @@
 #ifndef __GALAXYS2_H__
 #define __GALAXYS2_H__
 
-#define GALAXYS2_MODEM_IMAGE_SIZE                               0x1000000
-#define GALAXYS2_PSI_OFFSET                                     0
-#define GALAXYS2_PSI_SIZE                                       0xF000
-#define GALAXYS2_EBL_OFFSET                                     0xF000
-#define GALAXYS2_EBL_SIZE                                       0x19000
-#define GALAXYS2_SEC_START_OFFSET                               0x9FF800
-#define GALAXYS2_SEC_START_SIZE                                 0x800
-#define GALAXYS2_FIRMWARE_OFFSET                                0x28000
-#define GALAXYS2_FIRMWARE_SIZE                                  0x9D8000
-#define GALAXYS2_NV_DATA_OFFSET                                 0xA00000
-#define GALAXYS2_NV_DATA_SIZE                                   0x200000
+#define GALAXYS2_MODEM_IMAGE_SIZE			0x1000000
+#define GALAXYS2_PSI_OFFSET				0
+#define GALAXYS2_PSI_SIZE				0xF000
+#define GALAXYS2_EBL_OFFSET				0xF000
+#define GALAXYS2_EBL_SIZE				0x19000
+#define GALAXYS2_SEC_START_OFFSET			0x9FF800
+#define GALAXYS2_SEC_START_SIZE			0x800
+#define GALAXYS2_FIRMWARE_OFFSET			0x28000
+#define GALAXYS2_FIRMWARE_SIZE				0x9D8000
+#define GALAXYS2_NV_DATA_OFFSET			0xA00000
+#define GALAXYS2_NV_DATA_SIZE				0x200000
 
-#define GALAXYS2_MODEM_IMAGE_DEVICE             "/dev/block/mmcblk0p8"
+#define GALAXYS2_MODEM_IMAGE_DEVICE			"/dev/block/mmcblk0p8"
 
 struct galaxys2_transport_data {
-    int fd;
+	int fd;
 };
 
 extern struct ipc_client_ops galaxys2_fmt_ops;
@@ -44,6 +44,4 @@ extern struct ipc_client_handlers galaxys2_handlers;
 extern struct ipc_client_gprs_specs galaxys2_gprs_specs;
 extern struct ipc_client_nv_data_specs galaxys2_nv_data_specs;
 
-#endif
-
-// vim:ts=4:sw=4:expandtab
+#endif /* __GALAXYS2_H__ */
