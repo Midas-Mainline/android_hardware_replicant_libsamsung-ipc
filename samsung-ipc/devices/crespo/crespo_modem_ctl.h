@@ -16,10 +16,10 @@
 #ifndef __MODEM_CONTROL_H__
 #define __MODEM_CONTROL_H__
 
-#define IOCTL_MODEM_RAMDUMP             _IO('o', 0x19)
-#define IOCTL_MODEM_RESET               _IO('o', 0x20)
-#define IOCTL_MODEM_START               _IO('o', 0x21)
-#define IOCTL_MODEM_OFF                 _IO('o', 0x22)
+#define IOCTL_MODEM_RAMDUMP		_IO('o', 0x19)
+#define IOCTL_MODEM_RESET		_IO('o', 0x20)
+#define IOCTL_MODEM_START		_IO('o', 0x21)
+#define IOCTL_MODEM_OFF		_IO('o', 0x22)
 
 #define IOCTL_MODEM_SEND		_IO('o', 0x23)
 #define IOCTL_MODEM_RECV		_IO('o', 0x24)
@@ -34,11 +34,11 @@ struct modem_io {
 /* platform data */
 struct modemctl_data {
 	const char *name;
-	unsigned gpio_phone_active;
-	unsigned gpio_pda_active;
-	unsigned gpio_cp_reset;
-	unsigned gpio_phone_on;
-	bool is_cdma_modem; /* 1:CDMA Modem */
+	unsigned int gpio_phone_active;
+	unsigned int gpio_pda_active;
+	unsigned int gpio_cp_reset;
+	unsigned int gpio_phone_on;
+	bool is_cdma_modem;		/* 1:CDMA Modem */
 };
 
-#endif
+#endif /* __MODEM_CONTROL_H__ */
