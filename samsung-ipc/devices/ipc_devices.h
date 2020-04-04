@@ -33,20 +33,18 @@
 #define __IPC_DEVICES_H__
 
 struct ipc_device_desc {
-    char *name;
-    char *board_name;
-    char *kernel_version;
+	char *name;
+	char *board_name;
+	char *kernel_version;
 
-    struct ipc_client_ops *fmt_ops;
-    struct ipc_client_ops *rfs_ops;
-    struct ipc_client_handlers *handlers;
-    struct ipc_client_gprs_specs *gprs_specs;
-    struct ipc_client_nv_data_specs *nv_data_specs;
+	struct ipc_client_ops *fmt_ops;
+	struct ipc_client_ops *rfs_ops;
+	struct ipc_client_handlers *handlers;
+	struct ipc_client_gprs_specs *gprs_specs;
+	struct ipc_client_nv_data_specs *nv_data_specs;
 };
 
 extern struct ipc_device_desc ipc_devices[];
 extern unsigned int ipc_devices_count;
 
-#endif
-
-// vim:ts=4:sw=4:expandtab
+#endif /* __IPC_DEVICES_H__ */
