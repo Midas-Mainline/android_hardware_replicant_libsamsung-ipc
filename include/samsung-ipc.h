@@ -28,9 +28,9 @@
  * Values
  */
 
-#define IPC_CLIENT_TYPE_FMT                                     0x00
-#define IPC_CLIENT_TYPE_RFS                                     0x01
-#define IPC_CLIENT_TYPE_DUMMY                                   0x02
+#define IPC_CLIENT_TYPE_FMT					0x00
+#define IPC_CLIENT_TYPE_RFS					0x01
+#define IPC_CLIENT_TYPE_DUMMY					0x02
 
 /*
  * Structures
@@ -43,21 +43,21 @@ struct ipc_fmt_header;
 struct ipc_rfs_header;
 
 struct ipc_message {
-    unsigned char mseq;
-    unsigned char aseq;
-    unsigned short command;
-    unsigned char type;
-    void *data;
-    size_t size;
+	unsigned char mseq;
+	unsigned char aseq;
+	unsigned short command;
+	unsigned char type;
+	void *data;
+	size_t size;
 };
 
 struct ipc_client_gprs_capabilities {
-    unsigned int cid_count;
+	unsigned int cid_count;
 };
 
 struct ipc_poll_fds {
-    int *fds;
-    unsigned int count;
+	int *fds;
+	unsigned int count;
 };
 
 /*
@@ -69,33 +69,46 @@ int ipc_device_detect(void);
 struct ipc_client *ipc_client_create(int type);
 int ipc_client_destroy(struct ipc_client *client);
 
-int ipc_client_transport_handlers_register(struct ipc_client *client,
-    int (*open)(struct ipc_client *client, void *transport_data, int type),
-    int (*close)(struct ipc_client *client, void *transport_data),
-    int (*read)(struct ipc_client *client, void *transport_data, void *data, size_t size),
-    int (*write)(struct ipc_client *client, void *transport_data, const void *data, size_t size),
-    int (*poll)(struct ipc_client *client, void *transport_data, struct ipc_poll_fds *fds, struct timeval *timeout),
-    void *transport_data);
-int ipc_client_power_handlers_register(struct ipc_client *client,
-    int (*power_on)(struct ipc_client *client, void *power_data),
-    int (*power_off)(struct ipc_client *client, void *power_data),
-    void *power_data);
-int ipc_client_gprs_handlers_register(struct ipc_client *client,
-    int (*gprs_activate)(struct ipc_client *client, void *gprs_data, unsigned int cid),
-    int (*gprs_deactivate)(struct ipc_client *client, void *gprs_data, unsigned int cid), void *gprs_data);
+int ipc_client_transport_handlers_register(
+	struct ipc_client *client,
+	int (*open)(struct ipc_client *client, void *transport_data, int type),
+	int (*close)(struct ipc_client *client, void *transport_data),
+	int (*read)(struct ipc_client *client, void *transport_data, void *data,
+		    size_t size),
+	int (*write)(struct ipc_client *client, void *transport_data,
+		     const void *data, size_t size),
+	int (*poll)(struct ipc_client *client, void *transport_data,
+		    struct ipc_poll_fds *fds, struct timeval *timeout),
+	void *transport_data);
+int ipc_client_power_handlers_register(
+	struct ipc_client *client,
+	int (*power_on)(struct ipc_client *client, void *power_data),
+	int (*power_off)(struct ipc_client *client, void *power_data),
+	void *power_data);
+int ipc_client_gprs_handlers_register(
+	struct ipc_client *client,
+	int (*gprs_activate)(struct ipc_client *client, void *gprs_data,
+			     unsigned int cid),
+	int (*gprs_deactivate)(struct ipc_client *client, void *gprs_data,
+			       unsigned int cid),
+	void *gprs_data);
 
 void ipc_client_log(struct ipc_client *client, const char *message, ...);
-int ipc_client_log_callback_register(struct ipc_client *client,
-    void (*log_callback)(void *log_data, const char *message), void *log_data);
+int ipc_client_log_callback_register(
+	struct ipc_client *client,
+	void (*log_callback)(void *log_data, const char *message),
+	void *log_data);
 
 int ipc_client_boot(struct ipc_client *client);
 int ipc_client_send(struct ipc_client *client, unsigned char mseq,
-    unsigned short command, unsigned char type, const void *data, size_t size);
+		    unsigned short command, unsigned char type,
+		    const void *data, size_t size);
 int ipc_client_recv(struct ipc_client *client, struct ipc_message *message);
 
 int ipc_client_open(struct ipc_client *client);
 int ipc_client_close(struct ipc_client *client);
-int ipc_client_poll(struct ipc_client *client, struct ipc_poll_fds *fds, struct timeval *timeout);
+int ipc_client_poll(struct ipc_client *client, struct ipc_poll_fds *fds,
+		    struct timeval *timeout);
 int ipc_client_power_on(struct ipc_client *client);
 int ipc_client_power_off(struct ipc_client *client);
 int ipc_client_gprs_activate(struct ipc_client *client, unsigned int cid);
@@ -104,8 +117,9 @@ int ipc_client_data_create(struct ipc_client *client);
 int ipc_client_data_destroy(struct ipc_client *client);
 
 char *ipc_client_gprs_get_iface(struct ipc_client *client, unsigned int cid);
-int ipc_client_gprs_get_capabilities(struct ipc_client *client,
-    struct ipc_client_gprs_capabilities *capabilities);
+int ipc_client_gprs_get_capabilities(
+	struct ipc_client *client,
+	struct ipc_client_gprs_capabilities *capabilities);
 
 char *ipc_client_nv_data_path(struct ipc_client *client);
 char *ipc_client_nv_data_md5_path(struct ipc_client *client);
@@ -123,24 +137,24 @@ const char *ipc_command_string(unsigned short command);
 
 int ipc_data_dump(struct ipc_client *client, const void *data, size_t size);
 void ipc_client_log_send(struct ipc_client *client, struct ipc_message *message,
-    const char *prefix);
+			 const char *prefix);
 void ipc_client_log_recv(struct ipc_client *client, struct ipc_message *message,
-    const char *prefix);
+			 const char *prefix);
 
 int ipc_fmt_header_setup(struct ipc_fmt_header *header,
-    const struct ipc_message *message);
+			 const struct ipc_message *message);
 int ipc_fmt_message_setup(const struct ipc_fmt_header *header,
-    struct ipc_message *message);
+			  struct ipc_message *message);
 int ipc_rfs_header_setup(struct ipc_rfs_header *header,
-    const struct ipc_message *message);
+			 const struct ipc_message *message);
 int ipc_rfs_message_setup(const struct ipc_rfs_header *header,
-    struct ipc_message *message);
+			  struct ipc_message *message);
 
 void *file_data_read(struct ipc_client *client, const char *path, size_t size,
-                     size_t chunk_size, unsigned int offset);
+		     size_t chunk_size, unsigned int offset);
 int file_data_write(struct ipc_client *client, const char *path,
-                    const void *data, size_t size, size_t chunk_size,
-                    unsigned int offset);
+		    const void *data, size_t size, size_t chunk_size,
+		    unsigned int offset);
 int network_iface_up(const char *iface, int domain, int type);
 int network_iface_down(const char *iface, int domain, int type);
 int sysfs_value_read(const char *path);
@@ -174,6 +188,4 @@ void *string2data(const char *string);
 #include "rfs.h"
 #include "gen.h"
 
-#endif
-
-// vim:ts=4:sw=4:expandtab
+#endif /*  __SAMSUNG_IPC_H__ */
