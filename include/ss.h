@@ -27,38 +27,36 @@
  * Commands
  */
 
-#define IPC_SS_WAITING                                          0x0C01
-#define IPC_SS_CLI                                              0x0C02
-#define IPC_SS_BARRING                                          0x0C03
-#define IPC_SS_BARRING_PW                                       0x0C04
-#define IPC_SS_FORWARDING                                       0x0C05
-#define IPC_SS_INFO                                             0x0C06
-#define IPC_SS_MANAGE_CALL                                      0x0C07
-#define IPC_SS_USSD                                             0x0C08
-#define IPC_SS_AOC                                              0x0C09
-#define IPC_SS_RELEASE_COMPLETE                                 0x0C0A
+#define IPC_SS_WAITING						0x0C01
+#define IPC_SS_CLI						0x0C02
+#define IPC_SS_BARRING						0x0C03
+#define IPC_SS_BARRING_PW					0x0C04
+#define IPC_SS_FORWARDING					0x0C05
+#define IPC_SS_INFO						0x0C06
+#define IPC_SS_MANAGE_CALL					0x0C07
+#define IPC_SS_USSD						0x0C08
+#define IPC_SS_AOC						0x0C09
+#define IPC_SS_RELEASE_COMPLETE				0x0C0A
 
 /*
  * Values
  */
 
-#define IPC_SS_USSD_NO_ACTION_REQUIRE                           0x01
-#define IPC_SS_USSD_ACTION_REQUIRE                              0x02
-#define IPC_SS_USSD_TERMINATED_BY_NET                           0x03
-#define IPC_SS_USSD_OTHER_CLIENT                                0x04
-#define IPC_SS_USSD_NOT_SUPPORT                                 0x05
-#define IPC_SS_USSD_TIME_OUT                                    0x06
+#define IPC_SS_USSD_NO_ACTION_REQUIRE				0x01
+#define IPC_SS_USSD_ACTION_REQUIRE				0x02
+#define IPC_SS_USSD_TERMINATED_BY_NET				0x03
+#define IPC_SS_USSD_OTHER_CLIENT				0x04
+#define IPC_SS_USSD_NOT_SUPPORT				0x05
+#define IPC_SS_USSD_TIME_OUT					0x06
 
 /*
  * Structures
  */
 
 struct ipc_ss_ussd_header {
-    unsigned char state;
-    unsigned char dcs;
-    unsigned char length;
+	unsigned char state;
+	unsigned char dcs;
+	unsigned char length;
 } __attribute__((__packed__));
 
-#endif
-
-// vim:ts=4:sw=4:expandtab
+#endif /*  __SAMSUNG_IPC_SS_H__ */
