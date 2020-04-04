@@ -23,13 +23,11 @@
 
 int ipc_gen_phone_res_check(const struct ipc_gen_phone_res_data *data)
 {
-    if (data == NULL)
-        return -1;
+	if (data == NULL)
+		return -1;
 
-    if (data->code & IPC_GEN_PHONE_RES_CODE_SUCCESS)
-        return 0;
+	if (data->code & IPC_GEN_PHONE_RES_CODE_SUCCESS)
+		return 0;
 
-    return -1;
+	return -1;
 }
-
-// vim:ts=4:sw=4:expandtab
