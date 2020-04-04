@@ -23,56 +23,59 @@
 
 #include <samsung-ipc.h>
 
-int ipc_gprs_define_pdp_context_setup(struct ipc_gprs_define_pdp_context_data *data,
-    unsigned char enable, unsigned char cid, const char *apn)
+int ipc_gprs_define_pdp_context_setup(
+	struct ipc_gprs_define_pdp_context_data *data, unsigned char enable,
+	unsigned char cid, const char *apn)
 {
-    if (data == NULL || apn == NULL)
-        return -1;
+	if (data == NULL || apn == NULL)
+		return -1;
 
-    memset(data, 0, sizeof(struct ipc_gprs_define_pdp_context_data));
-    data->enable = enable;
-    data->cid = cid;
-    data->magic = 0x02;
+	memset(data, 0, sizeof(struct ipc_gprs_define_pdp_context_data));
+	data->enable = enable;
+	data->cid = cid;
+	data->magic = 0x02;
 
-    strncpy((char *) data->apn, apn, sizeof(data->apn));
+	strncpy((char *) data->apn, apn, sizeof(data->apn));
 
-    return 0;
+	return 0;
 }
 
-int ipc_gprs_pdp_context_request_set_setup(struct ipc_gprs_pdp_context_request_set_data *data,
-    unsigned char enable, unsigned char cid, const char *username,
-    const char *password)
+int ipc_gprs_pdp_context_request_set_setup(
+	struct ipc_gprs_pdp_context_request_set_data *data,
+	unsigned char enable, unsigned char cid, const char *username,
+	const char *password)
 {
-    if (data == NULL)
-        return -1;
+	if (data == NULL)
+		return -1;
 
-    memset(data, 0, sizeof(struct ipc_gprs_pdp_context_request_set_data));
-    data->enable = enable;
-    data->cid = cid;
+	memset(data, 0, sizeof(struct ipc_gprs_pdp_context_request_set_data));
+	data->enable = enable;
+	data->cid = cid;
 
-    if (enable && username != NULL && password != NULL) {
-        data->magic1[2] = 0x13;
-        data->magic2 = 0x01;
+	if (enable && username != NULL && password != NULL) {
+		data->magic1[2] = 0x13;
+		data->magic2 = 0x01;
 
-        strncpy((char *) data->username, username, sizeof(data->username));
-        strncpy((char *) data->password, password, sizeof(data->password));
-    }
+		strncpy((char *) data->username, username,
+			sizeof(data->username));
+		strncpy((char *) data->password, password,
+			sizeof(data->password));
+	}
 
-    return 0;
+	return 0;
 }
 
 int ipc_gprs_port_list_setup(struct ipc_gprs_port_list_data *data)
 {
-    // FIXME: These are only known-to-work values used on most devices
-    unsigned char magic[] = { 0x02, 0x04, 0x16, 0x00, 0x17, 0x00, 0x87, 0x00, 0xBD, 0x01 };
+	/* FIXME: These are only known-to-work values used on most devices */
+	unsigned char magic[] = { 0x02, 0x04, 0x16, 0x00, 0x17, 0x00, 0x87,
+				  0x00, 0xBD, 0x01 };
 
-    if (data == NULL)
-        return -1;
+	if (data == NULL)
+		return -1;
 
-    memset(data, 0, sizeof(struct ipc_gprs_port_list_data));
-    memcpy(data->magic, magic, sizeof(magic));
+	memset(data, 0, sizeof(struct ipc_gprs_port_list_data));
+	memcpy(data->magic, magic, sizeof(magic));
 
-    return 0;
+	return 0;
 }
-
-// vim:ts=4:sw=4:expandtab
