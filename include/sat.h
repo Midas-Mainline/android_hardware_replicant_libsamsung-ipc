@@ -26,18 +26,18 @@
  * Commands
  */
 
-#define IPC_SAT_PROFILE_DOWNLOAD                                0x0E01
-#define IPC_SAT_ENVELOPE_CMD                                    0x0E02
-#define IPC_SAT_PROACTIVE_CMD                                   0x0E03
-#define IPC_SAT_TERMINATE_USAT_SESSION                          0x0E04
-#define IPC_SAT_EVENT_DOWNLOAD                                  0x0E05
-#define IPC_SAT_PROVIDE_LOCAL_INFO                              0x0E06
-#define IPC_SAT_POLLING                                         0x0E07
-#define IPC_SAT_REFRESH                                         0x0E08
-#define IPC_SAT_SETUP_EVENT_LIST                                0x0E09
-#define IPC_SAT_CALL_CONTROL_RESULT                             0x0E0A
-#define IPC_SAT_IMAGE_CLUT                                      0x0E0B
-#define IPC_SAT_SETUP_CALL_PROCESSING                           0x0E0C
+#define IPC_SAT_PROFILE_DOWNLOAD				0x0E01
+#define IPC_SAT_ENVELOPE_CMD					0x0E02
+#define IPC_SAT_PROACTIVE_CMD					0x0E03
+#define IPC_SAT_TERMINATE_USAT_SESSION				0x0E04
+#define IPC_SAT_EVENT_DOWNLOAD					0x0E05
+#define IPC_SAT_PROVIDE_LOCAL_INFO				0x0E06
+#define IPC_SAT_POLLING					0x0E07
+#define IPC_SAT_REFRESH					0x0E08
+#define IPC_SAT_SETUP_EVENT_LIST				0x0E09
+#define IPC_SAT_CALL_CONTROL_RESULT				0x0E0A
+#define IPC_SAT_IMAGE_CLUT					0x0E0B
+#define IPC_SAT_SETUP_CALL_PROCESSING				0x0E0C
 
 #endif
 
