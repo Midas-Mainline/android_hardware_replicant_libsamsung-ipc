@@ -28,36 +28,34 @@
  * Commands
  */
 
-#define IPC_PWR_PHONE_PWR_UP                                    0x0101
-#define IPC_PWR_PHONE_PWR_OFF                                   0x0102
-#define IPC_PWR_PHONE_RESET                                     0x0103
-#define IPC_PWR_BATT_STATUS                                     0x0104
-#define IPC_PWR_BATT_TYPE                                       0x0105
-#define IPC_PWR_BATT_COMP                                       0x0106
-#define IPC_PWR_PHONE_STATE                                     0x0107
+#define IPC_PWR_PHONE_PWR_UP					0x0101
+#define IPC_PWR_PHONE_PWR_OFF					0x0102
+#define IPC_PWR_PHONE_RESET					0x0103
+#define IPC_PWR_BATT_STATUS					0x0104
+#define IPC_PWR_BATT_TYPE					0x0105
+#define IPC_PWR_BATT_COMP					0x0106
+#define IPC_PWR_PHONE_STATE					0x0107
 
 /*
  * Values
  */
 
-#define IPC_PWR_PHONE_STATE_REQUEST_LPM                         0x0001
-#define IPC_PWR_PHONE_STATE_REQUEST_NORMAL                      0x0202
+#define IPC_PWR_PHONE_STATE_REQUEST_LPM			0x0001
+#define IPC_PWR_PHONE_STATE_REQUEST_NORMAL			0x0202
 
-#define IPC_PWR_PHONE_STATE_RESPONSE_LPM                        0x01
-#define IPC_PWR_PHONE_STATE_RESPONSE_NORMAL                     0x02
+#define IPC_PWR_PHONE_STATE_RESPONSE_LPM			0x01
+#define IPC_PWR_PHONE_STATE_RESPONSE_NORMAL			0x02
 
 /*
  * Structures
  */
 
 struct ipc_pwr_phone_state_request_data {
-    unsigned short state; // IPC_PWR_PHONE_REQUEST_STATE
+	unsigned short state;		/* IPC_PWR_PHONE_REQUEST_STATE */
 } __attribute__((__packed__));
 
 struct ipc_pwr_phone_state_response_data {
-    unsigned char state; // IPC_PWR_PHONE_RESPONSE_STATE
+	unsigned char state;		/* IPC_PWR_PHONE_RESPONSE_STATE */
 } __attribute__((__packed__));
 
-#endif
-
-// vim:ts=4:sw=4:expandtab
+#endif /* __SAMSUNG_IPC_PWR_H__ */
