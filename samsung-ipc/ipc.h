@@ -31,72 +31,73 @@
  */
 
 struct ipc_client_ops {
-    int (*boot)(struct ipc_client *client);
-    int (*send)(struct ipc_client *client, struct ipc_message *message);
-    int (*recv)(struct ipc_client *client, struct ipc_message *message);
+	int (*boot)(struct ipc_client *client);
+	int (*send)(struct ipc_client *client, struct ipc_message *message);
+	int (*recv)(struct ipc_client *client, struct ipc_message *message);
 };
 
 struct ipc_client_handlers {
-    /* Transport handlers */
-    int (*open)(struct ipc_client *client, void *transport_data, int type);
-    int (*close)(struct ipc_client *client, void *transport_data);
+	/* Transport handlers */
+	int (*open)(struct ipc_client *client, void *transport_data, int type);
+	int (*close)(struct ipc_client *client, void *transport_data);
 
-    int (*read)(struct ipc_client *client, void *transport_data,
-                void *buffer, size_t length);
-    int (*write)(struct ipc_client *client, void *transport_data,
-                 const void *buffer, size_t length);
-    int (*poll)(struct ipc_client *client, void *transport_data,
-                struct ipc_poll_fds *fds, struct timeval *timeout);
+	int (*read)(struct ipc_client *client, void *transport_data,
+		    void *buffer, size_t length);
+	int (*write)(struct ipc_client *client, void *transport_data,
+		     const void *buffer, size_t length);
+	int (*poll)(struct ipc_client *client, void *transport_data,
+		    struct ipc_poll_fds *fds, struct timeval *timeout);
 
-    void *transport_data;
+	void *transport_data;
 
-    /* Power handlers */
-    int (*power_on)(struct ipc_client *client, void *power_data);
-    int (*power_off)(struct ipc_client *client, void *power_data);
+	/* Power handlers */
+	int (*power_on)(struct ipc_client *client, void *power_data);
+	int (*power_off)(struct ipc_client *client, void *power_data);
 
-    void *power_data;
+	void *power_data;
 
-    /* GPRS handlers */
-    int (*gprs_activate)(struct ipc_client *client, void *gprs_data,
-                         unsigned int cid);
-    int (*gprs_deactivate)(struct ipc_client *client, void *gprs_data,
-                           unsigned int cid);
+	/* GPRS handlers */
+	int (*gprs_activate)(struct ipc_client *client, void *gprs_data,
+			     unsigned int cid);
+	int (*gprs_deactivate)(struct ipc_client *client, void *gprs_data,
+			       unsigned int cid);
 
-    void *gprs_data;
+	void *gprs_data;
 
-    /* Data */
-    int (*data_create)(struct ipc_client *client, void **transport_data,
-                       void **power_data, void **gprs_data);
-    int (*data_destroy)(struct ipc_client *client, void *transport_data,
-                        void *power_data, void *gprs_data);
+	/* Data */
+	int (*data_create)(struct ipc_client *client, void **transport_data,
+			   void **power_data, void **gprs_data);
+	int (*data_destroy)(struct ipc_client *client, void *transport_data,
+			    void *power_data, void *gprs_data);
 };
 
 struct ipc_client_gprs_specs {
-    char *(*gprs_get_iface)(struct ipc_client *client, unsigned int cid);
-    int (*gprs_get_capabilities)(struct ipc_client *client,
-                                 struct ipc_client_gprs_capabilities *capabilities);
+	char *(*gprs_get_iface)(struct ipc_client *client, unsigned int cid);
+	int (*gprs_get_capabilities)(
+		struct ipc_client *client,
+		struct ipc_client_gprs_capabilities *capabilities);
 };
 
 struct ipc_client_nv_data_specs {
-    char *nv_data_path;
-    char *nv_data_md5_path;
-    char *nv_data_backup_path;
-    char *nv_data_backup_md5_path;
-    char *nv_data_secret;
-    size_t nv_data_size;
-    size_t nv_data_chunk_size;
+	char *nv_data_path;
+	char *nv_data_md5_path;
+	char *nv_data_backup_path;
+	char *nv_data_backup_md5_path;
+	char *nv_data_secret;
+	size_t nv_data_size;
+	size_t nv_data_chunk_size;
 };
 
 struct ipc_client {
-    int type;
+	int type;
 
-    void (*log_callback)(void *log_data, const char *message);
-    void *log_data;
+	void (*log_callback)(void *log_data, const char *message);
+	void *log_data;
 
-    struct ipc_client_ops *ops;
-    struct ipc_client_handlers *handlers;
-    struct ipc_client_gprs_specs *gprs_specs;
-    struct ipc_client_nv_data_specs *nv_data_specs;
+	struct ipc_client_ops *ops;
+	struct ipc_client_handlers *handlers;
+	struct ipc_client_gprs_specs *gprs_specs;
+	struct ipc_client_nv_data_specs *nv_data_specs;
 };
 
 /*
@@ -105,6 +106,4 @@ struct ipc_client {
 
 void ipc_client_log(struct ipc_client *client, const char *message, ...);
 
-#endif
-
-// vim:ts=4:sw=4:expandtab
+#endif /* __IPC_H__ */
