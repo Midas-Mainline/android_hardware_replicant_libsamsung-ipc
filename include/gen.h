@@ -27,23 +27,23 @@
  * Commands
  */
 
-#define IPC_GEN_PHONE_RES                                       0x8001
+#define IPC_GEN_PHONE_RES					0x8001
 
 /*
  * Values
  */
 
-#define IPC_GEN_PHONE_RES_CODE_SUCCESS                          0x8000
+#define IPC_GEN_PHONE_RES_CODE_SUCCESS				0x8000
 
 /*
  * Structures
  */
 
 struct ipc_gen_phone_res_data {
-    unsigned char group;
-    unsigned char index;
-    unsigned char type;
-    unsigned short code;
+	unsigned char group;
+	unsigned char index;
+	unsigned char type;
+	unsigned short code;
 } __attribute__((__packed__));
 
 /*
@@ -52,6 +52,4 @@ struct ipc_gen_phone_res_data {
 
 int ipc_gen_phone_res_check(const struct ipc_gen_phone_res_data *data);
 
-#endif
-
-// vim:ts=4:sw=4:expandtab
+#endif /* __SAMSUNG_IPC_GEN_H__ */
