@@ -26,114 +26,112 @@
 void log_callback(__attribute__((unused)) void *data,
 		  const char *message)
 {
-    char *buffer;
-    size_t length;
-    int i;
+	char *buffer;
+	size_t length;
+	int i;
 
-    if (message == NULL)
-        return;
+	if (message == NULL)
+		return;
 
-    buffer = strdup(message);
-    length = strlen(message);
+	buffer = strdup(message);
+	length = strlen(message);
 
-    for (i = length; i > 0; i--) {
-        if (buffer[i] == '\n')
-            buffer[i] = '\0';
-        else if (buffer[i] != '\0')
-            break;
-    }
+	for (i = length; i > 0; i--) {
+		if (buffer[i] == '\n')
+			buffer[i] = '\0';
+		else if (buffer[i] != '\0')
+			break;
+	}
 
-    printf("[ipc] %s\n", buffer);
+	printf("[ipc] %s\n", buffer);
 
-    free(buffer);
+	free(buffer);
 }
 
 int main(__attribute__((unused)) int args,
 	 __attribute__((unused)) char *argv[])
 {
-    struct ipc_client *client = NULL;
-    struct ipc_message message;
-    int rc;
-    int i;
+	struct ipc_client *client = NULL;
+	struct ipc_message message;
+	int rc;
+	int i;
 
-    client = ipc_client_create(IPC_CLIENT_TYPE_FMT);
-    if (client == NULL) {
-        printf("Creating client failed\n");
-        goto error;
-    }
+	client = ipc_client_create(IPC_CLIENT_TYPE_FMT);
+	if (client == NULL) {
+		printf("Creating client failed\n");
+		goto error;
+	}
 
-    rc = ipc_client_log_callback_register(client, log_callback, NULL);
-    if (rc < 0) {
-        printf("Registering log callback failed: error %d\n", rc);
-        goto error;
-    }
+	rc = ipc_client_log_callback_register(client, log_callback, NULL);
+	if (rc < 0) {
+		printf("Registering log callback failed: error %d\n", rc);
+		goto error;
+	}
 
-    rc = ipc_client_data_create(client);
-    if (rc < 0) {
-        printf("Creating data failed: error %d\n", rc);
-        goto error;
-    }
+	rc = ipc_client_data_create(client);
+	if (rc < 0) {
+		printf("Creating data failed: error %d\n", rc);
+		goto error;
+	}
 
-    rc = ipc_client_boot(client);
-    if (rc < 0) {
-        printf("Booting failed: error %d\n", rc);
-        goto error;
-    }
+	rc = ipc_client_boot(client);
+	if (rc < 0) {
+		printf("Booting failed: error %d\n", rc);
+		goto error;
+	}
 
-    rc = ipc_client_power_on(client);
-    if (rc < 0) {
-        printf("Powering on failed: error %d\n", rc);
-        goto error;
-    }
+	rc = ipc_client_power_on(client);
+	if (rc < 0) {
+		printf("Powering on failed: error %d\n", rc);
+		goto error;
+	}
 
-    rc = ipc_client_open(client);
-    if (rc < 0) {
-        printf("ipc_client_open failed: error %d\n", rc);
-        goto error;
-    }
+	rc = ipc_client_open(client);
+	if (rc < 0) {
+		printf("ipc_client_open failed: error %d\n", rc);
+		goto error;
+	}
 
-    for (i = 0; i < 5; i++) {
-        rc = ipc_client_poll(client, NULL, NULL);
-        if (rc < 0) {
-            printf("Polling failed: error %d\n", rc);
-            break;
-        }
+	for (i = 0; i < 5; i++) {
+		rc = ipc_client_poll(client, NULL, NULL);
+		if (rc < 0) {
+			printf("Polling failed: error %d\n", rc);
+			break;
+		}
 
-        rc = ipc_client_recv(client, &message);
-        if (rc < 0) {
-            printf("Receiving failed: error %d\n", rc);
-            break;
-        }
+		rc = ipc_client_recv(client, &message);
+		if (rc < 0) {
+			printf("Receiving failed: error %d\n", rc);
+			break;
+		}
 
-        if (message.data != NULL && message.size > 0) {
-            free(message.data);
-            message.data = NULL;
-        }
-    }
+		if (message.data != NULL && message.size > 0) {
+			free(message.data);
+			message.data = NULL;
+		}
+	}
 
-    rc = ipc_client_close(client);
-    if (rc < 0) {
-        printf("Closing failed: error %d\n", rc);
-        goto error;
-    }
+	rc = ipc_client_close(client);
+	if (rc < 0) {
+		printf("Closing failed: error %d\n", rc);
+		goto error;
+	}
 
-    rc = ipc_client_power_off(client);
-    if (rc < 0) {
-        printf("Powering on failed: error %d\n", rc);
-        goto error;
-    }
+	rc = ipc_client_power_off(client);
+	if (rc < 0) {
+		printf("Powering on failed: error %d\n", rc);
+		goto error;
+	}
 
-    rc = 0;
-    goto complete;
+	rc = 0;
+	goto complete;
 
 error:
-    rc = 1;
+	rc = 1;
 
 complete:
-    if (client != NULL)
-        ipc_client_destroy(client);
+	if (client != NULL)
+		ipc_client_destroy(client);
 
-    return rc;
+	return rc;
 }
-
-// vim:ts=4:sw=4:expandtab
