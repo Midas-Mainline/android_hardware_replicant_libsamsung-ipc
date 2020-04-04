@@ -25,53 +25,52 @@
 
 int ipc_misc_me_version_setup(struct ipc_misc_me_version_request_data *data)
 {
-    if (data == NULL)
-        return -1;
+	if (data == NULL)
+		return -1;
 
-    memset(data, 0, sizeof(struct ipc_misc_me_version_request_data));
-    data->magic = 0xff;
+	memset(data, 0, sizeof(struct ipc_misc_me_version_request_data));
+	data->magic = 0xff;
 
-    return 0;
+	return 0;
 }
 
 char *ipc_misc_me_imsi_imsi_extract(const void *data, size_t size)
 {
-    struct ipc_misc_me_imsi_header *header;
-    char *imsi;
-    size_t imsi_length;
+	struct ipc_misc_me_imsi_header *header;
+	char *imsi;
+	size_t imsi_length;
 
-    if (data == NULL || size < sizeof(struct ipc_misc_me_imsi_header))
-        return NULL;
+	if (data == NULL || size < sizeof(struct ipc_misc_me_imsi_header))
+		return NULL;
 
-    header = (struct ipc_misc_me_imsi_header *) data;
+	header = (struct ipc_misc_me_imsi_header *) data;
 
-    // header->length doesn't count the final null character
-    imsi_length = header->length + sizeof(char);
+	/* header->length doesn't count the final null character */
+	imsi_length = header->length + sizeof(char);
 
-    imsi = (char *) calloc(1, imsi_length);
+	imsi = (char *) calloc(1, imsi_length);
 
-    strncpy(imsi, (char *) data + sizeof(struct ipc_misc_me_imsi_header), header->length);
-    imsi[header->length] = '\0';
+	strncpy(imsi, (char *) data + sizeof(struct ipc_misc_me_imsi_header),
+		header->length);
+	imsi[header->length] = '\0';
 
-    return imsi;
+	return imsi;
 }
 
 char *ipc_misc_me_sn_extract(const struct ipc_misc_me_sn_response_data *data)
 {
-    char *string;
-    size_t length;
+	char *string;
+	size_t length;
 
-    if (data == NULL || data->length > sizeof(data->data))
-        return NULL;
+	if (data == NULL || data->length > sizeof(data->data))
+		return NULL;
 
-    length = data->length + sizeof(char);
+	length = data->length + sizeof(char);
 
-    string = (char *) calloc(1, length);
+	string = (char *) calloc(1, length);
 
-    strncpy(string, (char *) &data->data, data->length);
-    string[data->length] = '\0';
+	strncpy(string, (char *) &data->data, data->length);
+	string[data->length] = '\0';
 
-    return string;
+	return string;
 }
-
-// vim:ts=4:sw=4:expandtab
