@@ -28,57 +28,57 @@
  * Commands
  */
 
-#define IPC_MISC_ME_VERSION                                     0x0A01
-#define IPC_MISC_ME_IMSI                                        0x0A02
-#define IPC_MISC_ME_SN                                          0x0A03
-#define IPC_MISC_TIME_INFO                                      0x0A05
-#define IPC_MISC_DEBUG_LEVEL                                    0x0A0C
+#define IPC_MISC_ME_VERSION					0x0A01
+#define IPC_MISC_ME_IMSI					0x0A02
+#define IPC_MISC_ME_SN						0x0A03
+#define IPC_MISC_TIME_INFO					0x0A05
+#define IPC_MISC_DEBUG_LEVEL					0x0A0C
 
 /*
  * Values
  */
 
-#define IPC_MISC_ME_SN_SERIAL_NUM                               0x01
-#define IPC_MISC_ME_SN_SERIAL_NUM_SERIAL                        0x04
-#define IPC_MISC_ME_SN_SERIAL_NUM_MANUFACTURE_DATE              0x05
-#define IPC_MISC_ME_SN_SERIAL_NUM_BARCODE                       0x06
+#define IPC_MISC_ME_SN_SERIAL_NUM				0x01
+#define IPC_MISC_ME_SN_SERIAL_NUM_SERIAL			0x04
+#define IPC_MISC_ME_SN_SERIAL_NUM_MANUFACTURE_DATE		0x05
+#define IPC_MISC_ME_SN_SERIAL_NUM_BARCODE			0x06
 
 /*
  * Structures
  */
 
 struct ipc_misc_me_version_request_data {
-    unsigned char magic;
+	unsigned char magic;
 } __attribute__((__packed__));
 
 struct ipc_misc_me_version_response_data {
-    unsigned char unknown;
-    char software_version[32];
-    char hardware_version[32];
-    char cal_date[32];
-    char misc[32];
+	unsigned char unknown;
+	char software_version[32];
+	char hardware_version[32];
+	char cal_date[32];
+	char misc[32];
 } __attribute__((__packed__));
 
 struct ipc_misc_me_imsi_header {
-    unsigned char length;
+	unsigned char length;
 } __attribute__((__packed__));
 
 struct ipc_misc_me_sn_request_data {
-    unsigned char type; // IPC_MISC_ME_SN_SERIAL
+	unsigned char type;		/* IPC_MISC_ME_SN_SERIAL */
 } __attribute__((__packed__));
 
 struct ipc_misc_me_sn_response_data {
-    unsigned char type; // IPC_MISC_ME_SN_SERIAL
-    unsigned char length;
-    char data[32];
+	unsigned char type;		/* IPC_MISC_ME_SN_SERIAL */
+	unsigned char length;
+	char data[32];
 } __attribute__((__packed__));
 
 struct ipc_misc_time_info_data {
-    unsigned char tz_valid, daylight_valid;
-    unsigned char year, mon, day;
-    unsigned char hour, min, sec;
-    signed char tz, dl, dv;
-    char plmn[6];
+	unsigned char tz_valid, daylight_valid;
+	unsigned char year, mon, day;
+	unsigned char hour, min, sec;
+	signed char tz, dl, dv;
+	char plmn[6];
 } __attribute__((__packed__));
 
 /*
@@ -89,6 +89,4 @@ int ipc_misc_me_version_setup(struct ipc_misc_me_version_request_data *data);
 char *ipc_misc_me_imsi_imsi_extract(const void *data, size_t size);
 char *ipc_misc_me_sn_extract(const struct ipc_misc_me_sn_response_data *data);
 
-#endif
-
-// vim:ts=4:sw=4:expandtab
+#endif /*  __SAMSUNG_IPC_MISC_H__ */
