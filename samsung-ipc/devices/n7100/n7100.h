@@ -20,22 +20,22 @@
 #ifndef __N7100_H__
 #define __N7100_H__
 
-#define N7100_MODEM_IMAGE_SIZE                                  0x1000000
-#define N7100_PSI_OFFSET                                        0x1000
-#define N7100_PSI_SIZE                                          0xE000
-#define N7100_EBL_OFFSET                                        0xF000
-#define N7100_EBL_SIZE                                          0x19000
-#define N7100_SEC_START_OFFSET                                  0x9FF800
-#define N7100_SEC_START_SIZE                                    0x800
-#define N7100_FIRMWARE_OFFSET                                   0x28000
-#define N7100_FIRMWARE_SIZE                                     0x9D7800
-#define N7100_NV_DATA_OFFSET                                    0xA00000
-#define N7100_NV_DATA_SIZE                                      0x200000
+#define N7100_MODEM_IMAGE_SIZE				0x1000000
+#define N7100_PSI_OFFSET				0x1000
+#define N7100_PSI_SIZE					0xE000
+#define N7100_EBL_OFFSET				0xF000
+#define N7100_EBL_SIZE					0x19000
+#define N7100_SEC_START_OFFSET				0x9FF800
+#define N7100_SEC_START_SIZE				0x800
+#define N7100_FIRMWARE_OFFSET				0x28000
+#define N7100_FIRMWARE_SIZE				0x9D7800
+#define N7100_NV_DATA_OFFSET				0xA00000
+#define N7100_NV_DATA_SIZE				0x200000
 
-#define N7100_MODEM_IMAGE_DEVICE                "/dev/block/mmcblk0p10"
+#define N7100_MODEM_IMAGE_DEVICE			"/dev/block/mmcblk0p10"
 
 struct n7100_transport_data {
-    int fd;
+	int fd;
 };
 
 extern struct ipc_client_ops n7100_fmt_ops;
@@ -44,6 +44,4 @@ extern struct ipc_client_handlers n7100_handlers;
 extern struct ipc_client_gprs_specs n7100_gprs_specs;
 extern struct ipc_client_nv_data_specs n7100_nv_data_specs;
 
-#endif
-
-// vim:ts=4:sw=4:expandtab
+#endif /* __N7100_H__ */
