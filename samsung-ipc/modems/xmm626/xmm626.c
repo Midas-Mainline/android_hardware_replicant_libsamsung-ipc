@@ -25,19 +25,17 @@
 
 unsigned char xmm626_crc_calculate(const void *data, size_t size)
 {
-    unsigned char crc;
-    unsigned char *p;
+	unsigned char crc;
+	unsigned char *p;
 
-    if (data == NULL || size == 0)
-        return 0;
+	if (data == NULL || size == 0)
+		return 0;
 
-    p = (unsigned char *) data;
+	p = (unsigned char *) data;
 
-    crc = 0;
-    while (size--)
-        crc ^= *p++;
+	crc = 0;
+	while (size--)
+		crc ^= *p++;
 
-    return crc;
+	return crc;
 }
-
-// vim:ts=4:sw=4:expandtab

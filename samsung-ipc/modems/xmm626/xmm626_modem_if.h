@@ -36,7 +36,7 @@ enum dev_format {
 	IPC_RAMDUMP,
 	MAX_DEV_FORMAT,
 };
-#define MAX_IPC_DEV	(IPC_RFS + 1)
+#define MAX_IPC_DEV			(IPC_RFS + 1)
 
 enum modem_io {
 	IODEV_MISC,
@@ -54,7 +54,7 @@ enum modem_link {
 	LINKDEV_C2C,
 	LINKDEV_MAX,
 };
-#define LINKTYPE(modem_link) (1u << (modem_link))
+#define LINKTYPE(modem_link)		(1u << (modem_link))
 
 enum modem_network {
 	UMTS_NETWORK,
@@ -71,4 +71,4 @@ enum sipc_ver {
 	MAX_SIPC_VER,
 };
 
-#endif
+#endif /* __MODEM_IF_H__ */
