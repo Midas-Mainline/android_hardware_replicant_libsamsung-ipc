@@ -27,12 +27,12 @@
 
 #include <sys/socket.h>
 #ifndef AF_PHONET
-#define AF_PHONET 35
-#define PF_PHONET AF_PHONET
+#define AF_PHONET		35
+#define PF_PHONET		AF_PHONET
 #endif
 
 #define PN_PROTO_TRANSPORT	0
-#define PN_PROTO_PHONET		1
+#define PN_PROTO_PHONET	1
 #define PN_PROTO_PIPE		2
 
 #define SOL_PNPIPE		275
@@ -41,9 +41,9 @@
 #define PNPIPE_IFINDEX		2
 
 #define PNPIPE_ENCAP_NONE	0
-#define PNPIPE_ENCAP_IP		1
+#define PNPIPE_ENCAP_IP	1
 
-#define SIOCPNGETOBJECT		(SIOCPROTOPRIVATE + 0)
+#define SIOCPNGETOBJECT	(SIOCPROTOPRIVATE + 0)
 #define SIOCPNADDRESOURCE	(SIOCPROTOPRIVATE + 14)
 #define SIOCPNDELRESOURCE	(SIOCPROTOPRIVATE + 15)
 
@@ -57,7 +57,7 @@ struct sockaddr_pn {
 
 #include <linux/rtnetlink.h>
 #ifndef RTNLGRP_PHONET_IFADDR
-#define RTNLGRP_PHONET_IFADDR 21
+#define RTNLGRP_PHONET_IFADDR	21
 #endif
 
 #endif

@@ -23,8 +23,8 @@
 
 #include <linux/ioctl.h>
 
-#define ONEDRAM_GET_AUTH _IOW('o', 0x20, u32)
-#define ONEDRAM_PUT_AUTH _IO('o', 0x21)
-#define ONEDRAM_REL_SEM _IO('o', 0x22)
+#define ONEDRAM_GET_AUTH	_IOW('o', 0x20, u32)
+#define ONEDRAM_PUT_AUTH	_IO('o', 0x21)
+#define ONEDRAM_REL_SEM	_IO('o', 0x22)
 
 #endif /* __ONEDRAM_H__ */
