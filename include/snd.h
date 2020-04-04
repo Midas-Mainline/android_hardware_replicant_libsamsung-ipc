@@ -26,54 +26,52 @@
  * Commands
  */
 
-#define IPC_SND_SPKR_VOLUME_CTRL                                0x0901
-#define IPC_SND_MIC_MUTE_CTRL                                   0x0902
-#define IPC_SND_AUDIO_PATH_CTRL                                 0x0903
-#define IPC_SND_AUDIO_SOURCE_CTRL                               0x0904
-#define IPC_SND_LOOPBACK_CTRL                                   0x0905
-#define IPC_SND_VOICE_RECORDING_CTRL                            0x0906
-#define IPC_SND_VIDEO_CALL_CTRL                                 0x0907
-#define IPC_SND_RINGBACK_TONE_CTRL                              0x0908
-#define IPC_SND_CLOCK_CTRL                                      0x0909
-#define IPC_SND_WB_AMR_STATUS                                   0x090A
+#define IPC_SND_SPKR_VOLUME_CTRL				0x0901
+#define IPC_SND_MIC_MUTE_CTRL					0x0902
+#define IPC_SND_AUDIO_PATH_CTRL				0x0903
+#define IPC_SND_AUDIO_SOURCE_CTRL				0x0904
+#define IPC_SND_LOOPBACK_CTRL					0x0905
+#define IPC_SND_VOICE_RECORDING_CTRL				0x0906
+#define IPC_SND_VIDEO_CALL_CTRL				0x0907
+#define IPC_SND_RINGBACK_TONE_CTRL				0x0908
+#define IPC_SND_CLOCK_CTRL					0x0909
+#define IPC_SND_WB_AMR_STATUS					0x090A
 
 /*
  * Values
  */
 
-#define IPC_SND_VOLUME_TYPE_VOICE                               0x01
-#define IPC_SND_VOLUME_TYPE_SPEAKER                             0x11
-#define IPC_SND_VOLUME_TYPE_HEADSET                             0x31
-#define IPC_SND_VOLUME_TYPE_BTVOICE                             0x41
+#define IPC_SND_VOLUME_TYPE_VOICE				0x01
+#define IPC_SND_VOLUME_TYPE_SPEAKER				0x11
+#define IPC_SND_VOLUME_TYPE_HEADSET				0x31
+#define IPC_SND_VOLUME_TYPE_BTVOICE				0x41
 
-#define IPC_SND_AUDIO_PATH_HANDSET                              0x01
-#define IPC_SND_AUDIO_PATH_HEADSET                              0x02
-#define IPC_SND_AUDIO_PATH_SPEAKER                              0x06
-#define IPC_SND_AUDIO_PATH_BLUETOOTH                            0x04
-#define IPC_SND_AUDIO_PATH_BLUETOOTH_NO_NR                      0x08
-#define IPC_SND_AUDIO_PATH_HEADPHONE                            0x07
+#define IPC_SND_AUDIO_PATH_HANDSET				0x01
+#define IPC_SND_AUDIO_PATH_HEADSET				0x02
+#define IPC_SND_AUDIO_PATH_SPEAKER				0x06
+#define IPC_SND_AUDIO_PATH_BLUETOOTH				0x04
+#define IPC_SND_AUDIO_PATH_BLUETOOTH_NO_NR			0x08
+#define IPC_SND_AUDIO_PATH_HEADPHONE				0x07
 
 /*
  * Structures
  */
 
 struct ipc_snd_spkr_volume_ctrl_data {
-    unsigned char type; // IPC_SND_VOLUME_TYPE
-    unsigned char volume;
+	unsigned char type;			/* IPC_SND_VOLUME_TYPE */
+	unsigned char volume;
 } __attribute__((__packed__));
 
 struct ipc_snd_mic_mute_ctrl_data {
-    unsigned char mute;
+	unsigned char mute;
 } __attribute__((__packed__));
 
 struct ipc_snd_audio_path_ctrl_data {
-    unsigned char path; // IPC_SND_AUDIO_PATH
+	unsigned char path;			/* IPC_SND_AUDIO_PATH */
 } __attribute__((__packed__));
 
 struct ipc_snd_clock_ctrl_data {
-    unsigned char sync;
+	unsigned char sync;
 } __attribute__((__packed__));
 
-#endif
-
-// vim:ts=4:sw=4:expandtab
+#endif /* __SAMSUNG_IPC_SND_H__ */
