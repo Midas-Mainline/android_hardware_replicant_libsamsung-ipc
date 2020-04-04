@@ -26,9 +26,7 @@
  * Commands
  */
 
-#define IPC_IMEI_START                                          0x1001
-#define IPC_IMEI_CHECK_DEVICE_INFO                              0x1002
+#define IPC_IMEI_START						0x1001
+#define IPC_IMEI_CHECK_DEVICE_INFO				0x1002
 
-#endif
-
-// vim:ts=4:sw=4:expandtab
+#endif /* __SAMSUNG_IPC_IMEI_H__ */
