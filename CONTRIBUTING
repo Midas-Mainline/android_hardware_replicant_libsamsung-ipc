@@ -1,0 +1,46 @@
+How to Contribute to libsamsung-ipc
+===================================
+
+The upstream source code for libsamsung-ipc is available here:
+https://git.replicant.us/replicant/hardware_replicant_libsamsung-ipc
+
+Policies
+--------
+While at the time of writing, Replicant is the main user of libsamsung-ipc, and
+maintain it, libsamsung-ipc usage is not limited to Replicant nor Android.
+
+In the past, libsamsung-ipc was used in the SHR GNU/Linux distribution
+as well, with the freesmartphone.org middleware.
+
+This has some consequences:
+- When doing changes to the build system, we need to make sure that both the
+  Android.mk and the Autotools related files are updated.
+- The decisions to not to support certain smartphones and tablets in Replicant
+  don't apply to libsamsung-ipc as libsamsung-ipc can also be used by other
+  distributions that might want to support such devices.
+- While it's not possible to version libraries in Android yet, we still need to
+  think about updating the soname in the Autotools build system when breaking
+  the API or ABI.
+
+In order to enable people to use libsamsung-ipc from git without silent
+breakages, we decided to update the soname at each incompatible changes.
+
+Code style and commits:
+-----------------------
+Libsamsung-ipc follows the Linux code style as other projects like oFono also
+use a similar code style, and that several people working on libsamsung-ipc
+are used to it as they contributed to the Linux kernel too.
+
+It also enables to reuse the tools used by Linux to check the code style, which
+fit well into the workflow that is already in use for sending patches.
+
+Sending patches:
+----------------
+Patches for libsamsung-ipc are reviewed on the Replicant mailing list[1]. That
+mailing list is also used for many other Replicant topics, but at the time of
+writing it's not a very high traffic mailing list.
+
+As libsamsung-ipc is heavily used by Replicant, it also increase the number
+of people interested in reviewing patches.
+
+[1]https://lists.osuosl.org/mailman/listinfo/replicant
