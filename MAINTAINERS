@@ -1,7 +1,8 @@
-Paul Kocialkowski
-E-Mail: contact@paulk.fr
-Userid: paulk
-
-Simon Busch
-E-Mail: morphis@gravedo.de
-Userid: morphis
+Maintainers List
+----------------
+M:	Denis 'GNUtoo' Carikli <GNUtoo@cyberdimension.org>
+L:	replicant@osuosl.org
+T:	git git://git.replicant.us/replicant/external_libsamsung-ipc.git
+S:	Maintained
+F:	*
+F:	*/
