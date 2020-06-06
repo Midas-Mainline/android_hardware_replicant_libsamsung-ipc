@@ -29,7 +29,9 @@ import sh
 import sys
 
 def usage(progname):
-    print("{} <revision_range>".format(progname))
+    print("Usage: {} <revision_range> [-f]".format(progname))
+    print("       -f\tfull check: "
+          "verify if all the repository files have been checked")
     sys.exit(1)
 
 def run(*args):
@@ -54,7 +56,15 @@ def git_get_diffed_files(commit1, commit2):
 def git_get_commit_list(revision_range):
     return git_log_oneline(revision_range, '--reverse', '--format=%h')
 
-def checkpatch(revision_range):
+def get_revision_files(revision):
+    return git("ls-tree", "--name-only", '-r', revision).split(os.linesep)[:-1]
+
+def checkpatch(revision_range, full_check=False):
+    repository_files = []
+    if full_check:
+        last_commit = git_get_commit_list(revision_range)[-1]
+        repository_files = get_revision_files(last_commit)
+
     for commit in git_get_commit_list(revision_range):
         print("Checking {}".format(git_log_oneline(commit)[0]))
 
@@ -74,10 +84,22 @@ def checkpatch(revision_range):
                 print("  [  OK  ] {}".format(modified_file))
             except:
                 print("  [  !!  ] {}".format(modified_file))
+            if full_check:
+                if modified_file in repository_files:
+                    repository_files.remove(modified_file)
+
+    if full_check:
+        if len(repository_files) > 0:
+            print("Files not in {}:".format(revision_range))
+            for path in repository_files:
+                print("  [  !!  ] {}".format(path))
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if len(sys.argv) == 2:
+        revision_range = sys.argv[1]
+        checkpatch(revision_range)
+    elif len(sys.argv) == 3 and sys.argv[2] == "-f":
+        revision_range = sys.argv[1]
+        checkpatch(revision_range, full_check=True)
+    else:
         usage(sys.argv[0])
-
-    revision_range = sys.argv[1]
-    checkpatch(revision_range)
