@@ -59,6 +59,14 @@ def git_get_commit_list(revision_range):
 def get_revision_files(revision):
     return git("ls-tree", "--name-only", '-r', revision).split(os.linesep)[:-1]
 
+def check_file(filepath):
+    try:
+        file_report = run("scripts" + os.sep + "checkpatch.pl",
+                          "-f", filepath)
+        print("  [  OK  ] {}".format(filepath))
+    except:
+        print("  [  !!  ] {}".format(filepath))
+
 def checkpatch(revision_range, full_check=False):
     repository_files = []
     if full_check:
@@ -78,12 +86,7 @@ def checkpatch(revision_range, full_check=False):
         # Check the files of the commit
         modified_files = git_get_diffed_files(commit, commit + "~1")
         for modified_file in modified_files:
-            try:
-                file_report = run("scripts" + os.sep + "checkpatch.pl",
-                                  "-f", modified_file)
-                print("  [  OK  ] {}".format(modified_file))
-            except:
-                print("  [  !!  ] {}".format(modified_file))
+            check_file(modified_file)
             if full_check:
                 if modified_file in repository_files:
                     repository_files.remove(modified_file)
@@ -92,7 +95,7 @@ def checkpatch(revision_range, full_check=False):
         if len(repository_files) > 0:
             print("Files not in {}:".format(revision_range))
             for path in repository_files:
-                print("  [  !!  ] {}".format(path))
+                check_file(path)
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
