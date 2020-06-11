@@ -34,7 +34,7 @@
 #define IPC_SEC_RSIM_ACCESS                                     0x0505
 #define IPC_SEC_GSIM_ACCESS                                     0x0506
 #define IPC_SEC_SIM_ICC_TYPE                                    0x0507
-#define IPC_SEC_LOCK_INFOMATION                                 0x0508
+#define IPC_SEC_LOCK_INFORMATION                                0x0508
 #define IPC_SEC_IMS_AUTH                                        0x0509
 
 /*

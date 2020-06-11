@@ -165,8 +165,8 @@ const char *ipc_command_string(unsigned short command)
             return "IPC_SEC_GSIM_ACCESS";
         case IPC_SEC_SIM_ICC_TYPE:
             return "IPC_SEC_SIM_ICC_TYPE";
-        case IPC_SEC_LOCK_INFOMATION:
-            return "IPC_SEC_LOCK_INFOMATION";
+        case IPC_SEC_LOCK_INFORMATION:
+            return "IPC_SEC_LOCK_INFORMATION";
         case IPC_SEC_IMS_AUTH:
             return "IPC_SEC_IMS_AUTH";
         case IPC_PB_ACCESS:
