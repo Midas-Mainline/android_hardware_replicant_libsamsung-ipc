@@ -71,7 +71,7 @@
 #define IPC_GPRS_FAIL_CAUSE_REACT_REQUIRED                      0x0010
 #define IPC_GPRS_FAIL_CAUSE_FEATURE_NOT_SUPPORTED               0x0011
 #define IPC_GPRS_FAIL_CAUSE_TFT_FILTER_ERROR                    0x0012
-#define IPC_GPRS_FAIL_CAUSE_UNKOWN_PDP_CONTEXT                  0x0013
+#define IPC_GPRS_FAIL_CAUSE_UNKNOWN_PDP_CONTEXT                 0x0013
 #define IPC_GPRS_FAIL_CAUSE_INVALID_MSG                         0x0014
 #define IPC_GPRS_FAIL_CAUSE_PROTOCOL_ERROR                      0x0015
 #define IPC_GPRS_FAIL_CAUSE_MOBILE_FAILURE_ERROR                0x0016
