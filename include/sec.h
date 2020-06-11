@@ -155,7 +155,7 @@ struct ipc_sec_lock_information_request_data {
     unsigned char type; // IPC_SEC_PIN_TYPE
 } __attribute__((__packed__));
 
-struct ipc_sec_lock_infomation_response_data {
+struct ipc_sec_lock_information_response_data {
     unsigned char unknown;
     unsigned char type; // IPC_SEC_PIN_TYPE
     unsigned char key;
