@@ -199,13 +199,13 @@ void *ipc_sec_rsim_access_extract(const void *data, size_t size)
     return rsim_data;
 }
 
-int ipc_sec_lock_information_setup(struct ipc_sec_lock_infomation_request_data *data,
+int ipc_sec_lock_information_setup(struct ipc_sec_lock_information_request_data *data,
     unsigned char type)
 {
     if (data == NULL)
         return -1;
 
-    memset(data, 0, sizeof(struct ipc_sec_lock_infomation_request_data));
+    memset(data, 0, sizeof(struct ipc_sec_lock_information_request_data));
     data->magic = 0x01;
     data->type = type;
 
