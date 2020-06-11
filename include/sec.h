@@ -179,7 +179,7 @@ void *ipc_sec_rsim_access_setup(struct ipc_sec_rsim_access_request_header *heade
     const void *sim_io_data, size_t sim_io_size);
 size_t ipc_sec_rsim_access_size_extract(const void *data, size_t size);
 void *ipc_sec_rsim_access_extract(const void *data, size_t size);
-int ipc_sec_lock_infomation_setup(struct ipc_sec_lock_infomation_request_data *data,
+int ipc_sec_lock_information_setup(struct ipc_sec_lock_infomation_request_data *data,
     unsigned char type);
 
 #endif
