@@ -77,7 +77,7 @@ libsamsung_ipc_local_src_files := \
 	samsung-ipc/rfs.c \
 	samsung-ipc/gen.c
 
-libsamsung_ipc_local_copy_headers := \
+libsamsung_ipc_local_export_headers := \
 	include/call.h \
 	include/disp.h \
 	include/gen.h \
@@ -98,7 +98,7 @@ libsamsung_ipc_local_copy_headers := \
 	include/svc.h \
 
 local_export_c_include_dirs := \
-	$(TARGET_OUT_HEADERS)/libsamsung-ipc
+	$(LOCAL_PATH)/include
 
 libsamsung_ipc_local_c_includes := \
 	$(LOCAL_PATH)/include \
@@ -130,10 +130,6 @@ LOCAL_C_INCLUDES := $(libsamsung_ipc_local_c_includes)
 
 LOCAL_CFLAGS := $(libsamsung_local_cflags)
 LOCAL_SHARED_LIBRARIES := $(libsamsung_ipc_local_shared_libraries)
-
-LOCAL_COPY_HEADERS_TO := libsamsung-ipc
-LOCAL_COPY_HEADERS := $(libsamsung_ipc_local_copy_headers)
-
 LOCAL_EXPORT_C_INCLUDE_DIRS := $(local_export_c_include_dirs)
 
 include $(BUILD_STATIC_LIBRARY)
@@ -152,7 +148,6 @@ LOCAL_C_INCLUDES := $(libsamsung_ipc_local_c_includes)
 
 LOCAL_CFLAGS := $(libsamsung_local_cflags)
 LOCAL_SHARED_LIBRARIES := $(libsamsung_ipc_local_shared_libraries)
-
 LOCAL_EXPORT_C_INCLUDE_DIRS := $(local_export_c_include_dirs)
 
 include $(BUILD_SHARED_LIBRARY)
