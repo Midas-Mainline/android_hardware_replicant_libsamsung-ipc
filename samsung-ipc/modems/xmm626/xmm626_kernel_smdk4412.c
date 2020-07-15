@@ -30,7 +30,6 @@
 #include <samsung-ipc.h>
 #include <ipc.h>
 
-#include "xmm626_modem_if.h"
 #include "xmm626_modem_prj.h"
 #include "xmm626_modem_link_device_hsic.h"
 
