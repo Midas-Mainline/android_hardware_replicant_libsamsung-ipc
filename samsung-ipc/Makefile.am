@@ -3,9 +3,6 @@ NULL =
 AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/samsung-ipc \
-	-I$(top_srcdir)/samsung-ipc/devices \
-	-I$(top_srcdir)/samsung-ipc/modems/xmm616 \
-	-I$(top_srcdir)/samsung-ipc/modems/xmm626 \
 	$(OPENSSL_CFLAGS) \
 	$(NULL)
 

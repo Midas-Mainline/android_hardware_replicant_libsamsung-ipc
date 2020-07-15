@@ -29,8 +29,8 @@
 
 #include <samsung-ipc.h>
 
-#include "xmm626.h"
-#include "xmm626_hsic.h"
+#include "modems/xmm626/xmm626.h"
+#include "modems/xmm626/xmm626_hsic.h"
 
 int xmm626_hsic_ack_read(int device_fd, unsigned short ack)
 {

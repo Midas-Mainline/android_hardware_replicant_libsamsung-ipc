@@ -25,11 +25,11 @@
 
 #include <samsung-ipc.h>
 
-#include "i9300.h"
 #include "ipc.h"
-#include "xmm626.h"
-#include "xmm626_hsic.h"
-#include "xmm626_kernel_smdk4412.h"
+#include "devices/i9300/i9300.h"
+#include "modems/xmm626/xmm626.h"
+#include "modems/xmm626/xmm626_hsic.h"
+#include "modems/xmm626/xmm626_kernel_smdk4412.h"
 
 int i9300_boot(struct ipc_client *client)
 {

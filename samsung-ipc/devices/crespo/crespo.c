@@ -31,10 +31,10 @@
 
 #include <samsung-ipc.h>
 
-#include "crespo.h"
-#include "crespo_modem_ctl.h"
 #include "ipc.h"
-#include "xmm616.h"
+#include "devices/crespo/crespo.h"
+#include "devices/crespo/crespo_modem_ctl.h"
+#include "modems/xmm616/xmm616.h"
 
 int crespo_boot(struct ipc_client *client)
 {

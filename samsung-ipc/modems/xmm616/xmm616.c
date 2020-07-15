@@ -27,7 +27,7 @@
 
 #include <samsung-ipc.h>
 
-#include "xmm616.h"
+#include "modems/xmm616/xmm616.h"
 
 int xmm616_psi_send(struct ipc_client *client, int serial_fd,
 		    const void *psi_data, unsigned short psi_size)

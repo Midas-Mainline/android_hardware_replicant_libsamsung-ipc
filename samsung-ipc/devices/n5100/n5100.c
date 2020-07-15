@@ -27,10 +27,10 @@
 #include <samsung-ipc.h>
 
 #include "ipc.h"
-#include "n5100.h"
-#include "xmm626.h"
-#include "xmm626_hsic.h"
-#include "xmm626_kernel_smdk4412.h"
+#include "devices/n5100/n5100.h"
+#include "modems/xmm626/xmm626.h"
+#include "modems/xmm626/xmm626_hsic.h"
+#include "modems/xmm626/xmm626_kernel_smdk4412.h"
 
 int n5100_boot(struct ipc_client *client)
 {

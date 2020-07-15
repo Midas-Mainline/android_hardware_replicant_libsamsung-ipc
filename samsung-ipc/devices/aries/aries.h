@@ -18,7 +18,7 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "phonet.h"
+#include "devices/aries/phonet.h"
 
 #ifndef __ARIES_H__
 #define __ARIES_H__

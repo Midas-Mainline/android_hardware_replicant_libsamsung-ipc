@@ -29,8 +29,8 @@
 
 #include <samsung-ipc.h>
 
-#include "xmm626.h"
-#include "xmm626_mipi.h"
+#include "modems/xmm626/xmm626.h"
+#include "modems/xmm626/xmm626_mipi.h"
 
 int xmm626_mipi_crc_calculate(const void *data, size_t size)
 {

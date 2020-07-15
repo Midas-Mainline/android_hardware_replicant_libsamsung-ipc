@@ -103,9 +103,6 @@ local_export_c_include_dirs := \
 libsamsung_ipc_local_c_includes := \
 	$(LOCAL_PATH)/include \
 	$(LOCAL_PATH)/samsung-ipc \
-	$(LOCAL_PATH)/samsung-ipc/devices/ \
-	$(LOCAL_PATH)/samsung-ipc/modems/xmm616/ \
-	$(LOCAL_PATH)/samsung-ipc/modems/xmm626/ \
 	external/openssl/include
 
 libsamsung_local_cflags := \

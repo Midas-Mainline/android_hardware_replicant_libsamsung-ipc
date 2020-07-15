@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <sys/ioctl.h>
 
-#include "xmm626.h"
+#include "modems/xmm626/xmm626.h"
 
 unsigned char xmm626_crc_calculate(const void *data, size_t size)
 {

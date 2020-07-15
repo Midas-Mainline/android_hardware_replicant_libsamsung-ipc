@@ -21,7 +21,7 @@
 
 #include <samsung-ipc.h>
 
-#include "ipc_devices.h"
+#include "devices/ipc_devices.h"
 
 struct ipc_device_desc ipc_devices[] = {
 	{

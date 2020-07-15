@@ -27,10 +27,10 @@
 #include <samsung-ipc.h>
 
 #include "ipc.h"
-#include "maguro.h"
-#include "xmm626.h"
-#include "xmm626_mipi.h"
-#include "xmm626_kernel_smdk4412.h"
+#include "devices/maguro/maguro.h"
+#include "modems/xmm626/xmm626.h"
+#include "modems/xmm626/xmm626_kernel_smdk4412.h"
+#include "modems/xmm626/xmm626_mipi.h"
 
 int maguro_boot(struct ipc_client *client)
 {

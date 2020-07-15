@@ -34,11 +34,11 @@
 
 #include <samsung-ipc.h>
 
-#include "aries.h"
 #include "ipc.h"
-#include "onedram.h"
-#include "phonet.h"
-#include "xmm616.h"
+#include "devices/aries/aries.h"
+#include "devices/aries/onedram.h"
+#include "devices/aries/phonet.h"
+#include "modems/xmm616/xmm616.h"
 
 int aries_boot(struct ipc_client *client)
 {

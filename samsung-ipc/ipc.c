@@ -39,7 +39,7 @@
 #include <samsung-ipc.h>
 
 #include "ipc.h"
-#include "ipc_devices.h"
+#include "devices/ipc_devices.h"
 
 int ipc_device_detect(void)
 {
