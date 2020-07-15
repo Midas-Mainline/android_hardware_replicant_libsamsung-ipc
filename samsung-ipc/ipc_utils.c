@@ -30,7 +30,8 @@
 #include <asm/types.h>
 
 #include <samsung-ipc.h>
-#include <ipc.h>
+
+#include "ipc.h"
 
 int ipc_seq_valid(unsigned char seq)
 {

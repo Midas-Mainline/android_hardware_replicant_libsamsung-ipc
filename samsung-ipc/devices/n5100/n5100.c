@@ -24,9 +24,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <ipc.h>
 #include <samsung-ipc.h>
 
+#include "ipc.h"
 #include "n5100.h"
 #include "xmm626.h"
 #include "xmm626_hsic.h"

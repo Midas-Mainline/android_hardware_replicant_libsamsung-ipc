@@ -32,10 +32,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <ipc.h>
 #include <samsung-ipc.h>
 
 #include "aries.h"
+#include "ipc.h"
 #include "onedram.h"
 #include "phonet.h"
 #include "xmm616.h"

@@ -30,7 +30,7 @@
 
 #include <samsung-ipc.h>
 
-#include <ipc.h>
+#include "ipc.h"
 
 char *ipc_nv_data_md5_calculate(struct ipc_client *client,
 				const char *path, const char *secret,

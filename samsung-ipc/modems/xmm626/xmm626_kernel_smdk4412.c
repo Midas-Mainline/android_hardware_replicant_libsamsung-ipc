@@ -28,13 +28,12 @@
 #include <sys/select.h>
 
 #include <samsung-ipc.h>
-#include <ipc.h>
 
-#include "xmm626_modem_prj.h"
-#include "xmm626_modem_link_device_hsic.h"
-
+#include "ipc.h"
 #include "xmm626.h"
 #include "xmm626_kernel_smdk4412.h"
+#include "xmm626_modem_link_device_hsic.h"
+#include "xmm626_modem_prj.h"
 
 int xmm626_kernel_smdk4412_power(
 	__attribute__((unused)) struct ipc_client *client, int device_fd,
