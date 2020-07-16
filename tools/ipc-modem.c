@@ -18,19 +18,20 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <termios.h>
 #include <fcntl.h>
+#include <getopt.h>
+#include <pthread.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <termios.h>
+#include <unistd.h>
 #include <string.h>
+
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <pthread.h>
-#include <getopt.h>
 
 #include <samsung-ipc.h>
 

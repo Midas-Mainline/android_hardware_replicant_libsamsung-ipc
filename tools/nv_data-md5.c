@@ -17,12 +17,13 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <sys/types.h>
 
 #include <samsung-ipc.h>
-#include <string.h>
 
 void usage_print(void)
 {
