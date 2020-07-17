@@ -33,7 +33,8 @@
 #include "modems/xmm626/xmm626.h"
 #include "modems/xmm626/xmm626_hsic.h"
 
-int xmm626_hsic_ack_read(int device_fd, unsigned short ack)
+int xmm626_hsic_ack_read(__attribute__((unused)) struct ipc_client *client,
+			  int device_fd, unsigned short ack)
 {
 	struct timeval timeout;
 	fd_set fds;
@@ -215,7 +216,7 @@ int xmm626_hsic_psi_send(struct ipc_client *client, int device_fd,
 	}
 	ipc_client_log(client, "Read PSI CRC ACK");
 
-	rc = xmm626_hsic_ack_read(device_fd, XMM626_HSIC_PSI_ACK);
+	rc = xmm626_hsic_ack_read(client, device_fd, XMM626_HSIC_PSI_ACK);
 	if (rc < 0) {
 		ipc_client_log(client, "Reading PSI ACK failed");
 		goto error;
@@ -257,7 +258,7 @@ int xmm626_hsic_ebl_send(struct ipc_client *client, int device_fd,
 	}
 	ipc_client_log(client, "Wrote EBL size");
 
-	rc = xmm626_hsic_ack_read(device_fd, XMM626_HSIC_EBL_SIZE_ACK);
+	rc = xmm626_hsic_ack_read(client, device_fd, XMM626_HSIC_EBL_SIZE_ACK);
 	if (rc < 0) {
 		ipc_client_log(client, "Reading EBL size ACK failed");
 		goto error;
@@ -291,7 +292,7 @@ int xmm626_hsic_ebl_send(struct ipc_client *client, int device_fd,
 	}
 	ipc_client_log(client, "Wrote EBL CRC (0x%x)", ebl_crc);
 
-	rc = xmm626_hsic_ack_read(device_fd, XMM626_HSIC_EBL_ACK);
+	rc = xmm626_hsic_ack_read(client, device_fd, XMM626_HSIC_EBL_ACK);
 	if (rc < 0) {
 		ipc_client_log(client, "Reading EBL ACK failed");
 		goto error;
