@@ -43,7 +43,8 @@ int xmm626_mipi_crc_calculate(const void *data, size_t size)
 	return mipi_crc;
 }
 
-int xmm626_mipi_ack_read(int device_fd, unsigned short ack)
+int xmm626_mipi_ack_read(__attribute__((unused)) struct ipc_client *client,
+			 int device_fd, unsigned short ack)
 {
 	struct timeval timeout;
 	fd_set fds;
@@ -123,7 +124,7 @@ int xmm626_mipi_psi_send(struct ipc_client *client, int device_fd,
 		}
 	} while (rc == 0);
 
-	rc = xmm626_mipi_ack_read(device_fd, XMM626_MIPI_BOOT0_ACK);
+	rc = xmm626_mipi_ack_read(client, device_fd, XMM626_MIPI_BOOT0_ACK);
 	if (rc < 0) {
 		ipc_client_log(client, "Reading boot ACK failed");
 		goto error;
@@ -165,7 +166,7 @@ int xmm626_mipi_psi_send(struct ipc_client *client, int device_fd,
 	}
 	ipc_client_log(client, "Wrote PSI CRC (0x%x)", psi_crc);
 
-	rc = xmm626_mipi_ack_read(device_fd, XMM626_MIPI_PSI_ACK);
+	rc = xmm626_mipi_ack_read(client, device_fd, XMM626_MIPI_PSI_ACK);
 	if (rc < 0) {
 		ipc_client_log(client, "Reading PSI ACK failed");
 		goto error;
@@ -219,7 +220,7 @@ int xmm626_mipi_ebl_send(struct ipc_client *client, int device_fd,
 	}
 	ipc_client_log(client, "Wrote boot magic");
 
-	rc = xmm626_mipi_ack_read(device_fd, XMM626_MIPI_BOOT1_ACK);
+	rc = xmm626_mipi_ack_read(client, device_fd, XMM626_MIPI_BOOT1_ACK);
 	if (rc < 0) {
 		ipc_client_log(client, "Reading boot magic ACK failed");
 		goto error;
@@ -240,7 +241,7 @@ int xmm626_mipi_ebl_send(struct ipc_client *client, int device_fd,
 	}
 	ipc_client_log(client, "Wrote EBL size");
 
-	rc = xmm626_mipi_ack_read(device_fd, XMM626_MIPI_EBL_SIZE_ACK);
+	rc = xmm626_mipi_ack_read(client, device_fd, XMM626_MIPI_EBL_SIZE_ACK);
 	if (rc < 0) {
 		ipc_client_log(client, "Reading EBL size ACK failed");
 		goto error;
@@ -284,7 +285,7 @@ int xmm626_mipi_ebl_send(struct ipc_client *client, int device_fd,
 	}
 	ipc_client_log(client, "Wrote EBL CRC (0x%x)", ebl_crc);
 
-	rc = xmm626_mipi_ack_read(device_fd, XMM626_MIPI_EBL_ACK);
+	rc = xmm626_mipi_ack_read(client, device_fd, XMM626_MIPI_EBL_ACK);
 	if (rc < 0) {
 		ipc_client_log(client, "Reading EBL ACK failed");
 		goto error;
