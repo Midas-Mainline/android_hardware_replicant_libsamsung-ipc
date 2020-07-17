@@ -300,7 +300,8 @@ complete:
 	return rc;
 }
 
-int xmm626_mipi_command_send(int device_fd, unsigned short code,
+int xmm626_mipi_command_send(__attribute__((unused)) struct ipc_client *client,
+			     int device_fd, unsigned short code,
 			     const void *data, size_t size, int ack,
 			     int short_footer)
 {
@@ -419,8 +420,7 @@ complete:
 	return rc;
 }
 
-int xmm626_mipi_modem_data_send(
-	__attribute__((unused)) struct ipc_client *client,
+int xmm626_mipi_modem_data_send(struct ipc_client *client,
 	int device_fd, const void *data, size_t size,
 	int address)
 {
@@ -433,7 +433,7 @@ int xmm626_mipi_modem_data_send(
 	if (device_fd < 0 || data == NULL || size == 0)
 		return -1;
 
-	rc = xmm626_mipi_command_send(device_fd,
+	rc = xmm626_mipi_command_send(client, device_fd,
 				      XMM626_COMMAND_FLASH_SET_ADDRESS,
 				      &address, sizeof(address), 1, 0);
 	if (rc < 0)
@@ -446,7 +446,7 @@ int xmm626_mipi_modem_data_send(
 	while (c < size) {
 		count = chunk < size - c ? chunk : size - c;
 
-		rc = xmm626_mipi_command_send(device_fd,
+		rc = xmm626_mipi_command_send(client, device_fd,
 					      XMM626_COMMAND_FLASH_WRITE_BLOCK,
 					      p, count, 1, 1);
 		if (rc < 0)
@@ -522,8 +522,9 @@ int xmm626_mipi_port_config_send(struct ipc_client *client, int device_fd)
 	}
 	ipc_client_log(client, "Read port config");
 
-	rc = xmm626_mipi_command_send(device_fd, XMM626_COMMAND_SET_PORT_CONFIG,
-				      buffer, length, 1, 0);
+	rc = xmm626_mipi_command_send(client, device_fd,
+				      XMM626_COMMAND_SET_PORT_CONFIG, buffer,
+				      length, 1, 0);
 	if (rc < 0) {
 		ipc_client_log(client, "Sending port config command failed");
 		goto error;
@@ -552,8 +553,9 @@ int xmm626_mipi_sec_start_send(struct ipc_client *client, int device_fd,
 		return -1;
 	}
 
-	rc = xmm626_mipi_command_send(device_fd, XMM626_COMMAND_SEC_START,
-				      sec_data, sec_size, 1, 0);
+	rc = xmm626_mipi_command_send(client, device_fd,
+				      XMM626_COMMAND_SEC_START, sec_data,
+				      sec_size, 1, 0);
 	if (rc < 0)
 		return -1;
 
@@ -572,7 +574,7 @@ int xmm626_mipi_sec_end_send(struct ipc_client *client, int device_fd)
 	sec_data = XMM626_SEC_END_MAGIC;
 	sec_size = sizeof(sec_data);
 
-	rc = xmm626_mipi_command_send(device_fd, XMM626_COMMAND_SEC_END,
+	rc = xmm626_mipi_command_send(client, device_fd, XMM626_COMMAND_SEC_END,
 				      &sec_data, sec_size, 1, 1);
 	if (rc < 0)
 		return -1;
@@ -667,8 +669,9 @@ int xmm626_mipi_hw_reset_send(struct ipc_client *client, int device_fd)
 	hw_reset_data = XMM626_HW_RESET_MAGIC;
 	hw_reset_size = sizeof(hw_reset_data);
 
-	rc = xmm626_mipi_command_send(device_fd, XMM626_COMMAND_HW_RESET,
-				      &hw_reset_data, hw_reset_size, 0, 1);
+	rc = xmm626_mipi_command_send(client, device_fd,
+				      XMM626_COMMAND_HW_RESET, &hw_reset_data,
+				      hw_reset_size, 0, 1);
 	if (rc < 0)
 		return -1;
 
