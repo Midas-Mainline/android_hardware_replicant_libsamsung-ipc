@@ -307,7 +307,8 @@ complete:
 	return rc;
 }
 
-int xmm626_hsic_command_send(int device_fd, unsigned short code,
+int xmm626_hsic_command_send(__attribute__((unused)) struct ipc_client *client,
+			     int device_fd, unsigned short code,
 			     const void *data, size_t size,
 			     size_t command_data_size, int ack)
 {
@@ -405,7 +406,7 @@ int xmm626_hsic_modem_data_send(
 	if (device_fd < 0 || data == NULL || size == 0)
 		return -1;
 
-	rc = xmm626_hsic_command_send(device_fd,
+	rc = xmm626_hsic_command_send(client, device_fd,
 				      XMM626_COMMAND_FLASH_SET_ADDRESS,
 				      &address, sizeof(address),
 				      XMM626_HSIC_FLASH_SET_ADDRESS_SIZE, 1);
@@ -420,7 +421,7 @@ int xmm626_hsic_modem_data_send(
 		count = chunk < size - c ? chunk : size - c;
 
 		rc = xmm626_hsic_command_send(
-			device_fd, XMM626_COMMAND_FLASH_WRITE_BLOCK,
+			client, device_fd, XMM626_COMMAND_FLASH_WRITE_BLOCK,
 			p, count, XMM626_HSIC_FLASH_WRITE_BLOCK_SIZE, 0);
 		if (rc < 0)
 			goto error;
@@ -474,9 +475,10 @@ int xmm626_hsic_port_config_send(struct ipc_client *client, int device_fd)
 	}
 	ipc_client_log(client, "Read port config");
 
-	rc = xmm626_hsic_command_send(device_fd, XMM626_COMMAND_SET_PORT_CONFIG,
-				      buffer, length,
-				      XMM626_HSIC_SET_PORT_CONFIG_SIZE, 1);
+	rc = xmm626_hsic_command_send(client, device_fd,
+				      XMM626_COMMAND_SET_PORT_CONFIG, buffer,
+				      length, XMM626_HSIC_SET_PORT_CONFIG_SIZE,
+				      1);
 	if (rc < 0) {
 		ipc_client_log(client, "Sending port config command failed");
 		goto error;
@@ -505,9 +507,10 @@ int xmm626_hsic_sec_start_send(struct ipc_client *client, int device_fd,
 		return -1;
 	}
 
-	rc = xmm626_hsic_command_send(device_fd, XMM626_COMMAND_SEC_START,
-				      sec_data, sec_size,
-				      XMM626_HSIC_SEC_START_SIZE, 1);
+	rc = xmm626_hsic_command_send(client, device_fd,
+				      XMM626_COMMAND_SEC_START, sec_data,
+				      sec_size, XMM626_HSIC_SEC_START_SIZE,
+				      1);
 	if (rc < 0)
 		return -1;
 
@@ -526,7 +529,7 @@ int xmm626_hsic_sec_end_send(struct ipc_client *client, int device_fd)
 	sec_data = XMM626_SEC_END_MAGIC;
 	sec_size = sizeof(sec_data);
 
-	rc = xmm626_hsic_command_send(device_fd, XMM626_COMMAND_SEC_END,
+	rc = xmm626_hsic_command_send(client, device_fd, XMM626_COMMAND_SEC_END,
 				      &sec_data, sec_size,
 				      XMM626_HSIC_SEC_END_SIZE, 1);
 	if (rc < 0)
@@ -604,9 +607,10 @@ int xmm626_hsic_hw_reset_send(struct ipc_client *client, int device_fd)
 	hw_reset_data = XMM626_HW_RESET_MAGIC;
 	hw_reset_size = sizeof(hw_reset_data);
 
-	rc = xmm626_hsic_command_send(device_fd, XMM626_COMMAND_HW_RESET,
-				      &hw_reset_data, hw_reset_size,
-				      XMM626_HSIC_HW_RESET_SIZE, 0);
+	rc = xmm626_hsic_command_send(client, device_fd,
+				      XMM626_COMMAND_HW_RESET, &hw_reset_data,
+				      hw_reset_size, XMM626_HSIC_HW_RESET_SIZE,
+				      0);
 	if (rc < 0)
 		return -1;
 
