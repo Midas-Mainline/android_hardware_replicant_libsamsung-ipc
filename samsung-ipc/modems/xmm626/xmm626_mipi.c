@@ -419,8 +419,10 @@ complete:
 	return rc;
 }
 
-int xmm626_mipi_modem_data_send(int device_fd, const void *data, size_t size,
-				int address)
+int xmm626_mipi_modem_data_send(
+	__attribute__((unused)) struct ipc_client *client,
+	int device_fd, const void *data, size_t size,
+	int address)
 {
 	size_t chunk;
 	size_t count;
@@ -588,7 +590,7 @@ int xmm626_mipi_firmware_send(struct ipc_client *client, int device_fd,
 		return -1;
 	}
 
-	rc = xmm626_mipi_modem_data_send(device_fd, firmware_data,
+	rc = xmm626_mipi_modem_data_send(client, device_fd, firmware_data,
 					 firmware_size,
 					 XMM626_FIRMWARE_ADDRESS);
 	if (rc < 0)
@@ -617,7 +619,7 @@ int xmm626_mipi_nv_data_send(struct ipc_client *client, int device_fd)
 	}
 	ipc_client_log(client, "Loaded nv_data");
 
-	rc = xmm626_mipi_modem_data_send(device_fd, nv_data, nv_size,
+	rc = xmm626_mipi_modem_data_send(client, device_fd, nv_data, nv_size,
 					 XMM626_NV_DATA_ADDRESS);
 	if (rc < 0)
 		goto error;
@@ -645,7 +647,7 @@ int xmm626_mipi_mps_data_send(struct ipc_client *client, int device_fd,
 		return -1;
 	}
 
-	rc = xmm626_mipi_modem_data_send(device_fd, mps_data, mps_size,
+	rc = xmm626_mipi_modem_data_send(client, device_fd, mps_data, mps_size,
 					 XMM626_MPS_DATA_ADDRESS);
 	if (rc < 0)
 		return -1;
