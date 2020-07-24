@@ -179,3 +179,19 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
 LOCAL_SHARED_LIBRARIES := libsamsung-ipc
 
 include $(BUILD_EXECUTABLE)
+
+####################
+# nv_data-md5 tool #
+####################
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := nv_data-md5
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_SRC_FILES := tools/nv_data-md5.c
+
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+
+LOCAL_SHARED_LIBRARIES := libsamsung-ipc
+
+include $(BUILD_EXECUTABLE)
