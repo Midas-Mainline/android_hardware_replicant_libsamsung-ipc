@@ -18,6 +18,7 @@
  */
 
 #include <ctype.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -70,7 +71,9 @@ void *file_data_read(struct ipc_client *client, const char *path, size_t size,
 
 	fd = open(path, O_RDONLY);
 	if (fd < 0) {
-		ipc_client_log(client, "%s: Error: fd: %d ", __func__, fd);
+		rc = errno;
+		ipc_client_log(client, "%s open failed with error %d: %s", __func__, rc,
+			       strerror(rc));
 		goto error;
 	}
 
@@ -147,8 +150,9 @@ int file_data_write(struct ipc_client *client, const char *path,
 
 	fd = open(path, O_WRONLY | O_CREAT, 0644);
 	if (fd < 0) {
-		ipc_client_log(client, "%s: open failed with error %d",
-			       __func__, fd);
+		rc = errno;
+		ipc_client_log(client, "%s open failed with error %d: %s",
+			       __func__, rc, strerror(rc));
 		goto error;
 	}
 
