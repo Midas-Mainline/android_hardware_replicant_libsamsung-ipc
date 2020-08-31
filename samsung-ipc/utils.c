@@ -17,20 +17,23 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <ctype.h>
+#include <fcntl.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <unistd.h>
 #include <string.h>
-#include <fcntl.h>
-#include <ctype.h>
+#include <unistd.h>
+
+#include <asm/types.h>
+#include <net/if.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <asm/types.h>
+
+/* linux/netlink.h needs to be included after sys/socket.h */
 #include <linux/netlink.h>
-#include <net/if.h>
 
 #include <samsung-ipc.h>
 
