@@ -201,8 +201,8 @@ void *ipc_sec_rsim_access_extract(const void *data, size_t size)
 
 	if (data == NULL ||
 	    size < sizeof(struct ipc_sec_rsim_access_response_header)) {
-	}
 		return NULL;
+	}
 
 	header = (struct ipc_sec_rsim_access_response_header *) data;
 	if (header->length == 0 ||
