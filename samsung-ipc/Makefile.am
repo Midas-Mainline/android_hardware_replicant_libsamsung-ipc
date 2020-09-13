@@ -28,7 +28,7 @@ libsamsung_ipc_la_SOURCES = \
 	modems/xmm626/xmm626_kernel_smdk4412.h \
 	modems/xmm626/xmm626_mipi.c \
 	modems/xmm626/xmm626_mipi.h \
-	modems/xmm626/xmm626_modem.h \
+	modems/xmm626/xmm626_modem_if.h \
 	modems/xmm626/xmm626_modem_link_device_hsic.h \
 	modems/xmm626/xmm626_modem_prj.h \
 	devices/ipc_devices.c \
