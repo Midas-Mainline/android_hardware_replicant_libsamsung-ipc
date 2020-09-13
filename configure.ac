@@ -1,7 +1,8 @@
 AC_INIT([libsamsung-ipc], [0.6.0], [replicant@osuosl.org], [libsamsung-ipc])
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
-AM_INIT_AUTOMAKE([dist-bzip2 subdir-objects])
+AM_INIT_AUTOMAKE([dist-bzip2 dist-xz subdir-objects])
+XZ_OPT=-v9e
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_PROG_CC
