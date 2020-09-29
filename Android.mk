@@ -25,6 +25,10 @@ ifneq (,$(filter crespo,$(TARGET_DEVICE)))
 	ipc_device_name := crespo
 endif
 
+ifneq (,$(filter herolte,$(TARGET_DEVICE)))
+	ipc_device_name := herolte
+endif
+
 ifneq (,$(filter i9100 galaxys2 n7000,$(TARGET_DEVICE)))
 	ipc_device_name := galaxys2
 endif
@@ -66,6 +70,7 @@ libsamsung_ipc_local_src_files := \
 	samsung-ipc/devices/aries/aries.c \
 	samsung-ipc/devices/crespo/crespo.c \
 	samsung-ipc/devices/galaxys2/galaxys2.c \
+	samsung-ipc/devices/herolte/herolte.c \
 	samsung-ipc/devices/i9300/i9300.c \
 	samsung-ipc/devices/maguro/maguro.c \
 	samsung-ipc/devices/n5100/n5100.c \

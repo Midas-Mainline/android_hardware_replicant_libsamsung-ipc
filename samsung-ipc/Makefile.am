@@ -52,6 +52,8 @@ libsamsung_ipc_la_SOURCES = \
 	devices/n7100/n7100.h \
 	devices/n5100/n5100.c \
 	devices/n5100/n5100.h \
+	devices/herolte/herolte.c \
+	devices/herolte/herolte.h \
 	utils.c \
 	call.c \
 	sms.c \

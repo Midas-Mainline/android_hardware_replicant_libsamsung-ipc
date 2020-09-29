@@ -23,6 +23,7 @@
 #include "devices/aries/aries.h"
 #include "devices/crespo/crespo.h"
 #include "devices/galaxys2/galaxys2.h"
+#include "devices/herolte/herolte.h"
 #include "devices/i9300/i9300.h"
 #include "devices/maguro/maguro.h"
 #include "devices/n5100/n5100.h"

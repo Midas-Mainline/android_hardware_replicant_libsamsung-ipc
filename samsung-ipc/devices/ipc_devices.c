@@ -154,6 +154,16 @@ struct ipc_device_desc ipc_devices[] = {
 		.gprs_specs = &n5100_gprs_specs,
 		.nv_data_specs = &n5100_nv_data_specs,
 	},
+	{
+		.name = "herolte",
+		.board_name = NULL,
+		.kernel_version = NULL,
+		.fmt_ops = &herolte_fmt_ops,
+		.rfs_ops = &herolte_rfs_ops,
+		.handlers = &herolte_handlers,
+		.gprs_specs = &herolte_gprs_specs,
+		.nv_data_specs = &herolte_nv_data_specs,
+	},
 };
 
 unsigned int ipc_devices_count = sizeof(ipc_devices) /
