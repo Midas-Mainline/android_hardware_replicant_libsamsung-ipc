@@ -180,6 +180,22 @@ LOCAL_SHARED_LIBRARIES := libsamsung-ipc
 
 include $(BUILD_EXECUTABLE)
 
+#####################
+# nv_data-imei tool #
+#####################
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := nv_data-imei
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_SRC_FILES := tools/nv_data-imei.c
+
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+
+LOCAL_SHARED_LIBRARIES := libsamsung-ipc
+
+include $(BUILD_EXECUTABLE)
+
 ####################
 # nv_data-md5 tool #
 ####################
