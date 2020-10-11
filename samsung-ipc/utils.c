@@ -145,6 +145,7 @@ int file_data_write(struct ipc_client *client, const char *path,
 			ipc_client_log(client, "%s failed: chunk_size > size",
 				       __func__);
 		}
+		errno = EINVAL;
 		return -1;
 	}
 
@@ -158,6 +159,7 @@ int file_data_write(struct ipc_client *client, const char *path,
 
 	seek = lseek(fd, (off_t) offset, SEEK_SET);
 	if (seek < (off_t) offset) {
+		rc = errno;
 		ipc_client_log(client, "%s failed: seek < (off_t) offset",
 			       __func__);
 		goto error;
@@ -180,17 +182,17 @@ int file_data_write(struct ipc_client *client, const char *path,
 		count += rc;
 	}
 
-	rc = 0;
-	goto complete;
-
-error:
-	rc = -1;
-
-complete:
 	if (fd >= 0)
 		close(fd);
 
-	return rc;
+	return 0;
+
+error:
+	if (fd >= 0)
+		close(fd);
+
+	errno = rc;
+	return -1;
 }
 
 off_t file_data_size(struct ipc_client *client, const char *path)
