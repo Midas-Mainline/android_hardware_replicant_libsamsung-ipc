@@ -193,6 +193,47 @@ complete:
 	return rc;
 }
 
+off_t file_data_size(struct ipc_client *client, const char *path)
+{
+	int fd = -1;
+	off_t rc = 0;
+	int err = 0;
+
+	if (path == NULL) {
+		ipc_client_log(client, "%s: Failed: path is NULL",
+			       __func__);
+		err = ENOENT;
+		goto error;
+	}
+
+	fd = open(path, O_RDONLY);
+	if (fd < 0) {
+		err = errno;
+		ipc_client_log(client, "%s: open %s failed with error %d: %s",
+			       __func__, path, err, strerror(err));
+		goto error;
+	}
+
+	rc = lseek(fd, 0, SEEK_END);
+	if (rc == -1) {
+		err = errno;
+		ipc_client_log(client, "%s: seek %s failed with error %d: %s",
+			       __func__, path, err, strerror(err));
+		goto error;
+	}
+
+error:
+	if (fd >= 0)
+		close(fd);
+
+	if (err) {
+		errno = err;
+		return -1;
+	} else {
+		return rc;
+	}
+}
+
 int network_iface_up(const char *iface, int domain, int type)
 {
 	struct ifreq ifr;

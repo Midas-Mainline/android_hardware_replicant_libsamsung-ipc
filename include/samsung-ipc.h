@@ -155,6 +155,7 @@ void *file_data_read(struct ipc_client *client, const char *path, size_t size,
 int file_data_write(struct ipc_client *client, const char *path,
 		    const void *data, size_t size, size_t chunk_size,
 		    unsigned int offset);
+off_t file_data_size(struct ipc_client *client, const char *path);
 int network_iface_up(const char *iface, int domain, int type);
 int network_iface_down(const char *iface, int domain, int type);
 int sysfs_value_read(const char *path);
