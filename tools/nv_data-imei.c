@@ -816,6 +816,8 @@ static int errno_to_sysexit(int err)
 		return EX_OK;
 	case EACCES:
 		return EX_NOINPUT;
+	case -EINVAL:
+		return EX_USAGE;
 	default:
 		printf("%s: error: unknown error code %d.\n", __func__, err);
 		printf("%s: error code %d needs to be implemented\n", __func__,
