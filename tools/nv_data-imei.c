@@ -616,15 +616,14 @@ static int encode_imei(unsigned char *buf, struct imei *imei)
 int bruteforce_imei_offset(char *nv_data_path, struct imei *given_imei)
 {
 	struct ipc_client *client = NULL;
-	struct imei found_imei;
 	size_t file_size;
+	size_t search_size;
 	size_t nv_data_chunk_size;
 	void *buffer = NULL;
 	void *ptr = NULL;
 	unsigned char given_imei_buffer[(IMEI_LENGTH + 1) / 2] = { 0 };
+	bool found_imei = false;
 	int rc;
-
-	memset(&found_imei, 0, sizeof(found_imei));
 
 	rc = ipc_setup(&client);
 	if (rc)
@@ -662,9 +661,12 @@ int bruteforce_imei_offset(char *nv_data_path, struct imei *given_imei)
 	rc = encode_imei((unsigned char *)&given_imei_buffer, given_imei);
 	if (rc < 0)
 		return rc;
+
 	ptr = buffer;
+	search_size = file_size;
+
 	do {
-		ptr = memchr(ptr, given_imei_buffer[0], file_size);
+		ptr = memchr(ptr, given_imei_buffer[0], search_size);
 		if (ptr) {
 			if (!strncmp((void*)given_imei_buffer, ptr,
 				     sizeof(given_imei_buffer))) {
@@ -672,13 +674,22 @@ int bruteforce_imei_offset(char *nv_data_path, struct imei *given_imei)
 					       "=> Found IMEI at 0x%x (%d)",
 					       (ptr - buffer),
 					       (ptr - buffer));
-				rc = 0;
-				goto complete;
+				found_imei = true;
 			}
+
+			/* Continue searching even if we already found
+			 * it just in case we find the IMEI at a second
+			 * location too.
+			 */
+			search_size = file_size - (ptr - buffer);
+			ptr ++;
 		}
 	} while (ptr);
 
-	ipc_client_log(client, "=> IMEI not found");
+	if (!found_imei) {
+		rc = 0;
+		ipc_client_log(client, "=> IMEI not found");
+	}
 
 error:
 complete:
