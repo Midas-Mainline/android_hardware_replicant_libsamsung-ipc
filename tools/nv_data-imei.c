@@ -244,7 +244,7 @@ static struct command commands[] = {
 	},
 	{
 		"write-imei",
-		"Store the given IMEI to nv_data",
+		"Store the given IMEI to nv_data (may or may not work)",
 		OPTION_FILE|OPTION_IMEI|OPTION_OFFSET,
 		OPTION_FILE|OPTION_IMEI|OPTION_OFFSET,
 		write_imei,
