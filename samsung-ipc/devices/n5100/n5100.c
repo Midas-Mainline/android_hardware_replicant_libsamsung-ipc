@@ -86,10 +86,14 @@ int n5100_boot(struct ipc_client *client)
 	ipc_client_log(client, "Turned the modem off");
 
 	rc = xmm626_kernel_smdk4412_power(client, modem_boot_fd, 1);
-	rc |= xmm626_kernel_smdk4412_hci_power(client, 1);
-
 	if (rc < 0) {
-		ipc_client_log(client, "Turning the modem on failed");
+		ipc_client_log(client, "Powering on the modem failed");
+		goto error;
+	}
+
+	rc = xmm626_kernel_smdk4412_hci_power(client, 1);
+	if (rc < 0) {
+		ipc_client_log(client, "Powering on the HCI bus failed");
 		goto error;
 	}
 	ipc_client_log(client, "Turned the modem on");
@@ -179,12 +183,21 @@ int n5100_boot(struct ipc_client *client)
 
 	rc = xmm626_kernel_smdk4412_link_control_enable(client, modem_link_fd,
 							0);
-	rc |= xmm626_kernel_smdk4412_hci_power(client, 0);
-	rc |= xmm626_kernel_smdk4412_link_control_active(client, modem_link_fd,
-							 0);
-
 	if (rc < 0) {
-		ipc_client_log(client, "Turning the modem off failed");
+		ipc_client_log(client, "Disabling the modem link failed");
+		goto error;
+	}
+
+	rc = xmm626_kernel_smdk4412_hci_power(client, 0);
+	if (rc < 0) {
+		ipc_client_log(client, "Powering off the HCI bus failed");
+		goto error;
+	}
+
+	rc = xmm626_kernel_smdk4412_link_control_active(client, modem_link_fd,
+							0);
+	if (rc < 0) {
+		ipc_client_log(client, "Deactivating the modem link failed");
 		goto error;
 	}
 
@@ -198,12 +211,21 @@ int n5100_boot(struct ipc_client *client)
 
 	rc = xmm626_kernel_smdk4412_link_control_enable(client, modem_link_fd,
 							1);
-	rc |= xmm626_kernel_smdk4412_hci_power(client, 1);
-	rc |= xmm626_kernel_smdk4412_link_control_active(client, modem_link_fd,
-							 1);
-
 	if (rc < 0) {
-		ipc_client_log(client, "Turning the modem on failed");
+		ipc_client_log(client, "Enabling the modem link failed");
+		goto error;
+	}
+
+	rc = xmm626_kernel_smdk4412_hci_power(client, 1);
+	if (rc < 0) {
+		ipc_client_log(client, "Powering on the HCI bus failed");
+		goto error;
+	}
+
+	rc = xmm626_kernel_smdk4412_link_control_active(client, modem_link_fd,
+							1);
+	if (rc < 0) {
+		ipc_client_log(client, "Activating the modem link failed");
 		goto error;
 	}
 
