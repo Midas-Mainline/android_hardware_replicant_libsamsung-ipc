@@ -692,7 +692,6 @@ int bruteforce_imei_offset(char *nv_data_path, struct imei *given_imei)
 	}
 
 error:
-complete:
 	if (buffer)
 		free(buffer);
 
