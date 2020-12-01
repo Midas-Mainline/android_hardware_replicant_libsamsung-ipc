@@ -13,9 +13,10 @@ bin_PROGRAMS = \
 
 # TODO: Find a way to make test more modular and represent each run of the
 # nv_data-imei in TEST while having it implemented in a single python file
-TESTS = nv_data-imei.py
-TEST_EXTENSIONS = .py
 PY_LOG_COMPILER = $(PYTHON)
+TEST_EXTENSIONS = .py
+TESTS = nv_data-imei.py \
+	nv_data-md5.py
 
 ipc_modem_SOURCES = ipc-modem.c
 ipc_modem_LDADD = $(top_builddir)/samsung-ipc/libsamsung-ipc.la
