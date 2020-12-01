@@ -38,13 +38,31 @@ char *ipc_nv_data_md5_calculate(struct ipc_client *client,
 				const char *path, const char *secret,
 				size_t size, size_t chunk_size)
 {
+	struct stat st;
 	void *data = NULL;
 	char *md5_string = NULL;
 	unsigned char md5_hash[MD5_DIGEST_LENGTH] = { 0 };
 	MD5_CTX ctx;
+	int rc;
 
 	if (secret == NULL) {
 		ipc_client_log(client, "%s: Failed: secret is NULL", __func__);
+		return NULL;
+	}
+
+	rc = stat(path, &st);
+	if (rc == -1) {
+		rc = errno;
+		ipc_client_log(client, "%s: stat failed with error %d",
+			       __func__, rc, strerror(rc));
+		return NULL;
+	}
+
+	if ((unsigned long)st.st_size != size) {
+		ipc_client_log(client,
+			       "%s: Checking %s size failed: "
+			       "requested size: %d, file size: %d\n",
+			       __func__, path, size, st.st_size);
 		return NULL;
 	}
 

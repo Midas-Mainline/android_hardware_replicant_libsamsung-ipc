@@ -93,8 +93,14 @@ void *file_data_read(struct ipc_client *client, const char *path, size_t size,
 		rc = read(fd, p,
 			  size - count > chunk_size ?
 			  chunk_size : size - count);
-		if (rc <= 0) {
-			ipc_client_log(client, "%s: Error: rc < 0", __func__);
+		if (rc == -1) {
+			rc = errno;
+			ipc_client_log(client, "%s: read error: %d: %s",
+				       __func__, rc, strerror(rc));
+			goto error;
+		} else if (rc == 0) {
+			ipc_client_log(client, "%s: read error: end of file",
+				       __func__);
 			goto error;
 		}
 
