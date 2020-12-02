@@ -32,6 +32,8 @@
 
 #include "ipc.h"
 
+#define MD5_DIGEST_LENGTH_ASCII (2 * MD5_DIGEST_LENGTH)
+
 char *ipc_nv_data_md5_calculate(struct ipc_client *client,
 				const char *path, const char *secret,
 				size_t size, size_t chunk_size)
@@ -112,7 +114,7 @@ int ipc_nv_data_md5_path_check(struct ipc_client *client)
 		return -1;
 	}
 
-	if (st.st_size < 2 * sizeof(char) * MD5_DIGEST_LENGTH) {
+	if (st.st_size != MD5_DIGEST_LENGTH_ASCII) {
 		ipc_client_log(client, "Checking nv_data md5 size failed");
 		return -1;
 	}
@@ -173,7 +175,7 @@ int ipc_nv_data_backup_md5_path_check(struct ipc_client *client)
 		return -1;
 	}
 
-	if (st.st_size < 2 * sizeof(char) * MD5_DIGEST_LENGTH) {
+	if (st.st_size != MD5_DIGEST_LENGTH_ASCII) {
 		ipc_client_log(client,
 			       "Checking nv_data backup md5 size failed");
 		return -1;
@@ -493,7 +495,7 @@ int ipc_nv_data_restore(struct ipc_client *client)
 	free(data);
 	data = NULL;
 
-	length = 2 * sizeof(char) * MD5_DIGEST_LENGTH;
+	length = MD5_DIGEST_LENGTH_ASCII;
 
 	data = file_data_read(client, backup_md5_path, length, length, 0);
 	if (data == NULL) {
