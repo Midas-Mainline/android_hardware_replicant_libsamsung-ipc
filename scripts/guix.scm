@@ -29,11 +29,11 @@
 ;;; be interested in retrieving the source from git or releases tarballs.
 ;;;
 ;;; Once you have Guix installed, to build libsamsung-ipc with the
-;;; guix.scm file, you can use the 'guix build --file=guix.scm' command,
-;;; however as explained above, keep in mind that it will copy all the
-;;; files in the same directory than guix.scm, so you might want to
-;;; make sure that the sources are clean (with 'make distclean') if you
-;;; already built libsamsung-ipc in that directory.
+;;; guix.scm file, you can use the 'guix build --file=scripts/guix.scm'
+;;; command, however as explained above, keep in mind that it will copy
+;;; all the files in the same directory than guix.scm, so you might want
+;;; to make sure that the sources are clean (with 'make distclean') if
+;;; you already built libsamsung-ipc in that directory.
 ;;;
 ;;; While this file could also serve as a basis to make a libsamsung-ipc
 ;;; package in Guix, it is probably a good idea to wait until the API
@@ -72,7 +72,8 @@
 
 (define %local-source
   (local-file
-   (dirname (current-filename)) #:recursive? #t))
+    (dirname (dirname (current-filename)))
+   #:recursive? #t))
 
 (define-public libsamsung-ipc
   (package
