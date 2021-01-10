@@ -122,6 +122,7 @@ libsamsung_ipc_local_shared_libraries := \
 # Static library version of libsamsung-ipc #
 ############################################
 include $(CLEAR_VARS)
+include $(LOCAL_PATH)/android_versions.mk
 
 LOCAL_MODULE := libsamsung-ipc
 LOCAL_MODULE_TAGS := optional
@@ -140,6 +141,7 @@ include $(BUILD_STATIC_LIBRARY)
 # Shared library version of libsamsung-ipc #
 ############################################
 include $(CLEAR_VARS)
+include $(LOCAL_PATH)/android_versions.mk
 
 LOCAL_MODULE := libsamsung-ipc
 LOCAL_MODULE_TAGS := optional
@@ -158,6 +160,7 @@ include $(BUILD_SHARED_LIBRARY)
 # ipc-modem tool #
 ##################
 include $(CLEAR_VARS)
+include $(LOCAL_PATH)/android_versions.mk
 
 LOCAL_MODULE := ipc-modem
 LOCAL_MODULE_TAGS := optional
@@ -173,6 +176,7 @@ include $(BUILD_EXECUTABLE)
 # ipc-test tool #
 #################
 include $(CLEAR_VARS)
+include $(LOCAL_PATH)/android_versions.mk
 
 LOCAL_MODULE := ipc-test
 LOCAL_MODULE_TAGS := optional
@@ -189,6 +193,7 @@ include $(BUILD_EXECUTABLE)
 # nv_data-imei tool #
 #####################
 include $(CLEAR_VARS)
+include $(LOCAL_PATH)/android_versions.mk
 
 LOCAL_MODULE := nv_data-imei
 LOCAL_MODULE_TAGS := optional
@@ -205,6 +210,7 @@ include $(BUILD_EXECUTABLE)
 # nv_data-md5 tool #
 ####################
 include $(CLEAR_VARS)
+include $(LOCAL_PATH)/android_versions.mk
 
 LOCAL_MODULE := nv_data-md5
 LOCAL_MODULE_TAGS := optional
