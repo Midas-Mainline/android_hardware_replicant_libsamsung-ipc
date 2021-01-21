@@ -357,6 +357,56 @@ const char *ipc_command_string(unsigned short command)
 	}
 }
 
+const char *ipc_group_string(unsigned char group)
+{
+	static char group_string[5] = { 0 };
+
+	switch (group) {
+	case IPC_GROUP_PWR:
+		return "IPC_GROUP_PWR";
+	case IPC_GROUP_CALL:
+		return "IPC_GROUP_CALL";
+	case IPC_GROUP_SMS:
+		return "IPC_GROUP_SMS";
+	case IPC_GROUP_SEC:
+		return "IPC_GROUP_SEC";
+	case IPC_GROUP_PB:
+		return "IPC_GROUP_PB";
+	case IPC_GROUP_DISP:
+		return "IPC_GROUP_DISP";
+	case IPC_GROUP_NET:
+		return "IPC_GROUP_NET";
+	case IPC_GROUP_SND:
+		return "IPC_GROUP_SND";
+	case IPC_GROUP_MISC:
+		return "IPC_GROUP_MISC";
+	case IPC_GROUP_SVC:
+		return "IPC_GROUP_SVC";
+	case IPC_GROUP_SS:
+		return "IPC_GROUP_SS";
+	case IPC_GROUP_GPRS:
+		return "IPC_GROUP_GPRS";
+	case IPC_GROUP_SAT:
+		return "IPC_GROUP_SAT";
+	case IPC_GROUP_CFG:
+		return "IPC_GROUP_CFG";
+	case IPC_GROUP_IMEI:
+		return "IPC_GROUP_IMEI";
+	case IPC_GROUP_GPS:
+		return "IPC_GROUP_GPS";
+	case IPC_GROUP_SAP:
+		return "IPC_GROUP_SAP";
+	case IPC_GROUP_RFS:
+		return "IPC_GROUP_RFS";
+	case IPC_GROUP_GEN:
+		return "IPC_GROUP_GEN";
+	default:
+		snprintf((char *) &group_string, sizeof(group_string), "0x%02x",
+			 (unsigned int)group_string);
+		return group_string;
+	}
+}
+
 int ipc_data_dump(struct ipc_client *client, const void *data, size_t size)
 {
 	unsigned int cols = 8;
