@@ -176,6 +176,22 @@ LOCAL_SHARED_LIBRARIES := libsamsung-ipc
 
 include $(BUILD_EXECUTABLE)
 
+##################
+# ipc-imei tool #
+##################
+include $(CLEAR_VARS)
+include $(LOCAL_PATH)/android_versions.mk
+
+LOCAL_MODULE := ipc-imei
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_SRC_FILES := tools/ipc-imei.c tools/common/modem.c
+
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include $(LOCAL_PATH)/tools/include/glibc
+LOCAL_SHARED_LIBRARIES := libsamsung-ipc
+
+include $(BUILD_EXECUTABLE)
+
 #################
 # ipc-test tool #
 #################

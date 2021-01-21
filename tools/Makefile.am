@@ -6,6 +6,7 @@ AM_CFLAGS = \
 
 bin_PROGRAMS = \
 	ipc-modem \
+	ipc-imei \
 	ipc-test \
 	nv_data-imei \
 	nv_data-md5 \
@@ -21,6 +22,10 @@ TESTS = nv_data-imei.py \
 ipc_modem_SOURCES = ipc-modem.c
 ipc_modem_LDADD = $(top_builddir)/samsung-ipc/libsamsung-ipc.la
 ipc_modem_LDFLAGS =
+
+ipc_imei_SOURCES = ipc-imei.c common/modem.c
+ipc_imei_LDADD = $(top_builddir)/samsung-ipc/libsamsung-ipc.la
+ipc_imei_LDFLAGS =
 
 ipc_test_SOURCES = ipc-test.c
 ipc_test_LDADD = $(top_builddir)/samsung-ipc/libsamsung-ipc.la
