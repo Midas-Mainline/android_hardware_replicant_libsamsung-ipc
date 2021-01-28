@@ -22,6 +22,8 @@
 #ifndef __SAMSUNG_IPC_H__
 #define __SAMSUNG_IPC_H__
 
+#include <stddef.h>
+
 #include <sys/time.h>
 
 /*
