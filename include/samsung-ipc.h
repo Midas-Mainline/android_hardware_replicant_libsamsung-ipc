@@ -23,6 +23,7 @@
 #define __SAMSUNG_IPC_H__
 
 #include <stddef.h>
+#include <unistd.h>
 
 #include <sys/time.h>
 
