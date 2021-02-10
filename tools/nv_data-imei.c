@@ -834,6 +834,8 @@ static int errno_to_sysexit(int err)
 		       err);
 		assert(false);
 	}
+
+	return 0;
 }
 
 int main(int argc, char * const argv[])
@@ -1061,4 +1063,6 @@ int main(int argc, char * const argv[])
 	}
 
 	assert(false);
+
+	return 0;
 }
