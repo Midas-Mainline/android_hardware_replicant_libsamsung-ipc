@@ -190,7 +190,7 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := tools/nv_data-imei.c
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include $(LOCAL_PATH)/tools/include/glibc
 
 LOCAL_SHARED_LIBRARIES := libsamsung-ipc
 
