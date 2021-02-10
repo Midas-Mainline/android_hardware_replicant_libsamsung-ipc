@@ -619,8 +619,8 @@ int bruteforce_imei_offset(char *nv_data_path, struct imei *given_imei)
 	size_t file_size;
 	size_t search_size;
 	size_t nv_data_chunk_size;
-	void *buffer = NULL;
-	void *ptr = NULL;
+	char *buffer = NULL;
+	char *ptr = NULL;
 	unsigned char given_imei_buffer[(IMEI_LENGTH + 1) / 2] = { 0 };
 	bool found_imei = false;
 	int rc;
@@ -706,7 +706,7 @@ int read_imei(char *nv_data_path, struct offset *offset)
 	struct imei imei;
 	size_t file_size;
 	size_t nv_data_chunk_size;
-	void *buffer = NULL;
+	unsigned char *buffer = NULL;
 	int rc;
 
 	memset(&imei, 0, sizeof(imei));
