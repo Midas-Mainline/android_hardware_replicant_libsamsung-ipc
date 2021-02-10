@@ -1021,11 +1021,12 @@ int main(int argc, char * const argv[])
 	/* We use the - in optstring so all arguments go in the 'case 1:' */
 	assert(optind == argc);
 
-	if (argc == 2) {
+	if (argc == 2 || command == NULL) {
 		/* If none of the commands or options were reached, we are in
-		 * the case where users ran 'nv_data-imei FILE'.
+		 * the case where users ran 'nv_data-imei FILE' or used some
+		 * options like -i <argument> without any command.
 		 */
-		printf("Missing options, commands or invalid command '%s'\n",
+		printf("Missing options, command or invalid command '%s'\n",
 		       argv[1]);
 		printf("Try -h to print the help.\n");
 		return EX_USAGE;
