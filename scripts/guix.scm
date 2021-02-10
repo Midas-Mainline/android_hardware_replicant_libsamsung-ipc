@@ -61,17 +61,24 @@
  (gnu packages python-xyz)
  (gnu packages tls))
 
-(define %strict-cflags
+(define %common-strict-cflags
   (string-append
    " CFLAGS="
    " -W"
    " -Wall"
    " -Werror"
+   " -Werror=address"
+   " -Werror=return-type"
+   " -Werror=sequence-point"
    " -Winit-self"
    " -Wno-unused"
    " -Wpointer-arith"
    " -Wunused"
    " -Wunused-function"))
+
+(define %clang-strict-cflags
+  (string-append
+   "-Werror=non-virtual-dtor"))
 
 (define %commit
   (let* ((port (open-input-pipe
@@ -136,7 +143,7 @@ found in many Samsung smartphones and tablets.")
                (("BUILD_STATIC_LIBRARY") "BUILD_HOST_STATIC_LIBRARY")
                (("BUILD_STATIC_EXECUTABLE") "BUILD_HOST_STATIC_EXECUTABLE"))
              #t)))
-       #:make-flags (list ,%strict-cflags)))))
+       #:make-flags (list ,%common-strict-cflags)))))
 
 (define-public libsamsung-ipc-gcc-autotools
   (package
@@ -150,7 +157,7 @@ found in many Samsung smartphones and tablets.")
                                    (substitute* (find-files "tools" ".*\\.py$")
                                                 (("/usr/bin/env python") (which "python3")))
                                    #t)))
-      #:make-flags (list ,%strict-cflags)))))
+      #:make-flags (list ,%common-strict-cflags)))))
 
 (define-public libsamsung-ipc-clang-autotools
   (package
@@ -173,7 +180,7 @@ found in many Samsung smartphones and tablets.")
              (substitute* (find-files "tools" ".*\\.py$")
                (("/usr/bin/env python") (which "python3")))
              #t)))
-     #:make-flags (list ,%strict-cflags)))))
+     #:make-flags (list ,%common-strict-cflags ,%clang-strict-cflags)))))
 
 (define-public libsamsung-ipc-clang-android
   (package
@@ -200,7 +207,7 @@ found in many Samsung smartphones and tablets.")
                     (lambda* (#:key inputs #:allow-other-keys)
                       (setenv "CC" "clang")
                       #t)))
-       #:make-flags (list ,%strict-cflags)))))
+       #:make-flags (list ,%common-strict-cflags ,%clang-strict-cflags)))))
 
 ;; Combinaisons:
 ;; +--------------------------------+----------+----------+--------------+--------------+
