@@ -61,7 +61,14 @@
  (gnu packages python-xyz)
  (gnu packages tls))
 
-(define %strict-cflags "CFLAGS=-Werror -W -Wall -Wunused -Wunused-function")
+(define %strict-cflags
+  (string-append
+   " CFLAGS="
+   " -W"
+   " -Wall"
+   " -Werror"
+   " -Wunused"
+   " -Wunused-function"))
 
 (define %commit
   (let* ((port (open-input-pipe
