@@ -154,7 +154,7 @@ found in many Samsung smartphones and tablets.")
        ("pkgconfig" ,pkg-config)
        ("python" ,python)
        ("python-sh" ,python-sh)
-       ("clang" ,clang-10)))
+       ("clang" ,clang)))
     (arguments
      `(#:phases
        (modify-phases %standard-phases
@@ -173,7 +173,7 @@ found in many Samsung smartphones and tablets.")
     (inputs
      `(("android-libutils" ,android-libutils)
        ("libcrypto" ,openssl)
-       ("clang" ,clang-10)))
+       ("clang" ,clang)))
     (native-inputs '())
     (arguments
      `(#:phases
