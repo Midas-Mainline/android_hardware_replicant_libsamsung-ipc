@@ -67,6 +67,9 @@
    " -W"
    " -Wall"
    " -Werror"
+   " -Winit-self"
+   " -Wno-unused"
+   " -Wpointer-arith"
    " -Wunused"
    " -Wunused-function"))
 
