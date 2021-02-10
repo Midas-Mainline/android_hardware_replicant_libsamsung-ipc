@@ -843,8 +843,8 @@ int main(int argc, char * const argv[])
 	opterr = 0;
 	struct imei imei;
 	struct offset offset;
-	struct command *command;
-	struct command_option *option;
+	struct command *command = NULL;
+	struct command_option *option = NULL;
 	char *nv_data_path;
 	int c, rc;
 
