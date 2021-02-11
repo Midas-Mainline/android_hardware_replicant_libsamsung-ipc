@@ -66,6 +66,24 @@ static int print_imei(struct imei *imei)
 }
 #endif /* DEBUG */
 
+static int list_supported(void)
+{
+	/* TODO:
+	 * - Print the result in a parsable format (json?)
+	 * - Print the result in and a human format (a table for instance)
+	 * - Add IMEI location (under the battery, unknown, etc)
+	 * - Add IMEI known offsets
+	 */
+	printf("Supported devices:\n");
+
+	/* Offset: 0xE80, other?
+	 * Location: Under the battery
+	 */
+	printf("\tNexus S (GT-I902x)\n");
+
+	return 0;
+}
+
 static int get_offset(struct command *command, void *arg)
 {
 	struct offset *offset = arg;
@@ -233,7 +251,7 @@ static struct command commands[] = {
 		"Display supported devices and EFS",
 		NO_OPTIONS,
 		NO_OPTIONS,
-		NULL,
+		list_supported,
 	},
 	{
 		"read-imei",
@@ -504,24 +522,6 @@ static int command_help(const char *command_name)
 	}
 
 	printf("\n");
-
-	return 0;
-}
-
-static int list_supported(void)
-{
-	/* TODO:
-	 * - Print the result in a parsable format (json?)
-	 * - Print the result in and a human format (a table for instance)
-	 * - Add IMEI location (under the battery, unknown, etc)
-	 * - Add IMEI known offsets
-	 */
-	printf("Supported devices:\n");
-
-	/* Offset: 0xE80, other?
-	 * Location: Under the battery
-	 */
-	printf("\tNexus S (GT-I902x)\n");
 
 	return 0;
 }
@@ -880,14 +880,35 @@ int main(int argc, char * const argv[])
 			 * two.)
 			 */
 
-			/* nv_data-imei list-supported */
-			if (optind == 2 && argc == 2 &&
-			    strlen("list-supported") ==
-			    strlen(argv[optind - 1]) &&
-			    !strncmp("list-supported", argv[optind - 1],
-				     strlen("list-supported"))) {
-				printf("nv_data-imei list-supported\n");
-				return list_supported();
+			/* nv_data-imei <argument> */
+			if (optind == 2 && argc == 2) {
+				command = get_command(argv[optind - 1]);
+				/* Example: nv_data-imei list-supported */
+				if (command && command->options == NO_OPTIONS) {
+					rc = command->func();
+					return errno_to_sysexit(rc);
+				} else if (command) {
+					/* The other commands than
+					 * list-supported need at least a file
+					 * argument so we don't need to handle
+					 * all missing options
+					 */
+					if (command->options & OPTION_FILE) {
+						printf("Error: the '%s' command "
+						       "needs a FILE argument.\n",
+						       argv[optind - 1]);
+						printf("See 'nv_data-imei %s -h'"
+						       " for more details.\n",
+						       argv[optind - 1]);
+					}
+					return EX_USAGE;
+				} else {
+					printf("There is no '%s' command\n",
+					       argv[optind - 1]);
+					printf("Try nv_data-imei -h"
+					       " to print the help.\n");
+					return EX_USAGE;
+				}
 			/* nv_data-imei FILE COMMAND [...] */
 			} else if (optind == 3 && argc >= 3) {
 				nv_data_path = argv[optind - 2];
@@ -915,27 +936,6 @@ int main(int argc, char * const argv[])
 					       argv[optind - 1]);
 					return EX_USAGE;
 				}
-			/* nv_data-imei <INVALID_COMMAND> */
-			} else if (optind == 2 && argc == 2) {
-				command = get_command(argv[optind - 1]);
-
-				if (!command) {
-					printf("There is no '%s' command\n",
-					       argv[optind - 1]);
-					printf("Try nv_data-imei -h"
-					       " to print the help.\n");
-				} else if (command->options & OPTION_FILE) {
-					printf("Error: the '%s' command "
-					       "needs a FILE argument.\n",
-					       argv[optind - 1]);
-					printf("See 'nv_data-imei %s -h'"
-					       " for more details.\n",
-					       argv[optind - 1]);
-				} else {
-					assert(false);
-				}
-				return EX_USAGE;
-
 			}
 			break;
 		case 'h':
