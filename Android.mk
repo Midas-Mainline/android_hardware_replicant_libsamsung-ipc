@@ -80,7 +80,8 @@ libsamsung_ipc_local_src_files := \
 	samsung-ipc/modems/xmm626/xmm626.c \
 	samsung-ipc/modems/xmm626/xmm626_hsic.c \
 	samsung-ipc/modems/xmm626/xmm626_kernel_smdk4412.c \
-	samsung-ipc/modems/xmm626/xmm626_mipi.c
+	samsung-ipc/modems/xmm626/xmm626_mipi.c \
+	samsung-ipc/partitions/toc/toc.c
 
 libsamsung_ipc_local_export_headers := \
 	include/call.h \

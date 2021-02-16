@@ -32,6 +32,7 @@ libsamsung_ipc_la_SOURCES = \
 
 include devices/Makefile.am
 include modems/Makefile.am
+include partitions/Makefile.am
 
 libsamsung_ipc_la_LIBADD = \
 	$(OPENSSL_LIBS) \

@@ -35,15 +35,7 @@
 #include "modems/xmm626/xmm626.h"
 #include "modems/xmm626/xmm626_kernel_smdk4412.h"
 #include "modems/xmm626/xmm626_modem_prj.h"
-
-struct __attribute__((__packed__)) firmware_toc_entry {
-	char name[12];
-	uint32_t offset;   /* offset within firmware file/partition */
-	uint32_t loadaddr; /* target memory address for this blob */
-	uint32_t size;     /* size of this blob in bytes */
-	uint32_t crc;
-	uint32_t entryid;
-};
+#include "partitions/toc/toc.h"
 
 struct __attribute__((__packed__)) security_req {
 	uint32_t mode;
@@ -62,29 +54,6 @@ struct __attribute__((__packed__)) modem_firmware_partition_data {
 };
 
 #define IOCTL_SECURITY_REQ _IO('o', 0x53)
-
-#define N_TOC_ENTRIES (512 / sizeof(struct firmware_toc_entry))
-
-static struct firmware_toc_entry const *find_toc_entry(
-	char const *name,
-	struct firmware_toc_entry const *toc)
-{
-	unsigned int index;
-
-	/* We don't know all the details of the TOC format yet; for now, we
-	 * assume two things:
-	 * 1. reading 512 bytes of TOC is enough, and
-	 * 2. the first entry with an empty name field ends the list.
-	 */
-	for (index = 0; index < N_TOC_ENTRIES; index++) {
-		if (toc[index].name[0] == '\0')
-			break;
-		if (strncmp(toc[index].name, name,
-			    sizeof(toc[index].name)) == 0)
-			return &toc[index];
-	}
-	return NULL;
-}
 
 #define MAX_CHUNK_LEN (62 * 1024)  /* This is just what cbd uses.
 				    * Perhaps a larger value would also work.
