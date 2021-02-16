@@ -18,42 +18,6 @@ libsamsung_ipc_la_SOURCES = \
 	ipc.c \
 	ipc.h \
 	ipc_utils.c \
-	modems/xmm616/xmm616.c \
-	modems/xmm616/xmm616.h \
-	modems/xmm626/xmm626.c \
-	modems/xmm626/xmm626.h \
-	modems/xmm626/xmm626_hsic.c \
-	modems/xmm626/xmm626_hsic.h \
-	modems/xmm626/xmm626_kernel_smdk4412.c \
-	modems/xmm626/xmm626_kernel_smdk4412.h \
-	modems/xmm626/xmm626_mipi.c \
-	modems/xmm626/xmm626_mipi.h \
-	modems/xmm626/xmm626_modem_if.h \
-	modems/xmm626/xmm626_modem_link_device_hsic.h \
-	modems/xmm626/xmm626_modem_prj.h \
-	devices/ipc_devices.c \
-	devices/ipc_devices.h \
-	devices/crespo/crespo.c \
-	devices/crespo/crespo.h \
-	devices/crespo/crespo_modem_ctl.h \
-	devices/aries/aries.c \
-	devices/aries/aries.h \
-	devices/aries/onedram.h \
-	devices/aries/phonet.h \
-	devices/galaxys2/galaxys2.c \
-	devices/galaxys2/galaxys2.h \
-	devices/maguro/maguro.c \
-	devices/maguro/maguro.h \
-	devices/piranha/piranha.c \
-	devices/piranha/piranha.h \
-	devices/i9300/i9300.c \
-	devices/i9300/i9300.h \
-	devices/n7100/n7100.c \
-	devices/n7100/n7100.h \
-	devices/n5100/n5100.c \
-	devices/n5100/n5100.h \
-	devices/herolte/herolte.c \
-	devices/herolte/herolte.h \
 	utils.c \
 	call.c \
 	sms.c \
@@ -65,6 +29,9 @@ libsamsung_ipc_la_SOURCES = \
 	rfs.c \
 	gen.c \
 	$(NULL)
+
+include devices/Makefile.am
+include modems/Makefile.am
 
 libsamsung_ipc_la_LIBADD = \
 	$(OPENSSL_LIBS) \
