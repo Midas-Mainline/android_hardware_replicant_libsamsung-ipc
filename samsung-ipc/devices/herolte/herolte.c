@@ -35,6 +35,7 @@
 #include "modems/xmm626/xmm626.h"
 #include "modems/xmm626/xmm626_kernel_smdk4412.h"
 #include "modems/xmm626/xmm626_modem_prj.h"
+#include "partitions/android/android.h"
 #include "partitions/toc/toc.h"
 
 struct __attribute__((__packed__)) security_req {
@@ -189,30 +190,6 @@ static char const * const modem_image_devices[] = {
 	NULL
 };
 
-static int open_image_device(struct ipc_client *client)
-{
-	int i;
-
-	for (i = 0; modem_image_devices[i] != NULL; i++) {
-		char const * const path = modem_image_devices[i];
-		int fd;
-
-		ipc_client_log(client, "Trying device path %s", path);
-
-		fd = open(path, O_RDONLY);
-		if (fd == -1) {
-			if (errno == ENOENT)
-				continue;
-			/* Normally errno should be passed to the caller here */
-			return -1;
-		}
-		return fd;
-	}
-
-	errno = ENOENT;
-	return -1;
-}
-
 int herolte_boot(struct ipc_client *client)
 {
 	struct firmware_toc_entry toc[N_TOC_ENTRIES];
@@ -225,7 +202,7 @@ int herolte_boot(struct ipc_client *client)
 
 	ipc_client_log(client, "Loading firmware TOC");
 
-	imagefd = open_image_device(client);
+	imagefd = open_android_modem_partition(client, modem_image_devices);
 	if (imagefd == -1) {
 		rc = errno;
 		if (rc == ENOENT)
