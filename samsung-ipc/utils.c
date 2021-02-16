@@ -38,6 +38,49 @@
 
 #include <samsung-ipc.h>
 
+ssize_t data_read(__attribute__((unused)) struct ipc_client *client, int fd,
+		  void *buf, size_t count)
+{
+	/* From read(2): "According  to POSIX.1, if count is greater than
+	 * SSIZE_MAX, the result is implementation-defined"
+	 */
+	ssize_t remaining = (ssize_t)count;
+
+	while (remaining > 0) {
+		ssize_t rc;
+
+		rc = read(fd, buf, count);
+		if (rc == -1)
+			/* errno is passed to the caller */
+			return rc;
+		remaining -= rc;
+	}
+
+	return count;
+}
+
+ssize_t data_write(__attribute__((unused)) struct ipc_client *client, int fd,
+		   const void *buf, size_t count)
+{
+	/* From write(2): "According  to POSIX.1, if count is greater than
+	 * SSIZE_MAX, the result is implementation-defined"
+	 */
+	ssize_t remaining = (ssize_t)count;
+
+	while (remaining > 0) {
+		ssize_t rc;
+
+		rc = write(fd, buf, count);
+		if (rc == -1)
+			/* errno is passed to the caller */
+			return rc;
+		remaining -= rc;
+	}
+
+	return count;
+
+}
+
 void *file_data_read(struct ipc_client *client, const char *path, size_t size,
 		     size_t chunk_size, unsigned int offset)
 {

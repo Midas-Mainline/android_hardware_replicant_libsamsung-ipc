@@ -154,6 +154,9 @@ int ipc_rfs_header_setup(struct ipc_rfs_header *header,
 int ipc_rfs_message_setup(const struct ipc_rfs_header *header,
 			  struct ipc_message *message);
 
+ssize_t data_read(struct ipc_client *client, int fd, void *buf, size_t count);
+ssize_t data_write(struct ipc_client *client, int fd, const void *buf,
+		   size_t count);
 void *file_data_read(struct ipc_client *client, const char *path, size_t size,
 		     size_t chunk_size, unsigned int offset);
 int file_data_write(struct ipc_client *client, const char *path,
