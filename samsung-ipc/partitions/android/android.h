@@ -24,4 +24,6 @@
 #define __ANDROID_PARTITIONS_H__
 int open_android_modem_partition(struct ipc_client *client,
 				 char const * const *path_names);
+int open_android_modem_partition_by_name(struct ipc_client *client,
+					 const char *name, char **out_path);
 #endif /* __ANDROID_PARTITIONS_H__ */

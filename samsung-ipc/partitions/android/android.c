@@ -23,11 +23,19 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #include <samsung-ipc.h>
+
+static char const * const partitions_dirnames[] = {
+	"/dev/disk/by-partlabel/", /* GNU/Linux */
+	"/dev/block/by-name/",     /* Android */
+	NULL
+};
 
 int open_android_modem_partition(struct ipc_client *client,
 				 char const * const *path_names)
@@ -48,6 +56,61 @@ int open_android_modem_partition(struct ipc_client *client,
 			/* Normally errno should be passed to the caller here */
 			return -1;
 		}
+		return fd;
+	}
+
+	errno = ENOENT;
+	return -1;
+}
+
+int open_android_modem_partition_by_name(struct ipc_client *client,
+					 const char *name, char **out_path)
+{
+	int i;
+	int rc;
+
+	for (i = 0; partitions_dirnames[i] != NULL; i++) {
+		char *path = NULL;
+		int fd;
+		size_t len;
+
+		len = strlen(partitions_dirnames[i]) + strlen(name) + 1;
+		path = calloc(1, len);
+		if (path == NULL) {
+			rc = errno;
+			ipc_client_log(client,
+				       "%s: calloc failed with error %d: %s",
+				       __func__, rc, strerror(rc));
+			return -errno;
+		}
+
+		strncpy(path, partitions_dirnames[i],
+			strlen(partitions_dirnames[i]));
+		strcat(path, name);
+
+		ipc_client_log(client, "%s: Trying to open %s",
+			       __func__, path);
+
+		fd = open(path, O_RDONLY);
+		if (fd == -1) {
+			rc = -errno;
+			if (out_path)
+				*out_path = path;
+			else
+				free(path);
+
+			if (rc == -ENOENT)
+				continue;
+
+			errno = -rc;
+			return -1;
+		}
+
+		if (out_path)
+			*out_path = path;
+		else
+			free(path);
+
 		return fd;
 	}
 
