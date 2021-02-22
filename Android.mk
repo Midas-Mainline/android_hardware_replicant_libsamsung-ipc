@@ -17,36 +17,36 @@
 
 LOCAL_PATH := $(call my-dir)
 
-ifneq (,$(filter crespo,$(TARGET_DEVICE)))
-	ipc_device_name := crespo
-endif
-
 ifneq (,$(filter galaxysmtd galaxytab,$(TARGET_DEVICE)))
 	ipc_device_name := aries
+endif
+
+ifneq (,$(filter crespo,$(TARGET_DEVICE)))
+	ipc_device_name := crespo
 endif
 
 ifneq (,$(filter i9100 galaxys2 n7000,$(TARGET_DEVICE)))
 	ipc_device_name := galaxys2
 endif
 
+ifneq (,$(filter i9300,$(TARGET_DEVICE)))
+	ipc_device_name := i9300
+endif
+
 ifneq (,$(filter maguro,$(TARGET_DEVICE)))
 	ipc_device_name := maguro
 endif
 
-ifneq (,$(filter p5100 p3100 espresso3g,$(TARGET_DEVICE)))
-	ipc_device_name := piranha
-endif
-
-ifneq (,$(filter i9300,$(TARGET_DEVICE)))
-	ipc_device_name := i9300
+ifneq (,$(filter n5100,$(TARGET_DEVICE)))
+	ipc_device_name := n5100
 endif
 
 ifneq (,$(filter n7100,$(TARGET_DEVICE)))
 	ipc_device_name := n7100
 endif
 
-ifneq (,$(filter n5100,$(TARGET_DEVICE)))
-	ipc_device_name := n5100
+ifneq (,$(filter p5100 p3100 espresso3g,$(TARGET_DEVICE)))
+	ipc_device_name := piranha
 endif
 
 libsamsung_ipc_local_src_files := \
