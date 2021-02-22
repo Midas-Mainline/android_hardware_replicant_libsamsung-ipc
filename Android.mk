@@ -50,32 +50,32 @@ ifneq (,$(filter p5100 p3100 espresso3g,$(TARGET_DEVICE)))
 endif
 
 libsamsung_ipc_local_src_files := \
+	samsung-ipc/call.c \
+	samsung-ipc/gen.c \
+	samsung-ipc/gprs.c \
 	samsung-ipc/ipc.c \
 	samsung-ipc/ipc_utils.c \
+	samsung-ipc/misc.c \
+	samsung-ipc/net.c \
+	samsung-ipc/rfs.c \
+	samsung-ipc/sec.c \
+	samsung-ipc/sms.c \
+	samsung-ipc/svc.c \
+	samsung-ipc/utils.c \
+	samsung-ipc/devices/ipc_devices.c \
+	samsung-ipc/devices/aries/aries.c \
+	samsung-ipc/devices/crespo/crespo.c \
+	samsung-ipc/devices/galaxys2/galaxys2.c \
+	samsung-ipc/devices/i9300/i9300.c \
+	samsung-ipc/devices/maguro/maguro.c \
+	samsung-ipc/devices/n5100/n5100.c \
+	samsung-ipc/devices/n7100/n7100.c \
+	samsung-ipc/devices/piranha/piranha.c \
 	samsung-ipc/modems/xmm616/xmm616.c \
 	samsung-ipc/modems/xmm626/xmm626.c \
 	samsung-ipc/modems/xmm626/xmm626_hsic.c \
 	samsung-ipc/modems/xmm626/xmm626_kernel_smdk4412.c \
-	samsung-ipc/modems/xmm626/xmm626_mipi.c \
-	samsung-ipc/devices/ipc_devices.c \
-	samsung-ipc/devices/crespo/crespo.c \
-	samsung-ipc/devices/aries/aries.c \
-	samsung-ipc/devices/galaxys2/galaxys2.c \
-	samsung-ipc/devices/maguro/maguro.c \
-	samsung-ipc/devices/piranha/piranha.c \
-	samsung-ipc/devices/i9300/i9300.c \
-	samsung-ipc/devices/n7100/n7100.c \
-	samsung-ipc/devices/n5100/n5100.c \
-	samsung-ipc/utils.c \
-	samsung-ipc/call.c \
-	samsung-ipc/sms.c \
-	samsung-ipc/sec.c \
-	samsung-ipc/net.c \
-	samsung-ipc/misc.c \
-	samsung-ipc/svc.c \
-	samsung-ipc/gprs.c \
-	samsung-ipc/rfs.c \
-	samsung-ipc/gen.c
+	samsung-ipc/modems/xmm626/xmm626_mipi.c
 
 libsamsung_ipc_local_export_headers := \
 	include/call.h \
