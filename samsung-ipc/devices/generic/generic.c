@@ -533,6 +533,8 @@ int generic_poll(__attribute__((unused)) struct ipc_client *client,
 	int rc;
 	struct pollfd fd;
 
+	ipc_client_log(client, "ENTER %s", __func__);
+
 	if (data == NULL)
 		return -1;
 
@@ -541,7 +543,10 @@ int generic_poll(__attribute__((unused)) struct ipc_client *client,
 	fd.fd = transport_data->fd;
 	fd.events = POLLRDNORM | POLLIN;
 
+	ipc_client_log(client, "%s: transport_data->fd: %d", __func__, transport_data->fd);
 	rc = poll(&fd, 1, -1);
+
+	ipc_client_log(client, "%s: poll: %d", __func__, rc);
 
 	return rc - 1;
 }
