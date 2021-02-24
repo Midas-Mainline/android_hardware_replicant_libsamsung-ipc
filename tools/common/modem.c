@@ -307,6 +307,9 @@ int modem_read_loop(struct ipc_client *client,
 		return 0;
 	}
 
+	ipc_imei_request_imei(client);
+
+
 	memset(&resp, 0, sizeof(resp));
 
 	while (1) {

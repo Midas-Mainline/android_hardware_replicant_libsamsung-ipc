@@ -204,9 +204,9 @@ int main(int argc, char** argv)
 
 	ipc_imei_log(client, "modem_start done\n");
 
-	ipc_imei_request_imei(client);
+	// ipc_imei_request_imei(client);
 
-	//ipc_imei_log(client, "ipc_imei_request_imei done\n");
+	ipc_imei_log(client, "ipc_imei_request_imei done\n");
 
 	/* TODO: MODEM_STATE_LPM is not needed here */
 	rc = modem_read_loop(client, MODEM_STATE_LPM, &handler);

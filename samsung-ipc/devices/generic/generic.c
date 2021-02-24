@@ -551,6 +551,27 @@ int generic_poll(__attribute__((unused)) struct ipc_client *client,
 	return rc - 1;
 }
 
+
+int generic_smdk_poll(__attribute__((unused)) struct ipc_client *client, void *data,
+		      struct ipc_poll_fds *fds, struct timeval *timeout)
+{
+	struct generic_transport_data *transport_data;
+	int rc;
+
+	ipc_client_log(client, "ENTER %s", __func__);
+
+	if (data == NULL)
+		return -1;
+
+	transport_data = (struct generic_transport_data *) data;
+
+	rc = xmm626_kernel_smdk4412_poll(client, transport_data->fd, fds,
+					 timeout);
+
+	ipc_client_log(client, "%s: poll: %d", __func__, rc);
+	return rc;
+}
+
 int generic_power_on(__attribute__((unused)) struct ipc_client *client,
 		     __attribute__((unused)) void *data)
 {
