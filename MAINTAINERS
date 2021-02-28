@@ -2,7 +2,7 @@ Maintainers List
 ----------------
 M:	Denis 'GNUtoo' Carikli <GNUtoo@cyberdimension.org>
 L:	replicant@osuosl.org
-T:	git git://git.replicant.us/replicant/external_libsamsung-ipc.git
+T:	git https://git.replicant.us/replicant/hardware_replicant_libsamsung-ipc.git
 S:	Maintained
 F:	*
 F:	*/
