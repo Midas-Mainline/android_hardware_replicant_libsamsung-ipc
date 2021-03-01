@@ -44,6 +44,7 @@ AC_CONFIG_FILES([
     samsung-ipc.pc
     include/Makefile
     samsung-ipc/Makefile
+    samsung-ipc/tests/Makefile
     tools/Makefile
 ])
 AC_OUTPUT

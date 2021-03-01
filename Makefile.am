@@ -2,6 +2,7 @@ NULL =
 
 SUBDIRS = \
 	samsung-ipc \
+	samsung-ipc/tests \
 	include \
 	tools \
 	$(NULL)

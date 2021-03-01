@@ -113,7 +113,7 @@
        (modify-phases %standard-phases
          (add-before 'build 'patch-python
            (lambda _
-             (substitute* (find-files "tools" ".*\\.py$")
+             (substitute* (find-files "." ".*\\.py$")
                (("/usr/bin/env python") (which "python3")))
            #t)))))
     (synopsis "libsamsung-ipc is a free software implementation of the Samsung IPC modem protocol")
@@ -154,7 +154,7 @@ found in many Samsung smartphones and tablets.")
       (modify-phases %standard-phases
                      (add-before 'build 'patch-python
                                  (lambda _
-                                   (substitute* (find-files "tools" ".*\\.py$")
+                                   (substitute* (find-files "." ".*\\.py$")
                                                 (("/usr/bin/env python") (which "python3")))
                                    #t)))
       #:make-flags (list ,%common-strict-cflags)))))
@@ -177,7 +177,7 @@ found in many Samsung smartphones and tablets.")
        (modify-phases %standard-phases
          (add-before 'build 'patch-python
            (lambda _
-             (substitute* (find-files "tools" ".*\\.py$")
+             (substitute* (find-files "." ".*\\.py$")
                (("/usr/bin/env python") (which "python3")))
              #t)))
      #:make-flags (list ,%common-strict-cflags ,%clang-strict-cflags)))))
