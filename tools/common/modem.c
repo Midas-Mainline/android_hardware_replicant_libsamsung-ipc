@@ -63,6 +63,41 @@ int seq_get(void)
         return seq;
 }
 
+const char *modem_callback_state_string(unsigned char type)
+{
+        static char type_string[5] = { 0 };
+
+        switch (type) {
+        case MODEM_CALLBACK_STATE_UTILS:
+                return "MODEM_CALLBACK_STATE_UTILS";
+        case MODEM_CALLBACK_STATE_APP:
+                return "MODEM_CALLBACK_STATE_APP";
+        default:
+                snprintf((char *) &type_string, sizeof(type_string), "0x%02x",
+                         type);
+                return type_string;
+        }
+
+}
+
+const char *modem_state_string(enum modem_state state)
+{
+	static char group_string[5] = { 0 };
+
+	switch (state) {
+	case MODEM_STATE_LPM:
+		return "MODEM_STATE_LPM";
+	case MODEM_STATE_NORMAL:
+		return "MODEM_STATE_NORMAL";
+	case MODEM_STATE_SIM_OK:
+		return "MODEM_STATE_SIM_OK";
+	default:
+		snprintf((char *) &group_string, sizeof(group_string), "0x%02x",
+			 (unsigned int)group_string);
+		return group_string;
+	}
+};
+
 static int modem_response_sec(struct ipc_client *client,
 			      struct ipc_message *resp,
 			      enum modem_state new_state)
@@ -236,6 +271,8 @@ static int modem_start_response_handle(struct ipc_client *client,
 {
 	int rc;
 
+	ipc_client_log(client, "ENTER HANDLER %s\n", __func__);
+
 	if (!client)
 		return 0;
 
@@ -282,6 +319,30 @@ static int modem_response_handle(struct ipc_client *client,
 	if (!client)
 		return 0;
 
+	if (current_state == new_state)
+		callback_state = MODEM_CALLBACK_STATE_APP;
+
+	ipc_client_log(client,
+		       "%s: current_state %d: %s\n",
+		       __func__, current_state,
+		       modem_state_string(current_state));
+
+	ipc_client_log(client,
+		       "%s: new_state %d: %s\n",
+		       __func__, new_state,
+		       modem_state_string(new_state));
+
+	ipc_client_log(client,
+		       "%s: %s\n",
+		       __func__,
+		       (current_state == new_state) ?
+		       "current_state == new_state" :
+		       "current_state !== new_state");
+
+	ipc_client_log(client,
+		       "%s: callback state %d: %s\n",
+		       __func__, callback_state,
+		       modem_callback_state_string(callback_state));
 
 	if (callback_state == MODEM_CALLBACK_STATE_UTILS)
 		rc = modem_start_response_handle(client, resp, new_state);
@@ -398,24 +459,6 @@ static int _modem_start(struct ipc_client *client)
 	return rc;
 }
 
-const char *modem_state_to_string(enum modem_state state)
-{
-	static char group_string[5] = { 0 };
-
-	switch (state) {
-	case MODEM_STATE_LPM:
-		return "MODEM_STATE_LPM";
-	case MODEM_STATE_NORMAL:
-		return "MODEM_STATE_NORMAL";
-	case MODEM_STATE_SIM_OK:
-		return "MODEM_STATE_SIM_OK";
-	default:
-		snprintf((char *) &group_string, sizeof(group_string), "0x%02x",
-			 (unsigned int)group_string);
-		return group_string;
-	}
-};
-
 int modem_start(struct ipc_client *client, enum modem_state new_state,
 		struct app_modem_response_handler *handler)
 {
@@ -426,7 +469,7 @@ int modem_start(struct ipc_client *client, enum modem_state new_state,
 
 	common_modem_log(client, "%s: requested state %s: %d",
 		       __FUNCTION__,
-		       modem_state_to_string(new_state),
+		       modem_state_string(new_state),
 		       new_state);
 
 	rc = _modem_start(client);

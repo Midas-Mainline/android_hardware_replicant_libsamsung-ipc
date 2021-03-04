@@ -137,13 +137,17 @@ static int ipc_imei_response_handle(struct ipc_client *client,
 {
 	int rc;
 
+	ipc_client_log(client, "ENTER HANDLER %s\n", __func__);
+
 	if (!client)
 		return 0;
 
 	switch (IPC_GROUP(resp->command)) {
 	case IPC_GROUP_MISC:
-		rc = ipc_imei_parse_imei_response(client, resp, data);
-		return rc;
+		if (resp->command == IPC_MISC_ME_SN) {
+			rc = ipc_imei_parse_imei_response(client, resp, data);
+			return rc;
+		}
 	default:
 		ipc_imei_log(client, "Unhandled %s command",
 			       ipc_group_string(IPC_GROUP(resp->command)));
