@@ -251,6 +251,7 @@ int generic_boot(struct ipc_client *client)
 		return -1;
 
 	ipc_client_log(client, "Starting generic modem boot");
+
 	system("lsusb");
 
 	modem_image_fd = open_android_modem_partition_by_name(client, "RADIO",
@@ -263,6 +264,9 @@ int generic_boot(struct ipc_client *client)
 			       __func__, path, rc, strerror(rc));
 		goto error;
 	}
+
+	ipc_client_log(client,
+		       "%s: Opened the %s partition", __func__, "RADIO");
 
 	modem_image_data = mmap(0, GENERIC_MODEM_IMAGE_SIZE, PROT_READ,
 				MAP_SHARED, modem_image_fd, 0);
@@ -282,6 +286,7 @@ int generic_boot(struct ipc_client *client)
 			       rc);
 		goto error;
 	}
+
 	rc = xmm626_kernel_linux_modem_hci_power(client, 0);
 	if (rc < 0) {
 		ipc_client_log(client,
@@ -289,6 +294,7 @@ int generic_boot(struct ipc_client *client)
 			       "Turning the modem off failed");
 		goto error;
 	}
+
 	ipc_client_log(client, "Turned the modem off");
 	system("lsusb");
 
@@ -443,6 +449,10 @@ int generic_boot(struct ipc_client *client)
 	goto complete;
 
 error:
+	ipc_client_log(client,
+		       "+-------------------------+\n"
+		       "| /!\\ generic_boot failed |\n"
+		       "+-------------------------+\n");
 	rc = -1;
 
 complete:
