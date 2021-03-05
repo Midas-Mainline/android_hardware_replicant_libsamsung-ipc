@@ -150,7 +150,8 @@ int xmm626_kernel_linux_modem_open(struct ipc_client *client, int type)
 	while (fd < 0 && i < 30) {
 		i++;
 		usleep(30000);
-		ipc_client_log(client, "%s: type: %d", __func__, type);
+		ipc_client_log(client, "%s: client type: %s", __func__,
+			       ipc_client_type_string(type));
 		switch (type) {
 		case IPC_CLIENT_TYPE_FMT:
 			err = 0;
@@ -182,7 +183,8 @@ int xmm626_kernel_linux_modem_open(struct ipc_client *client, int type)
 			}
 			break;
 		default:
-			ipc_client_log(client, "%s: unknown type\n", __func__);
+			ipc_client_log(client, "%s: unknown client type %s\n",
+				       __func__, ipc_client_type_string(type));
 			return -1;
 		}
 	}
@@ -560,12 +562,19 @@ int generic_poll(__attribute__((unused)) struct ipc_client *client,
 	ipc_client_log(client, "%s: transport_data->fd: %d", __func__, transport_data->fd);
 #endif
 	rc = poll(&fd, 1, -1);
+	if (rc == -1) {
+		rc = errno;
+		ipc_client_log(client,
+			       "%s: poll failed with error %d: %s", __func__,
+			       rc, strerror(rc));
+		return -1;
+	}
 
 #if GENERIC_DEBUG
 	ipc_client_log(client, "%s: poll: %d", __func__, rc);
 #endif
 
-	return rc - 1;
+	return 0;
 }
 
 
