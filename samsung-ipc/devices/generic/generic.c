@@ -19,6 +19,8 @@
  */
 #define _GNU_SOURCE         /* See feature_test_macros(7) */
 
+#define GENERIC_DEBUG 0
+
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
@@ -543,8 +545,9 @@ int generic_poll(__attribute__((unused)) struct ipc_client *client,
 	int rc;
 	struct pollfd fd;
 
+#if GENERIC_DEBUG
 	ipc_client_log(client, "ENTER %s", __func__);
-
+#endif
 	if (data == NULL)
 		return -1;
 
@@ -553,10 +556,14 @@ int generic_poll(__attribute__((unused)) struct ipc_client *client,
 	fd.fd = transport_data->fd;
 	fd.events = POLLRDNORM | POLLIN;
 
+#if GENERIC_DEBUG
 	ipc_client_log(client, "%s: transport_data->fd: %d", __func__, transport_data->fd);
+#endif
 	rc = poll(&fd, 1, -1);
 
+#if GENERIC_DEBUG
 	ipc_client_log(client, "%s: poll: %d", __func__, rc);
+#endif
 
 	return rc - 1;
 }
