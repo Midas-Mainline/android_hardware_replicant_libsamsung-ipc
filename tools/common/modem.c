@@ -36,6 +36,10 @@ static enum modem_state current_state = MODEM_STATE_LPM;
 
 static enum modem_callback_state callback_state = MODEM_CALLBACK_STATE_UTILS;
 
+/* TODO: Fixme: the log handler is from the app!!! */
+void modem_log_handler(void *user_data, const char *msg);
+int ipc_imei_request_imei(struct ipc_client *client);
+
 /* TODO: check authorship from git log in samsung-ipc/ipc.c */
 void common_modem_log(struct ipc_client *client, const char *message, ...)
 {
@@ -47,6 +51,7 @@ void common_modem_log(struct ipc_client *client, const char *message, ...)
 
         va_start(args, message);
         vsnprintf((char *) &buffer, sizeof(buffer), message, args);
+
 	/* TODO: Fixme: the log handler is from the app!!! */
 	modem_log_handler("mdm", buffer); /* No access to ipc_client) */
         va_end(args);
@@ -368,8 +373,8 @@ int modem_read_loop(struct ipc_client *client,
 		return 0;
 	}
 
+	/* TODO: this is comming from the app */
 	ipc_imei_request_imei(client);
-
 
 	memset(&resp, 0, sizeof(resp));
 
@@ -460,7 +465,7 @@ static int _modem_start(struct ipc_client *client)
 }
 
 int modem_start(struct ipc_client *client, enum modem_state new_state,
-		struct app_modem_response_handler *handler)
+		__attribute__((unused)) struct app_modem_response_handler *handler)
 {
 	int rc;
 
