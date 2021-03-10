@@ -17,6 +17,7 @@ lib_LTLIBRARIES = \
 libsamsung_ipc_la_SOURCES = \
 	ipc.c \
 	ipc.h \
+	ipc_strings.c \
 	ipc_utils.c \
 	utils.c \
 	call.c \

@@ -58,6 +58,7 @@ libsamsung_ipc_local_src_files := \
 	samsung-ipc/gen.c \
 	samsung-ipc/gprs.c \
 	samsung-ipc/ipc.c \
+	samsung-ipc/ipc_strings.c \
 	samsung-ipc/ipc_utils.c \
 	samsung-ipc/misc.c \
 	samsung-ipc/net.c \
