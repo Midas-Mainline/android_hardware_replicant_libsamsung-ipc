@@ -107,6 +107,57 @@ int xmm626_kernel_linux_modem_hci_power(struct ipc_client *client, int power)
 	return 0;
 }
 
+/* xmm626_kernel_poll without the ioctls */
+int generic_kernel_poll(
+	__attribute__((unused)) struct ipc_client *client,
+	int fd, struct ipc_poll_fds *fds, struct timeval *timeout)
+{
+	fd_set set;
+	int fd_max;
+	unsigned int i;
+	unsigned int count;
+	int rc;
+
+	if (fd < 0)
+		return -1;
+
+	FD_ZERO(&set);
+	FD_SET(fd, &set);
+
+	fd_max = fd;
+
+	if (fds != NULL && fds->fds != NULL && fds->count > 0) {
+		for (i = 0; i < fds->count; i++) {
+			if (fds->fds[i] >= 0) {
+				FD_SET(fds->fds[i], &set);
+
+				if (fds->fds[i] > fd_max)
+					fd_max = fds->fds[i];
+			}
+		}
+	}
+
+	rc = select(fd_max + 1, &set, NULL, NULL, timeout);
+
+	if (FD_ISSET(fd, &set))
+		return -1;
+
+	if (fds != NULL && fds->fds != NULL && fds->count > 0) {
+		count = fds->count;
+
+		for (i = 0; i < fds->count; i++) {
+			if (!FD_ISSET(fds->fds[i], &set)) {
+				fds->fds[i] = -1;
+				count--;
+			}
+		}
+
+		fds->count = count;
+	}
+
+	return rc;
+}
+
 int xmm626_kernel_linux_modem_link_control_enable(
 	__attribute__((unused)) int device_fd, __attribute__((unused)) int enable)
 {
@@ -158,7 +209,7 @@ int xmm626_kernel_linux_modem_link_get_hostwake_wait(
 	int i;
 
 //	ipc_client_log(client, "ENTER %s", __func__);
-	
+
 	i = 0;
 	for (i = 0; i < 10; i++) {
 		/* TODO: read host wake GPIOs */
@@ -671,9 +722,9 @@ int generic_poll(__attribute__((unused)) struct ipc_client *client,
 	return 0;
 }
 
-
-int generic_smdk_poll(__attribute__((unused)) struct ipc_client *client, void *data,
-		      struct ipc_poll_fds *fds, struct timeval *timeout)
+int generic_smdk_poll(__attribute__((unused)) struct ipc_client *client,
+		      void *data, struct ipc_poll_fds *fds,
+		      struct timeval *timeout)
 {
 	struct generic_transport_data *transport_data;
 	int rc;
@@ -685,8 +736,8 @@ int generic_smdk_poll(__attribute__((unused)) struct ipc_client *client, void *d
 
 	transport_data = (struct generic_transport_data *) data;
 
-	rc = xmm626_kernel_smdk4412_poll(client, transport_data->fd, fds,
-					 timeout);
+	rc = generic_kernel_poll(client, transport_data->fd, fds,
+				 timeout);
 
 	ipc_client_log(client, "%s DONE: poll: %d", __func__, rc);
 
@@ -802,7 +853,7 @@ struct ipc_client_handlers generic_handlers = {
 	.write = generic_write,
 	.open = generic_open,
 	.close = generic_close,
-	.poll = generic_poll,
+	.poll = generic_smdk_poll,
 	.transport_data = NULL,
 	.power_on = generic_power_on,
 	.power_off = generic_power_off,
