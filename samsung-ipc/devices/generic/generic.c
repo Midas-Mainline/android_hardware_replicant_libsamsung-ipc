@@ -108,7 +108,7 @@ int xmm626_kernel_linux_modem_hci_power(struct ipc_client *client, int power)
 }
 
 int xmm626_kernel_linux_modem_link_control_enable(
-	__attribute__((unused)) int device_fd, int enable)
+	__attribute__((unused)) int device_fd, __attribute__((unused)) int enable)
 {
 //	ipc_client_log(client, "ENTER %s: dummy function", __func__);
 
