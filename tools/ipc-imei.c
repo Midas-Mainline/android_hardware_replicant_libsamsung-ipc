@@ -200,7 +200,7 @@ int main(int argc, char** argv)
 
 	ipc_imei_log(client, "Starting modem");
 
-	rc = modem_start(client, MODEM_STATE_LPM, &handler);
+	rc = modem_start(client, MODEM_STATE_NORMAL, &handler);
 	if (rc < 0) {
 		ipc_imei_log(client, "modem_start failed: error %d\n", rc);
 		return 1;
@@ -213,7 +213,7 @@ int main(int argc, char** argv)
 	ipc_imei_log(client, "ipc_imei_request_imei done\n");
 
 	/* TODO: MODEM_STATE_LPM is not needed here */
-	rc = modem_read_loop(client, MODEM_STATE_LPM, &handler);
+	rc = modem_read_loop(client, MODEM_STATE_NORMAL, &handler);
 	if (rc < 0)
 		ipc_imei_log(client,
 			       "ipc-imei: modem_read_loop failed: error %d\n",
