@@ -45,16 +45,16 @@ int xmm626_kernel_linux_modem_power(__attribute__((unused)) int device_fd,
 {
 	int rc;
 
-	ipc_client_log(client, "ENTER %s", __func__);
+//	ipc_client_log(client, "ENTER %s", __func__);
 
 	rc = sysfs_value_write(XMM626_KERNEL_LINUX_POWER_PATH, !!power);
 	if (rc == -1) {
-		ipc_client_log(client, "%s: sysfs_value_write failed with error -1",
-			       __func__);
+//		ipc_client_log(client, "%s: sysfs_value_write failed with error -1",
+//			       __func__);
 		return rc;
 	}
 
-	ipc_client_log(client, "%s DONE", __func__);
+//	ipc_client_log(client, "%s DONE", __func__);
 
 	return 0;
 }
@@ -110,7 +110,7 @@ int xmm626_kernel_linux_modem_hci_power(struct ipc_client *client, int power)
 int xmm626_kernel_linux_modem_link_control_enable(
 	__attribute__((unused)) int device_fd, int enable)
 {
-	ipc_client_log(client, "ENTER %s: dummy function", __func__);
+//	ipc_client_log(client, "ENTER %s: dummy function", __func__);
 
 	return 0;
 }
@@ -120,16 +120,16 @@ int xmm626_kernel_linux_modem_link_control_active(
 {
 	int rc;
 
-	ipc_client_log(client, "ENTER %s", __func__);
+//	ipc_client_log(client, "ENTER %s", __func__);
 
 	rc = sysfs_value_write(XMM626_KERNEL_LINUX_LINK_ACTIVE_PATH, !!active);
 	if (rc < 0) {
-		ipc_client_log(client, "%s: sysfs_value_write failed with error -1",
-			       __func__);
+//		ipc_client_log(client, "%s: sysfs_value_write failed with error -1",
+//			       __func__);
 		return -1;
 	}
 
-	ipc_client_log(client, "%s DONE", __func__);
+//	ipc_client_log(client, "%s DONE", __func__);
 
 	return 0;
 }
@@ -139,7 +139,7 @@ int xmm626_kernel_linux_modem_link_connected_wait(
 {
 	int i;
 
-	ipc_client_log(client, "ENTER %s", __func__);
+//	ipc_client_log(client, "ENTER %s", __func__);
 
 	i = 0;
 	for (i = 0; i < 10; i++) {
@@ -147,7 +147,7 @@ int xmm626_kernel_linux_modem_link_connected_wait(
 		usleep(50000);
 	}
 
-	ipc_client_log(client, "EXIT %s", __func__);
+//	ipc_client_log(client, "EXIT %s", __func__);
 
 	return 0;
 }
@@ -157,7 +157,7 @@ int xmm626_kernel_linux_modem_link_get_hostwake_wait(
 {
 	int i;
 
-	ipc_client_log(client, "ENTER %s", __func__);
+//	ipc_client_log(client, "ENTER %s", __func__);
 	
 	i = 0;
 	for (i = 0; i < 10; i++) {
@@ -165,7 +165,7 @@ int xmm626_kernel_linux_modem_link_get_hostwake_wait(
 		usleep(500000);
 	}
 
-	ipc_client_log(client, "%s DONE", __func__);
+//	ipc_client_log(client, "%s DONE", __func__);
 
 	return 0;
 }
@@ -228,14 +228,14 @@ int xmm626_kernel_linux_modem_read(int fd, void *buffer, size_t length)
 {
 	int rc;
 
-	ipc_client_log(client, "ENTER %s", __func__);
+//	ipc_client_log(client, "ENTER %s", __func__);
 
 	if (fd < 0 || buffer == NULL || length <= 0)
 		return -1;
 
 	rc = read(fd, buffer, length);
 
-	ipc_client_log(client, "%s DONE", __func__);
+//	ipc_client_log(client, "%s DONE", __func__);
 
 	return rc;
 }
@@ -244,18 +244,18 @@ int xmm626_kernel_linux_modem_write(int fd, const void *buffer, size_t length)
 {
 	int rc;
 
-	ipc_client_log(client, "ENTER %s", __func__);
+//	ipc_client_log(client, "ENTER %s", __func__);
 
 	if (fd < 0 || buffer == NULL || length <= 0) {
-		ipc_client_log(client, "%s: error: fd < 0 || buffer == NULL || length <= 0",
-			       __func__);
+//		ipc_client_log(client, "%s: error: fd < 0 || buffer == NULL || length <= 0",
+//			       __func__);
 
 		return -1;
 	}
 
 	rc = write(fd, buffer, length);
 
-	ipc_client_log(client, "%s DONE", __func__);
+//	ipc_client_log(client, "%s DONE", __func__);
 
 	return rc;
 }
@@ -264,18 +264,18 @@ char *xmm626_kernel_linux_modem_gprs_get_iface(unsigned int cid)
 {
 	char *iface = NULL;
 
-	ipc_client_log(client, "ENTER %s", __func__);
+//	ipc_client_log(client, "ENTER %s", __func__);
 
 	if (cid > XMM626_SEC_MODEM_GPRS_IFACE_COUNT) {
-		ipc_client_log(client,
-			       "%s: error: cid > XMM626_SEC_MODEM_GPRS_IFACE_COUNT",
-			       __func__);
+//		ipc_client_log(client,
+//			       "%s: error: cid > XMM626_SEC_MODEM_GPRS_IFACE_COUNT",
+//			       __func__);
 		return NULL;
 	}
 
 	asprintf(&iface, "%s%d", XMM626_SEC_MODEM_GPRS_IFACE_PREFIX, cid - 1);
 
-	ipc_client_log(client, "%s DONE", __func__);
+//	ipc_client_log(client, "%s DONE", __func__);
 
 	return iface;
 }
