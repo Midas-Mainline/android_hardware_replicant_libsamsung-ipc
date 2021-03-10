@@ -401,7 +401,10 @@ int modem_read_loop(struct ipc_client *client,
 
 		rc = modem_response_handle(client, &resp, new_state, handler);
 
-		common_modem_log(client, "modem_response_handle: rc=%d", rc);
+		if (rc == -EAGAIN)
+			common_modem_log(client, "modem_response_handle: rc=-EAGAIN");
+		else
+			common_modem_log(client, "modem_response_handle: rc=%d", rc);
 
 		if (resp.data != NULL)
 			free(resp.data);
