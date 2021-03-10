@@ -387,3 +387,21 @@ const char *ipc_group_string(unsigned char group)
 		return group_string;
 	}
 }
+
+const char *ipc_client_type_string(unsigned char client_type)
+{
+	static char client_type_string[5] = { 0 };
+
+	switch (client_type) {
+	case IPC_CLIENT_TYPE_FMT:
+		return "IPC_CLIENT_TYPE_FMT";
+	case IPC_CLIENT_TYPE_RFS:
+		return "IPC_CLIENT_TYPE_RFS";
+	case IPC_CLIENT_TYPE_DUMMY:
+		return "IPC_CLIENT_TYPE_DUMMY";
+	default:
+		snprintf((char *) &client_type_string, sizeof(client_type_string), "0x%02x",
+			 (unsigned int)client_type_string);
+		return client_type_string;
+	}
+}
