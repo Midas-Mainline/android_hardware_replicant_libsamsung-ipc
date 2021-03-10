@@ -701,7 +701,8 @@ int generic_poll(__attribute__((unused)) struct ipc_client *client,
 	transport_data = (struct generic_transport_data *) data;
 
 	fd.fd = transport_data->fd;
-	fd.events = POLLRDNORM | POLLIN;
+	// fd.events = POLLRDNORM | POLLIN;
+	// fd.events = POLLIN;
 
 //#if GENERIC_DEBUG
 //	ipc_client_log(client, "%s: transport_data->fd: %d", __func__, transport_data->fd);
@@ -853,7 +854,7 @@ struct ipc_client_handlers generic_handlers = {
 	.write = generic_write,
 	.open = generic_open,
 	.close = generic_close,
-	.poll = generic_smdk_poll,
+	.poll = generic_poll,
 	.transport_data = NULL,
 	.power_on = generic_power_on,
 	.power_off = generic_power_off,
