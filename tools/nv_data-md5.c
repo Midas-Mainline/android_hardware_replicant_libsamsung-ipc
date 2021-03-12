@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sysexits.h>
 
 #include <sys/types.h>
 
@@ -100,4 +101,6 @@ int main(int argc, char *argv[])
 error:
 	if (client != NULL)
 		ipc_client_destroy(client);
+
+	return EX_SOFTWARE;
 }
