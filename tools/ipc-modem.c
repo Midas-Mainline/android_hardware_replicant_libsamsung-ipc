@@ -40,7 +40,6 @@
 #define MODEM_STATE_SIM_OK  4
 
 #define DEF_CALL_NUMBER "950"
-#define DEF_SIM_PIN     "1234"
 
 int state = MODEM_STATE_LPM;
 int seq;
