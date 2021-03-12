@@ -18,6 +18,7 @@
  * along with libsamsung-ipc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
 #include <fcntl.h>
 #include <getopt.h>
 #include <pthread.h>
@@ -511,17 +512,17 @@ int main(int argc, char *argv[])
 			} else if (strcmp(opt_l[opt_i].name, "debug") == 0) {
 				debug = 1;
 				printf("[I] Debug enabled\n");
-			} else if (strcmp(opt_l[opt_i].name, "pin") == 0) {
-				if (optarg) {
-					if (strlen(optarg) < 8) {
-						printf("[I] Got SIM PIN!\n");
-						memcpy(sim_pin, optarg, 8);
-					} else {
-						printf("[E] "
-						       "SIM PIN is too long!"
-						       "\n");
-						return 1;
-					}
+			} else if ((strcmp(opt_l[opt_i].name, "pin") == 0) &&
+				   (optarg)) {
+				if (strlen(optarg) < 8) {
+					assert(strlen(optarg) <
+					       sizeof(sim_pin));
+
+					printf("[I] Got SIM PIN!\n");
+					strcpy(sim_pin, optarg);
+				} else {
+					printf("[E] SIM PIN is too long!\n");
+					return 1;
 				}
 			}
 			break;
