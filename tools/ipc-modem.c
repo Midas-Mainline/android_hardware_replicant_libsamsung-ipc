@@ -40,14 +40,13 @@
 #define MODEM_STATE_NORMAL  2
 #define MODEM_STATE_SIM_OK  4
 
-#define DEF_CALL_NUMBER "950"
-
 int state = MODEM_STATE_LPM;
 int seq;
 int in_call;
 int out_call;
 int call_done;
 
+char call_number[14];
 char sim_pin[8];
 
 int seq_get(void)
@@ -93,6 +92,7 @@ void modem_snd_audio_path_ctrl(struct ipc_client *client)
 }
 
 
+
 void modem_exec_call_out(struct ipc_client *client, char *num)
 {
 	struct ipc_call_outgoing_data call_out;
@@ -104,6 +104,7 @@ void modem_exec_call_out(struct ipc_client *client, char *num)
 	call_out.type = IPC_CALL_TYPE_VOICE;
 	call_out.identity = IPC_CALL_IDENTITY_DEFAULT;
 	call_out.number_length = strlen(num);
+	/* TODO: Add support for prefixes */
 	/* 0x21 = +33 */
 	call_out.prefix = IPC_CALL_PREFIX_NONE; //0x21;//IPC_CALL_PREFIX_NONE;
 	memcpy(call_out.number, num, call_out.number_length);
@@ -339,14 +340,12 @@ void modem_response_net(__attribute__((unused)) struct ipc_client *client,
 		printf("[6] Registered with network! "
 		       "Got PLMN (Mobile Network Code): '%s'\n",
 		       mnc);
-		/*
-		 * if (call_done == 0)
-		 * {
-		 * printf("Requesting outgoing call to %s!\n", DEF_CALL_NUMBER);
-		 * modem_exec_call_out(client, DEF_CALL_NUMBER);
-		 * }
-		 * call_done = 1;
-		 */
+		if (call_done == 0) {
+			printf("Requesting outgoing call to %s!\n",
+			       call_number);
+			modem_exec_call_out(client, call_number);
+		}
+		call_done = 1;
 		break;
 	}
 }
@@ -477,6 +476,7 @@ void print_help(void)
 	printf("arguments:\n");
 	printf("\t--debug               enable debug messages\n");
 	printf("\t--pin=[PIN]           provide SIM card PIN\n");
+	printf("\t--call=[NUMBER]       call NUMBER\n");
 }
 
 int main(int argc, char *argv[])
@@ -491,6 +491,7 @@ int main(int argc, char *argv[])
 		{"help",    no_argument,        0,  0 },
 		{"debug",   no_argument,        0,  0 },
 		{"pin",     required_argument,  0,  0 },
+		{"call",    required_argument,  0,  0 },
 		{0,         0,                  0,  0 }
 	};
 
@@ -524,7 +525,23 @@ int main(int argc, char *argv[])
 					printf("[E] SIM PIN is too long!\n");
 					return 1;
 				}
+			} else if (strcmp(opt_l[opt_i].name, "call") == 0) {
+				if (optarg) {
+					if (strlen(optarg) < 14) {
+						assert(strlen(optarg) <
+						       sizeof(call_number));
+						printf("[I] "
+						       "Got call number!\n");
+						strcpy(call_number, optarg);
+					} else {
+						printf("[E] "
+						       "Call number is too long!"
+						       "\n");
+						return 1;
+					}
+				}
 			}
+
 			break;
 		}
 	}
