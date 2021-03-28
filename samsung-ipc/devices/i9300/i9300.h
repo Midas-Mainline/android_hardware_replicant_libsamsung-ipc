@@ -32,7 +32,7 @@
 #define I9300_NV_DATA_OFFSET				0xA00000
 #define I9300_NV_DATA_SIZE				0x200000
 
-#define I9300_MODEM_IMAGE_DEVICE			"/dev/block/mmcblk0p7"
+#define I9300_MODEM_IMAGE_DEVICE			"/dev/mmcblk0p7"
 
 struct i9300_transport_data {
 	int fd;
